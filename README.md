@@ -1,162 +1,164 @@
-# Webume - The Resume Killer
+# ⚡ Webume - The Future of Professional Profiles
 
-> **Evidence over claims. Proof over promises. Merit over keywords.**
+> **Your Employee-for-Hire Empire Starts Here**
 
-Webume is the death of the traditional resume. A living, multimedia proof-of-work portfolio that replaces one-page PDF lies with verifiable impact.
+Transform your resume into a living, breathing professional profile. Upload once, customize endlessly, own forever. This isn't just a resume — it's your **Webume**.
 
-## Live Preview
+## 🚀 Live Preview
 
-**Development URL**: https://3000-izyu2fpqppfan5ciwputt-2e1b9533.sandbox.novita.ai
+**URL**: https://3000-izyu2fpqppfan5ciwputt-2e1b9533.sandbox.novita.ai
 
-## The 7 Pillars
+## ✨ Key Features
 
-### 1. Hero Intro
-- Video introduction (60-second pitch)
-- Dynamic tagline with gradient text
-- Key metrics displayed prominently (+47% Revenue, -22% Costs, 200+ Team)
-- Direct CTA buttons (Book Call, Contact, LinkedIn)
+### 🎨 Futuristic Design
+- **Glassmorphism UI** with frosted glass effects
+- **Animated mesh backgrounds** with floating orbs
+- **Grid line overlays** for that sci-fi aesthetic
+- **Gradient accents** throughout the interface
+- **Dark void color scheme** with neon highlights
 
-### 2. Career Timeline
-- Full narrative entries (no length limits)
-- Interactive Chart.js graphs showing revenue growth vs costs
-- Metric badges with icons for each achievement
-- Embedded video walkthroughs for project evidence
-- Split layout: Content left, charts/media right
-- Timeline visual with connecting dots
+### 📄 Resume Upload & Analysis
+- Drag-and-drop file upload
+- Support for PDF, DOC, DOCX, TXT
+- AI-powered parsing simulation
+- Progress indicator during analysis
+- Auto-populates all profile sections
 
-### 3. Colleague Validations
-- Public endorsement display under each role
-- "Verified Colleague" badges
-- Avatar initials with gradient backgrounds
-- "Add Yours" button to submit new validations
-- Quote-style formatting with author details
+### 🏗️ Profile Builder
 
-### 4. Truth Vault
-- Company culture ratings (1-10 scale)
-- Color-coded toxicity bars (green/yellow/red)
-- Trend indicators (improving/stable/declining)
-- Report counts for credibility
-- Category tags (enterprise, tech, startup)
-- **Leaderboard with tabs:**
-  - "Best Places" - Top-rated companies
-  - "Wall of Shame" - Toxic employers exposed
+#### Basic Info
+- Name, title, tagline
+- Contact information
+- Social links
 
-### 5. Hunter Agent (AI Chatbot)
-- Fixed position chat bubble with notification pulse
-- Proactive greeting when opened
-- Smart response system covering:
-  - Case studies and proof
-  - Salary/compensation discussions
-  - Availability and start dates
-  - Location/remote flexibility
-  - Culture questions (pulls Truth Vault data)
-  - Skills and strengths
-  - Experience deep-dives
-  - Booking calls (Calendly integration)
-  - Resume/PDF export
-- Quick action buttons for common queries
-- Typing indicator for realism
-- Bold text formatting in responses
+#### Experience (Chronological)
+- Company, role, dates
+- Full job description
+- Task breakdown
+- **"Day in the Life"** timeline
+- Key metrics with custom values
 
-### 6. Owner Dashboard (Modal)
-- **Pending Validations tab**: Approve/reject queue
-- **Edit Profile tab**: Update name, tagline, video URL, Calendly link
-- **Stats tab**: Quick metrics (validations, entries, companies rated)
-- Full localStorage persistence
+#### Achievements
+- Icon selection
+- Title and description
+- Visual showcase grid
 
-### 7. Share & Export
-- PDF export via browser print
-- Single link sharing (webume.app/yourname concept)
-- Meta tags for social sharing
+#### Awards
+- Organization, year
+- Recognition type
 
-## Tech Stack
+#### Reviews
+- Colleague testimonials
+- Rating system
+- Author attribution
+
+#### Pay History
+- Compensation tracking
+- Structure breakdown
+
+#### Projects
+- Portfolio items
+- Links and media
+
+#### Media
+- Photo gallery grid
+- Video uploads
+- Visual evidence
+
+### 🎭 Template System
+- **Executive** - Clean, professional, leadership-focused
+- **Creative** - Bold colors, unique layouts
+- **Tech Pioneer** - Modern, data-driven, metrics-heavy
+- **Minimal** - Simple, elegant, content-first
+
+### 📱 Mobile-First Design
+- Fully responsive layout
+- Touch-friendly interactions
+- Collapsible navigation
+- Optimized for all screen sizes
+
+### 🤖 AI Hunter Agent
+- Floating chat widget
+- Context-aware responses
+- Sells your profile to recruiters
+- Handles common questions
+
+### 👁️ Profile Preview
+- Full profile rendering
+- Export to PDF
+- Share link generation
+
+## 🎯 User Flow
+
+1. **Landing Page** → Upload resume or start from scratch
+2. **Analysis** → AI parses and structures your data
+3. **Builder** → Customize every section
+4. **Template** → Choose your visual style
+5. **Preview** → See the final result
+6. **Share** → Export or share your Webume
+
+## 🛠️ Tech Stack
 
 - **Framework**: Hono (Cloudflare Workers)
 - **Frontend**: React 18 (CDN + Babel)
 - **Charts**: Chart.js 4
+- **PDF Parsing**: PDF.js
 - **Icons**: Font Awesome 6
-- **Fonts**: Inter + Space Grotesk
-- **Styling**: Custom CSS with CSS variables
-- **Persistence**: localStorage
+- **Fonts**: Inter, Space Grotesk, JetBrains Mono
 - **Build**: Vite
-- **Deployment**: Cloudflare Pages
+- **Deploy**: Cloudflare Pages
 
-## Features
+## 📁 Project Structure
 
-| Feature | Status |
-|---------|--------|
-| Video hero intro | ✅ |
-| Full career narratives | ✅ |
-| Interactive charts | ✅ |
-| Metric badges | ✅ |
-| Colleague validations | ✅ |
-| Validation submission form | ✅ |
-| Validation moderation | ✅ |
-| Truth Vault ratings | ✅ |
-| Company leaderboard | ✅ |
-| AI Hunter Agent | ✅ |
-| Smart responses | ✅ |
-| Owner dashboard | ✅ |
-| Profile editing | ✅ |
-| Dark/Light mode | ✅ |
-| PDF export | ✅ |
-| localStorage persistence | ✅ |
-| Responsive design | ✅ |
+```
+webapp/
+├── src/
+│   └── index.tsx          # Complete application (92KB)
+├── ecosystem.config.cjs   # PM2 configuration
+├── wrangler.jsonc        # Cloudflare config
+├── package.json          # Dependencies
+└── README.md             # Documentation
+```
 
-## Getting Started
+## 🚀 Quick Start
 
 ```bash
-# Install dependencies
+# Install
 npm install
 
 # Build
 npm run build
 
-# Start development server
+# Run locally
 pm2 start ecosystem.config.cjs
 
-# Or directly
-npm run dev:sandbox
-```
-
-## The Vision
-
-> "30 years of broken hiring ends here. Build once, update forever, get hired on merit."
-
-Traditional resumes are:
-- Limited to bullet points
-- Unverifiable claims
-- One-page lies
-- Keyword-optimized garbage
-
-Webume provides:
-- Unlimited narrative space
-- Multimedia evidence
-- Colleague-verified claims
-- Company transparency
-- AI that sells for you
-
-**Power flips to the seeker. Evidence wins.**
-
-## Project Structure
-
-```
-webapp/
-├── src/
-│   └── index.tsx          # Complete Webume application
-├── dist/                  # Build output
-├── ecosystem.config.cjs   # PM2 configuration
-├── wrangler.jsonc        # Cloudflare config
-└── package.json
-```
-
-## Deployment
-
-```bash
-# Deploy to Cloudflare Pages
+# Deploy
 npm run deploy:prod
 ```
 
+## 🎨 Design System
+
+### Colors
+- **Void**: `#030308` - Deepest background
+- **Deep**: `#0a0a12` - Primary background
+- **Surface**: `#12121c` - Card backgrounds
+- **Primary**: `#6366f1` - Indigo accent
+- **Secondary**: `#8b5cf6` - Purple accent
+- **Cyan**: `#06b6d4` - Highlight color
+
+### Effects
+- Glassmorphism with `backdrop-filter: blur()`
+- Gradient mesh backgrounds
+- Floating animated orbs
+- Grid line overlays
+- Glow shadows
+
+## 📊 Stats (Simulated)
+
+- 50K+ Profiles Created
+- 94% Interview Rate
+- 2.5x Faster Hiring
+
 ---
 
-**© 2025 Webume - The Resume Killer**
+**© 2025 Webume - Built for the future of work.**
