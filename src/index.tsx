@@ -208,7 +208,11 @@ app.get('/', (c) => {
         }, 800 + Math.random() * 600);
       };
 
-      const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      const scrollToBottom = () => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+      };
 
       useEffect(scrollToBottom, [messages]);
 
@@ -468,7 +472,8 @@ app.get('/', (c) => {
       );
     };
 
-    ReactDOM.render(<App />, document.getElementById('root'));
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
   </script>
 </body>
 </html>`)
