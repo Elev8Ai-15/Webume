@@ -10,6 +10,7 @@ app.get('/', (c) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Webume - Brad Powell | The Resume Killer</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
   <meta name="description" content="30+ years of verified impact. Real results, not paragraphs. Evidence wins.">
   <meta property="og:title" content="Brad Powell - Webume">
   <meta property="og:description" content="Senior Operations Leader | 47% Revenue Growth | Verified by Colleagues">
@@ -22,10 +23,6 @@ app.get('/', (c) => {
   
   <!-- Chart.js for interactive charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  
-  <!-- html2canvas for PDF export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1003,7 +1000,7 @@ app.get('/', (c) => {
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, useRef, useCallback } = React;
+    const { useState, useEffect, useRef } = React;
 
     // ============================================
     // DATA STORE - All profile data
@@ -1144,7 +1141,7 @@ Most importantly, this is where I learned to mentor. The junior staff I trained 
             const parsed = JSON.parse(saved);
             setData(prev => ({ ...prev, ...parsed }));
           } catch (e) {
-            console.log('Using default data');
+            // Silent fallback to default data
           }
         }
       }, []);
