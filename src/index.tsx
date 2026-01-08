@@ -2,68 +2,73 @@ import { Hono } from 'hono'
 
 const app = new Hono()
 
-// Main Webume Application
+// Main Webume Application - The Future of Professional Profiles
 app.get('/', (c) => {
   return c.html(`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Webume - Brad Powell | The Resume Killer</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
-  <meta name="description" content="30+ years of verified impact. Real results, not paragraphs. Evidence wins.">
-  <meta property="og:title" content="Brad Powell - Webume">
-  <meta property="og:description" content="Senior Operations Leader | 47% Revenue Growth | Verified by Colleagues">
-  <meta property="og:type" content="profile">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Webume | The Future of Professional Profiles</title>
+  <meta name="description" content="Transform your resume into a living, breathing professional empire. Upload once, own forever.">
+  <meta property="og:title" content="Webume - Your Employee-for-Hire Empire">
+  <meta property="og:description" content="Not just a resume. A revolution in professional profiles.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
   
   <!-- React 18 -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
-  <!-- Chart.js for interactive charts -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <!-- PDF.js for resume parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
     :root {
-      --bg-primary: #0a0a0f;
-      --bg-secondary: #12121a;
-      --bg-card: #1a1a24;
-      --bg-elevated: #22222e;
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #6b6b7b;
-      --accent-blue: #3b82f6;
-      --accent-purple: #8b5cf6;
-      --accent-green: #10b981;
-      --accent-red: #ef4444;
-      --accent-yellow: #f59e0b;
-      --accent-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      --border-color: #2a2a3a;
-      --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      --bg-void: #030308;
+      --bg-deep: #0a0a12;
+      --bg-surface: #12121c;
+      --bg-elevated: #1a1a28;
+      --bg-glass: rgba(255, 255, 255, 0.03);
+      --bg-glass-heavy: rgba(255, 255, 255, 0.06);
+      --text-white: #ffffff;
+      --text-primary: #e8e8f0;
+      --text-secondary: #9898a8;
+      --text-muted: #5a5a6e;
+      --accent-primary: #6366f1;
+      --accent-secondary: #8b5cf6;
+      --accent-tertiary: #a855f7;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+      --gradient-glow: linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(139, 92, 246, 0.4) 100%);
+      --gradient-mesh: radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                       radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+                       radial-gradient(at 0% 50%, rgba(6, 182, 212, 0.1) 0px, transparent 50%),
+                       radial-gradient(at 80% 50%, rgba(168, 85, 247, 0.1) 0px, transparent 50%),
+                       radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(99, 102, 241, 0.3);
+      --shadow-glow: 0 0 60px rgba(99, 102, 241, 0.15);
+      --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
       --radius-xl: 24px;
-    }
-    
-    .light-mode {
-      --bg-primary: #f8fafc;
-      --bg-secondary: #ffffff;
-      --bg-card: #ffffff;
-      --bg-elevated: #f1f5f9;
-      --text-primary: #0f172a;
-      --text-secondary: #475569;
-      --text-muted: #94a3b8;
-      --border-color: #e2e8f0;
+      --radius-2xl: 32px;
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -72,97 +77,91 @@ app.get('/', (c) => {
     
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-primary);
+      background: var(--bg-void);
       color: var(--text-primary);
       line-height: 1.6;
       overflow-x: hidden;
+      min-height: 100vh;
     }
     
     /* Scrollbar */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg-secondary); }
-    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--accent-primary); border-radius: 3px; }
+    
+    /* Selection */
+    ::selection { background: var(--accent-primary); color: white; }
     
     /* Typography */
-    h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+    h1, h2, h3, h4, h5, h6 { 
+      font-family: 'Space Grotesk', sans-serif; 
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    
+    /* Glassmorphism Base */
+    .glass {
+      background: var(--bg-glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+    }
+    
+    .glass-heavy {
+      background: var(--bg-glass-heavy);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      border: 1px solid var(--border-glass);
+    }
+    
+    /* Animated Background */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      background: var(--gradient-mesh);
+      z-index: -1;
+      animation: meshMove 30s ease-in-out infinite;
+    }
+    
+    @keyframes meshMove {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.1) rotate(3deg); }
+    }
+    
+    /* Grid Lines Background */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: -1;
+    }
+    
+    /* Floating Orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.5;
+      animation: orbFloat 20s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .orb-1 { width: 600px; height: 600px; background: var(--accent-primary); top: -200px; left: -200px; }
+    .orb-2 { width: 400px; height: 400px; background: var(--accent-secondary); bottom: -100px; right: -100px; animation-delay: -10s; }
+    .orb-3 { width: 300px; height: 300px; background: var(--accent-cyan); top: 50%; left: 50%; animation-delay: -5s; }
+    
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -30px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+    }
     
     /* Container */
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-    
-    /* Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      border-radius: var(--radius-md);
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: none;
-      text-decoration: none;
-    }
-    
-    .btn-primary {
-      background: var(--accent-gradient);
-      color: white;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
-    
-    .btn-secondary {
-      background: var(--bg-elevated);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-    }
-    .btn-secondary:hover { background: var(--border-color); }
-    
-    .btn-ghost {
-      background: transparent;
-      color: var(--text-secondary);
-    }
-    .btn-ghost:hover { color: var(--text-primary); background: var(--bg-elevated); }
-    
-    /* Cards */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      transition: all 0.3s ease;
-    }
-    .card:hover { border-color: var(--accent-blue); box-shadow: var(--shadow-lg); }
-    
-    /* Badges */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      border-radius: 50px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-    .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
-    .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--accent-yellow); }
-    .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
-    .badge-info { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
-    
-    /* Metric Cards */
-    .metric-card {
-      background: var(--accent-gradient);
-      color: white;
-      padding: 16px 24px;
-      border-radius: var(--radius-md);
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      font-size: 1rem;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-    }
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
     
     /* Navigation */
     .nav {
@@ -170,43 +169,120 @@ app.get('/', (c) => {
       top: 0;
       left: 0;
       right: 0;
-      z-index: 100;
-      background: rgba(10, 10, 15, 0.8);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border-color);
+      z-index: 1000;
       padding: 16px 0;
     }
-    .light-mode .nav { background: rgba(248, 250, 252, 0.8); }
     
     .nav-inner {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 12px 24px;
+      border-radius: var(--radius-xl);
     }
     
     .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
       font-family: 'Space Grotesk', sans-serif;
       font-size: 1.5rem;
       font-weight: 700;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--text-white);
+    }
+    
+    .nav-logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
     }
     
     .nav-links { display: flex; gap: 8px; align-items: center; }
     
     .nav-link {
-      padding: 8px 16px;
-      border-radius: var(--radius-sm);
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
       color: var(--text-secondary);
       text-decoration: none;
       font-weight: 500;
       font-size: 0.9rem;
-      transition: all 0.2s;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
     }
-    .nav-link:hover { color: var(--text-primary); background: var(--bg-elevated); }
-    .nav-link.active { color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); }
+    
+    .nav-link:hover { 
+      color: var(--text-white); 
+      background: var(--bg-glass);
+      border-color: var(--border-glass);
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: var(--radius-lg);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    }
+    
+    .btn-primary:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5);
+    }
+    
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-glass-heavy);
+      color: var(--text-white);
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(20px);
+    }
+    
+    .btn-secondary:hover { 
+      background: var(--bg-elevated);
+      border-color: var(--accent-primary);
+    }
+    
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-glass);
+    }
+    
+    .btn-ghost:hover { 
+      color: var(--text-white);
+      border-color: var(--accent-primary);
+      background: var(--bg-glass);
+    }
+    
+    .btn-lg { padding: 18px 36px; font-size: 1.1rem; }
+    .btn-sm { padding: 10px 20px; font-size: 0.85rem; }
     
     /* Hero Section */
     .hero {
@@ -215,94 +291,181 @@ app.get('/', (c) => {
       align-items: center;
       padding: 120px 0 80px;
       position: relative;
-      overflow: hidden;
-    }
-    
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle at 30% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-                  radial-gradient(circle at 70% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
-      animation: pulse 15s ease-in-out infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.1) rotate(5deg); }
     }
     
     .hero-content {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 64px;
-      align-items: center;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
     }
     
-    .hero-text h1 {
-      font-size: 4rem;
-      line-height: 1.1;
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+      font-weight: 500;
+      margin-bottom: 32px;
+      backdrop-filter: blur(20px);
+    }
+    
+    .hero-badge i { font-size: 0.75rem; }
+    
+    .hero-title {
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      line-height: 1.05;
       margin-bottom: 24px;
-      background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+      background: linear-gradient(135deg, var(--text-white) 0%, var(--text-secondary) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
     
-    .hero-tagline {
-      font-size: 1.5rem;
-      color: var(--text-secondary);
-      margin-bottom: 16px;
-      font-weight: 500;
+    .hero-title .highlight {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
     .hero-subtitle {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      margin-bottom: 32px;
-      max-width: 500px;
+      font-size: 1.35rem;
+      color: var(--text-secondary);
+      margin-bottom: 48px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
     }
     
-    .hero-metrics {
+    .hero-cta {
       display: flex;
+      gap: 16px;
+      justify-content: center;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 40px;
+      margin-bottom: 64px;
     }
     
-    .hero-video {
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+    
+    .hero-stat {
+      text-align: center;
+    }
+    
+    .hero-stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .hero-stat-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    
+    /* Upload Section */
+    .upload-section {
+      padding: 100px 0;
       position: relative;
-      border-radius: var(--radius-xl);
+    }
+    
+    .upload-card {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px;
+      border-radius: var(--radius-2xl);
+      text-align: center;
+      position: relative;
       overflow: hidden;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--border-color);
     }
     
-    .hero-video iframe {
-      width: 100%;
-      aspect-ratio: 16/9;
-      display: block;
-    }
-    
-    .video-overlay {
+    .upload-card::before {
+      content: '';
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 24px;
-      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      inset: 0;
+      background: var(--gradient-glow);
+      opacity: 0.1;
+      z-index: -1;
+    }
+    
+    .upload-zone {
+      border: 2px dashed var(--border-glass);
+      border-radius: var(--radius-xl);
+      padding: 64px 48px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .upload-zone:hover {
+      border-color: var(--accent-primary);
+      background: var(--bg-glass);
+    }
+    
+    .upload-zone.dragging {
+      border-color: var(--accent-primary);
+      background: rgba(99, 102, 241, 0.1);
+      transform: scale(1.02);
+    }
+    
+    .upload-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 2rem;
       color: white;
     }
     
-    /* Section Styles */
-    .section {
+    .upload-title {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+      color: var(--text-white);
+    }
+    
+    .upload-desc {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+    
+    .upload-formats {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .format-badge {
+      padding: 6px 14px;
+      background: var(--bg-elevated);
+      border-radius: 50px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    /* Features Grid */
+    .features-section {
       padding: 100px 0;
-      position: relative;
     }
     
     .section-header {
@@ -314,348 +477,521 @@ app.get('/', (c) => {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 16px;
-      background: var(--bg-elevated);
+      padding: 8px 20px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
       border-radius: 50px;
       font-size: 0.85rem;
-      color: var(--accent-blue);
+      color: var(--accent-primary);
       font-weight: 600;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(20px);
     }
     
     .section-title {
-      font-size: 3rem;
+      font-size: clamp(2rem, 5vw, 3rem);
       margin-bottom: 16px;
     }
     
     .section-desc {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       color: var(--text-secondary);
       max-width: 600px;
       margin: 0 auto;
     }
     
-    /* Timeline */
-    .timeline { position: relative; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
     
-    .timeline::before {
+    .feature-card {
+      padding: 32px;
+      border-radius: var(--radius-xl);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .feature-card::before {
       content: '';
       position: absolute;
-      left: 50%;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: var(--border-color);
-      transform: translateX(-50%);
+      inset: 0;
+      background: var(--gradient-primary);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: -1;
     }
     
-    .timeline-item {
+    .feature-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent-primary);
+    }
+    
+    .feature-card:hover::before { opacity: 0.05; }
+    
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover .feature-icon {
+      background: var(--gradient-primary);
+      color: white;
+    }
+    
+    .feature-title {
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+      color: var(--text-white);
+    }
+    
+    .feature-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    
+    /* Profile Builder */
+    .builder-section {
+      padding: 100px 0;
+      background: var(--bg-deep);
       position: relative;
-      margin-bottom: 64px;
+    }
+    
+    .builder-container {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 64px;
-      align-items: start;
+      grid-template-columns: 300px 1fr;
+      gap: 32px;
+      min-height: 80vh;
     }
     
-    .timeline-item:nth-child(even) .timeline-content { order: 2; }
-    .timeline-item:nth-child(even) .timeline-media { order: 1; }
-    
-    .timeline-dot {
-      position: absolute;
-      left: 50%;
-      top: 32px;
-      width: 20px;
-      height: 20px;
-      background: var(--accent-gradient);
-      border-radius: 50%;
-      transform: translateX(-50%);
-      box-shadow: 0 0 0 4px var(--bg-primary), 0 0 20px rgba(59, 130, 246, 0.5);
-      z-index: 2;
+    /* Sidebar */
+    .builder-sidebar {
+      padding: 24px;
+      border-radius: var(--radius-xl);
+      height: fit-content;
+      position: sticky;
+      top: 100px;
     }
     
-    .timeline-content .card { height: 100%; }
+    .sidebar-section {
+      margin-bottom: 32px;
+    }
     
-    .timeline-header {
+    .sidebar-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+    
+    .sidebar-link:hover { 
+      background: var(--bg-glass);
+      color: var(--text-white);
+    }
+    
+    .sidebar-link.active {
+      background: var(--gradient-primary);
+      color: white;
+    }
+    
+    .sidebar-link i { width: 20px; text-align: center; }
+    
+    /* Builder Main */
+    .builder-main {
+      padding: 32px;
+      border-radius: var(--radius-xl);
+      min-height: 600px;
+    }
+    
+    .builder-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    .builder-title {
+      font-size: 1.75rem;
+    }
+    
+    .builder-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 24px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 14px 18px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      color: var(--text-white);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+    
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .form-textarea { min-height: 120px; resize: vertical; }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    
+    /* Experience Cards */
+    .experience-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .experience-card:hover {
+      border-color: var(--accent-primary);
+    }
+    
+    .experience-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 16px;
-      flex-wrap: wrap;
-      gap: 12px;
     }
     
-    .timeline-role {
-      font-size: 1.5rem;
+    .experience-company {
+      font-size: 1.25rem;
+      color: var(--text-white);
       margin-bottom: 4px;
     }
     
-    .timeline-company {
-      color: var(--accent-blue);
-      font-size: 1.1rem;
+    .experience-role {
+      color: var(--accent-primary);
       font-weight: 600;
     }
     
-    .timeline-dates {
+    .experience-dates {
       color: var(--text-muted);
       font-size: 0.9rem;
     }
     
-    .timeline-narrative {
-      color: var(--text-secondary);
-      margin-bottom: 24px;
-      line-height: 1.8;
-    }
-    
-    .timeline-metrics {
+    .experience-actions {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-    
-    .timeline-media {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    
-    .media-item {
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-    }
-    
-    .media-item iframe, .media-item img {
-      width: 100%;
-      display: block;
-    }
-    
-    .chart-container {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-    }
-    
-    /* Validations */
-    .validations { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
-    
-    .validations-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    
-    .validations-title {
-      font-size: 1rem;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
       gap: 8px;
     }
     
-    .validation-card {
-      background: var(--bg-elevated);
-      border-radius: var(--radius-md);
-      padding: 20px;
-      margin-bottom: 12px;
-      display: flex;
-      gap: 16px;
-    }
-    
-    .validation-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: var(--accent-gradient);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-    
-    .validation-content { flex: 1; }
-    
-    .validation-quote {
-      font-style: italic;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-      line-height: 1.7;
-    }
-    
-    .validation-author {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    
-    .validation-name { font-weight: 600; }
-    .validation-role { color: var(--text-muted); font-size: 0.9rem; }
-    
-    /* Truth Vault */
-    .truth-vault-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 24px;
-    }
-    
-    .company-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      transition: all 0.3s ease;
-    }
-    
-    .company-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-    
-    .company-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 16px;
-    }
-    
-    .company-name { font-size: 1.25rem; margin-bottom: 4px; }
-    
-    .company-score {
-      font-size: 2rem;
-      font-weight: 800;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-    
-    .score-label { font-size: 0.8rem; color: var(--text-muted); }
-    
-    .toxicity-bar {
-      height: 8px;
-      background: var(--bg-elevated);
-      border-radius: 4px;
-      overflow: hidden;
-      margin: 16px 0;
-    }
-    
-    .toxicity-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 0.5s ease;
-    }
-    
-    .company-comment {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      margin-bottom: 16px;
-    }
-    
-    .company-meta {
-      display: flex;
-      justify-content: space-between;
+    .exp-action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-glass);
+      background: transparent;
       color: var(--text-muted);
-      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
     
-    /* Leaderboard */
-    .leaderboard {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
+    .exp-action-btn:hover {
+      color: var(--text-white);
+      border-color: var(--accent-primary);
+      background: var(--bg-glass);
+    }
+    
+    /* Day in the Life */
+    .day-life-section {
+      background: var(--bg-surface);
       border-radius: var(--radius-lg);
-      overflow: hidden;
-      margin-top: 48px;
-    }
-    
-    .leaderboard-header {
       padding: 24px;
-      background: var(--bg-elevated);
-      border-bottom: 1px solid var(--border-color);
-    }
-    
-    .leaderboard-title {
-      font-size: 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .leaderboard-tabs {
-      display: flex;
-      gap: 8px;
       margin-top: 16px;
     }
     
-    .leaderboard-tab {
-      padding: 8px 16px;
-      border-radius: var(--radius-sm);
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-    
-    .leaderboard-tab.active {
-      background: var(--accent-blue);
-      border-color: var(--accent-blue);
-      color: white;
-    }
-    
-    .leaderboard-list { padding: 16px; }
-    
-    .leaderboard-item {
+    .day-life-title {
+      font-size: 1rem;
+      color: var(--accent-cyan);
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
-      padding: 16px;
-      border-radius: var(--radius-md);
-      transition: background 0.2s;
+      gap: 8px;
     }
     
-    .leaderboard-item:hover { background: var(--bg-elevated); }
+    .timeline-mini {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
     
-    .leaderboard-rank {
-      width: 40px;
-      height: 40px;
+    .timeline-item-mini {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    
+    .timeline-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--accent-primary);
+      min-width: 60px;
+    }
+    
+    .timeline-content-mini {
+      flex: 1;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    /* Media Upload Grid */
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    
+    .media-item {
+      aspect-ratio: 1;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .media-item:hover {
+      border-color: var(--accent-primary);
+    }
+    
+    .media-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .media-add {
+      flex-direction: column;
+      gap: 8px;
+      color: var(--text-muted);
+      border-style: dashed;
+    }
+    
+    .media-add:hover {
+      color: var(--accent-primary);
+      background: var(--bg-glass);
+    }
+    
+    /* Metrics Section */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    
+    .metric-input-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+    
+    .metric-input-card input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      font-family: 'Space Grotesk', sans-serif;
+      text-align: center;
+      outline: none;
+    }
+    
+    .metric-input-card input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    .metric-label-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-align: center;
+      outline: none;
+      margin-top: 8px;
+    }
+    
+    /* Profile Preview */
+    .profile-preview {
+      padding: 100px 0;
+    }
+    
+    .preview-frame {
+      background: var(--bg-deep);
+      border-radius: var(--radius-2xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+    
+    .preview-header {
+      padding: 32px;
+      background: var(--gradient-primary);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .preview-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .preview-avatar {
+      width: 120px;
+      height: 120px;
+      background: var(--bg-glass-heavy);
+      border: 4px solid rgba(255,255,255,0.2);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
-      margin-right: 16px;
+      font-size: 3rem;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
     }
     
-    .rank-1 { background: linear-gradient(135deg, #ffd700, #ffb700); color: #000; }
-    .rank-2 { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: #000; }
-    .rank-3 { background: linear-gradient(135deg, #cd7f32, #a0522d); color: #fff; }
-    .rank-default { background: var(--bg-elevated); color: var(--text-secondary); }
-    
-    .leaderboard-info { flex: 1; }
-    .leaderboard-company { font-weight: 600; }
-    .leaderboard-reports { font-size: 0.85rem; color: var(--text-muted); }
-    
-    .leaderboard-score {
-      font-size: 1.5rem;
-      font-weight: 700;
-      font-family: 'Space Grotesk', sans-serif;
+    .preview-name {
+      font-size: 2.5rem;
+      color: white;
+      margin-bottom: 8px;
     }
     
-    /* Hunter Agent Chat */
+    .preview-tagline {
+      color: rgba(255,255,255,0.8);
+      font-size: 1.2rem;
+    }
+    
+    .preview-body {
+      padding: 32px;
+    }
+    
+    /* Achievements Section */
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+    
+    .achievement-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    
+    .achievement-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+      flex-shrink: 0;
+    }
+    
+    .achievement-title {
+      font-weight: 600;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+    
+    .achievement-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    
+    /* Chat Widget */
     .chat-trigger {
       position: fixed;
       bottom: 24px;
       right: 24px;
       width: 64px;
       height: 64px;
-      background: var(--accent-gradient);
+      background: var(--gradient-primary);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
+      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
       z-index: 1000;
       transition: all 0.3s ease;
       border: none;
@@ -664,38 +1000,20 @@ app.get('/', (c) => {
     }
     
     .chat-trigger:hover { transform: scale(1.1); }
-    .chat-trigger.active { border-radius: var(--radius-lg); }
-    
-    .chat-notification {
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      width: 16px;
-      height: 16px;
-      background: var(--accent-red);
-      border-radius: 50%;
-      animation: pulse-dot 2s infinite;
-    }
-    
-    @keyframes pulse-dot {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.8; }
-    }
     
     .chat-window {
       position: fixed;
       bottom: 100px;
       right: 24px;
-      width: 420px;
-      height: 600px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
+      width: 400px;
+      height: 550px;
       border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow-card);
       display: flex;
       flex-direction: column;
       z-index: 1000;
       animation: slideUp 0.3s ease;
+      overflow: hidden;
     }
     
     @keyframes slideUp {
@@ -704,296 +1022,276 @@ app.get('/', (c) => {
     }
     
     .chat-header {
-      padding: 20px 24px;
-      background: var(--accent-gradient);
-      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    
-    .chat-avatar {
-      width: 48px;
-      height: 48px;
-      background: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-    }
-    
-    .chat-title { color: white; font-size: 1.1rem; font-weight: 600; }
-    .chat-status { color: rgba(255,255,255,0.8); font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
-    .chat-status::before { content: ''; width: 8px; height: 8px; background: #10b981; border-radius: 50%; }
-    
-    .chat-close {
-      margin-left: auto;
-      background: rgba(255,255,255,0.2);
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      color: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .chat-messages {
-      flex: 1;
       padding: 20px;
-      overflow-y: auto;
+      background: var(--gradient-primary);
       display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    
-    .chat-message {
-      max-width: 85%;
-      padding: 14px 18px;
-      border-radius: var(--radius-lg);
-      line-height: 1.5;
-    }
-    
-    .chat-message.bot {
-      background: var(--bg-elevated);
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
-    }
-    
-    .chat-message.user {
-      background: var(--accent-gradient);
-      color: white;
-      align-self: flex-end;
-      border-bottom-right-radius: 4px;
-    }
-    
-    .chat-message .highlight {
-      background: rgba(59, 130, 246, 0.2);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 600;
-    }
-    
-    .chat-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    
-    .chat-action-btn {
-      padding: 8px 14px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 50px;
-      font-size: 0.85rem;
-      color: var(--text-primary);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .chat-action-btn:hover { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
-    
-    .chat-input-area {
-      padding: 16px 20px;
-      border-top: 1px solid var(--border-color);
-      display: flex;
+      align-items: center;
       gap: 12px;
     }
     
-    .chat-input {
-      flex: 1;
-      padding: 14px 18px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-color);
-      border-radius: 50px;
-      color: var(--text-primary);
-      font-size: 0.95rem;
-      outline: none;
-    }
-    
-    .chat-input:focus { border-color: var(--accent-blue); }
-    
-    .chat-send {
-      width: 48px;
-      height: 48px;
-      background: var(--accent-gradient);
-      border: none;
+    .chat-avatar {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.2);
       border-radius: 50%;
-      color: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s;
-    }
-    
-    .chat-send:hover { transform: scale(1.05); }
-    
-    /* Dashboard Modal */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(8px);
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    
-    .modal {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-xl);
-      width: 100%;
-      max-width: 900px;
-      max-height: 90vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .modal-header {
-      padding: 24px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .modal-title { font-size: 1.5rem; }
-    
-    .modal-close {
-      width: 40px;
-      height: 40px;
-      background: var(--bg-elevated);
-      border: none;
-      border-radius: 50%;
-      color: var(--text-secondary);
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.2rem;
     }
     
-    .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+    .chat-info h4 { color: white; font-size: 1rem; margin-bottom: 2px; }
+    .chat-info span { color: rgba(255,255,255,0.7); font-size: 0.8rem; }
     
-    .modal-footer {
-      padding: 16px 24px;
-      border-top: 1px solid var(--border-color);
+    .chat-close {
+      margin-left: auto;
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+    }
+    
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: var(--bg-surface);
+    }
+    
+    .chat-message {
+      margin-bottom: 16px;
+      max-width: 85%;
+    }
+    
+    .chat-message.bot { margin-right: auto; }
+    .chat-message.user { margin-left: auto; }
+    
+    .chat-bubble {
+      padding: 12px 16px;
+      border-radius: var(--radius-lg);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    .chat-message.bot .chat-bubble {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-bottom-left-radius: 4px;
+    }
+    
+    .chat-message.user .chat-bubble {
+      background: var(--gradient-primary);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .chat-input-area {
+      padding: 16px;
+      background: var(--bg-elevated);
       display: flex;
-      justify-content: flex-end;
       gap: 12px;
     }
     
-    /* Forms */
-    .form-group { margin-bottom: 20px; }
-    
-    .form-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
+    .chat-input {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-glass);
+      border-radius: 50px;
+      color: var(--text-white);
       font-size: 0.95rem;
-    }
-    
-    .form-input, .form-textarea {
-      width: 100%;
-      padding: 14px 18px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      color: var(--text-primary);
-      font-size: 1rem;
       outline: none;
-      transition: border-color 0.2s;
     }
     
-    .form-input:focus, .form-textarea:focus { border-color: var(--accent-blue); }
-    
-    .form-textarea { min-height: 120px; resize: vertical; font-family: inherit; }
-    
-    /* Validation Form */
-    .validation-form {
-      background: var(--bg-elevated);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      margin-top: 24px;
-    }
-    
-    .validation-form-title {
-      font-size: 1.1rem;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .chat-send {
+      width: 44px;
+      height: 44px;
+      background: var(--gradient-primary);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
     }
     
     /* Footer */
     .footer {
-      padding: 64px 0 32px;
-      border-top: 1px solid var(--border-color);
-      text-align: center;
+      padding: 80px 0 40px;
+      border-top: 1px solid var(--border-glass);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
     }
     
     .footer-brand {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 1.5rem;
       font-weight: 700;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
       margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
     
-    .footer-tagline {
-      color: var(--text-muted);
+    .footer-desc {
+      color: var(--text-secondary);
       margin-bottom: 24px;
+      max-width: 300px;
+    }
+    
+    .footer-social {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .social-link {
+      width: 40px;
+      height: 40px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .social-link:hover {
+      background: var(--gradient-primary);
+      border-color: var(--accent-primary);
+      color: white;
+    }
+    
+    .footer-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text-white);
     }
     
     .footer-links {
       display: flex;
-      justify-content: center;
-      gap: 24px;
-      margin-bottom: 24px;
+      flex-direction: column;
+      gap: 12px;
     }
     
     .footer-link {
       color: var(--text-secondary);
       text-decoration: none;
-      font-weight: 500;
+      font-size: 0.9rem;
       transition: color 0.2s;
     }
     
-    .footer-link:hover { color: var(--accent-blue); }
+    .footer-link:hover { color: var(--accent-primary); }
     
-    .footer-copy { color: var(--text-muted); font-size: 0.9rem; }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-glass);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    
+    /* Templates */
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    
+    .template-card {
+      background: var(--bg-elevated);
+      border: 2px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .template-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-4px);
+    }
+    
+    .template-card.selected {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+    }
+    
+    .template-preview {
+      aspect-ratio: 4/3;
+      background: var(--bg-surface);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .template-info {
+      padding: 20px;
+    }
+    
+    .template-name {
+      font-weight: 600;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+    
+    .template-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
     
     /* Responsive */
     @media (max-width: 1024px) {
-      .hero-content { grid-template-columns: 1fr; text-align: center; }
-      .hero-text h1 { font-size: 3rem; }
-      .hero-subtitle { margin: 0 auto 32px; }
-      .hero-metrics { justify-content: center; }
-      .timeline::before { left: 20px; }
-      .timeline-item { grid-template-columns: 1fr; padding-left: 48px; }
-      .timeline-item:nth-child(even) .timeline-content { order: 1; }
-      .timeline-item:nth-child(even) .timeline-media { order: 2; }
-      .timeline-dot { left: 20px; }
+      .builder-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .builder-sidebar {
+        position: relative;
+        top: 0;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
     }
     
     @media (max-width: 768px) {
       .nav-links { display: none; }
-      .hero-text h1 { font-size: 2.5rem; }
-      .section-title { font-size: 2rem; }
-      .chat-window { width: calc(100vw - 48px); right: 24px; left: 24px; height: 70vh; bottom: 96px; }
+      .hero-title { font-size: 2.5rem; }
+      .hero-stats { gap: 24px; }
+      .hero-stat-value { font-size: 2rem; }
+      .upload-card { padding: 24px; }
+      .upload-zone { padding: 40px 24px; }
+      .chat-window { width: calc(100vw - 48px); height: 70vh; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
     }
+    
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 0.6s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
   </style>
 </head>
 <body>
@@ -1003,609 +1301,968 @@ app.get('/', (c) => {
     const { useState, useEffect, useRef } = React;
 
     // ============================================
-    // DATA STORE - All profile data
+    // INITIAL STATE
     // ============================================
-    const initialData = {
-      profile: {
-        name: 'Brad Powell',
-        tagline: 'Real results, not paragraphs.',
-        subtitle: '30+ years driving revenue growth. Every claim verified. Every metric proven.',
-        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-        email: 'brad@webume.app',
-        location: 'San Francisco, CA',
-        linkedin: 'linkedin.com/in/bradpowell',
-        calendlyUrl: 'https://calendly.com/bradpowell/30min'
+    const initialProfile = {
+      basics: {
+        name: '',
+        title: '',
+        tagline: '',
+        email: '',
+        phone: '',
+        location: '',
+        linkedin: '',
+        website: '',
+        avatar: null
       },
-      timeline: [
-        {
-          id: 1,
-          role: 'Senior Operations Leader',
-          company: 'Acme Corp',
-          dates: '2015 – 2025',
-          narrative: \`Led a complete organizational turnaround in a company on the verge of collapse. Inherited a demoralized team of 20 with outdated processes, zero visibility into operations, and bleeding revenue.
-
-Within 18 months, I rebuilt everything from the ground up: implemented real-time analytics dashboards that gave leadership actual visibility for the first time, redesigned workflows that cut processing time by 40%, and created a culture of accountability that attracted top talent.
-
-The team grew from 20 to 80 people — not through aggressive hiring, but because people wanted to work here. We became known as the turnaround team. The CFO called it "the most significant operational transformation in company history."
-
-Key wins:
-• Built custom dashboards that C-suite now uses daily for all strategic decisions
-• Negotiated vendor contracts that saved \$2.3M annually
-• Implemented agile methodologies across 6 departments
-• Zero voluntary turnover in final 2 years\`,
-          metrics: [
-            { label: 'Revenue Growth', value: '+47%', icon: 'fa-chart-line' },
-            { label: 'Cost Reduction', value: '-22%', icon: 'fa-piggy-bank' },
-            { label: 'Team Efficiency', value: '+65%', icon: 'fa-rocket' },
-            { label: 'Customer Satisfaction', value: '+35%', icon: 'fa-heart' }
-          ],
-          chartData: {
-            labels: ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
-            revenue: [12, 14, 18, 24, 31, 38, 45, 52, 61, 71],
-            costs: [10, 9.5, 9, 8.5, 8, 7.8, 7.5, 7.2, 7, 6.8]
-          },
-          media: [
-            { type: 'video', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', title: 'Project Walkthrough: The Acme Turnaround' }
-          ]
-        },
-        {
-          id: 2,
-          role: 'Operations Manager',
-          company: 'TechGiant Inc',
-          dates: '2008 – 2015',
-          narrative: \`Joined as employee #47 right after Series A. Left after IPO as the person who built the operational backbone that made it possible.
-
-When I started, we were processing 500 orders a day with spreadsheets and prayer. By the time I left, we were handling 50,000 daily with 99.97% accuracy. The systems I built are still running today.
-
-The secret wasn't just technology — it was understanding that operations is really about people. I hired and trained 200+ team members, many of whom are now directors and VPs across the industry. We created an operational playbook that became the template for three subsequent acquisitions.
-
-During the IPO roadshow, the CEO specifically highlighted our operational efficiency as a key differentiator. That felt good.\`,
-          metrics: [
-            { label: 'Volume Scaled', value: '+10,000%', icon: 'fa-expand' },
-            { label: 'Error Rate', value: '-90%', icon: 'fa-check-circle' },
-            { label: 'Processing Time', value: '-60%', icon: 'fa-clock' },
-            { label: 'Team Built', value: '200+', icon: 'fa-users' }
-          ],
-          chartData: {
-            labels: ['2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015'],
-            revenue: [2, 5, 12, 28, 52, 89, 134, 201],
-            costs: [3, 4, 5, 6, 7, 8, 8.5, 9]
-          },
-          media: []
-        },
-        {
-          id: 3,
-          role: 'Process Engineer',
-          company: 'StartupXYZ',
-          dates: '2002 – 2008',
-          narrative: \`First operations hire at a scrappy startup. Built everything from nothing — literally wrote the first process document on a napkin at a coffee shop.
-
-This is where I learned that constraints breed creativity. With no budget, I automated processes using free tools and elbow grease. The SOPs I created here became industry templates — I still see variations of them used at companies today.
-
-Most importantly, this is where I learned to mentor. The junior staff I trained here have gone on to lead teams at Google, Amazon, and Meta. That legacy matters more than any metric.\`,
-          metrics: [
-            { label: 'Process Efficiency', value: '+200%', icon: 'fa-cogs' },
-            { label: 'Quality Score', value: '99.2%', icon: 'fa-star' },
-            { label: 'Docs Created', value: '150+', icon: 'fa-file-alt' }
-          ],
-          chartData: null,
-          media: []
-        }
-      ],
-      validations: {
-        1: [
-          { id: 1, text: "Brad was instrumental in our turnaround. He didn't just optimize processes — he transformed how we think about operations. His dashboards gave us visibility we never had before.", name: 'Sarah Chen', role: 'VP of Engineering, Acme Corp', approved: true, date: '2024-11-15' },
-          { id: 2, text: "Best leader I've ever worked under. Data-driven but never cold. Always had time for 1:1s despite running six departments. Made me a better professional.", name: 'Mike Rodriguez', role: 'Senior Analyst (Direct Report)', approved: true, date: '2024-10-22' },
-          { id: 3, text: "Transformed our failing department into a profit center. The executive team was ready to shut us down before Brad stepped in. His vendor negotiations alone saved us millions.", name: 'Jennifer Walsh', role: 'CFO, Acme Corp', approved: true, date: '2024-09-30' }
-        ],
-        2: [
-          { id: 4, text: "Brad built the operational systems that scaled with us through IPO. His foresight in system design saved us from what would have been catastrophic growing pains.", name: 'David Park', role: 'CTO, TechGiant Inc', approved: true, date: '2024-08-15' },
-          { id: 5, text: "I learned more from Brad in 2 years than my entire MBA program. He's the reason I'm a director today.", name: 'Lisa Thompson', role: 'Director of Operations, Meta', approved: true, date: '2024-07-20' }
-        ],
-        3: [
-          { id: 6, text: "Brad set the standard for operational excellence at our startup. The processes he built are still running 15 years later.", name: 'Tom Baker', role: 'Founder & CEO, StartupXYZ', approved: true, date: '2024-06-10' }
-        ]
-      },
-      pendingValidations: [
-        { id: 7, text: "Great mentor and colleague. Taught me everything about operations.", name: 'New Colleague', role: 'Unknown', jobId: 1, date: '2025-01-07' }
-      ],
-      truthVault: [
-        { id: 1, company: 'Acme Corp', score: 7.2, reports: 47, trend: 'up', comment: 'High pressure but fair leadership. Good work-life balance initiatives recently. Transparent about challenges.', category: 'enterprise' },
-        { id: 2, company: 'TechGiant Inc', score: 8.4, reports: 156, trend: 'stable', comment: 'Great culture, transparent communication, strong benefits. Engineering-first mindset can frustrate other departments.', category: 'tech' },
-        { id: 3, company: 'BadCo Industries', score: 2.1, reports: 89, trend: 'down', comment: 'Toxic leadership, high turnover, broken promises. Multiple HR complaints ignored. Avoid.', category: 'enterprise' },
-        { id: 4, company: 'GoodPlace Solutions', score: 9.1, reports: 34, trend: 'up', comment: 'Genuinely employee-first culture. Remote-friendly, mental health support, unlimited PTO that people actually use.', category: 'startup' },
-        { id: 5, company: 'Mediocre Ltd', score: 5.3, reports: 23, trend: 'stable', comment: 'Not terrible, not great. Standard corporate environment. Gets the job done but no passion.', category: 'enterprise' },
-        { id: 6, company: 'StartupXYZ', score: 6.8, reports: 12, trend: 'up', comment: 'Fast-paced and demanding, but rewarding if you like ownership. Early employees did very well.', category: 'startup' },
-        { id: 7, company: 'NightmareCorp', score: 1.8, reports: 203, trend: 'down', comment: 'Worst company Ive ever worked for. Gaslighting management, impossible targets, disposable employees.', category: 'enterprise' },
-        { id: 8, company: 'DreamTeam Co', score: 8.9, reports: 67, trend: 'up', comment: 'Amazing people, great mission, competitive pay. Hard to get in but worth it.', category: 'tech' }
-      ]
+      experiences: [],
+      achievements: [],
+      awards: [],
+      reviews: [],
+      payHistory: [],
+      events: [],
+      projects: [],
+      media: { photos: [], videos: [] },
+      template: 'executive'
     };
 
+    const templates = [
+      { id: 'executive', name: 'Executive', desc: 'Clean, professional, leadership-focused' },
+      { id: 'creative', name: 'Creative', desc: 'Bold colors, unique layouts' },
+      { id: 'tech', name: 'Tech Pioneer', desc: 'Modern, data-driven, metrics-heavy' },
+      { id: 'minimal', name: 'Minimal', desc: 'Simple, elegant, content-first' }
+    ];
+
     // ============================================
-    // MAIN APP COMPONENT
+    // MAIN APP
     // ============================================
     const App = () => {
-      const [data, setData] = useState(initialData);
-      const [darkMode, setDarkMode] = useState(true);
+      const [view, setView] = useState('landing'); // landing, builder, preview
+      const [profile, setProfile] = useState(initialProfile);
+      const [activeSection, setActiveSection] = useState('basics');
       const [chatOpen, setChatOpen] = useState(false);
-      const [dashboardOpen, setDashboardOpen] = useState(false);
-      const [validationFormOpen, setValidationFormOpen] = useState(null);
-      const [activeSection, setActiveSection] = useState('all');
-      const [leaderboardTab, setLeaderboardTab] = useState('best');
+      const [uploadProgress, setUploadProgress] = useState(0);
+      const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-      // Load saved data
+      // Load saved profile
       useEffect(() => {
-        const saved = localStorage.getItem('webumeData');
+        const saved = localStorage.getItem('webumeProfile');
         if (saved) {
           try {
-            const parsed = JSON.parse(saved);
-            setData(prev => ({ ...prev, ...parsed }));
-          } catch (e) {
-            // Silent fallback to default data
-          }
+            setProfile(JSON.parse(saved));
+          } catch (e) {}
         }
       }, []);
 
-      // Save data changes
+      // Save profile
       useEffect(() => {
-        localStorage.setItem('webumeData', JSON.stringify(data));
-      }, [data]);
+        localStorage.setItem('webumeProfile', JSON.stringify(profile));
+      }, [profile]);
 
-      // Handle dark mode
-      useEffect(() => {
-        document.body.classList.toggle('light-mode', !darkMode);
-      }, [darkMode]);
+      const handleResumeUpload = async (file) => {
+        setIsAnalyzing(true);
+        setUploadProgress(0);
+        
+        // Simulate progress
+        const progressInterval = setInterval(() => {
+          setUploadProgress(prev => {
+            if (prev >= 90) {
+              clearInterval(progressInterval);
+              return 90;
+            }
+            return prev + 10;
+          });
+        }, 200);
 
-      // Scroll to section
-      const scrollTo = (id) => {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-        setActiveSection(id);
+        // Simulate parsing (in real app, this would be server-side or use PDF.js)
+        setTimeout(() => {
+          clearInterval(progressInterval);
+          setUploadProgress(100);
+          
+          // Mock parsed data
+          const parsedProfile = {
+            ...initialProfile,
+            basics: {
+              name: 'Alex Thompson',
+              title: 'Senior Product Manager',
+              tagline: 'Building products that matter. 10+ years driving innovation.',
+              email: 'alex@example.com',
+              phone: '+1 (555) 123-4567',
+              location: 'San Francisco, CA',
+              linkedin: 'linkedin.com/in/alexthompson',
+              website: 'alexthompson.dev',
+              avatar: null
+            },
+            experiences: [
+              {
+                id: 1,
+                company: 'TechCorp Global',
+                role: 'Senior Product Manager',
+                startDate: '2020-03',
+                endDate: 'Present',
+                description: 'Led product strategy for enterprise SaaS platform serving 2M+ users. Drove 40% revenue growth through data-driven feature prioritization.',
+                tasks: [
+                  'Define and execute product roadmap aligned with business objectives',
+                  'Lead cross-functional team of 15 engineers, designers, and analysts',
+                  'Conduct user research and translate insights into product requirements',
+                  'Present quarterly business reviews to C-suite executives'
+                ],
+                dayInLife: [
+                  { time: '8:00 AM', activity: 'Review metrics dashboard and overnight alerts' },
+                  { time: '9:00 AM', activity: 'Daily standup with engineering team' },
+                  { time: '10:00 AM', activity: 'Customer feedback analysis session' },
+                  { time: '12:00 PM', activity: 'Cross-team sync on Q3 initiatives' },
+                  { time: '2:00 PM', activity: 'Sprint planning and backlog refinement' },
+                  { time: '4:00 PM', activity: 'Stakeholder presentations and updates' }
+                ],
+                metrics: [
+                  { value: '+40%', label: 'Revenue Growth' },
+                  { value: '2M+', label: 'Active Users' },
+                  { value: '15', label: 'Team Size' },
+                  { value: '98%', label: 'Retention Rate' }
+                ]
+              },
+              {
+                id: 2,
+                company: 'StartupXYZ',
+                role: 'Product Manager',
+                startDate: '2017-06',
+                endDate: '2020-02',
+                description: 'First PM hire. Built product function from ground up. Took product from MVP to Series B.',
+                tasks: [
+                  'Established product development processes and best practices',
+                  'Hired and mentored team of 5 associate product managers',
+                  'Launched 3 major product lines generating $5M ARR'
+                ],
+                dayInLife: [
+                  { time: '7:30 AM', activity: 'Early morning deep work on strategy docs' },
+                  { time: '10:00 AM', activity: 'Customer discovery calls' },
+                  { time: '1:00 PM', activity: 'Design review sessions' },
+                  { time: '3:00 PM', activity: 'Engineering collaboration' }
+                ],
+                metrics: [
+                  { value: '$5M', label: 'ARR Generated' },
+                  { value: '3', label: 'Product Lines' },
+                  { value: '5', label: 'PMs Hired' }
+                ]
+              }
+            ],
+            achievements: [
+              { id: 1, icon: 'fa-trophy', title: 'Product of the Year', desc: 'TechCrunch Disrupt 2022' },
+              { id: 2, icon: 'fa-star', title: 'Top 40 Under 40', desc: 'Business Insider 2021' },
+              { id: 3, icon: 'fa-award', title: 'Innovation Award', desc: 'Company-wide recognition' }
+            ],
+            awards: [
+              { id: 1, title: 'Best Product Launch', organization: 'Product Hunt', year: '2023' },
+              { id: 2, title: 'Excellence in Leadership', organization: 'TechCorp', year: '2022' }
+            ],
+            reviews: [
+              { id: 1, text: 'Alex transformed our product culture. Exceptional strategic thinker.', author: 'Sarah Chen', role: 'CEO, TechCorp', rating: 5 },
+              { id: 2, text: 'Best PM I have worked with. Data-driven but deeply empathetic.', author: 'Marcus Johnson', role: 'Engineering Lead', rating: 5 }
+            ]
+          };
+          
+          setProfile(parsedProfile);
+          setIsAnalyzing(false);
+          setView('builder');
+        }, 2500);
       };
 
       return (
         <div>
+          {/* Background Effects */}
+          <div className="bg-mesh"></div>
+          <div className="grid-bg"></div>
+          <div className="orb orb-1"></div>
+          <div className="orb orb-2"></div>
+          <div className="orb orb-3"></div>
+
           {/* Navigation */}
-          <Navigation 
-            darkMode={darkMode} 
-            setDarkMode={setDarkMode}
-            onDashboard={() => setDashboardOpen(true)}
-            scrollTo={scrollTo}
-            activeSection={activeSection}
-          />
+          <Navigation view={view} setView={setView} />
 
-          {/* Hero Section */}
-          <HeroSection profile={data.profile} />
+          {/* Views */}
+          {view === 'landing' && (
+            <LandingPage 
+              onUpload={handleResumeUpload}
+              uploadProgress={uploadProgress}
+              isAnalyzing={isAnalyzing}
+              setView={setView}
+            />
+          )}
 
-          {/* Timeline Section */}
-          <TimelineSection 
-            timeline={data.timeline}
-            validations={data.validations}
-            onValidationForm={setValidationFormOpen}
-          />
+          {view === 'builder' && (
+            <BuilderPage 
+              profile={profile}
+              setProfile={setProfile}
+              activeSection={activeSection}
+              setActiveSection={setActiveSection}
+              setView={setView}
+            />
+          )}
 
-          {/* Truth Vault Section */}
-          <TruthVaultSection 
-            truthVault={data.truthVault}
-            leaderboardTab={leaderboardTab}
-            setLeaderboardTab={setLeaderboardTab}
-          />
-
-          {/* Footer */}
-          <Footer profile={data.profile} />
+          {view === 'preview' && (
+            <PreviewPage 
+              profile={profile}
+              setView={setView}
+            />
+          )}
 
           {/* Hunter Agent Chat */}
-          <HunterAgent 
+          <HunterChat 
             isOpen={chatOpen}
             onToggle={() => setChatOpen(!chatOpen)}
-            profile={data.profile}
-            timeline={data.timeline}
-            truthVault={data.truthVault}
+            profile={profile}
           />
-
-          {/* Dashboard Modal */}
-          {dashboardOpen && (
-            <DashboardModal 
-              data={data}
-              setData={setData}
-              onClose={() => setDashboardOpen(false)}
-            />
-          )}
-
-          {/* Validation Form Modal */}
-          {validationFormOpen && (
-            <ValidationFormModal
-              jobId={validationFormOpen}
-              timeline={data.timeline}
-              onSubmit={(validation) => {
-                setData(prev => ({
-                  ...prev,
-                  pendingValidations: [...prev.pendingValidations, { ...validation, id: Date.now(), date: new Date().toISOString().split('T')[0] }]
-                }));
-                setValidationFormOpen(null);
-              }}
-              onClose={() => setValidationFormOpen(null)}
-            />
-          )}
         </div>
       );
     };
 
     // ============================================
-    // NAVIGATION COMPONENT
+    // NAVIGATION
     // ============================================
-    const Navigation = ({ darkMode, setDarkMode, onDashboard, scrollTo, activeSection }) => {
-      return (
-        <nav className="nav">
-          <div className="container nav-inner">
-            <div className="nav-logo">Webume</div>
+    const Navigation = ({ view, setView }) => (
+      <nav className="nav">
+        <div className="container">
+          <div className="nav-inner glass">
+            <div className="nav-logo">
+              <div className="nav-logo-icon">⚡</div>
+              Webume
+            </div>
             <div className="nav-links">
-              <a href="#hero" className={"nav-link" + (activeSection === 'hero' ? ' active' : '')} onClick={(e) => { e.preventDefault(); scrollTo('hero'); }}>Home</a>
-              <a href="#timeline" className={"nav-link" + (activeSection === 'timeline' ? ' active' : '')} onClick={(e) => { e.preventDefault(); scrollTo('timeline'); }}>Timeline</a>
-              <a href="#truth-vault" className={"nav-link" + (activeSection === 'truth-vault' ? ' active' : '')} onClick={(e) => { e.preventDefault(); scrollTo('truth-vault'); }}>Truth Vault</a>
-              <button className="btn btn-ghost" onClick={() => setDarkMode(!darkMode)}>
-                <i className={"fas " + (darkMode ? "fa-sun" : "fa-moon")}></i>
-              </button>
-              <button className="btn btn-secondary" onClick={onDashboard}>
-                <i className="fas fa-cog"></i> Dashboard
-              </button>
-              <button className="btn btn-primary" onClick={() => window.print()}>
-                <i className="fas fa-file-pdf"></i> Export PDF
+              <a href="#features" className="nav-link">Features</a>
+              <a href="#templates" className="nav-link">Templates</a>
+              <a href="#pricing" className="nav-link">Pricing</a>
+              {view !== 'landing' && (
+                <button className="nav-link" onClick={() => setView('landing')}>Home</button>
+              )}
+              <button className="btn btn-primary btn-sm" onClick={() => setView('builder')}>
+                <i className="fas fa-rocket"></i> Get Started
               </button>
             </div>
-          </div>
-        </nav>
-      );
-    };
-
-    // ============================================
-    // HERO SECTION
-    // ============================================
-    const HeroSection = ({ profile }) => {
-      return (
-        <section className="hero" id="hero">
-          <div className="container hero-content">
-            <div className="hero-text">
-              <h1>{profile.name}</h1>
-              <p className="hero-tagline">{profile.tagline}</p>
-              <p className="hero-subtitle">{profile.subtitle}</p>
-              
-              <div className="hero-metrics">
-                <div className="metric-card">
-                  <i className="fas fa-chart-line"></i>
-                  <span>+47% Revenue</span>
-                </div>
-                <div className="metric-card">
-                  <i className="fas fa-piggy-bank"></i>
-                  <span>-22% Costs</span>
-                </div>
-                <div className="metric-card">
-                  <i className="fas fa-users"></i>
-                  <span>200+ Team Built</span>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <a href={profile.calendlyUrl} target="_blank" className="btn btn-primary">
-                  <i className="fas fa-calendar"></i> Book a Call
-                </a>
-                <a href={"mailto:" + profile.email} className="btn btn-secondary">
-                  <i className="fas fa-envelope"></i> Contact
-                </a>
-                <a href={"https://" + profile.linkedin} target="_blank" className="btn btn-ghost">
-                  <i className="fab fa-linkedin"></i> LinkedIn
-                </a>
-              </div>
-            </div>
-
-            <div className="hero-video">
-              <iframe 
-                src={profile.videoUrl}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-              <div className="video-overlay">
-                <strong>60-Second Intro</strong>
-                <p style={{ fontSize: '0.9rem', opacity: 0.8, marginTop: '4px' }}>Who I am. What I deliver. No fluff.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      );
-    };
-
-    // ============================================
-    // TIMELINE SECTION
-    // ============================================
-    const TimelineSection = ({ timeline, validations, onValidationForm }) => {
-      return (
-        <section className="section" id="timeline" style={{ background: 'var(--bg-secondary)' }}>
-          <div className="container">
-            <div className="section-header">
-              <div className="section-badge">
-                <i className="fas fa-briefcase"></i> Career Timeline
-              </div>
-              <h2 className="section-title">Proof of Work</h2>
-              <p className="section-desc">Full narratives, real metrics, verified by colleagues. No bullet-point lies.</p>
-            </div>
-
-            <div className="timeline">
-              {timeline.map((job, index) => (
-                <TimelineItem 
-                  key={job.id}
-                  job={job}
-                  validations={validations[job.id] || []}
-                  onValidationForm={onValidationForm}
-                  index={index}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      );
-    };
-
-    // ============================================
-    // TIMELINE ITEM
-    // ============================================
-    const TimelineItem = ({ job, validations, onValidationForm, index }) => {
-      const chartRef = useRef(null);
-      const chartInstance = useRef(null);
-
-      useEffect(() => {
-        if (job.chartData && chartRef.current) {
-          const ctx = chartRef.current.getContext('2d');
-          
-          if (chartInstance.current) {
-            chartInstance.current.destroy();
-          }
-
-          chartInstance.current = new Chart(ctx, {
-            type: 'line',
-            data: {
-              labels: job.chartData.labels,
-              datasets: [
-                {
-                  label: 'Revenue ($M)',
-                  data: job.chartData.revenue,
-                  borderColor: '#3b82f6',
-                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                  fill: true,
-                  tension: 0.4
-                },
-                {
-                  label: 'Costs ($M)',
-                  data: job.chartData.costs,
-                  borderColor: '#ef4444',
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  fill: true,
-                  tension: 0.4
-                }
-              ]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  position: 'top',
-                  labels: { color: '#a0a0b0' }
-                }
-              },
-              scales: {
-                x: { ticks: { color: '#6b6b7b' }, grid: { color: '#2a2a3a' } },
-                y: { ticks: { color: '#6b6b7b' }, grid: { color: '#2a2a3a' } }
-              }
-            }
-          });
-        }
-
-        return () => {
-          if (chartInstance.current) {
-            chartInstance.current.destroy();
-          }
-        };
-      }, [job.chartData]);
-
-      return (
-        <div className="timeline-item">
-          <div className="timeline-dot"></div>
-          
-          <div className="timeline-content">
-            <div className="card">
-              <div className="timeline-header">
-                <div>
-                  <h3 className="timeline-role">{job.role}</h3>
-                  <div className="timeline-company">{job.company}</div>
-                </div>
-                <span className="timeline-dates">{job.dates}</span>
-              </div>
-
-              <div className="timeline-narrative">
-                {job.narrative.split('\\n\\n').map((para, i) => (
-                  <p key={i} style={{ marginBottom: '16px' }}>{para}</p>
-                ))}
-              </div>
-
-              <div className="timeline-metrics">
-                {job.metrics.map((metric, i) => (
-                  <div key={i} className="metric-card" style={{ fontSize: '0.9rem', padding: '10px 16px' }}>
-                    <i className={"fas " + metric.icon}></i>
-                    <span>{metric.value} {metric.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Validations */}
-              <div className="validations">
-                <div className="validations-header">
-                  <h4 className="validations-title">
-                    <i className="fas fa-user-check"></i>
-                    Colleague Validations ({validations.length})
-                  </h4>
-                  <button className="btn btn-ghost" onClick={() => onValidationForm(job.id)}>
-                    <i className="fas fa-plus"></i> Add Yours
-                  </button>
-                </div>
-
-                {validations.filter(v => v.approved).map(validation => (
-                  <div key={validation.id} className="validation-card">
-                    <div className="validation-avatar">
-                      {validation.name.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <div className="validation-content">
-                      <p className="validation-quote">"{validation.text}"</p>
-                      <div className="validation-author">
-                        <div>
-                          <div className="validation-name">{validation.name}</div>
-                          <div className="validation-role">{validation.role}</div>
-                        </div>
-                        <span className="badge badge-success">
-                          <i className="fas fa-check-circle"></i> Verified Colleague
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="timeline-media">
-            {job.chartData && (
-              <div className="chart-container">
-                <h4 style={{ marginBottom: '16px', color: 'var(--text-secondary)' }}>
-                  <i className="fas fa-chart-area" style={{ marginRight: '8px' }}></i>
-                  Performance Metrics
-                </h4>
-                <div style={{ height: '250px' }}>
-                  <canvas ref={chartRef}></canvas>
-                </div>
-              </div>
-            )}
-            
-            {job.media.map((item, i) => (
-              <div key={i} className="media-item">
-                {item.type === 'video' ? (
-                  <iframe 
-                    src={item.url}
-                    height="200"
-                    frameBorder="0"
-                    allowFullScreen
-                    title={item.title}
-                  ></iframe>
-                ) : (
-                  <img src={item.url} alt={item.title} />
-                )}
-              </div>
-            ))}
           </div>
         </div>
-      );
-    };
+      </nav>
+    );
 
     // ============================================
-    // TRUTH VAULT SECTION
+    // LANDING PAGE
     // ============================================
-    const TruthVaultSection = ({ truthVault, leaderboardTab, setLeaderboardTab }) => {
-      const getScoreColor = (score) => {
-        if (score >= 7) return 'var(--accent-green)';
-        if (score >= 4) return 'var(--accent-yellow)';
-        return 'var(--accent-red)';
+    const LandingPage = ({ onUpload, uploadProgress, isAnalyzing, setView }) => {
+      const [dragging, setDragging] = useState(false);
+      const fileInputRef = useRef(null);
+
+      const handleDrop = (e) => {
+        e.preventDefault();
+        setDragging(false);
+        const file = e.dataTransfer.files[0];
+        if (file) onUpload(file);
       };
 
-      const sortedCompanies = [...truthVault].sort((a, b) => 
-        leaderboardTab === 'best' ? b.score - a.score : a.score - b.score
-      );
+      const handleFileSelect = (e) => {
+        const file = e.target.files[0];
+        if (file) onUpload(file);
+      };
 
       return (
-        <section className="section" id="truth-vault">
-          <div className="container">
-            <div className="section-header">
-              <div className="section-badge">
-                <i className="fas fa-shield-alt"></i> Truth Vault
+        <>
+          {/* Hero Section */}
+          <section className="hero">
+            <div className="container hero-content">
+              <div className="hero-badge fade-in">
+                <i className="fas fa-bolt"></i>
+                The Future of Professional Profiles
               </div>
-              <h2 className="section-title">Company Transparency</h2>
-              <p className="section-desc">Anonymous ratings from real employees. Exposing the good, the bad, and the toxic.</p>
+              
+              <h1 className="hero-title fade-in stagger-1">
+                Your <span className="highlight">Employee-for-Hire</span> Empire Starts Here
+              </h1>
+              
+              <p className="hero-subtitle fade-in stagger-2">
+                Transform your resume into a living, breathing professional profile. 
+                Upload once, customize endlessly, own forever. This isn't just a resume — 
+                it's your <strong>Webume</strong>.
+              </p>
+              
+              <div className="hero-cta fade-in stagger-3">
+                <button className="btn btn-primary btn-lg" onClick={() => fileInputRef.current?.click()}>
+                  <i className="fas fa-upload"></i> Upload Your Resume
+                </button>
+                <button className="btn btn-secondary btn-lg" onClick={() => setView('builder')}>
+                  <i className="fas fa-wand-magic-sparkles"></i> Start from Scratch
+                </button>
+              </div>
+              
+              <div className="hero-stats fade-in stagger-4">
+                <div className="hero-stat">
+                  <div className="hero-stat-value">50K+</div>
+                  <div className="hero-stat-label">Profiles Created</div>
+                </div>
+                <div className="hero-stat">
+                  <div className="hero-stat-value">94%</div>
+                  <div className="hero-stat-label">Interview Rate</div>
+                </div>
+                <div className="hero-stat">
+                  <div className="hero-stat-value">2.5x</div>
+                  <div className="hero-stat-label">Faster Hiring</div>
+                </div>
+              </div>
             </div>
+          </section>
 
-            <div className="truth-vault-grid">
-              {truthVault.slice(0, 6).map(company => (
-                <div key={company.id} className="company-card">
-                  <div className="company-header">
-                    <div>
-                      <h3 className="company-name">{company.company}</h3>
-                      <span className="badge badge-info">{company.category}</span>
+          {/* Upload Section */}
+          <section className="upload-section" id="upload">
+            <div className="container">
+              <div className="upload-card glass-heavy">
+                {isAnalyzing ? (
+                  <div style={{ padding: '40px' }}>
+                    <div className="upload-icon" style={{ animation: 'pulse 2s infinite' }}>
+                      <i className="fas fa-brain"></i>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div className="company-score" style={{ color: getScoreColor(company.score) }}>
-                        {company.score}
+                    <h3 className="upload-title">Analyzing Your Resume...</h3>
+                    <p className="upload-desc">Our AI is extracting and organizing your experience</p>
+                    <div style={{ 
+                      height: '8px', 
+                      background: 'var(--bg-elevated)', 
+                      borderRadius: '4px',
+                      overflow: 'hidden',
+                      maxWidth: '400px',
+                      margin: '24px auto'
+                    }}>
+                      <div style={{
+                        height: '100%',
+                        width: uploadProgress + '%',
+                        background: 'var(--gradient-primary)',
+                        transition: 'width 0.3s ease',
+                        borderRadius: '4px'
+                      }}></div>
+                    </div>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                      {uploadProgress < 30 && 'Reading document...'}
+                      {uploadProgress >= 30 && uploadProgress < 60 && 'Extracting experience...'}
+                      {uploadProgress >= 60 && uploadProgress < 90 && 'Building your timeline...'}
+                      {uploadProgress >= 90 && 'Almost there...'}
+                    </p>
+                  </div>
+                ) : (
+                  <div 
+                    className={"upload-zone" + (dragging ? " dragging" : "")}
+                    onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                    onDragLeave={() => setDragging(false)}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <input 
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.txt"
+                      onChange={handleFileSelect}
+                      style={{ display: 'none' }}
+                    />
+                    <div className="upload-icon">
+                      <i className="fas fa-cloud-arrow-up"></i>
+                    </div>
+                    <h3 className="upload-title">Drop your resume here</h3>
+                    <p className="upload-desc">or click to browse your files</p>
+                    <div className="upload-formats">
+                      <span className="format-badge">.PDF</span>
+                      <span className="format-badge">.DOC</span>
+                      <span className="format-badge">.DOCX</span>
+                      <span className="format-badge">.TXT</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* Features Section */}
+          <section className="features-section" id="features">
+            <div className="container">
+              <div className="section-header">
+                <div className="section-badge">
+                  <i className="fas fa-sparkles"></i> Features
+                </div>
+                <h2 className="section-title">Everything Your Resume Should Have Been</h2>
+                <p className="section-desc">
+                  Not limitations. Possibilities. Build the professional profile you deserve.
+                </p>
+              </div>
+
+              <div className="features-grid">
+                {[
+                  { icon: 'fa-brain', title: 'AI-Powered Analysis', desc: 'Upload your resume and watch our AI transform it into a structured, chronological masterpiece.' },
+                  { icon: 'fa-clock', title: 'Day in the Life', desc: 'Show recruiters what you actually do. Real schedules, real tasks, real impact.' },
+                  { icon: 'fa-photo-video', title: 'Rich Media', desc: 'Photos, videos, project demos. Prove your work, do not just describe it.' },
+                  { icon: 'fa-chart-line', title: 'Metrics Dashboard', desc: 'Quantify your impact. Revenue grown, costs saved, teams built.' },
+                  { icon: 'fa-users', title: 'Colleague Validations', desc: 'Verified endorsements from people who worked with you.' },
+                  { icon: 'fa-trophy', title: 'Achievements Showcase', desc: 'Awards, certifications, milestones — all in one place.' },
+                  { icon: 'fa-shield-halved', title: 'Truth Vault', desc: 'Anonymous company ratings. Know where you are going before you go.' },
+                  { icon: 'fa-robot', title: 'AI Headhunter', desc: 'Your personal agent that sells you 24/7 to recruiters.' }
+                ].map((feature, i) => (
+                  <div key={i} className="feature-card glass">
+                    <div className="feature-icon">
+                      <i className={"fas " + feature.icon}></i>
+                    </div>
+                    <h3 className="feature-title">{feature.title}</h3>
+                    <p className="feature-desc">{feature.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Templates Section */}
+          <section className="features-section" id="templates" style={{ background: 'var(--bg-deep)' }}>
+            <div className="container">
+              <div className="section-header">
+                <div className="section-badge">
+                  <i className="fas fa-palette"></i> Templates
+                </div>
+                <h2 className="section-title">Start With a Vision</h2>
+                <p className="section-desc">
+                  Choose your template, then customize every detail to match your brand.
+                </p>
+              </div>
+
+              <div className="template-grid">
+                {templates.map(template => (
+                  <div key={template.id} className="template-card">
+                    <div className="template-preview" style={{
+                      background: template.id === 'executive' ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' :
+                                 template.id === 'creative' ? 'linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)' :
+                                 template.id === 'tech' ? 'linear-gradient(135deg, #00d2d3 0%, #54a0ff 100%)' :
+                                 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
+                    }}>
+                      <div style={{ 
+                        position: 'absolute', 
+                        inset: '20px', 
+                        background: 'rgba(255,255,255,0.1)', 
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        fontSize: '3rem'
+                      }}>
+                        {template.id === 'executive' && '👔'}
+                        {template.id === 'creative' && '🎨'}
+                        {template.id === 'tech' && '💻'}
+                        {template.id === 'minimal' && '✨'}
                       </div>
-                      <div className="score-label">/10 Culture Score</div>
                     </div>
-                  </div>
-
-                  <div className="toxicity-bar">
-                    <div 
-                      className="toxicity-fill"
-                      style={{ 
-                        width: (company.score * 10) + '%',
-                        background: getScoreColor(company.score)
-                      }}
-                    ></div>
-                  </div>
-
-                  <p className="company-comment">{company.comment}</p>
-
-                  <div className="company-meta">
-                    <span><i className="fas fa-users"></i> {company.reports} reports</span>
-                    <span>
-                      <i className={"fas fa-arrow-" + (company.trend === 'up' ? 'up' : company.trend === 'down' ? 'down' : 'right')} 
-                         style={{ color: company.trend === 'up' ? 'var(--accent-green)' : company.trend === 'down' ? 'var(--accent-red)' : 'var(--text-muted)' }}></i>
-                      {' '}{company.trend === 'up' ? 'Improving' : company.trend === 'down' ? 'Declining' : 'Stable'}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Leaderboard */}
-            <div className="leaderboard">
-              <div className="leaderboard-header">
-                <h3 className="leaderboard-title">
-                  <i className="fas fa-trophy"></i>
-                  Company Leaderboard
-                </h3>
-                <div className="leaderboard-tabs">
-                  <button 
-                    className={"leaderboard-tab" + (leaderboardTab === 'best' ? ' active' : '')}
-                    onClick={() => setLeaderboardTab('best')}
-                  >
-                    <i className="fas fa-star"></i> Best Places
-                  </button>
-                  <button 
-                    className={"leaderboard-tab" + (leaderboardTab === 'worst' ? ' active' : '')}
-                    onClick={() => setLeaderboardTab('worst')}
-                  >
-                    <i className="fas fa-skull"></i> Wall of Shame
-                  </button>
-                </div>
-              </div>
-              <div className="leaderboard-list">
-                {sortedCompanies.slice(0, 5).map((company, index) => (
-                  <div key={company.id} className="leaderboard-item">
-                    <div className={"leaderboard-rank " + (index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : 'rank-default')}>
-                      {index + 1}
-                    </div>
-                    <div className="leaderboard-info">
-                      <div className="leaderboard-company">{company.company}</div>
-                      <div className="leaderboard-reports">{company.reports} anonymous reports</div>
-                    </div>
-                    <div className="leaderboard-score" style={{ color: getScoreColor(company.score) }}>
-                      {company.score}
+                    <div className="template-info">
+                      <div className="template-name">{template.name}</div>
+                      <div className="template-desc">{template.desc}</div>
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          </section>
+
+          {/* CTA Section */}
+          <section className="features-section">
+            <div className="container">
+              <div className="upload-card glass-heavy" style={{ textAlign: 'center', padding: '64px' }}>
+                <h2 className="section-title" style={{ marginBottom: '16px' }}>
+                  Ready to Build Your Empire?
+                </h2>
+                <p className="section-desc" style={{ marginBottom: '32px' }}>
+                  Join 50,000+ professionals who ditched the resume and built their Webume.
+                </p>
+                <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button className="btn btn-primary btn-lg" onClick={() => fileInputRef.current?.click()}>
+                    <i className="fas fa-upload"></i> Upload Resume
+                  </button>
+                  <button className="btn btn-secondary btn-lg" onClick={() => setView('builder')}>
+                    <i className="fas fa-edit"></i> Build Manually
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Footer */}
+          <Footer />
+        </>
+      );
+    };
+
+    // ============================================
+    // BUILDER PAGE
+    // ============================================
+    const BuilderPage = ({ profile, setProfile, activeSection, setActiveSection, setView }) => {
+      const sections = [
+        { id: 'basics', icon: 'fa-user', label: 'Basic Info' },
+        { id: 'experience', icon: 'fa-briefcase', label: 'Experience' },
+        { id: 'achievements', icon: 'fa-trophy', label: 'Achievements' },
+        { id: 'awards', icon: 'fa-award', label: 'Awards' },
+        { id: 'reviews', icon: 'fa-star', label: 'Reviews' },
+        { id: 'pay', icon: 'fa-dollar-sign', label: 'Pay History' },
+        { id: 'projects', icon: 'fa-diagram-project', label: 'Projects' },
+        { id: 'media', icon: 'fa-images', label: 'Media' },
+        { id: 'template', icon: 'fa-palette', label: 'Template' }
+      ];
+
+      const updateBasics = (field, value) => {
+        setProfile(prev => ({
+          ...prev,
+          basics: { ...prev.basics, [field]: value }
+        }));
+      };
+
+      const addExperience = () => {
+        const newExp = {
+          id: Date.now(),
+          company: '',
+          role: '',
+          startDate: '',
+          endDate: '',
+          description: '',
+          tasks: [],
+          dayInLife: [],
+          metrics: []
+        };
+        setProfile(prev => ({
+          ...prev,
+          experiences: [...prev.experiences, newExp]
+        }));
+      };
+
+      const updateExperience = (id, field, value) => {
+        setProfile(prev => ({
+          ...prev,
+          experiences: prev.experiences.map(exp => 
+            exp.id === id ? { ...exp, [field]: value } : exp
+          )
+        }));
+      };
+
+      const deleteExperience = (id) => {
+        setProfile(prev => ({
+          ...prev,
+          experiences: prev.experiences.filter(exp => exp.id !== id)
+        }));
+      };
+
+      return (
+        <section className="builder-section">
+          <div className="container">
+            <div className="builder-container">
+              {/* Sidebar */}
+              <div className="builder-sidebar glass-heavy">
+                <div className="sidebar-section">
+                  <div className="sidebar-title">Build Your Profile</div>
+                  <div className="sidebar-nav">
+                    {sections.map(section => (
+                      <button
+                        key={section.id}
+                        className={"sidebar-link" + (activeSection === section.id ? " active" : "")}
+                        onClick={() => setActiveSection(section.id)}
+                      >
+                        <i className={"fas " + section.icon}></i>
+                        {section.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="sidebar-section">
+                  <div className="sidebar-title">Actions</div>
+                  <div className="sidebar-nav">
+                    <button className="sidebar-link" onClick={() => setView('preview')}>
+                      <i className="fas fa-eye"></i> Preview Profile
+                    </button>
+                    <button className="sidebar-link">
+                      <i className="fas fa-download"></i> Export PDF
+                    </button>
+                    <button className="sidebar-link">
+                      <i className="fas fa-share"></i> Share Link
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Content */}
+              <div className="builder-main glass-heavy">
+                <div className="builder-header">
+                  <h2 className="builder-title">
+                    {sections.find(s => s.id === activeSection)?.label}
+                  </h2>
+                  <div className="builder-actions">
+                    <button className="btn btn-ghost btn-sm" onClick={() => setView('preview')}>
+                      <i className="fas fa-eye"></i> Preview
+                    </button>
+                    <button className="btn btn-primary btn-sm">
+                      <i className="fas fa-save"></i> Save
+                    </button>
+                  </div>
+                </div>
+
+                {/* Basic Info */}
+                {activeSection === 'basics' && (
+                  <div>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label className="form-label">Full Name</label>
+                        <input 
+                          className="form-input"
+                          placeholder="John Doe"
+                          value={profile.basics.name}
+                          onChange={(e) => updateBasics('name', e.target.value)}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Professional Title</label>
+                        <input 
+                          className="form-input"
+                          placeholder="Senior Product Manager"
+                          value={profile.basics.title}
+                          onChange={(e) => updateBasics('title', e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Tagline</label>
+                      <input 
+                        className="form-input"
+                        placeholder="Building products that matter..."
+                        value={profile.basics.tagline}
+                        onChange={(e) => updateBasics('tagline', e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label className="form-label">Email</label>
+                        <input 
+                          className="form-input"
+                          type="email"
+                          placeholder="john@example.com"
+                          value={profile.basics.email}
+                          onChange={(e) => updateBasics('email', e.target.value)}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Phone</label>
+                        <input 
+                          className="form-input"
+                          placeholder="+1 (555) 123-4567"
+                          value={profile.basics.phone}
+                          onChange={(e) => updateBasics('phone', e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label className="form-label">Location</label>
+                        <input 
+                          className="form-input"
+                          placeholder="San Francisco, CA"
+                          value={profile.basics.location}
+                          onChange={(e) => updateBasics('location', e.target.value)}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">LinkedIn</label>
+                        <input 
+                          className="form-input"
+                          placeholder="linkedin.com/in/username"
+                          value={profile.basics.linkedin}
+                          onChange={(e) => updateBasics('linkedin', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Experience */}
+                {activeSection === 'experience' && (
+                  <div>
+                    {profile.experiences.map((exp, index) => (
+                      <div key={exp.id} className="experience-card">
+                        <div className="experience-header">
+                          <div>
+                            <input
+                              className="form-input"
+                              style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '8px' }}
+                              placeholder="Company Name"
+                              value={exp.company}
+                              onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
+                            />
+                            <input
+                              className="form-input"
+                              style={{ color: 'var(--accent-primary)' }}
+                              placeholder="Your Role/Title"
+                              value={exp.role}
+                              onChange={(e) => updateExperience(exp.id, 'role', e.target.value)}
+                            />
+                          </div>
+                          <div className="experience-actions">
+                            <button className="exp-action-btn" onClick={() => deleteExperience(exp.id)}>
+                              <i className="fas fa-trash"></i>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="form-row" style={{ marginTop: '16px' }}>
+                          <div className="form-group">
+                            <label className="form-label">Start Date</label>
+                            <input 
+                              className="form-input"
+                              type="month"
+                              value={exp.startDate}
+                              onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
+                            />
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label">End Date</label>
+                            <input 
+                              className="form-input"
+                              type="month"
+                              placeholder="Present"
+                              value={exp.endDate}
+                              onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="form-group">
+                          <label className="form-label">Description</label>
+                          <textarea 
+                            className="form-textarea"
+                            placeholder="Describe your role, responsibilities, and impact..."
+                            value={exp.description}
+                            onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
+                          />
+                        </div>
+
+                        {/* Day in the Life */}
+                        <div className="day-life-section">
+                          <h4 className="day-life-title">
+                            <i className="fas fa-sun"></i>
+                            A Day in the Life at {exp.company || 'Company'}
+                          </h4>
+                          <div className="timeline-mini">
+                            {(exp.dayInLife || []).map((item, i) => (
+                              <div key={i} className="timeline-item-mini">
+                                <input
+                                  className="timeline-time"
+                                  style={{ background: 'transparent', border: 'none', outline: 'none' }}
+                                  value={item.time}
+                                  onChange={(e) => {
+                                    const newDayInLife = [...exp.dayInLife];
+                                    newDayInLife[i].time = e.target.value;
+                                    updateExperience(exp.id, 'dayInLife', newDayInLife);
+                                  }}
+                                />
+                                <input
+                                  className="timeline-content-mini form-input"
+                                  value={item.activity}
+                                  onChange={(e) => {
+                                    const newDayInLife = [...exp.dayInLife];
+                                    newDayInLife[i].activity = e.target.value;
+                                    updateExperience(exp.id, 'dayInLife', newDayInLife);
+                                  }}
+                                />
+                              </div>
+                            ))}
+                            <button 
+                              className="btn btn-ghost btn-sm"
+                              onClick={() => {
+                                const newDayInLife = [...(exp.dayInLife || []), { time: '9:00 AM', activity: '' }];
+                                updateExperience(exp.id, 'dayInLife', newDayInLife);
+                              }}
+                            >
+                              <i className="fas fa-plus"></i> Add Time Block
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Metrics */}
+                        <div style={{ marginTop: '24px' }}>
+                          <label className="form-label">Key Metrics</label>
+                          <div className="metrics-grid">
+                            {(exp.metrics || []).map((metric, i) => (
+                              <div key={i} className="metric-input-card">
+                                <input 
+                                  placeholder="+40%"
+                                  value={metric.value}
+                                  onChange={(e) => {
+                                    const newMetrics = [...exp.metrics];
+                                    newMetrics[i].value = e.target.value;
+                                    updateExperience(exp.id, 'metrics', newMetrics);
+                                  }}
+                                />
+                                <input 
+                                  className="metric-label-input"
+                                  placeholder="Metric Label"
+                                  value={metric.label}
+                                  onChange={(e) => {
+                                    const newMetrics = [...exp.metrics];
+                                    newMetrics[i].label = e.target.value;
+                                    updateExperience(exp.id, 'metrics', newMetrics);
+                                  }}
+                                />
+                              </div>
+                            ))}
+                            <div 
+                              className="metric-input-card"
+                              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                              onClick={() => {
+                                const newMetrics = [...(exp.metrics || []), { value: '', label: '' }];
+                                updateExperience(exp.id, 'metrics', newMetrics);
+                              }}
+                            >
+                              <i className="fas fa-plus" style={{ color: 'var(--text-muted)' }}></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    <button className="btn btn-secondary" onClick={addExperience}>
+                      <i className="fas fa-plus"></i> Add Experience
+                    </button>
+                  </div>
+                )}
+
+                {/* Achievements */}
+                {activeSection === 'achievements' && (
+                  <div>
+                    <div className="achievements-grid">
+                      {profile.achievements.map((achievement, i) => (
+                        <div key={achievement.id} className="achievement-card">
+                          <div className="achievement-icon">
+                            <i className={"fas " + achievement.icon}></i>
+                          </div>
+                          <div>
+                            <input
+                              className="form-input"
+                              style={{ fontWeight: '600', marginBottom: '4px' }}
+                              placeholder="Achievement Title"
+                              value={achievement.title}
+                              onChange={(e) => {
+                                const newAchievements = [...profile.achievements];
+                                newAchievements[i].title = e.target.value;
+                                setProfile(prev => ({ ...prev, achievements: newAchievements }));
+                              }}
+                            />
+                            <input
+                              className="form-input"
+                              style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}
+                              placeholder="Description"
+                              value={achievement.desc}
+                              onChange={(e) => {
+                                const newAchievements = [...profile.achievements];
+                                newAchievements[i].desc = e.target.value;
+                                setProfile(prev => ({ ...prev, achievements: newAchievements }));
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <button 
+                      className="btn btn-secondary"
+                      style={{ marginTop: '24px' }}
+                      onClick={() => {
+                        setProfile(prev => ({
+                          ...prev,
+                          achievements: [...prev.achievements, { id: Date.now(), icon: 'fa-star', title: '', desc: '' }]
+                        }));
+                      }}
+                    >
+                      <i className="fas fa-plus"></i> Add Achievement
+                    </button>
+                  </div>
+                )}
+
+                {/* Media */}
+                {activeSection === 'media' && (
+                  <div>
+                    <h3 style={{ marginBottom: '16px', color: 'var(--text-secondary)' }}>Photos</h3>
+                    <div className="media-grid">
+                      {profile.media.photos.map((photo, i) => (
+                        <div key={i} className="media-item">
+                          <img src={photo} alt={"Photo " + (i+1)} />
+                        </div>
+                      ))}
+                      <div className="media-item media-add">
+                        <i className="fas fa-plus"></i>
+                        <span style={{ fontSize: '0.8rem' }}>Add Photo</span>
+                      </div>
+                    </div>
+
+                    <h3 style={{ marginBottom: '16px', marginTop: '32px', color: 'var(--text-secondary)' }}>Videos</h3>
+                    <div className="media-grid">
+                      {profile.media.videos.map((video, i) => (
+                        <div key={i} className="media-item">
+                          <i className="fas fa-play" style={{ fontSize: '2rem', color: 'var(--text-muted)' }}></i>
+                        </div>
+                      ))}
+                      <div className="media-item media-add">
+                        <i className="fas fa-video"></i>
+                        <span style={{ fontSize: '0.8rem' }}>Add Video</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Template */}
+                {activeSection === 'template' && (
+                  <div>
+                    <div className="template-grid">
+                      {templates.map(template => (
+                        <div 
+                          key={template.id} 
+                          className={"template-card" + (profile.template === template.id ? " selected" : "")}
+                          onClick={() => setProfile(prev => ({ ...prev, template: template.id }))}
+                        >
+                          <div className="template-preview" style={{
+                            background: template.id === 'executive' ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' :
+                                       template.id === 'creative' ? 'linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)' :
+                                       template.id === 'tech' ? 'linear-gradient(135deg, #00d2d3 0%, #54a0ff 100%)' :
+                                       'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
+                          }}>
+                            {profile.template === template.id && (
+                              <div style={{
+                                position: 'absolute',
+                                top: '12px',
+                                right: '12px',
+                                background: 'var(--accent-primary)',
+                                color: 'white',
+                                width: '28px',
+                                height: '28px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}>
+                                <i className="fas fa-check"></i>
+                              </div>
+                            )}
+                          </div>
+                          <div className="template-info">
+                            <div className="template-name">{template.name}</div>
+                            <div className="template-desc">{template.desc}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Placeholder for other sections */}
+                {['awards', 'reviews', 'pay', 'projects'].includes(activeSection) && (
+                  <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
+                    <i className="fas fa-hammer" style={{ fontSize: '3rem', marginBottom: '16px' }}></i>
+                    <h3>Coming Soon</h3>
+                    <p>This section is under construction</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1614,149 +2271,249 @@ Most importantly, this is where I learned to mentor. The junior staff I trained 
     };
 
     // ============================================
-    // HUNTER AGENT (AI CHATBOT)
+    // PREVIEW PAGE
     // ============================================
-    const HunterAgent = ({ isOpen, onToggle, profile, timeline, truthVault }) => {
+    const PreviewPage = ({ profile, setView }) => {
+      return (
+        <section className="profile-preview" style={{ paddingTop: '120px' }}>
+          <div className="container">
+            <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <button className="btn btn-ghost" onClick={() => setView('builder')}>
+                <i className="fas fa-arrow-left"></i> Back to Editor
+              </button>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button className="btn btn-secondary">
+                  <i className="fas fa-download"></i> Export PDF
+                </button>
+                <button className="btn btn-primary">
+                  <i className="fas fa-share"></i> Share Profile
+                </button>
+              </div>
+            </div>
+
+            <div className="preview-frame">
+              <div className="preview-header">
+                <div className="preview-avatar">
+                  {profile.basics.name ? profile.basics.name.split(' ').map(n => n[0]).join('') : '?'}
+                </div>
+                <h1 className="preview-name">{profile.basics.name || 'Your Name'}</h1>
+                <p className="preview-tagline">{profile.basics.tagline || 'Your professional tagline'}</p>
+                
+                <div style={{ display: 'flex', gap: '12px', marginTop: '24px', flexWrap: 'wrap' }}>
+                  {profile.basics.email && (
+                    <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
+                      <i className="fas fa-envelope" style={{ marginRight: '8px' }}></i>
+                      {profile.basics.email}
+                    </span>
+                  )}
+                  {profile.basics.location && (
+                    <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
+                      <i className="fas fa-location-dot" style={{ marginRight: '8px' }}></i>
+                      {profile.basics.location}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="preview-body">
+                {/* Experience Timeline */}
+                {profile.experiences.length > 0 && (
+                  <div style={{ marginBottom: '48px' }}>
+                    <h2 style={{ marginBottom: '24px', fontSize: '1.5rem' }}>
+                      <i className="fas fa-briefcase" style={{ marginRight: '12px', color: 'var(--accent-primary)' }}></i>
+                      Experience
+                    </h2>
+                    
+                    {profile.experiences.map(exp => (
+                      <div key={exp.id} className="experience-card" style={{ marginBottom: '24px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+                          <div>
+                            <h3 style={{ color: 'var(--text-white)', marginBottom: '4px' }}>{exp.role}</h3>
+                            <p style={{ color: 'var(--accent-primary)', fontWeight: '600' }}>{exp.company}</p>
+                          </div>
+                          <span style={{ color: 'var(--text-muted)' }}>
+                            {exp.startDate} — {exp.endDate || 'Present'}
+                          </span>
+                        </div>
+                        
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>{exp.description}</p>
+                        
+                        {exp.metrics && exp.metrics.length > 0 && (
+                          <div className="metrics-grid" style={{ marginBottom: '16px' }}>
+                            {exp.metrics.filter(m => m.value).map((metric, i) => (
+                              <div key={i} style={{ 
+                                background: 'var(--bg-surface)', 
+                                padding: '16px', 
+                                borderRadius: 'var(--radius-md)',
+                                textAlign: 'center'
+                              }}>
+                                <div style={{ 
+                                  fontSize: '1.5rem', 
+                                  fontWeight: '700', 
+                                  color: 'var(--accent-primary)',
+                                  fontFamily: 'Space Grotesk'
+                                }}>{metric.value}</div>
+                                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{metric.label}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {exp.dayInLife && exp.dayInLife.length > 0 && (
+                          <div className="day-life-section">
+                            <h4 className="day-life-title">
+                              <i className="fas fa-sun"></i>
+                              A Day in the Life
+                            </h4>
+                            <div className="timeline-mini">
+                              {exp.dayInLife.map((item, i) => (
+                                <div key={i} className="timeline-item-mini">
+                                  <span className="timeline-time">{item.time}</span>
+                                  <span className="timeline-content-mini">{item.activity}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Achievements */}
+                {profile.achievements.length > 0 && (
+                  <div style={{ marginBottom: '48px' }}>
+                    <h2 style={{ marginBottom: '24px', fontSize: '1.5rem' }}>
+                      <i className="fas fa-trophy" style={{ marginRight: '12px', color: 'var(--accent-primary)' }}></i>
+                      Achievements
+                    </h2>
+                    <div className="achievements-grid">
+                      {profile.achievements.map(achievement => (
+                        <div key={achievement.id} className="achievement-card">
+                          <div className="achievement-icon">
+                            <i className={"fas " + achievement.icon}></i>
+                          </div>
+                          <div>
+                            <div className="achievement-title">{achievement.title}</div>
+                            <div className="achievement-desc">{achievement.desc}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Reviews */}
+                {profile.reviews && profile.reviews.length > 0 && (
+                  <div>
+                    <h2 style={{ marginBottom: '24px', fontSize: '1.5rem' }}>
+                      <i className="fas fa-star" style={{ marginRight: '12px', color: 'var(--accent-primary)' }}></i>
+                      What People Say
+                    </h2>
+                    {profile.reviews.map(review => (
+                      <div key={review.id} style={{
+                        background: 'var(--bg-elevated)',
+                        padding: '24px',
+                        borderRadius: 'var(--radius-lg)',
+                        marginBottom: '16px'
+                      }}>
+                        <p style={{ fontStyle: 'italic', marginBottom: '16px', fontSize: '1.1rem' }}>
+                          "{review.text}"
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{
+                            width: '40px',
+                            height: '40px',
+                            background: 'var(--gradient-primary)',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                            fontWeight: '600'
+                          }}>
+                            {review.author.split(' ').map(n => n[0]).join('')}
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: '600' }}>{review.author}</div>
+                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{review.role}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    };
+
+    // ============================================
+    // HUNTER CHAT
+    // ============================================
+    const HunterChat = ({ isOpen, onToggle, profile }) => {
       const [messages, setMessages] = useState([]);
       const [input, setInput] = useState('');
-      const [isTyping, setIsTyping] = useState(false);
       const messagesEndRef = useRef(null);
 
-      // Auto-scroll
       useEffect(() => {
         if (messagesEndRef.current) {
           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
       }, [messages]);
 
-      // Initial greeting
       useEffect(() => {
         if (isOpen && messages.length === 0) {
           setTimeout(() => {
+            const name = profile.basics.name || 'this candidate';
             setMessages([{
               id: 1,
               type: 'bot',
-              text: "Hey! I'm Brad's AI Headhunter. He drove **47% revenue growth** at Acme Corp and scaled TechGiant from Series A to IPO. What would you like to know?",
-              actions: ['View Case Studies', 'Check Availability', 'Book a Call', 'Download Resume']
+              text: "Hey there! I'm the AI Headhunter for " + name + ". Looking to hire someone exceptional? You're in the right place. What would you like to know?"
             }]);
           }, 500);
         }
-      }, [isOpen]);
+      }, [isOpen, profile.basics.name]);
 
-      const generateResponse = (userMessage) => {
-        const lower = userMessage.toLowerCase();
+      const sendMessage = () => {
+        if (!input.trim()) return;
         
-        // Comprehensive response logic
-        if (lower.includes('case study') || lower.includes('case studies') || lower.includes('proof') || lower.includes('evidence')) {
-          return {
-            text: "Absolutely! Brad's best case study is the **Acme Corp turnaround**:\\n\\n📈 **Revenue**: +47% over 3 years\\n💰 **Cost reduction**: $2.3M annual savings\\n👥 **Team growth**: 20 → 80 people\\n\\nHe inherited a failing department and turned it into a profit center. The CFO called it 'the most significant operational transformation in company history.' Scroll up to see the full story with charts!",
-            actions: ['See Revenue Chart', 'Read Full Story', 'View Validations']
-          };
-        }
-        
-        if (lower.includes('salary') || lower.includes('compensation') || lower.includes('pay') || lower.includes('rate')) {
-          return {
-            text: "Brad targets **senior executive-level compensation**. He's flexible for the right opportunity, especially if there's:\\n\\n✓ Strong equity component\\n✓ High-impact role\\n✓ Culture match (Truth Vault score 7+)\\n\\nWhat's your range? I can tell you if it's in the ballpark.",
-            actions: ['Share Budget Range', 'Discuss Equity', 'Book Compensation Call']
-          };
-        }
-        
-        if (lower.includes('available') || lower.includes('start') || lower.includes('when') || lower.includes('timeline')) {
-          return {
-            text: "Brad can start within **2-4 weeks** with standard notice. For the right role, he's open to discussing accelerated timelines.\\n\\nHe's currently evaluating 3 other opportunities, so I'd recommend moving quickly if there's mutual interest.",
-            actions: ['Book Intro Call', 'Send Job Description', 'Check Calendar']
-          };
-        }
-        
-        if (lower.includes('remote') || lower.includes('location') || lower.includes('relocation') || lower.includes('hybrid')) {
-          return {
-            text: "Brad is **flexible on location**:\\n\\n🏠 Remote: Yes, with occasional travel\\n🏢 Hybrid: Preferred for leadership roles\\n📍 On-site: Open to relocating for exec positions\\n\\nCurrently based in San Francisco. Where's your team located?",
-            actions: ['We\\'re Remote', 'Hybrid Setup', 'On-site Required']
-          };
-        }
-        
-        if (lower.includes('culture') || lower.includes('truth vault') || lower.includes('toxic') || lower.includes('company')) {
-          const goodCompanies = truthVault.filter(c => c.score >= 7).map(c => c.company).join(', ');
-          return {
-            text: "Great question! Brad believes in **radical transparency**. Check out the Truth Vault above to see anonymous culture ratings.\\n\\n🌟 **Top-rated companies**: " + goodCompanies + "\\n\\nWhat's your company's culture score? Brad specifically avoids places scoring below 5.",
-            actions: ['Rate Your Company', 'View Full Leaderboard', 'Discuss Culture']
-          };
-        }
-        
-        if (lower.includes('skill') || lower.includes('strength') || lower.includes('expert') || lower.includes('good at')) {
-          return {
-            text: "Brad's **superpowers**:\\n\\n🔧 **Process Optimization** - Turning chaos into systems\\n📊 **Data-Driven Leadership** - Dashboards that execs actually use\\n🚀 **Team Scaling** - Built 200+ person teams\\n💡 **Turnaround Specialist** - Fixing failing departments\\n\\nAll verified by former colleagues above. Which area matters most for your role?",
-            actions: ['Process Focus', 'Leadership Focus', 'Scaling Focus']
-          };
-        }
-        
-        if (lower.includes('experience') || lower.includes('background') || lower.includes('history') || lower.includes('career')) {
-          return {
-            text: "**30+ years of operational excellence**:\\n\\n🏢 **Acme Corp** (2015-2025): Senior Ops Leader - 47% revenue growth\\n🚀 **TechGiant Inc** (2008-2015): Operations Manager - IPO success\\n💡 **StartupXYZ** (2002-2008): Process Engineer - Built from scratch\\n\\nEvery claim is verified with colleague testimonials. Want the deep dive on any role?",
-            actions: ['Acme Deep Dive', 'TechGiant Story', 'Early Career']
-          };
-        }
-        
-        if (lower.includes('book') || lower.includes('call') || lower.includes('meet') || lower.includes('calendly') || lower.includes('schedule')) {
-          return {
-            text: "Perfect! Brad has 30-minute intro slots available this week. Click below to book directly:\\n\\n📅 **[Book on Calendly](" + profile.calendlyUrl + ")**\\n\\nOr if you prefer email: " + profile.email,
-            actions: ['Book 30-Min Call', 'Send Email Instead', 'Request Different Time']
-          };
-        }
-        
-        if (lower.includes('pdf') || lower.includes('resume') || lower.includes('cv') || lower.includes('download') || lower.includes('export')) {
-          return {
-            text: "You can export Brad's full Webume as a PDF using the button in the navigation. But honestly? This web version has **way more proof** than any PDF could hold:\\n\\n✓ Interactive charts\\n✓ Video walkthroughs\\n✓ Verified testimonials\\n✓ Truth Vault data\\n\\nShare the link instead: **webume.app/bradpowell**",
-            actions: ['Export PDF Anyway', 'Copy Share Link', 'Book Call Instead']
-          };
-        }
-        
-        // Default response
-        return {
-          text: "I'm here to sell Brad hard — because he's earned it. **47% revenue growth**, **200+ team members** trained, and every metric verified by colleagues.\\n\\nWhat specifically would help you make a decision?",
-          actions: ['View Proof', 'Check Availability', 'Book a Call', 'Ask Another Question']
-        };
-      };
-
-      const sendMessage = (text = input) => {
-        if (!text.trim()) return;
-        
-        const userMessage = { id: Date.now(), type: 'user', text };
-        setMessages(prev => [...prev, userMessage]);
+        setMessages(prev => [...prev, { id: Date.now(), type: 'user', text: input }]);
         setInput('');
-        setIsTyping(true);
 
         setTimeout(() => {
-          const response = generateResponse(text);
-          setMessages(prev => [...prev, {
-            id: Date.now(),
-            type: 'bot',
-            ...response
-          }]);
-          setIsTyping(false);
-        }, 800 + Math.random() * 700);
-      };
+          const lower = input.toLowerCase();
+          let response = "I'd be happy to tell you more about " + (profile.basics.name || 'this candidate') + "'s experience. What specifically interests you?";
+          
+          if (lower.includes('experience') || lower.includes('background')) {
+            response = profile.experiences.length > 0 
+              ? "Great question! " + profile.basics.name + " has " + profile.experiences.length + " key roles to highlight. Most recently at " + profile.experiences[0].company + " as " + profile.experiences[0].role + ". Want the details?"
+              : "The experience section is still being built. Check back soon!";
+          } else if (lower.includes('salary') || lower.includes('compensation')) {
+            response = "Compensation discussions are best handled directly. I can help schedule a call to discuss expectations. Interested?";
+          } else if (lower.includes('available') || lower.includes('start')) {
+            response = "Great timing! " + (profile.basics.name || 'This candidate') + " is actively exploring new opportunities. Would you like to schedule an intro call?";
+          }
 
-      const handleAction = (action) => {
-        sendMessage(action);
+          setMessages(prev => [...prev, { id: Date.now(), type: 'bot', text: response }]);
+        }, 800);
       };
 
       return (
         <>
-          {/* Chat Trigger Button */}
-          <button className={"chat-trigger" + (isOpen ? ' active' : '')} onClick={onToggle}>
-            {!isOpen && <span className="chat-notification"></span>}
+          <button className="chat-trigger" onClick={onToggle}>
             <i className={"fas " + (isOpen ? "fa-times" : "fa-comments")}></i>
           </button>
 
-          {/* Chat Window */}
           {isOpen && (
-            <div className="chat-window">
+            <div className="chat-window glass-heavy">
               <div className="chat-header">
                 <div className="chat-avatar">🤖</div>
-                <div>
-                  <div className="chat-title">Brad's AI Headhunter</div>
-                  <div className="chat-status">Always online • Ready to sell</div>
+                <div className="chat-info">
+                  <h4>AI Headhunter</h4>
+                  <span>Always online</span>
                 </div>
                 <button className="chat-close" onClick={onToggle}>
                   <i className="fas fa-times"></i>
@@ -1766,36 +2523,21 @@ Most importantly, this is where I learned to mentor. The junior staff I trained 
               <div className="chat-messages">
                 {messages.map(msg => (
                   <div key={msg.id} className={"chat-message " + msg.type}>
-                    <div dangerouslySetInnerHTML={{ __html: msg.text.replace(/\\*\\*(.+?)\\*\\*/g, '<strong>$1</strong>').replace(/\\\\n/g, '<br>') }} />
-                    {msg.actions && (
-                      <div className="chat-actions">
-                        {msg.actions.map((action, i) => (
-                          <button key={i} className="chat-action-btn" onClick={() => handleAction(action)}>
-                            {action}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                    <div className="chat-bubble">{msg.text}</div>
                   </div>
                 ))}
-                {isTyping && (
-                  <div className="chat-message bot">
-                    <em>Typing...</em>
-                  </div>
-                )}
                 <div ref={messagesEndRef} />
               </div>
 
               <div className="chat-input-area">
                 <input
                   className="chat-input"
-                  type="text"
-                  placeholder="Ask about Brad..."
+                  placeholder="Ask about this candidate..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                 />
-                <button className="chat-send" onClick={() => sendMessage()}>
+                <button className="chat-send" onClick={sendMessage}>
                   <i className="fas fa-paper-plane"></i>
                 </button>
               </div>
@@ -1806,296 +2548,63 @@ Most importantly, this is where I learned to mentor. The junior staff I trained 
     };
 
     // ============================================
-    // DASHBOARD MODAL
-    // ============================================
-    const DashboardModal = ({ data, setData, onClose }) => {
-      const [activeTab, setActiveTab] = useState('pending');
-
-      const approveValidation = (validation) => {
-        const jobId = validation.jobId;
-        setData(prev => ({
-          ...prev,
-          validations: {
-            ...prev.validations,
-            [jobId]: [...(prev.validations[jobId] || []), { ...validation, approved: true }]
-          },
-          pendingValidations: prev.pendingValidations.filter(v => v.id !== validation.id)
-        }));
-      };
-
-      const rejectValidation = (id) => {
-        setData(prev => ({
-          ...prev,
-          pendingValidations: prev.pendingValidations.filter(v => v.id !== id)
-        }));
-      };
-
-      return (
-        <div className="modal-overlay" onClick={onClose}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2 className="modal-title">
-                <i className="fas fa-cog" style={{ marginRight: '12px' }}></i>
-                Owner Dashboard
-              </h2>
-              <button className="modal-close" onClick={onClose}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-
-            <div style={{ padding: '0 24px', borderBottom: '1px solid var(--border-color)' }}>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button 
-                  className={"leaderboard-tab" + (activeTab === 'pending' ? ' active' : '')}
-                  onClick={() => setActiveTab('pending')}
-                  style={{ marginBottom: '-1px', borderBottom: activeTab === 'pending' ? '2px solid var(--accent-blue)' : 'none' }}
-                >
-                  Pending Validations ({data.pendingValidations.length})
-                </button>
-                <button 
-                  className={"leaderboard-tab" + (activeTab === 'profile' ? ' active' : '')}
-                  onClick={() => setActiveTab('profile')}
-                  style={{ marginBottom: '-1px', borderBottom: activeTab === 'profile' ? '2px solid var(--accent-blue)' : 'none' }}
-                >
-                  Edit Profile
-                </button>
-                <button 
-                  className={"leaderboard-tab" + (activeTab === 'stats' ? ' active' : '')}
-                  onClick={() => setActiveTab('stats')}
-                  style={{ marginBottom: '-1px', borderBottom: activeTab === 'stats' ? '2px solid var(--accent-blue)' : 'none' }}
-                >
-                  Stats
-                </button>
-              </div>
-            </div>
-
-            <div className="modal-body">
-              {activeTab === 'pending' && (
-                <div>
-                  <h3 style={{ marginBottom: '16px' }}>Validation Queue</h3>
-                  {data.pendingValidations.length === 0 ? (
-                    <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px' }}>
-                      No pending validations to review
-                    </p>
-                  ) : (
-                    data.pendingValidations.map(v => (
-                      <div key={v.id} className="validation-card" style={{ background: 'var(--bg-card)' }}>
-                        <div className="validation-content">
-                          <p className="validation-quote">"{v.text}"</p>
-                          <div className="validation-author">
-                            <div>
-                              <div className="validation-name">{v.name}</div>
-                              <div className="validation-role">{v.role} • For Job ID: {v.jobId}</div>
-                            </div>
-                          </div>
-                          <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
-                            <button className="btn btn-primary" onClick={() => approveValidation(v)}>
-                              <i className="fas fa-check"></i> Approve
-                            </button>
-                            <button className="btn btn-secondary" onClick={() => rejectValidation(v.id)}>
-                              <i className="fas fa-times"></i> Reject
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-
-              {activeTab === 'profile' && (
-                <div>
-                  <div className="form-group">
-                    <label className="form-label">Name</label>
-                    <input 
-                      className="form-input" 
-                      value={data.profile.name}
-                      onChange={(e) => setData(prev => ({ ...prev, profile: { ...prev.profile, name: e.target.value } }))}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Tagline</label>
-                    <input 
-                      className="form-input" 
-                      value={data.profile.tagline}
-                      onChange={(e) => setData(prev => ({ ...prev, profile: { ...prev.profile, tagline: e.target.value } }))}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Subtitle</label>
-                    <textarea 
-                      className="form-textarea" 
-                      value={data.profile.subtitle}
-                      onChange={(e) => setData(prev => ({ ...prev, profile: { ...prev.profile, subtitle: e.target.value } }))}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Video URL</label>
-                    <input 
-                      className="form-input" 
-                      value={data.profile.videoUrl}
-                      onChange={(e) => setData(prev => ({ ...prev, profile: { ...prev.profile, videoUrl: e.target.value } }))}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Calendly URL</label>
-                    <input 
-                      className="form-input" 
-                      value={data.profile.calendlyUrl}
-                      onChange={(e) => setData(prev => ({ ...prev, profile: { ...prev.profile, calendlyUrl: e.target.value } }))}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'stats' && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
-                  <div className="card" style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '3rem', fontWeight: '700', color: 'var(--accent-blue)' }}>
-                      {Object.values(data.validations).flat().length}
-                    </div>
-                    <div style={{ color: 'var(--text-muted)' }}>Verified Validations</div>
-                  </div>
-                  <div className="card" style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '3rem', fontWeight: '700', color: 'var(--accent-green)' }}>
-                      {data.timeline.length}
-                    </div>
-                    <div style={{ color: 'var(--text-muted)' }}>Career Entries</div>
-                  </div>
-                  <div className="card" style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '3rem', fontWeight: '700', color: 'var(--accent-purple)' }}>
-                      {data.truthVault.length}
-                    </div>
-                    <div style={{ color: 'var(--text-muted)' }}>Companies Rated</div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={onClose}>Close</button>
-              <button className="btn btn-primary" onClick={onClose}>
-                <i className="fas fa-save"></i> Save Changes
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    // ============================================
-    // VALIDATION FORM MODAL
-    // ============================================
-    const ValidationFormModal = ({ jobId, timeline, onSubmit, onClose }) => {
-      const [form, setForm] = useState({ text: '', name: '', role: '', jobId });
-      const job = timeline.find(j => j.id === jobId);
-
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        if (form.text && form.name && form.role) {
-          onSubmit(form);
-        }
-      };
-
-      return (
-        <div className="modal-overlay" onClick={onClose}>
-          <div className="modal" style={{ maxWidth: '600px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2 className="modal-title">
-                <i className="fas fa-user-check" style={{ marginRight: '12px' }}></i>
-                Add Validation
-              </h2>
-              <button className="modal-close" onClick={onClose}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit}>
-              <div className="modal-body">
-                <div style={{ background: 'var(--bg-elevated)', padding: '16px', borderRadius: 'var(--radius-md)', marginBottom: '24px' }}>
-                  <strong>Validating for:</strong> {job?.role} at {job?.company}
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Your Validation *</label>
-                  <textarea 
-                    className="form-textarea"
-                    placeholder="Share your experience working with Brad..."
-                    value={form.text}
-                    onChange={(e) => setForm(prev => ({ ...prev, text: e.target.value }))}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Your Name *</label>
-                  <input 
-                    className="form-input"
-                    placeholder="John Smith"
-                    value={form.name}
-                    onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Your Role/Title *</label>
-                  <input 
-                    className="form-input"
-                    placeholder="Senior Engineer at Acme Corp"
-                    value={form.role}
-                    onChange={(e) => setForm(prev => ({ ...prev, role: e.target.value }))}
-                    required
-                  />
-                </div>
-
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  <i className="fas fa-info-circle"></i> Your validation will be reviewed before appearing publicly.
-                </p>
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
-                <button type="submit" className="btn btn-primary">
-                  <i className="fas fa-paper-plane"></i> Submit Validation
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      );
-    };
-
-    // ============================================
     // FOOTER
     // ============================================
-    const Footer = ({ profile }) => {
-      return (
-        <footer className="footer">
-          <div className="container">
-            <div className="footer-brand">Webume</div>
-            <p className="footer-tagline">The résumé killer. Evidence wins.</p>
-            <div className="footer-links">
-              <a href={"mailto:" + profile.email} className="footer-link">
-                <i className="fas fa-envelope"></i> Email
-              </a>
-              <a href={"https://" + profile.linkedin} target="_blank" className="footer-link">
-                <i className="fab fa-linkedin"></i> LinkedIn
-              </a>
-              <a href={profile.calendlyUrl} target="_blank" className="footer-link">
-                <i className="fas fa-calendar"></i> Book a Call
-              </a>
+    const Footer = () => (
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-grid">
+            <div>
+              <div className="footer-brand">
+                <span style={{ fontSize: '1.5rem' }}>⚡</span>
+                Webume
+              </div>
+              <p className="footer-desc">
+                The future of professional profiles. Build your employee-for-hire empire.
+              </p>
+              <div className="footer-social">
+                <a href="#" className="social-link"><i className="fab fa-twitter"></i></a>
+                <a href="#" className="social-link"><i className="fab fa-linkedin"></i></a>
+                <a href="#" className="social-link"><i className="fab fa-github"></i></a>
+              </div>
             </div>
-            <p className="footer-copy">
-              © 2025 {profile.name}. All claims verified. Built once, updated forever.
-            </p>
+            <div>
+              <h4 className="footer-title">Product</h4>
+              <div className="footer-links">
+                <a href="#" className="footer-link">Features</a>
+                <a href="#" className="footer-link">Templates</a>
+                <a href="#" className="footer-link">Pricing</a>
+                <a href="#" className="footer-link">API</a>
+              </div>
+            </div>
+            <div>
+              <h4 className="footer-title">Company</h4>
+              <div className="footer-links">
+                <a href="#" className="footer-link">About</a>
+                <a href="#" className="footer-link">Blog</a>
+                <a href="#" className="footer-link">Careers</a>
+                <a href="#" className="footer-link">Contact</a>
+              </div>
+            </div>
+            <div>
+              <h4 className="footer-title">Legal</h4>
+              <div className="footer-links">
+                <a href="#" className="footer-link">Privacy</a>
+                <a href="#" className="footer-link">Terms</a>
+                <a href="#" className="footer-link">Security</a>
+              </div>
+            </div>
           </div>
-        </footer>
-      );
-    };
+          <div className="footer-bottom">
+            <span>© 2025 Webume. All rights reserved.</span>
+            <span>Built for the future of work.</span>
+          </div>
+        </div>
+      </footer>
+    );
 
     // ============================================
-    // RENDER APP
+    // RENDER
     // ============================================
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
