@@ -2,987 +2,1249 @@ import { Hono } from 'hono'
 
 const app = new Hono()
 
-// Main Webume Application - The Future of Professional Profiles
+// ============================================
+// WEBUME: THE RESUME KILLER
+// Premium Glassmorphism UI - Complete Redesign
+// Built to take back control from Big Corporations
+// ============================================
+
 app.get('/', (c) => {
   return c.html(`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Webume | The Future of Professional Profiles</title>
-  <meta name="description" content="Transform your resume into a living, breathing professional empire. Upload once, own forever.">
-  <meta property="og:title" content="Webume - Your Employee-for-Hire Empire">
-  <meta property="og:description" content="Not just a resume. A revolution in professional profiles.">
+  <title>Webume | The Resume Killer - Take Back Control</title>
+  <meta name="description" content="The resume killer we've needed for 30 years. Transform your career into a living, verifiable proof-of-work empire. Real results, not paragraphs.">
+  <meta property="og:title" content="Webume - Brad Powell | The Resume Killer">
+  <meta property="og:description" content="30+ years of verified impact. Evidence wins. Take back control from Big Corporations.">
+  <meta property="og:type" content="profile">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
   
-  <!-- React 18 -->
+  <!-- React 18 + Babel -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
-  <!-- Chart.js -->
+  <!-- Chart.js for metrics visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   
-  <!-- PDF.js for resume parsing -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  
-  <!-- Fonts -->
+  <!-- Premium Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   
-  <!-- Font Awesome -->
+  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
+    /* ============================================
+       CHUNK 1: PREMIUM DESIGN TOKENS
+       Glassmorphism-centric color system
+       ============================================ */
     :root {
-      --bg-void: #030308;
-      --bg-deep: #0a0a12;
-      --bg-surface: #12121c;
-      --bg-elevated: #1a1a28;
-      --bg-glass: rgba(255, 255, 255, 0.03);
-      --bg-glass-heavy: rgba(255, 255, 255, 0.06);
-      --text-white: #ffffff;
-      --text-primary: #e8e8f0;
-      --text-secondary: #9898a8;
-      --text-muted: #5a5a6e;
-      --accent-primary: #6366f1;
-      --accent-secondary: #8b5cf6;
-      --accent-tertiary: #a855f7;
-      --accent-cyan: #06b6d4;
-      --accent-emerald: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-rose: #f43f5e;
-      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-      --gradient-glow: linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(139, 92, 246, 0.4) 100%);
-      --gradient-mesh: radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                       radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
-                       radial-gradient(at 0% 50%, rgba(6, 182, 212, 0.1) 0px, transparent 50%),
-                       radial-gradient(at 80% 50%, rgba(168, 85, 247, 0.1) 0px, transparent 50%),
-                       radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
-      --border-glass: rgba(255, 255, 255, 0.08);
-      --border-glow: rgba(99, 102, 241, 0.3);
-      --shadow-glow: 0 0 60px rgba(99, 102, 241, 0.15);
-      --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      /* === VOID SCALE (Backgrounds) === */
+      --void-900: #020204;
+      --void-800: #050508;
+      --void-700: #08080d;
+      --void-600: #0c0c14;
+      --void-500: #12121e;
+      --void-400: #1a1a2a;
+      --void-300: #242438;
+
+      /* === PREMIUM GLASS TOKENS === */
+      --glass-bg-ultra: rgba(255, 255, 255, 0.02);
+      --glass-bg-light: rgba(255, 255, 255, 0.04);
+      --glass-bg-medium: rgba(255, 255, 255, 0.08);
+      --glass-bg-heavy: rgba(255, 255, 255, 0.12);
+      --glass-bg-solid: rgba(255, 255, 255, 0.16);
+      --glass-bg-tinted: rgba(99, 102, 241, 0.08);
+      --glass-bg-tinted-heavy: rgba(99, 102, 241, 0.15);
+
+      /* === GLASS BORDERS === */
+      --glass-border-subtle: rgba(255, 255, 255, 0.04);
+      --glass-border-light: rgba(255, 255, 255, 0.08);
+      --glass-border-default: rgba(255, 255, 255, 0.12);
+      --glass-border-heavy: rgba(255, 255, 255, 0.18);
+      --glass-border-highlight: rgba(255, 255, 255, 0.25);
+      --glass-border-glow: rgba(99, 102, 241, 0.5);
+
+      /* === PRIMARY ACCENT SPECTRUM === */
+      --accent-50: #eef2ff;
+      --accent-100: #e0e7ff;
+      --accent-200: #c7d2fe;
+      --accent-300: #a5b4fc;
+      --accent-400: #818cf8;
+      --accent-500: #6366f1;
+      --accent-600: #4f46e5;
+      --accent-700: #4338ca;
+
+      /* === VIOLET SPECTRUM === */
+      --violet-400: #a78bfa;
+      --violet-500: #8b5cf6;
+      --violet-600: #7c3aed;
+
+      /* === FUCHSIA/PINK SPECTRUM === */
+      --fuchsia-400: #e879f9;
+      --fuchsia-500: #d946ef;
+      --fuchsia-600: #c026d3;
+
+      /* === SEMANTIC COLORS === */
+      --success-400: #4ade80;
+      --success-500: #22c55e;
+      --success-glow: rgba(34, 197, 94, 0.3);
+
+      --warning-400: #fbbf24;
+      --warning-500: #f59e0b;
+      --warning-glow: rgba(245, 158, 11, 0.3);
+
+      --danger-400: #f87171;
+      --danger-500: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.3);
+
+      --info-400: #22d3ee;
+      --info-500: #06b6d4;
+      --info-glow: rgba(6, 182, 212, 0.3);
+
+      /* === TEXT HIERARCHY === */
+      --text-100: #ffffff;
+      --text-200: #f4f4f8;
+      --text-300: #d8d8e4;
+      --text-400: #a0a0b8;
+      --text-500: #6e6e88;
+      --text-600: #4a4a60;
+
+      /* === PREMIUM GRADIENTS === */
+      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+      --gradient-secondary: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%);
+      --gradient-accent: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+      --gradient-success: linear-gradient(135deg, #22c55e 0%, #06b6d4 100%);
+      --gradient-dark: linear-gradient(180deg, var(--void-600) 0%, var(--void-900) 100%);
+      --gradient-radial: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+      
+      /* === MESH GRADIENT (Premium Background) === */
+      --gradient-mesh: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.25) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.20) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(217, 70, 239, 0.15) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(6, 182, 212, 0.18) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(168, 85, 247, 0.10) 0px, transparent 60%);
+
+      /* === SHADOW SYSTEM === */
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+      --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.6);
+      --shadow-glow-sm: 0 0 20px rgba(99, 102, 241, 0.25);
+      --shadow-glow-md: 0 0 40px rgba(99, 102, 241, 0.35);
+      --shadow-glow-lg: 0 0 60px rgba(99, 102, 241, 0.45);
+      --shadow-glow-xl: 0 0 80px rgba(99, 102, 241, 0.55);
+      --shadow-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+      /* === BLUR INTENSITIES === */
+      --blur-xs: 4px;
+      --blur-sm: 8px;
+      --blur-md: 16px;
+      --blur-lg: 24px;
+      --blur-xl: 32px;
+      --blur-2xl: 48px;
+
+      /* === BORDER RADIUS === */
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
-      --radius-xl: 24px;
-      --radius-2xl: 32px;
+      --radius-xl: 20px;
+      --radius-2xl: 28px;
+      --radius-3xl: 36px;
+      --radius-full: 9999px;
+
+      /* === SPACING SCALE === */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-10: 40px;
+      --space-12: 48px;
+      --space-16: 64px;
+      --space-20: 80px;
+      --space-24: 96px;
+
+      /* === TIMING FUNCTIONS === */
+      --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* === DURATIONS === */
+      --duration-fast: 150ms;
+      --duration-normal: 300ms;
+      --duration-slow: 500ms;
     }
-    
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    html { scroll-behavior: smooth; }
-    
+
+    /* ============================================
+       CHUNK 2: GLOBAL RESETS & BASE STYLES
+       ============================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-void);
-      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: var(--void-900);
+      color: var(--text-200);
       line-height: 1.6;
       overflow-x: hidden;
       min-height: 100vh;
     }
-    
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--accent-primary); border-radius: 3px; }
-    
+
+    /* Premium Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--void-800); }
+    ::-webkit-scrollbar-thumb { 
+      background: linear-gradient(180deg, var(--accent-500), var(--violet-500));
+      border-radius: var(--radius-full);
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent-400); }
+
     /* Selection */
-    ::selection { background: var(--accent-primary); color: white; }
-    
-    /* Typography */
+    ::selection { 
+      background: rgba(99, 102, 241, 0.4); 
+      color: var(--text-100);
+    }
+
+    /* Typography Hierarchy */
     h1, h2, h3, h4, h5, h6 { 
       font-family: 'Space Grotesk', sans-serif; 
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
     }
+
+    /* ============================================
+       CHUNK 3: ANIMATED BACKGROUND SYSTEM
+       Premium mesh gradients + floating orbs
+       ============================================ */
     
-    /* Glassmorphism Base */
-    .glass {
-      background: var(--bg-glass);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--border-glass);
-    }
-    
-    .glass-heavy {
-      background: var(--bg-glass-heavy);
-      backdrop-filter: blur(40px);
-      -webkit-backdrop-filter: blur(40px);
-      border: 1px solid var(--border-glass);
-    }
-    
-    /* Animated Background */
-    .bg-mesh {
+    /* Main Mesh Background */
+    .mesh-bg {
       position: fixed;
       inset: 0;
       background: var(--gradient-mesh);
-      z-index: -1;
-      animation: meshMove 30s ease-in-out infinite;
+      z-index: -3;
+      animation: meshFloat 40s ease-in-out infinite;
     }
-    
-    @keyframes meshMove {
-      0%, 100% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.1) rotate(3deg); }
+
+    @keyframes meshFloat {
+      0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.9; }
+      25% { transform: scale(1.02) translate(1%, -1%); opacity: 1; }
+      50% { transform: scale(0.98) translate(-1%, 1%); opacity: 0.85; }
+      75% { transform: scale(1.01) translate(0.5%, 0.5%); opacity: 0.95; }
     }
-    
-    /* Grid Lines Background */
-    .grid-bg {
+
+    /* Premium Grid Overlay */
+    .grid-overlay {
       position: fixed;
       inset: 0;
       background-image: 
         linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
-      background-size: 60px 60px;
-      z-index: -1;
+      background-size: 80px 80px;
+      z-index: -2;
+      mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 70%);
     }
-    
+
     /* Floating Orbs */
     .orb {
       position: fixed;
       border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.5;
-      animation: orbFloat 20s ease-in-out infinite;
       pointer-events: none;
       z-index: -1;
     }
-    
-    .orb-1 { width: 600px; height: 600px; background: var(--accent-primary); top: -200px; left: -200px; }
-    .orb-2 { width: 400px; height: 400px; background: var(--accent-secondary); bottom: -100px; right: -100px; animation-delay: -10s; }
-    .orb-3 { width: 300px; height: 300px; background: var(--accent-cyan); top: 50%; left: 50%; animation-delay: -5s; }
-    
-    @keyframes orbFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(30px, -30px) scale(1.1); }
-      66% { transform: translate(-20px, 20px) scale(0.9); }
+
+    .orb-1 {
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%);
+      top: -300px;
+      left: -300px;
+      filter: blur(100px);
+      animation: orbDrift1 30s ease-in-out infinite;
     }
+
+    .orb-2 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, transparent 70%);
+      bottom: -200px;
+      right: -200px;
+      filter: blur(80px);
+      animation: orbDrift2 25s ease-in-out infinite;
+    }
+
+    .orb-3 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, transparent 70%);
+      top: 40%;
+      left: 60%;
+      filter: blur(90px);
+      animation: orbDrift3 35s ease-in-out infinite;
+    }
+
+    .orb-4 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(217, 70, 239, 0.25) 0%, transparent 70%);
+      top: 60%;
+      left: 10%;
+      filter: blur(70px);
+      animation: orbDrift4 28s ease-in-out infinite;
+    }
+
+    @keyframes orbDrift1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(40px, 30px) scale(1.1); }
+      66% { transform: translate(-30px, -20px) scale(0.9); }
+    }
+
+    @keyframes orbDrift2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-50px, -40px) scale(1.15); }
+      66% { transform: translate(30px, 20px) scale(0.85); }
+    }
+
+    @keyframes orbDrift3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-60px, 40px) scale(1.05); }
+    }
+
+    @keyframes orbDrift4 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(50px, -30px) scale(1.1); }
+    }
+
+    /* ============================================
+       CHUNK 4: GLASSMORPHISM COMPONENT CLASSES
+       Premium glass cards with rim highlights
+       ============================================ */
     
-    /* Container */
-    .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
-    
-    /* Navigation */
+    /* Base Glass Card */
+    .glass {
+      background: var(--glass-bg-medium);
+      backdrop-filter: blur(var(--blur-lg)) saturate(180%);
+      -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(180%);
+      border: 1px solid var(--glass-border-default);
+      border-top-color: var(--glass-border-heavy);
+      box-shadow: var(--shadow-glass);
+      position: relative;
+    }
+
+    .glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    /* Heavy Glass */
+    .glass-heavy {
+      background: var(--glass-bg-heavy);
+      backdrop-filter: blur(var(--blur-xl)) saturate(200%);
+      -webkit-backdrop-filter: blur(var(--blur-xl)) saturate(200%);
+      border: 1px solid var(--glass-border-heavy);
+      border-top-color: var(--glass-border-highlight);
+      box-shadow: var(--shadow-glass), var(--shadow-glow-sm);
+      position: relative;
+    }
+
+    .glass-heavy::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 40%);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    /* Ultra Glass (Strongest effect) */
+    .glass-ultra {
+      background: var(--glass-bg-solid);
+      backdrop-filter: blur(var(--blur-2xl)) saturate(220%);
+      -webkit-backdrop-filter: blur(var(--blur-2xl)) saturate(220%);
+      border: 1px solid var(--glass-border-highlight);
+      box-shadow: 
+        var(--shadow-lg),
+        var(--shadow-glow-md),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .glass-ultra::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 35%);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    /* Tinted Glass */
+    .glass-tinted {
+      background: var(--glass-bg-tinted);
+      backdrop-filter: blur(var(--blur-lg)) saturate(180%);
+      -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(180%);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-top-color: rgba(99, 102, 241, 0.35);
+      box-shadow: var(--shadow-glass), 0 0 30px rgba(99, 102, 241, 0.15);
+    }
+
+    /* Card Hover Effects */
+    .glass-card {
+      transition: 
+        transform var(--duration-normal) var(--ease-spring),
+        box-shadow var(--duration-normal) var(--ease-smooth),
+        border-color var(--duration-fast) var(--ease-smooth),
+        background var(--duration-fast) var(--ease-smooth);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-6px);
+      background: var(--glass-bg-heavy);
+      border-color: var(--glass-border-glow);
+      box-shadow: 
+        var(--shadow-lg),
+        var(--shadow-glow-lg),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    /* ============================================
+       CHUNK 5: NAVIGATION
+       Premium floating glass navbar
+       ============================================ */
     .nav {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: var(--space-4);
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - var(--space-8));
+      max-width: 1400px;
       z-index: 1000;
-      padding: 16px 0;
+      padding: var(--space-3) var(--space-6);
+      border-radius: var(--radius-2xl);
+      background: rgba(8, 8, 13, 0.8);
+      backdrop-filter: blur(var(--blur-xl)) saturate(180%);
+      -webkit-backdrop-filter: blur(var(--blur-xl)) saturate(180%);
+      border: 1px solid var(--glass-border-light);
+      box-shadow: var(--shadow-lg), var(--shadow-glow-sm);
     }
-    
+
     .nav-inner {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 24px;
-      border-radius: var(--radius-xl);
     }
-    
+
     .nav-logo {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: var(--space-3);
       font-family: 'Space Grotesk', sans-serif;
       font-size: 1.5rem;
       font-weight: 700;
-      color: var(--text-white);
+      color: var(--text-100);
+      text-decoration: none;
     }
-    
+
     .nav-logo-icon {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       background: var(--gradient-primary);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
+      box-shadow: var(--shadow-glow-sm);
+      position: relative;
+      overflow: hidden;
     }
-    
-    .nav-links { display: flex; gap: 8px; align-items: center; }
-    
+
+    .nav-logo-icon::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: var(--space-2);
+      align-items: center;
+    }
+
     .nav-link {
-      padding: 10px 20px;
-      border-radius: var(--radius-md);
-      color: var(--text-secondary);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-lg);
+      color: var(--text-400);
       text-decoration: none;
       font-weight: 500;
       font-size: 0.9rem;
-      transition: all 0.3s ease;
+      transition: all var(--duration-fast) var(--ease-smooth);
       border: 1px solid transparent;
+      background: transparent;
+      cursor: pointer;
     }
-    
-    .nav-link:hover { 
-      color: var(--text-white); 
-      background: var(--bg-glass);
-      border-color: var(--border-glass);
+
+    .nav-link:hover {
+      color: var(--text-100);
+      background: var(--glass-bg-medium);
+      border-color: var(--glass-border-light);
     }
-    
-    /* Buttons */
+
+    .nav-link.active {
+      color: var(--text-100);
+      background: var(--glass-bg-tinted);
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    /* ============================================
+       CHUNK 6: BUTTON SYSTEM
+       Premium buttons with glow effects
+       ============================================ */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      padding: 14px 28px;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-6);
       border-radius: var(--radius-lg);
+      font-family: 'Inter', sans-serif;
       font-weight: 600;
       font-size: 0.95rem;
       cursor: pointer;
-      transition: all 0.3s ease;
       border: none;
       text-decoration: none;
       position: relative;
       overflow: hidden;
+      transition: all var(--duration-normal) var(--ease-spring);
     }
-    
+
+    /* Primary Button */
     .btn-primary {
       background: var(--gradient-primary);
-      color: white;
-      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+      color: var(--text-100);
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4), var(--shadow-inner-glow);
     }
-    
-    .btn-primary:hover { 
-      transform: translateY(-2px); 
-      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5);
-    }
-    
+
     .btn-primary::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+      background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%);
     }
-    
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 
+        0 8px 30px rgba(99, 102, 241, 0.5),
+        0 0 0 1px rgba(99, 102, 241, 0.5),
+        var(--shadow-inner-glow);
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px);
+    }
+
+    /* Secondary Button (Glass) */
     .btn-secondary {
-      background: var(--bg-glass-heavy);
-      color: var(--text-white);
-      border: 1px solid var(--border-glass);
-      backdrop-filter: blur(20px);
+      background: var(--glass-bg-heavy);
+      backdrop-filter: blur(var(--blur-md));
+      -webkit-backdrop-filter: blur(var(--blur-md));
+      color: var(--text-200);
+      border: 1px solid var(--glass-border-default);
+      box-shadow: var(--shadow-sm);
     }
-    
-    .btn-secondary:hover { 
-      background: var(--bg-elevated);
-      border-color: var(--accent-primary);
+
+    .btn-secondary:hover {
+      background: var(--glass-bg-solid);
+      border-color: var(--accent-500);
+      box-shadow: var(--shadow-md), var(--shadow-glow-sm);
+      transform: translateY(-2px);
     }
-    
+
+    /* Ghost Button */
     .btn-ghost {
       background: transparent;
-      color: var(--text-secondary);
-      border: 1px solid var(--border-glass);
+      color: var(--text-400);
+      border: 1px solid var(--glass-border-light);
     }
-    
-    .btn-ghost:hover { 
-      color: var(--text-white);
-      border-color: var(--accent-primary);
-      background: var(--bg-glass);
+
+    .btn-ghost:hover {
+      color: var(--text-100);
+      background: var(--glass-bg-light);
+      border-color: var(--accent-500);
     }
-    
-    .btn-lg { padding: 18px 36px; font-size: 1.1rem; }
-    .btn-sm { padding: 10px 20px; font-size: 0.85rem; }
-    
-    /* Hero Section */
+
+    /* Button Sizes */
+    .btn-lg {
+      padding: var(--space-4) var(--space-8);
+      font-size: 1.1rem;
+      border-radius: var(--radius-xl);
+    }
+
+    .btn-sm {
+      padding: var(--space-2) var(--space-4);
+      font-size: 0.85rem;
+    }
+
+    /* Icon Button */
+    .btn-icon {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border-radius: var(--radius-lg);
+    }
+
+    /* ============================================
+       CHUNK 7: HERO SECTION
+       Epic landing with gradient text
+       ============================================ */
     .hero {
       min-height: 100vh;
       display: flex;
       align-items: center;
-      padding: 120px 0 80px;
+      padding: 140px 0 100px;
       position: relative;
     }
-    
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 var(--space-6);
+      width: 100%;
+    }
+
     .hero-content {
       text-align: center;
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto;
     }
-    
+
     .hero-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 20px;
-      background: var(--bg-glass);
-      border: 1px solid var(--border-glass);
-      border-radius: 50px;
-      font-size: 0.85rem;
-      color: var(--accent-cyan);
-      font-weight: 500;
-      margin-bottom: 32px;
-      backdrop-filter: blur(20px);
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-5);
+      background: var(--glass-bg-tinted);
+      backdrop-filter: blur(var(--blur-md));
+      -webkit-backdrop-filter: blur(var(--blur-md));
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--radius-full);
+      font-size: 0.9rem;
+      color: var(--accent-400);
+      font-weight: 600;
+      margin-bottom: var(--space-8);
+      box-shadow: var(--shadow-glow-sm);
+      animation: fadeInUp 0.8s var(--ease-spring) forwards;
+      opacity: 0;
     }
-    
-    .hero-badge i { font-size: 0.75rem; }
-    
+
+    .hero-badge i {
+      font-size: 0.8rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
     .hero-title {
-      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-size: clamp(3rem, 8vw, 6rem);
       line-height: 1.05;
-      margin-bottom: 24px;
-      background: linear-gradient(135deg, var(--text-white) 0%, var(--text-secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      margin-bottom: var(--space-6);
+      animation: fadeInUp 0.8s var(--ease-spring) 0.1s forwards;
+      opacity: 0;
     }
-    
-    .hero-title .highlight {
+
+    .hero-title-line {
+      display: block;
+    }
+
+    .hero-title .gradient-text {
       background: var(--gradient-primary);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    
+
+    .hero-title .white-text {
+      color: var(--text-100);
+    }
+
     .hero-subtitle {
-      font-size: 1.35rem;
-      color: var(--text-secondary);
-      margin-bottom: 48px;
-      max-width: 700px;
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      color: var(--text-400);
+      margin-bottom: var(--space-10);
+      max-width: 750px;
       margin-left: auto;
       margin-right: auto;
       line-height: 1.7;
+      animation: fadeInUp 0.8s var(--ease-spring) 0.2s forwards;
+      opacity: 0;
     }
-    
+
+    .hero-subtitle strong {
+      color: var(--text-200);
+    }
+
     .hero-cta {
       display: flex;
-      gap: 16px;
+      gap: var(--space-4);
       justify-content: center;
       flex-wrap: wrap;
-      margin-bottom: 64px;
+      margin-bottom: var(--space-16);
+      animation: fadeInUp 0.8s var(--ease-spring) 0.3s forwards;
+      opacity: 0;
     }
-    
+
     .hero-stats {
       display: flex;
       justify-content: center;
-      gap: 48px;
+      gap: var(--space-12);
       flex-wrap: wrap;
+      animation: fadeInUp 0.8s var(--ease-spring) 0.4s forwards;
+      opacity: 0;
     }
-    
+
     .hero-stat {
       text-align: center;
     }
-    
+
     .hero-stat-value {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 2.5rem;
+      font-size: clamp(2rem, 5vw, 3rem);
       font-weight: 700;
       background: var(--gradient-primary);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      line-height: 1.2;
     }
-    
+
     .hero-stat-label {
       font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-top: 4px;
+      color: var(--text-500);
+      margin-top: var(--space-1);
+      font-weight: 500;
     }
-    
-    /* Upload Section */
-    .upload-section {
-      padding: 100px 0;
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ============================================
+       CHUNK 8: PROFILE SECTION
+       Brad Powell's premium profile display
+       ============================================ */
+    .profile-section {
+      padding: var(--space-24) 0;
       position: relative;
     }
-    
-    .upload-card {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 48px;
-      border-radius: var(--radius-2xl);
+
+    .profile-header {
       text-align: center;
-      position: relative;
-      overflow: hidden;
+      margin-bottom: var(--space-16);
     }
-    
-    .upload-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: var(--gradient-glow);
-      opacity: 0.1;
-      z-index: -1;
-    }
-    
-    .upload-zone {
-      border: 2px dashed var(--border-glass);
-      border-radius: var(--radius-xl);
-      padding: 64px 48px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-    
-    .upload-zone:hover {
-      border-color: var(--accent-primary);
-      background: var(--bg-glass);
-    }
-    
-    .upload-zone.dragging {
-      border-color: var(--accent-primary);
-      background: rgba(99, 102, 241, 0.1);
-      transform: scale(1.02);
-    }
-    
-    .upload-icon {
-      width: 80px;
-      height: 80px;
+
+    .profile-avatar {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto var(--space-6);
+      border-radius: 50%;
       background: var(--gradient-primary);
-      border-radius: var(--radius-xl);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 24px;
-      font-size: 2rem;
-      color: white;
-    }
-    
-    .upload-title {
-      font-size: 1.5rem;
-      margin-bottom: 12px;
-      color: var(--text-white);
-    }
-    
-    .upload-desc {
-      color: var(--text-secondary);
-      margin-bottom: 24px;
-    }
-    
-    .upload-formats {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    
-    .format-badge {
-      padding: 6px 14px;
-      background: var(--bg-elevated);
-      border-radius: 50px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
-    }
-    
-    /* Features Grid */
-    .features-section {
-      padding: 100px 0;
-    }
-    
-    .section-header {
-      text-align: center;
-      margin-bottom: 64px;
-    }
-    
-    .section-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 20px;
-      background: var(--bg-glass);
-      border: 1px solid var(--border-glass);
-      border-radius: 50px;
-      font-size: 0.85rem;
-      color: var(--accent-primary);
-      font-weight: 600;
-      margin-bottom: 20px;
-      backdrop-filter: blur(20px);
-    }
-    
-    .section-title {
-      font-size: clamp(2rem, 5vw, 3rem);
-      margin-bottom: 16px;
-    }
-    
-    .section-desc {
-      font-size: 1.15rem;
-      color: var(--text-secondary);
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
-    }
-    
-    .feature-card {
-      padding: 32px;
-      border-radius: var(--radius-xl);
-      transition: all 0.4s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: var(--gradient-primary);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      z-index: -1;
-    }
-    
-    .feature-card:hover {
-      transform: translateY(-8px);
-      border-color: var(--accent-primary);
-    }
-    
-    .feature-card:hover::before { opacity: 0.05; }
-    
-    .feature-icon {
-      width: 56px;
-      height: 56px;
-      background: var(--bg-elevated);
-      border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      font-size: 1.5rem;
-      transition: all 0.3s ease;
-    }
-    
-    .feature-card:hover .feature-icon {
-      background: var(--gradient-primary);
-      color: white;
-    }
-    
-    .feature-title {
-      font-size: 1.25rem;
-      margin-bottom: 12px;
-      color: var(--text-white);
-    }
-    
-    .feature-desc {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      line-height: 1.7;
-    }
-    
-    /* Profile Builder */
-    .builder-section {
-      padding: 100px 0;
-      background: var(--bg-deep);
+      padding: 4px;
+      box-shadow: var(--shadow-glow-lg);
       position: relative;
     }
-    
-    .builder-container {
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 32px;
-      min-height: 80vh;
-    }
-    
-    /* Sidebar */
-    .builder-sidebar {
-      padding: 24px;
-      border-radius: var(--radius-xl);
-      height: fit-content;
-      position: sticky;
-      top: 100px;
-    }
-    
-    .sidebar-section {
-      margin-bottom: 32px;
-    }
-    
-    .sidebar-title {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-    }
-    
-    .sidebar-nav {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    
-    .sidebar-link {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
-      cursor: pointer;
-      border: none;
-      background: transparent;
+
+    .profile-avatar-inner {
       width: 100%;
-      text-align: left;
-    }
-    
-    .sidebar-link:hover { 
-      background: var(--bg-glass);
-      color: var(--text-white);
-    }
-    
-    .sidebar-link.active {
-      background: var(--gradient-primary);
-      color: white;
-    }
-    
-    .sidebar-link i { width: 20px; text-align: center; }
-    
-    /* Builder Main */
-    .builder-main {
-      padding: 32px;
-      border-radius: var(--radius-xl);
-      min-height: 600px;
-    }
-    
-    .builder-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 32px;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    
-    .builder-title {
-      font-size: 1.75rem;
-    }
-    
-    .builder-actions {
-      display: flex;
-      gap: 12px;
-    }
-    
-    /* Form Elements */
-    .form-group {
-      margin-bottom: 24px;
-    }
-    
-    .form-label {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-    }
-    
-    .form-input, .form-textarea, .form-select {
-      width: 100%;
-      padding: 14px 18px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-md);
-      color: var(--text-white);
-      font-size: 1rem;
-      font-family: inherit;
-      transition: all 0.2s ease;
-    }
-    
-    .form-input:focus, .form-textarea:focus, .form-select:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-    
-    .form-textarea { min-height: 120px; resize: vertical; }
-    
-    .form-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-    }
-    
-    /* Experience Cards */
-    .experience-card {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      margin-bottom: 16px;
-      transition: all 0.3s ease;
-    }
-    
-    .experience-card:hover {
-      border-color: var(--accent-primary);
-    }
-    
-    .experience-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 16px;
-    }
-    
-    .experience-company {
-      font-size: 1.25rem;
-      color: var(--text-white);
-      margin-bottom: 4px;
-    }
-    
-    .experience-role {
-      color: var(--accent-primary);
-      font-weight: 600;
-    }
-    
-    .experience-dates {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-    
-    .experience-actions {
-      display: flex;
-      gap: 8px;
-    }
-    
-    .exp-action-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-glass);
-      background: transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    .exp-action-btn:hover {
-      color: var(--text-white);
-      border-color: var(--accent-primary);
-      background: var(--bg-glass);
-    }
-    
-    /* Day in the Life */
-    .day-life-section {
-      background: var(--bg-surface);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      margin-top: 16px;
-    }
-    
-    .day-life-title {
-      font-size: 1rem;
-      color: var(--accent-cyan);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .timeline-mini {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    
-    .timeline-item-mini {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-    }
-    
-    .timeline-time {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      color: var(--accent-primary);
-      min-width: 60px;
-    }
-    
-    .timeline-content-mini {
-      flex: 1;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-    
-    /* Media Upload Grid */
-    .media-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 16px;
-      margin-top: 16px;
-    }
-    
-    .media-item {
-      aspect-ratio: 1;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-md);
+      height: 100%;
+      border-radius: 50%;
+      background: var(--void-700);
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      font-size: 4rem;
       overflow: hidden;
-      position: relative;
     }
-    
-    .media-item:hover {
-      border-color: var(--accent-primary);
-    }
-    
-    .media-item img {
+
+    .profile-avatar-inner img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    
-    .media-add {
-      flex-direction: column;
-      gap: 8px;
-      color: var(--text-muted);
-      border-style: dashed;
+
+    .profile-name {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      margin-bottom: var(--space-3);
+      background: linear-gradient(135deg, var(--text-100) 0%, var(--text-300) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    
-    .media-add:hover {
-      color: var(--accent-primary);
-      background: var(--bg-glass);
+
+    .profile-title {
+      font-size: 1.4rem;
+      color: var(--accent-400);
+      font-weight: 600;
+      margin-bottom: var(--space-4);
     }
-    
-    /* Metrics Section */
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-top: 16px;
+
+    .profile-tagline {
+      font-size: 1.15rem;
+      color: var(--text-400);
+      max-width: 600px;
+      margin: 0 auto var(--space-8);
+      line-height: 1.7;
     }
-    
-    .metric-input-card {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-md);
-      padding: 20px;
-    }
-    
-    .metric-input-card input {
-      width: 100%;
-      background: transparent;
-      border: none;
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--accent-primary);
-      font-family: 'Space Grotesk', sans-serif;
-      text-align: center;
-      outline: none;
-    }
-    
-    .metric-input-card input::placeholder {
-      color: var(--text-muted);
-    }
-    
-    .metric-label-input {
-      width: 100%;
-      background: transparent;
-      border: none;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      text-align: center;
-      outline: none;
-      margin-top: 8px;
-    }
-    
-    /* Profile Preview */
-    .profile-preview {
-      padding: 100px 0;
-    }
-    
-    .preview-frame {
-      background: var(--bg-deep);
+
+    .profile-video {
+      max-width: 800px;
+      margin: 0 auto;
       border-radius: var(--radius-2xl);
       overflow: hidden;
-      box-shadow: var(--shadow-card);
+      box-shadow: var(--shadow-xl), var(--shadow-glow-md);
+      border: 1px solid var(--glass-border-default);
     }
-    
-    .preview-header {
-      padding: 32px;
-      background: var(--gradient-primary);
+
+    .profile-video iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      display: block;
+    }
+
+    /* ============================================
+       CHUNK 9: TIMELINE SECTION
+       Premium career timeline with glow effects
+       ============================================ */
+    .timeline-section {
+      padding: var(--space-24) 0;
+      background: linear-gradient(180deg, transparent 0%, var(--void-800) 50%, transparent 100%);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: var(--space-16);
+    }
+
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-5);
+      background: var(--glass-bg-tinted);
+      backdrop-filter: blur(var(--blur-md));
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      color: var(--accent-400);
+      font-weight: 600;
+      margin-bottom: var(--space-5);
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin-bottom: var(--space-4);
+      color: var(--text-100);
+    }
+
+    .section-desc {
+      font-size: 1.15rem;
+      color: var(--text-400);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Timeline Container */
+    .timeline {
       position: relative;
-      overflow: hidden;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding-left: var(--space-16);
     }
-    
-    .preview-header::before {
+
+    /* Glowing Timeline Line */
+    .timeline::before {
       content: '';
       position: absolute;
-      inset: 0;
-      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      left: 24px;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, 
+        var(--accent-500) 0%, 
+        var(--violet-500) 50%, 
+        var(--fuchsia-500) 100%
+      );
+      border-radius: var(--radius-full);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
     }
-    
-    .preview-avatar {
-      width: 120px;
-      height: 120px;
-      background: var(--bg-glass-heavy);
-      border: 4px solid rgba(255,255,255,0.2);
+
+    /* Timeline Entry */
+    .timeline-entry {
+      position: relative;
+      margin-bottom: var(--space-12);
+      padding: var(--space-8);
+      border-radius: var(--radius-2xl);
+      transition: all var(--duration-normal) var(--ease-spring);
+    }
+
+    .timeline-entry:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Timeline Node */
+    .timeline-node {
+      position: absolute;
+      left: calc(-1 * var(--space-16) + 14px);
+      top: var(--space-8);
+      width: 24px;
+      height: 24px;
+      background: var(--void-800);
+      border: 3px solid var(--accent-500);
       border-radius: 50%;
+      box-shadow: 
+        0 0 0 6px var(--void-800),
+        var(--shadow-glow-md);
+      z-index: 1;
+    }
+
+    .timeline-entry:hover .timeline-node {
+      background: var(--accent-500);
+      box-shadow: 
+        0 0 0 6px var(--void-800),
+        var(--shadow-glow-lg);
+    }
+
+    /* Timeline Content */
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .timeline-company {
+      font-size: 1.75rem;
+      color: var(--text-100);
+      margin-bottom: var(--space-1);
+    }
+
+    .timeline-role {
+      font-size: 1.1rem;
+      color: var(--accent-400);
+      font-weight: 600;
+    }
+
+    .timeline-dates {
+      padding: var(--space-2) var(--space-4);
+      background: var(--glass-bg-medium);
+      border: 1px solid var(--glass-border-light);
+      border-radius: var(--radius-full);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-400);
+    }
+
+    .timeline-description {
+      color: var(--text-300);
+      line-height: 1.7;
+      margin-bottom: var(--space-6);
+    }
+
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+    }
+
+    .metric-card {
+      padding: var(--space-5);
+      background: var(--glass-bg-light);
+      backdrop-filter: blur(var(--blur-sm));
+      border: 1px solid var(--glass-border-light);
+      border-radius: var(--radius-xl);
+      text-align: center;
+      transition: all var(--duration-fast) var(--ease-smooth);
+    }
+
+    .metric-card:hover {
+      background: var(--glass-bg-medium);
+      border-color: var(--accent-500);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-glow-sm);
+    }
+
+    .metric-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+    }
+
+    .metric-value.success {
+      background: var(--gradient-success);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      color: var(--text-500);
+      margin-top: var(--space-1);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Chart Container */
+    .chart-container {
+      margin-top: var(--space-6);
+      padding: var(--space-6);
+      background: var(--glass-bg-light);
+      border: 1px solid var(--glass-border-light);
+      border-radius: var(--radius-xl);
+    }
+
+    .chart-container canvas {
+      max-height: 300px;
+    }
+
+    /* ============================================
+       CHUNK 10: TRUTH VAULT SECTION
+       Company toxicity ratings with glow bars
+       ============================================ */
+    .truth-vault-section {
+      padding: var(--space-24) 0;
+    }
+
+    .truth-vault-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: var(--space-6);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .truth-vault-card {
+      padding: var(--space-6);
+      border-radius: var(--radius-2xl);
+      transition: all var(--duration-normal) var(--ease-spring);
+    }
+
+    .truth-vault-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-4);
+    }
+
+    .truth-vault-company {
+      font-size: 1.25rem;
+      color: var(--text-100);
+      font-weight: 600;
+    }
+
+    .truth-vault-score {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .truth-vault-score.low {
+      color: var(--success-400);
+      text-shadow: 0 0 20px var(--success-glow);
+    }
+
+    .truth-vault-score.medium {
+      color: var(--warning-400);
+      text-shadow: 0 0 20px var(--warning-glow);
+    }
+
+    .truth-vault-score.high {
+      color: var(--danger-400);
+      text-shadow: 0 0 20px var(--danger-glow);
+    }
+
+    /* Toxicity Bar */
+    .toxicity-bar {
+      height: 10px;
+      background: var(--void-500);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .toxicity-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width 1s var(--ease-spring);
+      position: relative;
+    }
+
+    .toxicity-fill.low {
+      background: linear-gradient(90deg, var(--success-500), var(--success-400));
+      box-shadow: 0 0 15px var(--success-glow);
+    }
+
+    .toxicity-fill.medium {
+      background: linear-gradient(90deg, var(--warning-500), var(--warning-400));
+      box-shadow: 0 0 15px var(--warning-glow);
+    }
+
+    .toxicity-fill.high {
+      background: linear-gradient(90deg, var(--danger-500), var(--danger-400));
+      box-shadow: 0 0 15px var(--danger-glow);
+    }
+
+    .truth-vault-label {
+      font-size: 0.85rem;
+      color: var(--text-500);
+      margin-top: var(--space-3);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ============================================
+       CHUNK 11: VALIDATIONS SECTION
+       Colleague endorsements with badges
+       ============================================ */
+    .validations-section {
+      padding: var(--space-24) 0;
+      background: linear-gradient(180deg, transparent 0%, var(--void-800) 50%, transparent 100%);
+    }
+
+    .validations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--space-6);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .validation-card {
+      padding: var(--space-6);
+      border-radius: var(--radius-2xl);
+    }
+
+    .validation-quote {
+      font-size: 1.1rem;
+      color: var(--text-300);
+      line-height: 1.7;
+      margin-bottom: var(--space-5);
+      font-style: italic;
+      position: relative;
+      padding-left: var(--space-6);
+    }
+
+    .validation-quote::before {
+      content: '"';
+      position: absolute;
+      left: 0;
+      top: -10px;
+      font-size: 3rem;
+      color: var(--accent-500);
+      font-family: Georgia, serif;
+      line-height: 1;
+    }
+
+    .validation-author {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      margin-bottom: 20px;
-      backdrop-filter: blur(10px);
+      gap: var(--space-4);
     }
-    
-    .preview-name {
-      font-size: 2.5rem;
-      color: white;
-      margin-bottom: 8px;
-    }
-    
-    .preview-tagline {
-      color: rgba(255,255,255,0.8);
-      font-size: 1.2rem;
-    }
-    
-    .preview-body {
-      padding: 32px;
-    }
-    
-    /* Achievements Section */
-    .achievements-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 16px;
-    }
-    
-    .achievement-card {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-    }
-    
-    .achievement-icon {
+
+    .validation-avatar {
       width: 48px;
       height: 48px;
+      border-radius: 50%;
       background: var(--gradient-primary);
-      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.2rem;
       color: white;
-      flex-shrink: 0;
     }
-    
-    .achievement-title {
+
+    .validation-name {
       font-weight: 600;
-      color: var(--text-white);
-      margin-bottom: 4px;
+      color: var(--text-100);
     }
-    
-    .achievement-desc {
-      font-size: 0.9rem;
-      color: var(--text-muted);
+
+    .validation-role {
+      font-size: 0.85rem;
+      color: var(--text-500);
     }
-    
-    /* Chat Widget */
+
+    .validation-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: var(--space-1) var(--space-3);
+      background: var(--glass-bg-tinted);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      color: var(--accent-400);
+      font-weight: 600;
+      margin-top: var(--space-2);
+    }
+
+    .validation-badge i {
+      font-size: 0.65rem;
+    }
+
+    /* ============================================
+       CHUNK 12: HUNTER AGENT CHAT
+       Premium floating chatbot
+       ============================================ */
     .chat-trigger {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
+      bottom: var(--space-6);
+      right: var(--space-6);
       width: 64px;
       height: 64px;
       background: var(--gradient-primary);
@@ -991,796 +1253,621 @@ app.get('/', (c) => {
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
-      z-index: 1000;
-      transition: all 0.3s ease;
       border: none;
       color: white;
       font-size: 24px;
+      z-index: 1001;
+      box-shadow: var(--shadow-lg), var(--shadow-glow-lg);
+      transition: all var(--duration-normal) var(--ease-spring);
     }
-    
-    .chat-trigger:hover { transform: scale(1.1); }
-    
+
+    .chat-trigger::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+    }
+
+    .chat-trigger:hover {
+      transform: scale(1.1);
+      box-shadow: var(--shadow-xl), var(--shadow-glow-xl);
+    }
+
+    .chat-trigger.active {
+      transform: rotate(45deg);
+    }
+
     .chat-window {
       position: fixed;
       bottom: 100px;
-      right: 24px;
+      right: var(--space-6);
       width: 400px;
       height: 550px;
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-card);
+      border-radius: var(--radius-2xl);
       display: flex;
       flex-direction: column;
       z-index: 1000;
-      animation: slideUp 0.3s ease;
       overflow: hidden;
+      background: rgba(8, 8, 13, 0.95);
+      backdrop-filter: blur(var(--blur-2xl)) saturate(180%);
+      -webkit-backdrop-filter: blur(var(--blur-2xl)) saturate(180%);
+      border: 1px solid var(--glass-border-default);
+      box-shadow: var(--shadow-xl), var(--shadow-glow-lg);
+      animation: slideUp 0.4s var(--ease-spring);
     }
-    
+
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    
+
     .chat-header {
-      padding: 20px;
+      padding: var(--space-5);
       background: var(--gradient-primary);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: var(--space-3);
+      position: relative;
     }
-    
+
+    .chat-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+    }
+
     .chat-avatar {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
       border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .chat-info h4 {
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .chat-info span {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.8rem;
+    }
+
+    .chat-close {
+      margin-left: auto;
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--duration-fast);
+      position: relative;
+      z-index: 1;
+    }
+
+    .chat-close:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: var(--space-5);
+      overflow-y: auto;
+      background: var(--void-800);
+    }
+
+    .chat-message {
+      margin-bottom: var(--space-4);
+      max-width: 85%;
+      animation: messageIn 0.3s var(--ease-spring);
+    }
+
+    @keyframes messageIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-message.bot {
+      margin-right: auto;
+    }
+
+    .chat-message.user {
+      margin-left: auto;
+    }
+
+    .chat-bubble {
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-xl);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .chat-message.bot .chat-bubble {
+      background: var(--glass-bg-heavy);
+      border: 1px solid var(--glass-border-light);
+      color: var(--text-200);
+      border-bottom-left-radius: var(--radius-sm);
+    }
+
+    .chat-message.user .chat-bubble {
+      background: var(--gradient-primary);
+      color: white;
+      border-bottom-right-radius: var(--radius-sm);
+    }
+
+    .chat-input-area {
+      padding: var(--space-4);
+      background: var(--void-700);
+      border-top: 1px solid var(--glass-border-light);
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: var(--space-3) var(--space-4);
+      background: var(--void-600);
+      border: 1px solid var(--glass-border-light);
+      border-radius: var(--radius-full);
+      color: var(--text-100);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color var(--duration-fast);
+    }
+
+    .chat-input:focus {
+      border-color: var(--accent-500);
+    }
+
+    .chat-input::placeholder {
+      color: var(--text-500);
+    }
+
+    .chat-send {
+      width: 48px;
+      height: 48px;
+      background: var(--gradient-primary);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform var(--duration-fast), box-shadow var(--duration-fast);
+    }
+
+    .chat-send:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-glow-sm);
+    }
+
+    /* Quick Actions */
+    .chat-quick-actions {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+      margin-top: var(--space-3);
+    }
+
+    .quick-action-btn {
+      padding: var(--space-2) var(--space-3);
+      background: var(--glass-bg-medium);
+      border: 1px solid var(--glass-border-light);
+      border-radius: var(--radius-full);
+      color: var(--text-300);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all var(--duration-fast);
+    }
+
+    .quick-action-btn:hover {
+      background: var(--glass-bg-tinted);
+      border-color: var(--accent-500);
+      color: var(--text-100);
+    }
+
+    /* ============================================
+       CHUNK 13: FOOTER
+       Premium footer with glass effects
+       ============================================ */
+    .footer {
+      padding: var(--space-20) 0 var(--space-10);
+      border-top: 1px solid var(--glass-border-subtle);
+      background: linear-gradient(180deg, transparent 0%, var(--void-900) 100%);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: var(--space-12);
+      margin-bottom: var(--space-12);
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-100);
+      margin-bottom: var(--space-4);
+    }
+
+    .footer-brand-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.2rem;
     }
-    
-    .chat-info h4 { color: white; font-size: 1rem; margin-bottom: 2px; }
-    .chat-info span { color: rgba(255,255,255,0.7); font-size: 0.8rem; }
-    
-    .chat-close {
-      margin-left: auto;
-      width: 32px;
-      height: 32px;
-      background: rgba(255,255,255,0.1);
-      border: none;
-      border-radius: 50%;
-      color: white;
-      cursor: pointer;
-    }
-    
-    .chat-messages {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      background: var(--bg-surface);
-    }
-    
-    .chat-message {
-      margin-bottom: 16px;
-      max-width: 85%;
-    }
-    
-    .chat-message.bot { margin-right: auto; }
-    .chat-message.user { margin-left: auto; }
-    
-    .chat-bubble {
-      padding: 12px 16px;
-      border-radius: var(--radius-lg);
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-    
-    .chat-message.bot .chat-bubble {
-      background: var(--bg-elevated);
-      color: var(--text-primary);
-      border-bottom-left-radius: 4px;
-    }
-    
-    .chat-message.user .chat-bubble {
-      background: var(--gradient-primary);
-      color: white;
-      border-bottom-right-radius: 4px;
-    }
-    
-    .chat-input-area {
-      padding: 16px;
-      background: var(--bg-elevated);
-      display: flex;
-      gap: 12px;
-    }
-    
-    .chat-input {
-      flex: 1;
-      padding: 12px 16px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-glass);
-      border-radius: 50px;
-      color: var(--text-white);
-      font-size: 0.95rem;
-      outline: none;
-    }
-    
-    .chat-send {
-      width: 44px;
-      height: 44px;
-      background: var(--gradient-primary);
-      border: none;
-      border-radius: 50%;
-      color: white;
-      cursor: pointer;
-    }
-    
-    /* Footer */
-    .footer {
-      padding: 80px 0 40px;
-      border-top: 1px solid var(--border-glass);
-    }
-    
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
-      gap: 48px;
-      margin-bottom: 48px;
-    }
-    
-    .footer-brand {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
+
     .footer-desc {
-      color: var(--text-secondary);
-      margin-bottom: 24px;
-      max-width: 300px;
+      color: var(--text-400);
+      line-height: 1.7;
+      max-width: 320px;
+      margin-bottom: var(--space-6);
     }
-    
+
     .footer-social {
       display: flex;
-      gap: 12px;
+      gap: var(--space-3);
     }
-    
+
     .social-link {
-      width: 40px;
-      height: 40px;
-      background: var(--bg-glass);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-md);
+      width: 44px;
+      height: 44px;
+      background: var(--glass-bg-medium);
+      border: 1px solid var(--glass-border-light);
+      border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--text-secondary);
+      color: var(--text-400);
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: all var(--duration-fast) var(--ease-smooth);
     }
-    
+
     .social-link:hover {
       background: var(--gradient-primary);
-      border-color: var(--accent-primary);
+      border-color: var(--accent-500);
       color: white;
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-glow-sm);
     }
-    
+
     .footer-title {
       font-size: 0.9rem;
       font-weight: 600;
-      margin-bottom: 20px;
-      color: var(--text-white);
+      color: var(--text-100);
+      margin-bottom: var(--space-5);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
-    
+
     .footer-links {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: var(--space-3);
     }
-    
+
     .footer-link {
-      color: var(--text-secondary);
+      color: var(--text-400);
       text-decoration: none;
-      font-size: 0.9rem;
-      transition: color 0.2s;
+      font-size: 0.95rem;
+      transition: color var(--duration-fast);
     }
-    
-    .footer-link:hover { color: var(--accent-primary); }
-    
+
+    .footer-link:hover {
+      color: var(--accent-400);
+    }
+
     .footer-bottom {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 24px;
-      border-top: 1px solid var(--border-glass);
-      color: var(--text-muted);
+      padding-top: var(--space-6);
+      border-top: 1px solid var(--glass-border-subtle);
+      color: var(--text-500);
       font-size: 0.85rem;
     }
-    
-    /* Templates */
-    .template-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
+
+    .footer-tagline {
+      color: var(--accent-400);
+      font-weight: 500;
     }
-    
-    .template-card {
-      background: var(--bg-elevated);
-      border: 2px solid var(--border-glass);
-      border-radius: var(--radius-xl);
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .template-card:hover {
-      border-color: var(--accent-primary);
-      transform: translateY(-4px);
-    }
-    
-    .template-card.selected {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
-    }
-    
-    .template-preview {
-      aspect-ratio: 4/3;
-      background: var(--bg-surface);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .template-info {
-      padding: 20px;
-    }
-    
-    .template-name {
-      font-weight: 600;
-      color: var(--text-white);
-      margin-bottom: 4px;
-    }
-    
-    .template-desc {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-    
-    /* Responsive */
+
+    /* ============================================
+       CHUNK 14: RESPONSIVE DESIGN
+       Mobile-first breakpoints
+       ============================================ */
     @media (max-width: 1024px) {
-      .builder-container {
-        grid-template-columns: 1fr;
-      }
-      
-      .builder-sidebar {
-        position: relative;
-        top: 0;
-      }
-      
       .footer-grid {
         grid-template-columns: 1fr 1fr;
+        gap: var(--space-8);
+      }
+
+      .timeline {
+        padding-left: var(--space-12);
+      }
+
+      .timeline::before {
+        left: 16px;
+      }
+
+      .timeline-node {
+        left: calc(-1 * var(--space-12) + 8px);
       }
     }
-    
+
     @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .hero-title { font-size: 2.5rem; }
-      .hero-stats { gap: 24px; }
-      .hero-stat-value { font-size: 2rem; }
-      .upload-card { padding: 24px; }
-      .upload-zone { padding: 40px 24px; }
-      .chat-window { width: calc(100vw - 48px); height: 70vh; }
-      .footer-grid { grid-template-columns: 1fr; }
-      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+      .nav {
+        width: calc(100% - var(--space-4));
+        padding: var(--space-2) var(--space-4);
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero-title {
+        font-size: clamp(2.5rem, 10vw, 4rem);
+      }
+
+      .hero-stats {
+        gap: var(--space-6);
+      }
+
+      .timeline {
+        padding-left: var(--space-8);
+      }
+
+      .timeline::before {
+        left: 10px;
+      }
+
+      .timeline-node {
+        left: calc(-1 * var(--space-8) + 4px);
+        width: 18px;
+        height: 18px;
+      }
+
+      .timeline-entry {
+        padding: var(--space-5);
+      }
+
+      .chat-window {
+        width: calc(100vw - var(--space-8));
+        height: 70vh;
+        bottom: 90px;
+        right: var(--space-4);
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-4);
+        text-align: center;
+      }
+
+      .truth-vault-grid,
+      .validations-grid {
+        grid-template-columns: 1fr;
+      }
     }
-    
-    /* Animations */
-    .fade-in {
-      animation: fadeIn 0.6s ease forwards;
+
+    /* ============================================
+       CHUNK 15: ACCESSIBILITY & FALLBACKS
+       ============================================ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .orb, .mesh-bg, .grid-overlay {
+        animation: none !important;
+      }
     }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+
+    @supports not (backdrop-filter: blur(10px)) {
+      .glass, .glass-heavy, .glass-ultra, .glass-tinted {
+        background: rgba(12, 12, 20, 0.95);
+      }
+
+      .nav {
+        background: rgba(8, 8, 13, 0.98);
+      }
+
+      .chat-window {
+        background: rgba(8, 8, 13, 0.98);
+      }
     }
-    
-    .stagger-1 { animation-delay: 0.1s; }
-    .stagger-2 { animation-delay: 0.2s; }
-    .stagger-3 { animation-delay: 0.3s; }
-    .stagger-4 { animation-delay: 0.4s; }
+
+    /* Focus States */
+    :focus-visible {
+      outline: 2px solid var(--accent-500);
+      outline-offset: 3px;
+    }
+
+    /* Skip to main content (accessibility) */
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: var(--space-4);
+      padding: var(--space-3) var(--space-4);
+      background: var(--accent-500);
+      color: white;
+      border-radius: var(--radius-md);
+      z-index: 9999;
+      transition: top var(--duration-fast);
+    }
+
+    .skip-link:focus {
+      top: var(--space-4);
+    }
   </style>
 </head>
 <body>
+  <a href="#main" class="skip-link">Skip to main content</a>
   <div id="root"></div>
 
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
     // ============================================
-    // INITIAL STATE
+    // WEBUME DATA - Brad Powell Profile
+    // Preserving all original data points
     // ============================================
-    const initialProfile = {
-      basics: {
-        name: '',
-        title: '',
-        tagline: '',
-        email: '',
-        phone: '',
-        location: '',
-        linkedin: '',
-        website: '',
-        avatar: null
-      },
-      experiences: [],
-      achievements: [],
-      awards: [],
-      reviews: [],
-      payHistory: [],
-      events: [],
-      projects: [],
-      media: { photos: [], videos: [] },
-      template: 'executive'
+    const PROFILE_DATA = {
+      name: "Brad Powell",
+      title: "Senior Operations Leader",
+      tagline: "30+ years of verified impact. Real results, not paragraphs. Evidence wins.",
+      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      avatarUrl: "https://api.dicebear.com/7.x/initials/svg?seed=BP&backgroundColor=6366f1",
+      calendlyUrl: "https://calendly.com/bradpowell/30min",
+      
+      timeline: [
+        {
+          id: 1,
+          company: "Acme Corp",
+          role: "Senior Ops Leader",
+          period: "2015 - 2025",
+          description: "Led enterprise-wide operational transformation, driving measurable impact across revenue, cost optimization, and team performance. Implemented data-driven decision frameworks that revolutionized how we approach operational excellence.",
+          metrics: [
+            { value: "+47%", label: "Revenue Growth" },
+            { value: "-22%", label: "Costs Reduced" },
+            { value: "+65%", label: "Team Efficiency" },
+            { value: "+35%", label: "Customer Sat" }
+          ],
+          chartUrl: "https://via.placeholder.com/800x400?text=Revenue+Growth+Chart"
+        },
+        {
+          id: 2,
+          company: "TechGiant Inc",
+          role: "Operations Manager",
+          period: "2008 - 2015",
+          description: "Scaled operations from startup phase to enterprise level. Built and led cross-functional teams that delivered unprecedented growth while maintaining quality standards.",
+          metrics: [
+            { value: "+1000%", label: "Volume Growth" },
+            { value: "-90%", label: "Error Rate" },
+            { value: "-60%", label: "Processing Time" },
+            { value: "50+", label: "Team Size" }
+          ]
+        }
+      ],
+
+      truthVault: [
+        { company: "Acme Corp", toxicity: 3, period: "2015-2025" },
+        { company: "TechGiant Inc", toxicity: 8, period: "2008-2015" },
+        { company: "GoodPlace LLC", toxicity: 2, period: "2005-2008" },
+        { company: "StartupXYZ", toxicity: 9, period: "2002-2005" }
+      ],
+
+      validations: [
+        {
+          id: 1,
+          quote: "Brad transformed our entire operations culture. His data-driven approach and genuine leadership style made him invaluable. One of the most impactful leaders I have worked with.",
+          author: "Sarah Chen",
+          role: "CEO, Acme Corp",
+          avatar: "SC"
+        },
+        {
+          id: 2,
+          quote: "Working with Brad was a masterclass in operational excellence. He does not just optimize processes—he builds teams that sustain excellence long after implementation.",
+          author: "Marcus Johnson",
+          role: "VP Engineering, TechGiant",
+          avatar: "MJ"
+        },
+        {
+          id: 3,
+          quote: "Brad's ability to see both the big picture and the critical details is rare. He delivered results that exceeded our most optimistic projections.",
+          author: "Elena Rodriguez",
+          role: "COO, Acme Corp",
+          avatar: "ER"
+        }
+      ]
     };
 
-    const templates = [
-      { id: 'executive', name: 'Executive', desc: 'Clean, professional, leadership-focused' },
-      { id: 'creative', name: 'Creative', desc: 'Bold colors, unique layouts' },
-      { id: 'tech', name: 'Tech Pioneer', desc: 'Modern, data-driven, metrics-heavy' },
-      { id: 'minimal', name: 'Minimal', desc: 'Simple, elegant, content-first' }
-    ];
+    // ============================================
+    // HUNTER AGENT RESPONSES
+    // Intelligent chatbot responses
+    // ============================================
+    const AGENT_RESPONSES = {
+      greeting: "Hey! I'm Brad's AI Hunter Agent. I'm here to help recruiters and hiring managers learn about Brad's experience. What would you like to know?",
+      
+      experience: "Brad brings 30+ years of verified impact:\\n\\n• Acme Corp (2015-2025): Senior Ops Leader\\n  → +47% revenue, -22% costs, +65% efficiency\\n\\n• TechGiant Inc (2008-2015): Operations Manager\\n  → +1000% volume growth, -90% error rate\\n\\nEvery metric is backed by real data.",
+      
+      salary: "Brad's compensation expectations are aligned with senior leadership roles in operations. Given his track record (+47% revenue growth, -22% cost reduction), he's seeking opportunities that reflect this proven impact. Let's schedule a call to discuss specifics.",
+      
+      availability: "Brad is currently exploring new opportunities and is available for:\\n\\n✓ Immediate start for the right role\\n✓ Remote, hybrid, or on-site\\n✓ Open to relocation for exceptional opportunities\\n\\nWant to book a 30-minute call?",
+      
+      culture: "Great question! Brad has worked across different company cultures. His Truth Vault shows transparent ratings:\\n\\n• Acme Corp: 3/10 toxicity (Great!)\\n• TechGiant: 8/10 toxicity (Challenging)\\n\\nHe thrives in collaborative, data-driven environments.",
+      
+      skills: "Brad's core competencies:\\n\\n⚡ Operational Excellence\\n⚡ Team Leadership (50+ direct reports)\\n⚡ Process Optimization\\n⚡ Data-Driven Decision Making\\n⚡ Cross-functional Collaboration\\n⚡ Change Management\\n⚡ P&L Ownership",
+      
+      book: "Excellent! You can book a 30-minute call with Brad directly:\\n\\n📅 calendly.com/bradpowell/30min\\n\\nOr I can help answer more questions first. What else would you like to know?",
+      
+      default: "I can help you learn about Brad's:\\n\\n• Experience & achievements\\n• Salary expectations\\n• Availability\\n• Company culture preferences\\n• Core skills\\n\\nOr you can book a call directly. What interests you?"
+    };
 
     // ============================================
-    // MAIN APP
+    // MAIN APP COMPONENT
     // ============================================
     const App = () => {
-      const [view, setView] = useState('landing'); // landing, builder, preview
-      const [profile, setProfile] = useState(initialProfile);
-      const [activeSection, setActiveSection] = useState('basics');
       const [chatOpen, setChatOpen] = useState(false);
-      const [uploadProgress, setUploadProgress] = useState(0);
-      const [isAnalyzing, setIsAnalyzing] = useState(false);
-
-      // Load saved profile
-      useEffect(() => {
-        const saved = localStorage.getItem('webumeProfile');
-        if (saved) {
-          try {
-            setProfile(JSON.parse(saved));
-          } catch (e) {}
-        }
-      }, []);
-
-      // Save profile
-      useEffect(() => {
-        localStorage.setItem('webumeProfile', JSON.stringify(profile));
-      }, [profile]);
-
-      const handleResumeUpload = async (file) => {
-        setIsAnalyzing(true);
-        setUploadProgress(0);
-        
-        // Simulate progress
-        const progressInterval = setInterval(() => {
-          setUploadProgress(prev => {
-            if (prev >= 90) {
-              clearInterval(progressInterval);
-              return 90;
-            }
-            return prev + 10;
-          });
-        }, 200);
-
-        // Simulate parsing (in real app, this would be server-side or use PDF.js)
-        setTimeout(() => {
-          clearInterval(progressInterval);
-          setUploadProgress(100);
-          
-          // Mock parsed data
-          const parsedProfile = {
-            ...initialProfile,
-            basics: {
-              name: 'Alex Thompson',
-              title: 'Senior Product Manager',
-              tagline: 'Building products that matter. 10+ years driving innovation.',
-              email: 'alex@example.com',
-              phone: '+1 (555) 123-4567',
-              location: 'San Francisco, CA',
-              linkedin: 'linkedin.com/in/alexthompson',
-              website: 'alexthompson.dev',
-              avatar: null
-            },
-            experiences: [
-              {
-                id: 1,
-                company: 'TechCorp Global',
-                role: 'Senior Product Manager',
-                startDate: '2020-03',
-                endDate: 'Present',
-                description: 'Led product strategy for enterprise SaaS platform serving 2M+ users. Drove 40% revenue growth through data-driven feature prioritization.',
-                tasks: [
-                  'Define and execute product roadmap aligned with business objectives',
-                  'Lead cross-functional team of 15 engineers, designers, and analysts',
-                  'Conduct user research and translate insights into product requirements',
-                  'Present quarterly business reviews to C-suite executives'
-                ],
-                dayInLife: [
-                  { time: '8:00 AM', activity: 'Review metrics dashboard and overnight alerts' },
-                  { time: '9:00 AM', activity: 'Daily standup with engineering team' },
-                  { time: '10:00 AM', activity: 'Customer feedback analysis session' },
-                  { time: '12:00 PM', activity: 'Cross-team sync on Q3 initiatives' },
-                  { time: '2:00 PM', activity: 'Sprint planning and backlog refinement' },
-                  { time: '4:00 PM', activity: 'Stakeholder presentations and updates' }
-                ],
-                metrics: [
-                  { value: '+40%', label: 'Revenue Growth' },
-                  { value: '2M+', label: 'Active Users' },
-                  { value: '15', label: 'Team Size' },
-                  { value: '98%', label: 'Retention Rate' }
-                ]
-              },
-              {
-                id: 2,
-                company: 'StartupXYZ',
-                role: 'Product Manager',
-                startDate: '2017-06',
-                endDate: '2020-02',
-                description: 'First PM hire. Built product function from ground up. Took product from MVP to Series B.',
-                tasks: [
-                  'Established product development processes and best practices',
-                  'Hired and mentored team of 5 associate product managers',
-                  'Launched 3 major product lines generating $5M ARR'
-                ],
-                dayInLife: [
-                  { time: '7:30 AM', activity: 'Early morning deep work on strategy docs' },
-                  { time: '10:00 AM', activity: 'Customer discovery calls' },
-                  { time: '1:00 PM', activity: 'Design review sessions' },
-                  { time: '3:00 PM', activity: 'Engineering collaboration' }
-                ],
-                metrics: [
-                  { value: '$5M', label: 'ARR Generated' },
-                  { value: '3', label: 'Product Lines' },
-                  { value: '5', label: 'PMs Hired' }
-                ]
-              }
-            ],
-            achievements: [
-              { id: 1, icon: 'fa-trophy', title: 'Product of the Year', desc: 'TechCrunch Disrupt 2022' },
-              { id: 2, icon: 'fa-star', title: 'Top 40 Under 40', desc: 'Business Insider 2021' },
-              { id: 3, icon: 'fa-award', title: 'Innovation Award', desc: 'Company-wide recognition' }
-            ],
-            awards: [
-              { id: 1, title: 'Best Product Launch', organization: 'Product Hunt', year: '2023' },
-              { id: 2, title: 'Excellence in Leadership', organization: 'TechCorp', year: '2022' }
-            ],
-            reviews: [
-              { id: 1, text: 'Alex transformed our product culture. Exceptional strategic thinker.', author: 'Sarah Chen', role: 'CEO, TechCorp', rating: 5 },
-              { id: 2, text: 'Best PM I have worked with. Data-driven but deeply empathetic.', author: 'Marcus Johnson', role: 'Engineering Lead', rating: 5 }
-            ]
-          };
-          
-          setProfile(parsedProfile);
-          setIsAnalyzing(false);
-          setView('builder');
-        }, 2500);
-      };
-
-      return (
-        <div>
-          {/* Background Effects */}
-          <div className="bg-mesh"></div>
-          <div className="grid-bg"></div>
-          <div className="orb orb-1"></div>
-          <div className="orb orb-2"></div>
-          <div className="orb orb-3"></div>
-
-          {/* Navigation */}
-          <Navigation view={view} setView={setView} />
-
-          {/* Views */}
-          {view === 'landing' && (
-            <LandingPage 
-              onUpload={handleResumeUpload}
-              uploadProgress={uploadProgress}
-              isAnalyzing={isAnalyzing}
-              setView={setView}
-            />
-          )}
-
-          {view === 'builder' && (
-            <BuilderPage 
-              profile={profile}
-              setProfile={setProfile}
-              activeSection={activeSection}
-              setActiveSection={setActiveSection}
-              setView={setView}
-            />
-          )}
-
-          {view === 'preview' && (
-            <PreviewPage 
-              profile={profile}
-              setView={setView}
-            />
-          )}
-
-          {/* Hunter Agent Chat */}
-          <HunterChat 
-            isOpen={chatOpen}
-            onToggle={() => setChatOpen(!chatOpen)}
-            profile={profile}
-          />
-        </div>
-      );
-    };
-
-    // ============================================
-    // NAVIGATION
-    // ============================================
-    const Navigation = ({ view, setView }) => (
-      <nav className="nav">
-        <div className="container">
-          <div className="nav-inner glass">
-            <div className="nav-logo">
-              <div className="nav-logo-icon">⚡</div>
-              Webume
-            </div>
-            <div className="nav-links">
-              <a href="#features" className="nav-link">Features</a>
-              <a href="#templates" className="nav-link">Templates</a>
-              <a href="#pricing" className="nav-link">Pricing</a>
-              {view !== 'landing' && (
-                <button className="nav-link" onClick={() => setView('landing')}>Home</button>
-              )}
-              <button className="btn btn-primary btn-sm" onClick={() => setView('builder')}>
-                <i className="fas fa-rocket"></i> Get Started
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-    );
-
-    // ============================================
-    // LANDING PAGE
-    // ============================================
-    const LandingPage = ({ onUpload, uploadProgress, isAnalyzing, setView }) => {
-      const [dragging, setDragging] = useState(false);
-      const fileInputRef = useRef(null);
-
-      const handleDrop = (e) => {
-        e.preventDefault();
-        setDragging(false);
-        const file = e.dataTransfer.files[0];
-        if (file) onUpload(file);
-      };
-
-      const handleFileSelect = (e) => {
-        const file = e.target.files[0];
-        if (file) onUpload(file);
-      };
 
       return (
         <>
-          {/* Hero Section */}
-          <section className="hero">
-            <div className="container hero-content">
-              <div className="hero-badge fade-in">
-                <i className="fas fa-bolt"></i>
-                The Future of Professional Profiles
-              </div>
-              
-              <h1 className="hero-title fade-in stagger-1">
-                Your <span className="highlight">Employee-for-Hire</span> Empire Starts Here
-              </h1>
-              
-              <p className="hero-subtitle fade-in stagger-2">
-                Transform your resume into a living, breathing professional profile. 
-                Upload once, customize endlessly, own forever. This isn't just a resume — 
-                it's your <strong>Webume</strong>.
-              </p>
-              
-              <div className="hero-cta fade-in stagger-3">
-                <button className="btn btn-primary btn-lg" onClick={() => fileInputRef.current?.click()}>
-                  <i className="fas fa-upload"></i> Upload Your Resume
-                </button>
-                <button className="btn btn-secondary btn-lg" onClick={() => setView('builder')}>
-                  <i className="fas fa-wand-magic-sparkles"></i> Start from Scratch
-                </button>
-              </div>
-              
-              <div className="hero-stats fade-in stagger-4">
-                <div className="hero-stat">
-                  <div className="hero-stat-value">50K+</div>
-                  <div className="hero-stat-label">Profiles Created</div>
-                </div>
-                <div className="hero-stat">
-                  <div className="hero-stat-value">94%</div>
-                  <div className="hero-stat-label">Interview Rate</div>
-                </div>
-                <div className="hero-stat">
-                  <div className="hero-stat-value">2.5x</div>
-                  <div className="hero-stat-label">Faster Hiring</div>
-                </div>
-              </div>
-            </div>
-          </section>
+          {/* Premium Background Effects */}
+          <div className="mesh-bg" aria-hidden="true"></div>
+          <div className="grid-overlay" aria-hidden="true"></div>
+          <div className="orb orb-1" aria-hidden="true"></div>
+          <div className="orb orb-2" aria-hidden="true"></div>
+          <div className="orb orb-3" aria-hidden="true"></div>
+          <div className="orb orb-4" aria-hidden="true"></div>
 
-          {/* Upload Section */}
-          <section className="upload-section" id="upload">
-            <div className="container">
-              <div className="upload-card glass-heavy">
-                {isAnalyzing ? (
-                  <div style={{ padding: '40px' }}>
-                    <div className="upload-icon" style={{ animation: 'pulse 2s infinite' }}>
-                      <i className="fas fa-brain"></i>
-                    </div>
-                    <h3 className="upload-title">Analyzing Your Resume...</h3>
-                    <p className="upload-desc">Our AI is extracting and organizing your experience</p>
-                    <div style={{ 
-                      height: '8px', 
-                      background: 'var(--bg-elevated)', 
-                      borderRadius: '4px',
-                      overflow: 'hidden',
-                      maxWidth: '400px',
-                      margin: '24px auto'
-                    }}>
-                      <div style={{
-                        height: '100%',
-                        width: uploadProgress + '%',
-                        background: 'var(--gradient-primary)',
-                        transition: 'width 0.3s ease',
-                        borderRadius: '4px'
-                      }}></div>
-                    </div>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                      {uploadProgress < 30 && 'Reading document...'}
-                      {uploadProgress >= 30 && uploadProgress < 60 && 'Extracting experience...'}
-                      {uploadProgress >= 60 && uploadProgress < 90 && 'Building your timeline...'}
-                      {uploadProgress >= 90 && 'Almost there...'}
-                    </p>
-                  </div>
-                ) : (
-                  <div 
-                    className={"upload-zone" + (dragging ? " dragging" : "")}
-                    onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-                    onDragLeave={() => setDragging(false)}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <input 
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".pdf,.doc,.docx,.txt"
-                      onChange={handleFileSelect}
-                      style={{ display: 'none' }}
-                    />
-                    <div className="upload-icon">
-                      <i className="fas fa-cloud-arrow-up"></i>
-                    </div>
-                    <h3 className="upload-title">Drop your resume here</h3>
-                    <p className="upload-desc">or click to browse your files</p>
-                    <div className="upload-formats">
-                      <span className="format-badge">.PDF</span>
-                      <span className="format-badge">.DOC</span>
-                      <span className="format-badge">.DOCX</span>
-                      <span className="format-badge">.TXT</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
+          {/* Navigation */}
+          <Navigation />
 
-          {/* Features Section */}
-          <section className="features-section" id="features">
-            <div className="container">
-              <div className="section-header">
-                <div className="section-badge">
-                  <i className="fas fa-sparkles"></i> Features
-                </div>
-                <h2 className="section-title">Everything Your Resume Should Have Been</h2>
-                <p className="section-desc">
-                  Not limitations. Possibilities. Build the professional profile you deserve.
-                </p>
-              </div>
+          {/* Main Content */}
+          <main id="main">
+            <HeroSection />
+            <ProfileSection data={PROFILE_DATA} />
+            <TimelineSection data={PROFILE_DATA.timeline} />
+            <TruthVaultSection data={PROFILE_DATA.truthVault} />
+            <ValidationsSection data={PROFILE_DATA.validations} />
+          </main>
 
-              <div className="features-grid">
-                {[
-                  { icon: 'fa-brain', title: 'AI-Powered Analysis', desc: 'Upload your resume and watch our AI transform it into a structured, chronological masterpiece.' },
-                  { icon: 'fa-clock', title: 'Day in the Life', desc: 'Show recruiters what you actually do. Real schedules, real tasks, real impact.' },
-                  { icon: 'fa-photo-video', title: 'Rich Media', desc: 'Photos, videos, project demos. Prove your work, do not just describe it.' },
-                  { icon: 'fa-chart-line', title: 'Metrics Dashboard', desc: 'Quantify your impact. Revenue grown, costs saved, teams built.' },
-                  { icon: 'fa-users', title: 'Colleague Validations', desc: 'Verified endorsements from people who worked with you.' },
-                  { icon: 'fa-trophy', title: 'Achievements Showcase', desc: 'Awards, certifications, milestones — all in one place.' },
-                  { icon: 'fa-shield-halved', title: 'Truth Vault', desc: 'Anonymous company ratings. Know where you are going before you go.' },
-                  { icon: 'fa-robot', title: 'AI Headhunter', desc: 'Your personal agent that sells you 24/7 to recruiters.' }
-                ].map((feature, i) => (
-                  <div key={i} className="feature-card glass">
-                    <div className="feature-icon">
-                      <i className={"fas " + feature.icon}></i>
-                    </div>
-                    <h3 className="feature-title">{feature.title}</h3>
-                    <p className="feature-desc">{feature.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Templates Section */}
-          <section className="features-section" id="templates" style={{ background: 'var(--bg-deep)' }}>
-            <div className="container">
-              <div className="section-header">
-                <div className="section-badge">
-                  <i className="fas fa-palette"></i> Templates
-                </div>
-                <h2 className="section-title">Start With a Vision</h2>
-                <p className="section-desc">
-                  Choose your template, then customize every detail to match your brand.
-                </p>
-              </div>
-
-              <div className="template-grid">
-                {templates.map(template => (
-                  <div key={template.id} className="template-card">
-                    <div className="template-preview" style={{
-                      background: template.id === 'executive' ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' :
-                                 template.id === 'creative' ? 'linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)' :
-                                 template.id === 'tech' ? 'linear-gradient(135deg, #00d2d3 0%, #54a0ff 100%)' :
-                                 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
-                    }}>
-                      <div style={{ 
-                        position: 'absolute', 
-                        inset: '20px', 
-                        background: 'rgba(255,255,255,0.1)', 
-                        borderRadius: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        fontSize: '3rem'
-                      }}>
-                        {template.id === 'executive' && '👔'}
-                        {template.id === 'creative' && '🎨'}
-                        {template.id === 'tech' && '💻'}
-                        {template.id === 'minimal' && '✨'}
-                      </div>
-                    </div>
-                    <div className="template-info">
-                      <div className="template-name">{template.name}</div>
-                      <div className="template-desc">{template.desc}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* CTA Section */}
-          <section className="features-section">
-            <div className="container">
-              <div className="upload-card glass-heavy" style={{ textAlign: 'center', padding: '64px' }}>
-                <h2 className="section-title" style={{ marginBottom: '16px' }}>
-                  Ready to Build Your Empire?
-                </h2>
-                <p className="section-desc" style={{ marginBottom: '32px' }}>
-                  Join 50,000+ professionals who ditched the resume and built their Webume.
-                </p>
-                <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <button className="btn btn-primary btn-lg" onClick={() => fileInputRef.current?.click()}>
-                    <i className="fas fa-upload"></i> Upload Resume
-                  </button>
-                  <button className="btn btn-secondary btn-lg" onClick={() => setView('builder')}>
-                    <i className="fas fa-edit"></i> Build Manually
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
+          {/* Hunter Agent Chat */}
+          <HunterChat 
+            isOpen={chatOpen} 
+            onToggle={() => setChatOpen(!chatOpen)}
+            profile={PROFILE_DATA}
+          />
 
           {/* Footer */}
           <Footer />
@@ -1789,661 +1876,225 @@ app.get('/', (c) => {
     };
 
     // ============================================
-    // BUILDER PAGE
+    // NAVIGATION COMPONENT
     // ============================================
-    const BuilderPage = ({ profile, setProfile, activeSection, setActiveSection, setView }) => {
-      const sections = [
-        { id: 'basics', icon: 'fa-user', label: 'Basic Info' },
-        { id: 'experience', icon: 'fa-briefcase', label: 'Experience' },
-        { id: 'achievements', icon: 'fa-trophy', label: 'Achievements' },
-        { id: 'awards', icon: 'fa-award', label: 'Awards' },
-        { id: 'reviews', icon: 'fa-star', label: 'Reviews' },
-        { id: 'pay', icon: 'fa-dollar-sign', label: 'Pay History' },
-        { id: 'projects', icon: 'fa-diagram-project', label: 'Projects' },
-        { id: 'media', icon: 'fa-images', label: 'Media' },
-        { id: 'template', icon: 'fa-palette', label: 'Template' }
-      ];
-
-      const updateBasics = (field, value) => {
-        setProfile(prev => ({
-          ...prev,
-          basics: { ...prev.basics, [field]: value }
-        }));
-      };
-
-      const addExperience = () => {
-        const newExp = {
-          id: Date.now(),
-          company: '',
-          role: '',
-          startDate: '',
-          endDate: '',
-          description: '',
-          tasks: [],
-          dayInLife: [],
-          metrics: []
-        };
-        setProfile(prev => ({
-          ...prev,
-          experiences: [...prev.experiences, newExp]
-        }));
-      };
-
-      const updateExperience = (id, field, value) => {
-        setProfile(prev => ({
-          ...prev,
-          experiences: prev.experiences.map(exp => 
-            exp.id === id ? { ...exp, [field]: value } : exp
-          )
-        }));
-      };
-
-      const deleteExperience = (id) => {
-        setProfile(prev => ({
-          ...prev,
-          experiences: prev.experiences.filter(exp => exp.id !== id)
-        }));
-      };
-
-      return (
-        <section className="builder-section">
-          <div className="container">
-            <div className="builder-container">
-              {/* Sidebar */}
-              <div className="builder-sidebar glass-heavy">
-                <div className="sidebar-section">
-                  <div className="sidebar-title">Build Your Profile</div>
-                  <div className="sidebar-nav">
-                    {sections.map(section => (
-                      <button
-                        key={section.id}
-                        className={"sidebar-link" + (activeSection === section.id ? " active" : "")}
-                        onClick={() => setActiveSection(section.id)}
-                      >
-                        <i className={"fas " + section.icon}></i>
-                        {section.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="sidebar-section">
-                  <div className="sidebar-title">Actions</div>
-                  <div className="sidebar-nav">
-                    <button className="sidebar-link" onClick={() => setView('preview')}>
-                      <i className="fas fa-eye"></i> Preview Profile
-                    </button>
-                    <button className="sidebar-link">
-                      <i className="fas fa-download"></i> Export PDF
-                    </button>
-                    <button className="sidebar-link">
-                      <i className="fas fa-share"></i> Share Link
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Main Content */}
-              <div className="builder-main glass-heavy">
-                <div className="builder-header">
-                  <h2 className="builder-title">
-                    {sections.find(s => s.id === activeSection)?.label}
-                  </h2>
-                  <div className="builder-actions">
-                    <button className="btn btn-ghost btn-sm" onClick={() => setView('preview')}>
-                      <i className="fas fa-eye"></i> Preview
-                    </button>
-                    <button className="btn btn-primary btn-sm">
-                      <i className="fas fa-save"></i> Save
-                    </button>
-                  </div>
-                </div>
-
-                {/* Basic Info */}
-                {activeSection === 'basics' && (
-                  <div>
-                    <div className="form-row">
-                      <div className="form-group">
-                        <label className="form-label">Full Name</label>
-                        <input 
-                          className="form-input"
-                          placeholder="John Doe"
-                          value={profile.basics.name}
-                          onChange={(e) => updateBasics('name', e.target.value)}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label className="form-label">Professional Title</label>
-                        <input 
-                          className="form-input"
-                          placeholder="Senior Product Manager"
-                          value={profile.basics.title}
-                          onChange={(e) => updateBasics('title', e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">Tagline</label>
-                      <input 
-                        className="form-input"
-                        placeholder="Building products that matter..."
-                        value={profile.basics.tagline}
-                        onChange={(e) => updateBasics('tagline', e.target.value)}
-                      />
-                    </div>
-
-                    <div className="form-row">
-                      <div className="form-group">
-                        <label className="form-label">Email</label>
-                        <input 
-                          className="form-input"
-                          type="email"
-                          placeholder="john@example.com"
-                          value={profile.basics.email}
-                          onChange={(e) => updateBasics('email', e.target.value)}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label className="form-label">Phone</label>
-                        <input 
-                          className="form-input"
-                          placeholder="+1 (555) 123-4567"
-                          value={profile.basics.phone}
-                          onChange={(e) => updateBasics('phone', e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-row">
-                      <div className="form-group">
-                        <label className="form-label">Location</label>
-                        <input 
-                          className="form-input"
-                          placeholder="San Francisco, CA"
-                          value={profile.basics.location}
-                          onChange={(e) => updateBasics('location', e.target.value)}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label className="form-label">LinkedIn</label>
-                        <input 
-                          className="form-input"
-                          placeholder="linkedin.com/in/username"
-                          value={profile.basics.linkedin}
-                          onChange={(e) => updateBasics('linkedin', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Experience */}
-                {activeSection === 'experience' && (
-                  <div>
-                    {profile.experiences.map((exp, index) => (
-                      <div key={exp.id} className="experience-card">
-                        <div className="experience-header">
-                          <div>
-                            <input
-                              className="form-input"
-                              style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '8px' }}
-                              placeholder="Company Name"
-                              value={exp.company}
-                              onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
-                            />
-                            <input
-                              className="form-input"
-                              style={{ color: 'var(--accent-primary)' }}
-                              placeholder="Your Role/Title"
-                              value={exp.role}
-                              onChange={(e) => updateExperience(exp.id, 'role', e.target.value)}
-                            />
-                          </div>
-                          <div className="experience-actions">
-                            <button className="exp-action-btn" onClick={() => deleteExperience(exp.id)}>
-                              <i className="fas fa-trash"></i>
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="form-row" style={{ marginTop: '16px' }}>
-                          <div className="form-group">
-                            <label className="form-label">Start Date</label>
-                            <input 
-                              className="form-input"
-                              type="month"
-                              value={exp.startDate}
-                              onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
-                            />
-                          </div>
-                          <div className="form-group">
-                            <label className="form-label">End Date</label>
-                            <input 
-                              className="form-input"
-                              type="month"
-                              placeholder="Present"
-                              value={exp.endDate}
-                              onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="form-group">
-                          <label className="form-label">Description</label>
-                          <textarea 
-                            className="form-textarea"
-                            placeholder="Describe your role, responsibilities, and impact..."
-                            value={exp.description}
-                            onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
-                          />
-                        </div>
-
-                        {/* Day in the Life */}
-                        <div className="day-life-section">
-                          <h4 className="day-life-title">
-                            <i className="fas fa-sun"></i>
-                            A Day in the Life at {exp.company || 'Company'}
-                          </h4>
-                          <div className="timeline-mini">
-                            {(exp.dayInLife || []).map((item, i) => (
-                              <div key={i} className="timeline-item-mini">
-                                <input
-                                  className="timeline-time"
-                                  style={{ background: 'transparent', border: 'none', outline: 'none' }}
-                                  value={item.time}
-                                  onChange={(e) => {
-                                    const newDayInLife = [...exp.dayInLife];
-                                    newDayInLife[i].time = e.target.value;
-                                    updateExperience(exp.id, 'dayInLife', newDayInLife);
-                                  }}
-                                />
-                                <input
-                                  className="timeline-content-mini form-input"
-                                  value={item.activity}
-                                  onChange={(e) => {
-                                    const newDayInLife = [...exp.dayInLife];
-                                    newDayInLife[i].activity = e.target.value;
-                                    updateExperience(exp.id, 'dayInLife', newDayInLife);
-                                  }}
-                                />
-                              </div>
-                            ))}
-                            <button 
-                              className="btn btn-ghost btn-sm"
-                              onClick={() => {
-                                const newDayInLife = [...(exp.dayInLife || []), { time: '9:00 AM', activity: '' }];
-                                updateExperience(exp.id, 'dayInLife', newDayInLife);
-                              }}
-                            >
-                              <i className="fas fa-plus"></i> Add Time Block
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Metrics */}
-                        <div style={{ marginTop: '24px' }}>
-                          <label className="form-label">Key Metrics</label>
-                          <div className="metrics-grid">
-                            {(exp.metrics || []).map((metric, i) => (
-                              <div key={i} className="metric-input-card">
-                                <input 
-                                  placeholder="+40%"
-                                  value={metric.value}
-                                  onChange={(e) => {
-                                    const newMetrics = [...exp.metrics];
-                                    newMetrics[i].value = e.target.value;
-                                    updateExperience(exp.id, 'metrics', newMetrics);
-                                  }}
-                                />
-                                <input 
-                                  className="metric-label-input"
-                                  placeholder="Metric Label"
-                                  value={metric.label}
-                                  onChange={(e) => {
-                                    const newMetrics = [...exp.metrics];
-                                    newMetrics[i].label = e.target.value;
-                                    updateExperience(exp.id, 'metrics', newMetrics);
-                                  }}
-                                />
-                              </div>
-                            ))}
-                            <div 
-                              className="metric-input-card"
-                              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                              onClick={() => {
-                                const newMetrics = [...(exp.metrics || []), { value: '', label: '' }];
-                                updateExperience(exp.id, 'metrics', newMetrics);
-                              }}
-                            >
-                              <i className="fas fa-plus" style={{ color: 'var(--text-muted)' }}></i>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    <button className="btn btn-secondary" onClick={addExperience}>
-                      <i className="fas fa-plus"></i> Add Experience
-                    </button>
-                  </div>
-                )}
-
-                {/* Achievements */}
-                {activeSection === 'achievements' && (
-                  <div>
-                    <div className="achievements-grid">
-                      {profile.achievements.map((achievement, i) => (
-                        <div key={achievement.id} className="achievement-card">
-                          <div className="achievement-icon">
-                            <i className={"fas " + achievement.icon}></i>
-                          </div>
-                          <div>
-                            <input
-                              className="form-input"
-                              style={{ fontWeight: '600', marginBottom: '4px' }}
-                              placeholder="Achievement Title"
-                              value={achievement.title}
-                              onChange={(e) => {
-                                const newAchievements = [...profile.achievements];
-                                newAchievements[i].title = e.target.value;
-                                setProfile(prev => ({ ...prev, achievements: newAchievements }));
-                              }}
-                            />
-                            <input
-                              className="form-input"
-                              style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}
-                              placeholder="Description"
-                              value={achievement.desc}
-                              onChange={(e) => {
-                                const newAchievements = [...profile.achievements];
-                                newAchievements[i].desc = e.target.value;
-                                setProfile(prev => ({ ...prev, achievements: newAchievements }));
-                              }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <button 
-                      className="btn btn-secondary"
-                      style={{ marginTop: '24px' }}
-                      onClick={() => {
-                        setProfile(prev => ({
-                          ...prev,
-                          achievements: [...prev.achievements, { id: Date.now(), icon: 'fa-star', title: '', desc: '' }]
-                        }));
-                      }}
-                    >
-                      <i className="fas fa-plus"></i> Add Achievement
-                    </button>
-                  </div>
-                )}
-
-                {/* Media */}
-                {activeSection === 'media' && (
-                  <div>
-                    <h3 style={{ marginBottom: '16px', color: 'var(--text-secondary)' }}>Photos</h3>
-                    <div className="media-grid">
-                      {profile.media.photos.map((photo, i) => (
-                        <div key={i} className="media-item">
-                          <img src={photo} alt={"Photo " + (i+1)} />
-                        </div>
-                      ))}
-                      <div className="media-item media-add">
-                        <i className="fas fa-plus"></i>
-                        <span style={{ fontSize: '0.8rem' }}>Add Photo</span>
-                      </div>
-                    </div>
-
-                    <h3 style={{ marginBottom: '16px', marginTop: '32px', color: 'var(--text-secondary)' }}>Videos</h3>
-                    <div className="media-grid">
-                      {profile.media.videos.map((video, i) => (
-                        <div key={i} className="media-item">
-                          <i className="fas fa-play" style={{ fontSize: '2rem', color: 'var(--text-muted)' }}></i>
-                        </div>
-                      ))}
-                      <div className="media-item media-add">
-                        <i className="fas fa-video"></i>
-                        <span style={{ fontSize: '0.8rem' }}>Add Video</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Template */}
-                {activeSection === 'template' && (
-                  <div>
-                    <div className="template-grid">
-                      {templates.map(template => (
-                        <div 
-                          key={template.id} 
-                          className={"template-card" + (profile.template === template.id ? " selected" : "")}
-                          onClick={() => setProfile(prev => ({ ...prev, template: template.id }))}
-                        >
-                          <div className="template-preview" style={{
-                            background: template.id === 'executive' ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' :
-                                       template.id === 'creative' ? 'linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)' :
-                                       template.id === 'tech' ? 'linear-gradient(135deg, #00d2d3 0%, #54a0ff 100%)' :
-                                       'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
-                          }}>
-                            {profile.template === template.id && (
-                              <div style={{
-                                position: 'absolute',
-                                top: '12px',
-                                right: '12px',
-                                background: 'var(--accent-primary)',
-                                color: 'white',
-                                width: '28px',
-                                height: '28px',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                              }}>
-                                <i className="fas fa-check"></i>
-                              </div>
-                            )}
-                          </div>
-                          <div className="template-info">
-                            <div className="template-name">{template.name}</div>
-                            <div className="template-desc">{template.desc}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Placeholder for other sections */}
-                {['awards', 'reviews', 'pay', 'projects'].includes(activeSection) && (
-                  <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
-                    <i className="fas fa-hammer" style={{ fontSize: '3rem', marginBottom: '16px' }}></i>
-                    <h3>Coming Soon</h3>
-                    <p>This section is under construction</p>
-                  </div>
-                )}
-              </div>
-            </div>
+    const Navigation = () => (
+      <nav className="nav" role="navigation" aria-label="Main navigation">
+        <div className="nav-inner">
+          <a href="#" className="nav-logo">
+            <div className="nav-logo-icon">⚡</div>
+            Webume
+          </a>
+          <div className="nav-links">
+            <a href="#profile" className="nav-link">Profile</a>
+            <a href="#timeline" className="nav-link">Timeline</a>
+            <a href="#truth-vault" className="nav-link">Truth Vault</a>
+            <a href="#validations" className="nav-link">Validations</a>
+            <button className="btn btn-primary btn-sm">
+              <i className="fas fa-calendar"></i> Book a Call
+            </button>
           </div>
-        </section>
-      );
-    };
+        </div>
+      </nav>
+    );
 
     // ============================================
-    // PREVIEW PAGE
+    // HERO SECTION
     // ============================================
-    const PreviewPage = ({ profile, setView }) => {
-      return (
-        <section className="profile-preview" style={{ paddingTop: '120px' }}>
-          <div className="container">
-            <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <button className="btn btn-ghost" onClick={() => setView('builder')}>
-                <i className="fas fa-arrow-left"></i> Back to Editor
+    const HeroSection = () => (
+      <section className="hero">
+        <div className="container">
+          <div className="hero-content">
+            <div className="hero-badge">
+              <i className="fas fa-bolt"></i>
+              The Resume Killer
+            </div>
+            
+            <h1 className="hero-title">
+              <span className="hero-title-line white-text">Take Back Control</span>
+              <span className="hero-title-line gradient-text">From Big Corporations</span>
+            </h1>
+            
+            <p className="hero-subtitle">
+              This isn't a resume. It's a <strong>living, breathing proof-of-work</strong> that puts 
+              power back in the hands of job seekers. Real metrics. Verified impact. 
+              <strong> Evidence wins.</strong>
+            </p>
+            
+            <div className="hero-cta">
+              <button className="btn btn-primary btn-lg">
+                <i className="fas fa-rocket"></i> View Full Profile
               </button>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button className="btn btn-secondary">
-                  <i className="fas fa-download"></i> Export PDF
-                </button>
-                <button className="btn btn-primary">
-                  <i className="fas fa-share"></i> Share Profile
-                </button>
+              <button className="btn btn-secondary btn-lg">
+                <i className="fas fa-play"></i> Watch Intro
+              </button>
+            </div>
+            
+            <div className="hero-stats">
+              <div className="hero-stat">
+                <div className="hero-stat-value">30+</div>
+                <div className="hero-stat-label">Years Experience</div>
+              </div>
+              <div className="hero-stat">
+                <div className="hero-stat-value">+47%</div>
+                <div className="hero-stat-label">Revenue Growth</div>
+              </div>
+              <div className="hero-stat">
+                <div className="hero-stat-value">-22%</div>
+                <div className="hero-stat-label">Costs Reduced</div>
+              </div>
+              <div className="hero-stat">
+                <div className="hero-stat-value">200+</div>
+                <div className="hero-stat-label">Team Members Led</div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+    );
 
-            <div className="preview-frame">
-              <div className="preview-header">
-                <div className="preview-avatar">
-                  {profile.basics.name ? profile.basics.name.split(' ').map(n => n[0]).join('') : '?'}
-                </div>
-                <h1 className="preview-name">{profile.basics.name || 'Your Name'}</h1>
-                <p className="preview-tagline">{profile.basics.tagline || 'Your professional tagline'}</p>
-                
-                <div style={{ display: 'flex', gap: '12px', marginTop: '24px', flexWrap: 'wrap' }}>
-                  {profile.basics.email && (
-                    <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
-                      <i className="fas fa-envelope" style={{ marginRight: '8px' }}></i>
-                      {profile.basics.email}
-                    </span>
-                  )}
-                  {profile.basics.location && (
-                    <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
-                      <i className="fas fa-location-dot" style={{ marginRight: '8px' }}></i>
-                      {profile.basics.location}
-                    </span>
-                  )}
-                </div>
+    // ============================================
+    // PROFILE SECTION
+    // ============================================
+    const ProfileSection = ({ data }) => (
+      <section className="profile-section" id="profile">
+        <div className="container">
+          <div className="profile-header">
+            <div className="profile-avatar">
+              <div className="profile-avatar-inner">
+                <img src={data.avatarUrl} alt={data.name} />
               </div>
+            </div>
+            <h2 className="profile-name">{data.name}</h2>
+            <p className="profile-title">{data.title}</p>
+            <p className="profile-tagline">{data.tagline}</p>
+          </div>
 
-              <div className="preview-body">
-                {/* Experience Timeline */}
-                {profile.experiences.length > 0 && (
-                  <div style={{ marginBottom: '48px' }}>
-                    <h2 style={{ marginBottom: '24px', fontSize: '1.5rem' }}>
-                      <i className="fas fa-briefcase" style={{ marginRight: '12px', color: 'var(--accent-primary)' }}></i>
-                      Experience
-                    </h2>
-                    
-                    {profile.experiences.map(exp => (
-                      <div key={exp.id} className="experience-card" style={{ marginBottom: '24px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-                          <div>
-                            <h3 style={{ color: 'var(--text-white)', marginBottom: '4px' }}>{exp.role}</h3>
-                            <p style={{ color: 'var(--accent-primary)', fontWeight: '600' }}>{exp.company}</p>
-                          </div>
-                          <span style={{ color: 'var(--text-muted)' }}>
-                            {exp.startDate} — {exp.endDate || 'Present'}
-                          </span>
-                        </div>
-                        
-                        <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>{exp.description}</p>
-                        
-                        {exp.metrics && exp.metrics.length > 0 && (
-                          <div className="metrics-grid" style={{ marginBottom: '16px' }}>
-                            {exp.metrics.filter(m => m.value).map((metric, i) => (
-                              <div key={i} style={{ 
-                                background: 'var(--bg-surface)', 
-                                padding: '16px', 
-                                borderRadius: 'var(--radius-md)',
-                                textAlign: 'center'
-                              }}>
-                                <div style={{ 
-                                  fontSize: '1.5rem', 
-                                  fontWeight: '700', 
-                                  color: 'var(--accent-primary)',
-                                  fontFamily: 'Space Grotesk'
-                                }}>{metric.value}</div>
-                                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{metric.label}</div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+          <div className="profile-video">
+            <iframe 
+              src={data.videoUrl}
+              title="Introduction Video"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+      </section>
+    );
 
-                        {exp.dayInLife && exp.dayInLife.length > 0 && (
-                          <div className="day-life-section">
-                            <h4 className="day-life-title">
-                              <i className="fas fa-sun"></i>
-                              A Day in the Life
-                            </h4>
-                            <div className="timeline-mini">
-                              {exp.dayInLife.map((item, i) => (
-                                <div key={i} className="timeline-item-mini">
-                                  <span className="timeline-time">{item.time}</span>
-                                  <span className="timeline-content-mini">{item.activity}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+    // ============================================
+    // TIMELINE SECTION
+    // ============================================
+    const TimelineSection = ({ data }) => {
+      const chartRef = useRef(null);
+      const chartInstance = useRef(null);
 
-                {/* Achievements */}
-                {profile.achievements.length > 0 && (
-                  <div style={{ marginBottom: '48px' }}>
-                    <h2 style={{ marginBottom: '24px', fontSize: '1.5rem' }}>
-                      <i className="fas fa-trophy" style={{ marginRight: '12px', color: 'var(--accent-primary)' }}></i>
-                      Achievements
-                    </h2>
-                    <div className="achievements-grid">
-                      {profile.achievements.map(achievement => (
-                        <div key={achievement.id} className="achievement-card">
-                          <div className="achievement-icon">
-                            <i className={"fas " + achievement.icon}></i>
-                          </div>
-                          <div>
-                            <div className="achievement-title">{achievement.title}</div>
-                            <div className="achievement-desc">{achievement.desc}</div>
-                          </div>
-                        </div>
-                      ))}
+      useEffect(() => {
+        if (chartRef.current && window.Chart) {
+          if (chartInstance.current) {
+            chartInstance.current.destroy();
+          }
+
+          const ctx = chartRef.current.getContext('2d');
+          chartInstance.current = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: ['2015', '2017', '2019', '2021', '2023', '2025'],
+              datasets: [
+                {
+                  label: 'Revenue Growth',
+                  data: [100, 115, 128, 135, 142, 147],
+                  borderColor: '#6366f1',
+                  backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                  fill: true,
+                  tension: 0.4
+                },
+                {
+                  label: 'Cost Index',
+                  data: [100, 95, 88, 84, 80, 78],
+                  borderColor: '#22c55e',
+                  backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                  fill: true,
+                  tension: 0.4
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  labels: { color: '#a0a0b8' }
+                }
+              },
+              scales: {
+                x: {
+                  grid: { color: 'rgba(255,255,255,0.05)' },
+                  ticks: { color: '#6e6e88' }
+                },
+                y: {
+                  grid: { color: 'rgba(255,255,255,0.05)' },
+                  ticks: { color: '#6e6e88' }
+                }
+              }
+            }
+          });
+        }
+
+        return () => {
+          if (chartInstance.current) {
+            chartInstance.current.destroy();
+          }
+        };
+      }, []);
+
+      return (
+        <section className="timeline-section" id="timeline">
+          <div className="container">
+            <div className="section-header">
+              <div className="section-badge">
+                <i className="fas fa-briefcase"></i> Career Timeline
+              </div>
+              <h2 className="section-title">Verified Impact</h2>
+              <p className="section-desc">
+                Every metric below is backed by real data. No fluff, no exaggeration—just evidence.
+              </p>
+            </div>
+
+            <div className="timeline">
+              {data.map((entry, index) => (
+                <div key={entry.id} className="timeline-entry glass-heavy glass-card">
+                  <div className="timeline-node"></div>
+                  
+                  <div className="timeline-header">
+                    <div>
+                      <h3 className="timeline-company">{entry.company}</h3>
+                      <p className="timeline-role">{entry.role}</p>
                     </div>
+                    <span className="timeline-dates">{entry.period}</span>
                   </div>
-                )}
-
-                {/* Reviews */}
-                {profile.reviews && profile.reviews.length > 0 && (
-                  <div>
-                    <h2 style={{ marginBottom: '24px', fontSize: '1.5rem' }}>
-                      <i className="fas fa-star" style={{ marginRight: '12px', color: 'var(--accent-primary)' }}></i>
-                      What People Say
-                    </h2>
-                    {profile.reviews.map(review => (
-                      <div key={review.id} style={{
-                        background: 'var(--bg-elevated)',
-                        padding: '24px',
-                        borderRadius: 'var(--radius-lg)',
-                        marginBottom: '16px'
-                      }}>
-                        <p style={{ fontStyle: 'italic', marginBottom: '16px', fontSize: '1.1rem' }}>
-                          "{review.text}"
-                        </p>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{
-                            width: '40px',
-                            height: '40px',
-                            background: 'var(--gradient-primary)',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            fontWeight: '600'
-                          }}>
-                            {review.author.split(' ').map(n => n[0]).join('')}
-                          </div>
-                          <div>
-                            <div style={{ fontWeight: '600' }}>{review.author}</div>
-                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{review.role}</div>
-                          </div>
+                  
+                  <p className="timeline-description">{entry.description}</p>
+                  
+                  <div className="metrics-grid">
+                    {entry.metrics.map((metric, i) => (
+                      <div key={i} className="metric-card">
+                        <div className={"metric-value" + (metric.value.startsWith('-') || metric.value.startsWith('+') && metric.label.includes('Reduced') ? ' success' : '')}>
+                          {metric.value}
                         </div>
+                        <div className="metric-label">{metric.label}</div>
                       </div>
                     ))}
                   </div>
-                )}
-              </div>
+
+                  {index === 0 && (
+                    <div className="chart-container">
+                      <canvas ref={chartRef} height="250"></canvas>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -2451,71 +2102,185 @@ app.get('/', (c) => {
     };
 
     // ============================================
-    // HUNTER CHAT
+    // TRUTH VAULT SECTION
+    // ============================================
+    const TruthVaultSection = ({ data }) => {
+      const getToxicityClass = (score) => {
+        if (score <= 3) return 'low';
+        if (score <= 6) return 'medium';
+        return 'high';
+      };
+
+      const getToxicityLabel = (score) => {
+        if (score <= 3) return 'Great Culture';
+        if (score <= 6) return 'Mixed Experience';
+        return 'Challenging Environment';
+      };
+
+      return (
+        <section className="truth-vault-section" id="truth-vault">
+          <div className="container">
+            <div className="section-header">
+              <div className="section-badge">
+                <i className="fas fa-shield-halved"></i> Truth Vault
+              </div>
+              <h2 className="section-title">Honest Company Ratings</h2>
+              <p className="section-desc">
+                Anonymous toxicity scores from real experience. Transparency exposes bad employers.
+              </p>
+            </div>
+
+            <div className="truth-vault-grid">
+              {data.map((entry, index) => (
+                <div key={index} className="truth-vault-card glass-heavy glass-card">
+                  <div className="truth-vault-header">
+                    <div>
+                      <h3 className="truth-vault-company">{entry.company}</h3>
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-500)' }}>{entry.period}</span>
+                    </div>
+                    <div className={"truth-vault-score " + getToxicityClass(entry.toxicity)}>
+                      {entry.toxicity}/10
+                    </div>
+                  </div>
+                  
+                  <div className="toxicity-bar">
+                    <div 
+                      className={"toxicity-fill " + getToxicityClass(entry.toxicity)}
+                      style={{ width: (entry.toxicity * 10) + '%' }}
+                    ></div>
+                  </div>
+                  
+                  <div className="truth-vault-label">
+                    <span>{getToxicityLabel(entry.toxicity)}</span>
+                    <span>Toxicity Index</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    };
+
+    // ============================================
+    // VALIDATIONS SECTION
+    // ============================================
+    const ValidationsSection = ({ data }) => (
+      <section className="validations-section" id="validations">
+        <div className="container">
+          <div className="section-header">
+            <div className="section-badge">
+              <i className="fas fa-users"></i> Colleague Validations
+            </div>
+            <h2 className="section-title">Verified Endorsements</h2>
+            <p className="section-desc">
+              Real testimonials from people who worked directly with Brad.
+            </p>
+          </div>
+
+          <div className="validations-grid">
+            {data.map((validation) => (
+              <div key={validation.id} className="validation-card glass-heavy glass-card">
+                <p className="validation-quote">{validation.quote}</p>
+                
+                <div className="validation-author">
+                  <div className="validation-avatar">{validation.avatar}</div>
+                  <div>
+                    <div className="validation-name">{validation.author}</div>
+                    <div className="validation-role">{validation.role}</div>
+                    <div className="validation-badge">
+                      <i className="fas fa-check-circle"></i>
+                      Verified Colleague
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+
+    // ============================================
+    // HUNTER CHAT COMPONENT
     // ============================================
     const HunterChat = ({ isOpen, onToggle, profile }) => {
-      const [messages, setMessages] = useState([]);
+      const [messages, setMessages] = useState([
+        { id: 1, type: 'bot', text: AGENT_RESPONSES.greeting }
+      ]);
       const [input, setInput] = useState('');
       const messagesEndRef = useRef(null);
 
-      useEffect(() => {
+      const scrollToBottom = () => {
         if (messagesEndRef.current) {
           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
-      }, [messages]);
+      };
 
       useEffect(() => {
-        if (isOpen && messages.length === 0) {
-          setTimeout(() => {
-            const name = profile.basics.name || 'this candidate';
-            setMessages([{
-              id: 1,
-              type: 'bot',
-              text: "Hey there! I'm the AI Headhunter for " + name + ". Looking to hire someone exceptional? You're in the right place. What would you like to know?"
-            }]);
-          }, 500);
+        scrollToBottom();
+      }, [messages]);
+
+      const getResponse = (query) => {
+        const q = query.toLowerCase();
+        if (q.includes('experience') || q.includes('work') || q.includes('history') || q.includes('background')) {
+          return AGENT_RESPONSES.experience;
         }
-      }, [isOpen, profile.basics.name]);
+        if (q.includes('salary') || q.includes('compensation') || q.includes('pay') || q.includes('money')) {
+          return AGENT_RESPONSES.salary;
+        }
+        if (q.includes('available') || q.includes('start') || q.includes('when') || q.includes('timeline')) {
+          return AGENT_RESPONSES.availability;
+        }
+        if (q.includes('culture') || q.includes('environment') || q.includes('toxic') || q.includes('truth')) {
+          return AGENT_RESPONSES.culture;
+        }
+        if (q.includes('skill') || q.includes('competenc') || q.includes('strength') || q.includes('good at')) {
+          return AGENT_RESPONSES.skills;
+        }
+        if (q.includes('book') || q.includes('call') || q.includes('meet') || q.includes('schedule') || q.includes('calendly')) {
+          return AGENT_RESPONSES.book;
+        }
+        return AGENT_RESPONSES.default;
+      };
 
       const sendMessage = () => {
         if (!input.trim()) return;
         
-        setMessages(prev => [...prev, { id: Date.now(), type: 'user', text: input }]);
+        const userMessage = { id: Date.now(), type: 'user', text: input };
+        setMessages(prev => [...prev, userMessage]);
         setInput('');
-
+        
         setTimeout(() => {
-          const lower = input.toLowerCase();
-          let response = "I'd be happy to tell you more about " + (profile.basics.name || 'this candidate') + "'s experience. What specifically interests you?";
-          
-          if (lower.includes('experience') || lower.includes('background')) {
-            response = profile.experiences.length > 0 
-              ? "Great question! " + profile.basics.name + " has " + profile.experiences.length + " key roles to highlight. Most recently at " + profile.experiences[0].company + " as " + profile.experiences[0].role + ". Want the details?"
-              : "The experience section is still being built. Check back soon!";
-          } else if (lower.includes('salary') || lower.includes('compensation')) {
-            response = "Compensation discussions are best handled directly. I can help schedule a call to discuss expectations. Interested?";
-          } else if (lower.includes('available') || lower.includes('start')) {
-            response = "Great timing! " + (profile.basics.name || 'This candidate') + " is actively exploring new opportunities. Would you like to schedule an intro call?";
-          }
+          const botResponse = { id: Date.now() + 1, type: 'bot', text: getResponse(input) };
+          setMessages(prev => [...prev, botResponse]);
+        }, 600);
+      };
 
-          setMessages(prev => [...prev, { id: Date.now(), type: 'bot', text: response }]);
-        }, 800);
+      const handleQuickAction = (action) => {
+        setInput(action);
+        setTimeout(() => sendMessage(), 100);
       };
 
       return (
         <>
-          <button className="chat-trigger" onClick={onToggle}>
-            <i className={"fas " + (isOpen ? "fa-times" : "fa-comments")}></i>
+          <button 
+            className={"chat-trigger" + (isOpen ? " active" : "")}
+            onClick={onToggle}
+            aria-label={isOpen ? "Close chat" : "Open chat"}
+          >
+            <i className={"fas " + (isOpen ? "fa-times" : "fa-robot")}></i>
           </button>
 
           {isOpen && (
-            <div className="chat-window glass-heavy">
+            <div className="chat-window" role="dialog" aria-label="Hunter Agent Chat">
               <div className="chat-header">
                 <div className="chat-avatar">🤖</div>
                 <div className="chat-info">
-                  <h4>AI Headhunter</h4>
-                  <span>Always online</span>
+                  <h4>Hunter Agent</h4>
+                  <span>Brad's AI Representative</span>
                 </div>
-                <button className="chat-close" onClick={onToggle}>
+                <button className="chat-close" onClick={onToggle} aria-label="Close chat">
                   <i className="fas fa-times"></i>
                 </button>
               </div>
@@ -2523,7 +2288,27 @@ app.get('/', (c) => {
               <div className="chat-messages">
                 {messages.map(msg => (
                   <div key={msg.id} className={"chat-message " + msg.type}>
-                    <div className="chat-bubble">{msg.text}</div>
+                    <div className="chat-bubble">
+                      {msg.text.split('\\n').map((line, i) => (
+                        <span key={i}>{line}<br/></span>
+                      ))}
+                    </div>
+                    {msg.type === 'bot' && msg.id === 1 && (
+                      <div className="chat-quick-actions">
+                        <button className="quick-action-btn" onClick={() => handleQuickAction('Tell me about experience')}>
+                          Experience
+                        </button>
+                        <button className="quick-action-btn" onClick={() => handleQuickAction('What are salary expectations?')}>
+                          Salary
+                        </button>
+                        <button className="quick-action-btn" onClick={() => handleQuickAction('When can Brad start?')}>
+                          Availability
+                        </button>
+                        <button className="quick-action-btn" onClick={() => handleQuickAction('Book a call')}>
+                          Book Call
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
@@ -2532,12 +2317,12 @@ app.get('/', (c) => {
               <div className="chat-input-area">
                 <input
                   className="chat-input"
-                  placeholder="Ask about this candidate..."
+                  placeholder="Ask about Brad..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                 />
-                <button className="chat-send" onClick={sendMessage}>
+                <button className="chat-send" onClick={sendMessage} aria-label="Send message">
                   <i className="fas fa-paper-plane"></i>
                 </button>
               </div>
@@ -2548,7 +2333,7 @@ app.get('/', (c) => {
     };
 
     // ============================================
-    // FOOTER
+    // FOOTER COMPONENT
     // ============================================
     const Footer = () => (
       <footer className="footer">
@@ -2556,55 +2341,67 @@ app.get('/', (c) => {
           <div className="footer-grid">
             <div>
               <div className="footer-brand">
-                <span style={{ fontSize: '1.5rem' }}>⚡</span>
+                <div className="footer-brand-icon">⚡</div>
                 Webume
               </div>
               <p className="footer-desc">
-                The future of professional profiles. Build your employee-for-hire empire.
+                The resume killer we've needed for 30 years. Take back control from Big Corporations. 
+                Merit-based storytelling wins.
               </p>
               <div className="footer-social">
-                <a href="#" className="social-link"><i className="fab fa-twitter"></i></a>
-                <a href="#" className="social-link"><i className="fab fa-linkedin"></i></a>
-                <a href="#" className="social-link"><i className="fab fa-github"></i></a>
+                <a href="#" className="social-link" aria-label="Twitter">
+                  <i className="fab fa-twitter"></i>
+                </a>
+                <a href="#" className="social-link" aria-label="LinkedIn">
+                  <i className="fab fa-linkedin"></i>
+                </a>
+                <a href="#" className="social-link" aria-label="GitHub">
+                  <i className="fab fa-github"></i>
+                </a>
               </div>
             </div>
+            
             <div>
-              <h4 className="footer-title">Product</h4>
+              <h4 className="footer-title">Profile</h4>
               <div className="footer-links">
-                <a href="#" className="footer-link">Features</a>
-                <a href="#" className="footer-link">Templates</a>
-                <a href="#" className="footer-link">Pricing</a>
-                <a href="#" className="footer-link">API</a>
+                <a href="#timeline" className="footer-link">Career Timeline</a>
+                <a href="#truth-vault" className="footer-link">Truth Vault</a>
+                <a href="#validations" className="footer-link">Validations</a>
+                <a href="#" className="footer-link">Download PDF</a>
               </div>
             </div>
+            
             <div>
-              <h4 className="footer-title">Company</h4>
+              <h4 className="footer-title">Connect</h4>
               <div className="footer-links">
-                <a href="#" className="footer-link">About</a>
-                <a href="#" className="footer-link">Blog</a>
-                <a href="#" className="footer-link">Careers</a>
-                <a href="#" className="footer-link">Contact</a>
+                <a href="#" className="footer-link">Book a Call</a>
+                <a href="#" className="footer-link">Send Message</a>
+                <a href="#" className="footer-link">LinkedIn</a>
+                <a href="#" className="footer-link">Email</a>
               </div>
             </div>
+            
             <div>
-              <h4 className="footer-title">Legal</h4>
+              <h4 className="footer-title">Webume</h4>
               <div className="footer-links">
+                <a href="#" className="footer-link">Create Yours</a>
+                <a href="#" className="footer-link">How It Works</a>
                 <a href="#" className="footer-link">Privacy</a>
                 <a href="#" className="footer-link">Terms</a>
-                <a href="#" className="footer-link">Security</a>
               </div>
             </div>
           </div>
+          
           <div className="footer-bottom">
-            <span>© 2025 Webume. All rights reserved.</span>
-            <span>Built for the future of work.</span>
+            <span>© 2025 Webume. The future of professional profiles.</span>
+            <span className="footer-tagline">Built to disrupt. Designed to win.</span>
           </div>
         </div>
       </footer>
     );
 
     // ============================================
-    // RENDER
+    // RENDER APPLICATION
     // ============================================
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
