@@ -191,8 +191,8 @@ app.get('/', (c) => {
     }
     
     /* ===========================================================
-       PREMIUM BACKGROUND - Glass Cards Image with Blur
-       Using the beautiful glass cards image as background
+       PREMIUM BACKGROUND - Glass Cards Image - CRYSTAL CLEAR
+       The beautiful glass cards image as background - NO BLUR
        =========================================================== */
     .premium-bg {
       position: fixed;
@@ -201,36 +201,29 @@ app.get('/', (c) => {
       overflow: hidden;
     }
     
-    /* Background image - minimal blur to show glass cards clearly */
+    /* Background image - NO BLUR - crystal clear glass cards */
     .bg-image {
       position: absolute;
-      inset: -10px;
+      inset: 0;
       background-image: url('/static/background.png');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      filter: blur(2px) brightness(0.85) saturate(1.1);
-      transform: scale(1.02);
+      /* NO BLUR - show the beautiful glass cards clearly */
+      filter: brightness(1) saturate(1.05);
       opacity: 1;
     }
     
-    /* Very subtle gradient overlay - maximize background visibility */
+    /* Minimal overlay - just a hint of darkness for text readability */
     .bg-gradient {
       position: absolute;
       inset: 0;
-      background: 
-        radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
-        linear-gradient(180deg, rgba(10, 10, 18, 0.05) 0%, rgba(10, 10, 18, 0.2) 100%);
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.25) 100%);
     }
     
-    /* Subtle noise texture overlay */
+    /* No noise overlay - keep it clean */
     .noise-overlay {
-      position: absolute;
-      inset: 0;
-      opacity: 0.04;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-      pointer-events: none;
+      display: none;
     }
     
     /* ===========================================================
