@@ -85,7 +85,8 @@ app.get('/', (c) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WEBUME | Premium AI Resume Builder</title>
+  <title>Webumé | Your WebApp Resume</title>
+  <link rel="icon" type="image/png" href="/static/logo.png">
   <meta name="description" content="Transform your resume into an immersive digital experience">
   
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -119,80 +120,45 @@ app.get('/', (c) => {
     }
     
     /* ===========================================================
-       PREMIUM BACKGROUND - Vibrant Gradient Orbs (Key Element!)
-       Based on reference images - large colorful blurred spheres
+       PREMIUM BACKGROUND - Glass Cards Image with Blur
+       Using the beautiful glass cards image as background
        =========================================================== */
     .premium-bg {
       position: fixed;
       inset: 0;
-      background: linear-gradient(180deg, #1e1033 0%, #150b24 50%, #0f0818 100%);
+      background: #0a0a12;
       overflow: hidden;
     }
     
-    /* Large gradient orbs - the defining feature of glassmorphism */
-    .orb {
+    /* Background image with blur effect */
+    .bg-image {
       position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.75;
-      animation: orbFloat 20s ease-in-out infinite;
+      inset: -50px;
+      background-image: url('/static/background.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: blur(30px) brightness(0.6) saturate(1.3);
+      transform: scale(1.1);
+      opacity: 0.85;
     }
     
-    /* Purple orb - top left, largest */
-    .orb-1 {
-      width: 800px;
-      height: 800px;
-      background: radial-gradient(circle, #8B5CF6 0%, #7C3AED 30%, rgba(124, 58, 237, 0) 70%);
-      top: -20%;
-      left: -10%;
-      animation-delay: 0s;
-    }
-    
-    /* Pink orb - right side */
-    .orb-2 {
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, #EC4899 0%, #DB2777 30%, rgba(219, 39, 119, 0) 70%);
-      top: 40%;
-      right: -10%;
-      animation-delay: -5s;
-      animation-duration: 25s;
-    }
-    
-    /* Cyan orb - bottom */
-    .orb-3 {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, #06B6D4 0%, #0891B2 30%, rgba(8, 145, 178, 0) 70%);
-      bottom: -15%;
-      left: 25%;
-      animation-delay: -10s;
-      animation-duration: 22s;
-    }
-    
-    /* Secondary purple orb - center */
-    .orb-4 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, #A78BFA 0%, #8B5CF6 30%, rgba(139, 92, 246, 0) 70%);
-      top: 20%;
-      left: 45%;
-      animation-delay: -15s;
-      opacity: 0.5;
-    }
-    
-    @keyframes orbFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(30px, -30px) scale(1.05); }
-      50% { transform: translate(-20px, 20px) scale(0.95); }
-      75% { transform: translate(20px, 10px) scale(1.02); }
+    /* Gradient overlay for depth */
+    .bg-gradient {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, rgba(6, 182, 212, 0.1) 0%, transparent 40%),
+        linear-gradient(180deg, rgba(10, 10, 18, 0.3) 0%, rgba(10, 10, 18, 0.7) 100%);
     }
     
     /* Subtle noise texture overlay */
     .noise-overlay {
       position: absolute;
       inset: 0;
-      opacity: 0.03;
+      opacity: 0.04;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
       pointer-events: none;
     }
@@ -273,30 +239,21 @@ app.get('/', (c) => {
     .logo {
       display: flex;
       align-items: center;
-      gap: 14px;
+      justify-content: center;
       padding: 0 12px;
       margin-bottom: 40px;
     }
     
-    .logo-icon {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, var(--purple-main), var(--pink-main));
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      color: #fff;
-      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+    .logo-img {
+      width: 180px;
+      height: auto;
+      filter: drop-shadow(0 8px 24px rgba(139, 92, 246, 0.4));
+      transition: transform 0.3s ease, filter 0.3s ease;
     }
     
-    .logo-text {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 24px;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: -0.5px;
+    .logo-img:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 12px 32px rgba(139, 92, 246, 0.5));
     }
     
     .nav-group {
@@ -526,26 +483,33 @@ app.get('/', (c) => {
       background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.05));
     }
     
+    .upload-logo {
+      width: 280px;
+      height: auto;
+      margin: 0 auto 32px;
+      filter: drop-shadow(0 20px 50px rgba(139, 92, 246, 0.5));
+      animation: floatLogo 4s ease-in-out infinite;
+    }
+    
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-15px) scale(1.02); }
+    }
+    
     .upload-icon-wrap {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 28px;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
       background: linear-gradient(135deg, var(--purple-main), var(--pink-main));
-      border-radius: 28px;
+      border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 20px 50px rgba(139, 92, 246, 0.4);
-      animation: floatIcon 3s ease-in-out infinite;
-    }
-    
-    @keyframes floatIcon {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
+      box-shadow: 0 16px 40px rgba(139, 92, 246, 0.4);
     }
     
     .upload-icon-wrap i {
-      font-size: 40px;
+      font-size: 32px;
       color: #fff;
     }
     
@@ -1186,12 +1150,10 @@ app.get('/', (c) => {
   </style>
 </head>
 <body>
-  <!-- Premium Background with Gradient Orbs -->
+  <!-- Premium Background with Glass Cards Image -->
   <div class="premium-bg">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="orb orb-4"></div>
+    <div class="bg-image"></div>
+    <div class="bg-gradient"></div>
     <div class="noise-overlay"></div>
   </div>
   
@@ -1394,8 +1356,7 @@ app.get('/', (c) => {
           {/* Sidebar */}
           <aside className="sidebar glass-sidebar">
             <div className="logo">
-              <div className="logo-icon">⚡</div>
-              <div className="logo-text">WEBUME</div>
+              <img src="/static/logo.png" alt="Webumé" className="logo-img" />
             </div>
             
             <div className="nav-group">
@@ -1549,6 +1510,8 @@ app.get('/', (c) => {
                 accept=".pdf,.docx,.doc,.txt"
                 style={{ display: 'none' }}
               />
+              
+              <img src="/static/logo.png" alt="Webumé" className="upload-logo" />
               
               <div className="upload-icon-wrap">
                 <i className="fas fa-cloud-upload-alt"></i>
