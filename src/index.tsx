@@ -2,9 +2,114 @@ import { Hono } from 'hono'
 
 const app = new Hono()
 
+// Gemini API Key for AI-powered resume parsing
+const GEMINI_API_KEY = 'AIzaSyB9jQaRGkfj4Tyq5y5j45RiYAeb_H2e-2g';
+
+// ============================================
+// AI RESUME PARSING ENDPOINT
+// ============================================
+app.post('/api/parse-resume', async (c) => {
+  try {
+    const { text } = await c.req.json();
+    
+    const prompt = `You are an expert resume parser. Analyze this resume text and extract ALL information into a structured JSON format.
+
+RESUME TEXT:
+${text}
+
+EXTRACT THE FOLLOWING INTO JSON:
+{
+  "basics": {
+    "name": "Full name",
+    "title": "Current/most recent job title",
+    "tagline": "A compelling 1-line professional summary",
+    "email": "Email address",
+    "phone": "Phone number",
+    "location": "City, State",
+    "linkedin": "LinkedIn URL if present",
+    "website": "Personal website if present"
+  },
+  "experience": [
+    {
+      "company": "Company name",
+      "role": "Job title",
+      "startDate": "Start date (Month Year format)",
+      "endDate": "End date or Present",
+      "description": "Full job description",
+      "tasks": "Key responsibilities and tasks as bullet points",
+      "dayInLife": [
+        {"time": "9:00 AM", "activity": "Realistic morning activity based on role"},
+        {"time": "11:00 AM", "activity": "Mid-morning activity"},
+        {"time": "1:00 PM", "activity": "Afternoon activity"},
+        {"time": "3:00 PM", "activity": "Late afternoon activity"},
+        {"time": "5:00 PM", "activity": "End of day activity"}
+      ],
+      "metrics": [
+        {"value": "+X%", "label": "Key metric 1 - extract from description if mentioned"},
+        {"value": "$XM", "label": "Key metric 2"},
+        {"value": "X+", "label": "Key metric 3"},
+        {"value": "XK", "label": "Key metric 4"}
+      ]
+    }
+  ],
+  "skills": ["Array of all skills mentioned"],
+  "education": [
+    {"degree": "Degree name", "school": "School name", "year": "Graduation year"}
+  ],
+  "achievements": [
+    {"title": "Achievement title", "description": "Description"}
+  ],
+  "certifications": [
+    {"name": "Certification name", "org": "Issuing organization", "year": "Year"}
+  ]
+}
+
+IMPORTANT:
+1. Extract ALL experiences found, in chronological order (most recent first)
+2. Parse metrics/numbers from job descriptions (revenue, %, headcount, etc.)
+3. Generate realistic "day in the life" activities based on the job role
+4. Create a compelling tagline summarizing career highlights
+5. If information is not available, use empty string "" not null
+
+Return ONLY valid JSON, no markdown or explanation.`;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 8192
+          }
+        })
+      }
+    );
+
+    const data = await response.json();
+    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // Clean and parse JSON from response
+    let parsed;
+    try {
+      // Remove markdown code blocks if present
+      const jsonStr = aiText.replace(/```json\n?|\n?```/g, '').trim();
+      parsed = JSON.parse(jsonStr);
+    } catch (e) {
+      return c.json({ error: 'Failed to parse AI response', raw: aiText }, 500);
+    }
+
+    return c.json(parsed);
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
 // ============================================
 // WEBUME: THE RESUME KILLER
-// Premium Dashboard UI + Real Resume Parsing
+// Premium Dashboard UI + AI Resume Parsing
 // ============================================
 
 app.get('/', (c) => {
@@ -14,6 +119,7 @@ app.get('/', (c) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Webume | Employee-for-Hire Empire</title>
+  <meta name="description" content="The resume killer we've needed. Transform your career history into a living, verifiable proof-of-work portfolio.">
   
   <!-- React 18 -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -40,108 +146,185 @@ app.get('/', (c) => {
   
   <style>
     /* ============================================
-       WEBUME PREMIUM DASHBOARD UI
-       Based on Reference Designs
+       WEBUME PREMIUM ULTRA DASHBOARD UI
+       Futuristic Glassmorphism Design System
        ============================================ */
     
     :root {
-      /* Background Gradient - Deep Purple/Blue */
-      --bg-primary: #0f0a1e;
-      --bg-secondary: #1a1333;
-      --bg-tertiary: #251d3d;
-      --bg-card: rgba(30, 24, 54, 0.85);
-      --bg-card-hover: rgba(40, 32, 70, 0.95);
+      /* Deep Space Background */
+      --bg-void: #050510;
+      --bg-deep: #0a0a1f;
+      --bg-primary: #0d0d24;
+      --bg-secondary: #12122e;
+      --bg-tertiary: #1a1a3e;
+      --bg-elevated: #222255;
       
-      /* Accent Colors - Vibrant Purple/Pink/Cyan */
-      --accent-purple: #9a77ff;
-      --accent-pink: #f15bb5;
-      --accent-cyan: #1cd5a9;
-      --accent-blue: #3b46db;
-      --accent-orange: #ff9f43;
-      --accent-red: #ff6b6b;
+      /* Glass Effects */
+      --glass-bg: rgba(255, 255, 255, 0.02);
+      --glass-bg-hover: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.06);
+      --glass-border-hover: rgba(255, 255, 255, 0.12);
+      --glass-highlight: rgba(255, 255, 255, 0.08);
+      --glass-glow: rgba(138, 43, 226, 0.15);
+      
+      /* Neon Accent Palette */
+      --neon-purple: #a855f7;
+      --neon-violet: #8b5cf6;
+      --neon-pink: #ec4899;
+      --neon-magenta: #d946ef;
+      --neon-cyan: #06b6d4;
+      --neon-teal: #14b8a6;
+      --neon-blue: #3b82f6;
+      --neon-green: #22c55e;
+      --neon-orange: #f97316;
+      --neon-red: #ef4444;
+      --neon-gold: #fbbf24;
       
       /* Gradients */
-      --gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --gradient-pink: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      --gradient-cyan: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      --gradient-card: linear-gradient(145deg, rgba(154, 119, 255, 0.1) 0%, rgba(241, 91, 181, 0.05) 100%);
-      --gradient-bg: radial-gradient(ellipse at 20% 0%, rgba(154, 119, 255, 0.15) 0%, transparent 50%),
-                     radial-gradient(ellipse at 80% 100%, rgba(241, 91, 181, 0.1) 0%, transparent 50%),
-                     radial-gradient(ellipse at 50% 50%, rgba(28, 213, 169, 0.05) 0%, transparent 60%);
+      --gradient-purple: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+      --gradient-pink: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+      --gradient-cyan: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
+      --gradient-gold: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      --gradient-aurora: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #06b6d4 100%);
+      --gradient-cosmic: linear-gradient(180deg, rgba(138, 43, 226, 0.3) 0%, rgba(236, 72, 153, 0.15) 50%, transparent 100%);
       
       /* Text */
       --text-primary: #ffffff;
-      --text-secondary: #b8b5c9;
-      --text-muted: #6b6889;
+      --text-secondary: #c4b5fd;
+      --text-muted: #7c7c9a;
+      --text-dim: #4a4a6a;
       
-      /* Glass Effect */
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --glass-highlight: rgba(255, 255, 255, 0.12);
-      
-      /* Shadows */
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
-      --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.5);
-      --shadow-glow: 0 0 40px rgba(154, 119, 255, 0.3);
-      --shadow-glow-pink: 0 0 40px rgba(241, 91, 181, 0.3);
-      --shadow-glow-cyan: 0 0 40px rgba(28, 213, 169, 0.3);
+      /* Shadows & Glows */
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.6);
+      --shadow-xl: 0 24px 80px rgba(0, 0, 0, 0.7);
+      --glow-purple: 0 0 60px rgba(168, 85, 247, 0.4);
+      --glow-pink: 0 0 60px rgba(236, 72, 153, 0.4);
+      --glow-cyan: 0 0 60px rgba(6, 182, 212, 0.4);
+      --glow-subtle: 0 0 40px rgba(168, 85, 247, 0.2);
       
       /* Sizing */
       --sidebar-width: 280px;
-      --header-height: 72px;
+      --header-height: 80px;
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
-      --radius-xl: 24px;
+      --radius-xl: 20px;
+      --radius-2xl: 28px;
     }
     
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    html, body, #root {
-      height: 100%;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #root { height: 100%; }
     
     body {
       font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--bg-primary);
+      background: var(--bg-void);
       color: var(--text-primary);
-      line-height: 1.5;
+      line-height: 1.6;
       overflow: hidden;
     }
     
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
+    /* Premium Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { 
-      background: var(--accent-purple);
-      border-radius: 3px;
+      background: linear-gradient(180deg, var(--neon-purple), var(--neon-pink));
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover { opacity: 0.8; }
+    
+    /* ============================================
+       ANIMATED BACKGROUND
+       ============================================ */
+    .cosmic-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      background: 
+        radial-gradient(ellipse 150% 100% at 0% 0%, rgba(88, 28, 135, 0.4) 0%, transparent 50%),
+        radial-gradient(ellipse 100% 150% at 100% 100%, rgba(157, 23, 77, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 80% at 50% 50%, rgba(30, 64, 175, 0.2) 0%, transparent 60%),
+        var(--bg-void);
+    }
+    
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.6;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    .orb-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%);
+      top: -200px;
+      left: -200px;
+      animation-delay: 0s;
+    }
+    
+    .orb-2 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.35) 0%, transparent 70%);
+      top: 50%;
+      right: -150px;
+      animation-delay: -7s;
+      animation-duration: 25s;
+    }
+    
+    .orb-3 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, transparent 70%);
+      bottom: -100px;
+      left: 30%;
+      animation-delay: -14s;
+      animation-duration: 22s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -30px) scale(1.05); }
+      50% { transform: translate(-20px, 20px) scale(0.95); }
+      75% { transform: translate(40px, 10px) scale(1.02); }
+    }
+    
+    /* Grid overlay */
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.5;
     }
     
     /* ============================================
-       APP LAYOUT - Dashboard Style
+       APP LAYOUT
        ============================================ */
     .app {
       display: flex;
       height: 100vh;
-      background: var(--gradient-bg), var(--bg-primary);
+      position: relative;
+      z-index: 1;
     }
     
     /* ============================================
-       SIDEBAR
+       PREMIUM SIDEBAR
        ============================================ */
     .sidebar {
       width: var(--sidebar-width);
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
+      background: rgba(10, 10, 31, 0.8);
+      backdrop-filter: blur(40px);
       border-right: 1px solid var(--glass-border);
       display: flex;
       flex-direction: column;
-      padding: 24px 16px;
+      padding: 28px 20px;
       position: relative;
       z-index: 100;
     }
@@ -152,59 +335,81 @@ app.get('/', (c) => {
       top: 0;
       left: 0;
       right: 0;
-      height: 200px;
-      background: linear-gradient(180deg, rgba(154, 119, 255, 0.1) 0%, transparent 100%);
+      height: 300px;
+      background: var(--gradient-cosmic);
       pointer-events: none;
+      opacity: 0.5;
+    }
+    
+    .sidebar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 1px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--neon-purple) 0%, transparent 50%, var(--neon-cyan) 100%);
+      opacity: 0.3;
     }
     
     .logo {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 0 12px;
-      margin-bottom: 40px;
+      gap: 14px;
+      padding: 0 8px;
+      margin-bottom: 48px;
       position: relative;
     }
     
     .logo-icon {
-      width: 48px;
-      height: 48px;
-      background: var(--gradient-purple);
-      border-radius: var(--radius-md);
+      width: 52px;
+      height: 52px;
+      background: var(--gradient-aurora);
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-      box-shadow: var(--shadow-glow);
+      font-size: 26px;
+      box-shadow: var(--glow-purple), var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .logo-icon::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
     }
     
     .logo-text {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 700;
-      background: linear-gradient(135deg, #fff 0%, #b8b5c9 100%);
+      background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
     }
     
     .nav-section {
-      margin-bottom: 32px;
+      margin-bottom: 36px;
     }
     
     .nav-label {
-      font-size: 11px;
-      font-weight: 600;
+      font-size: 10px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--text-muted);
-      padding: 0 16px;
-      margin-bottom: 12px;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      padding: 0 12px;
+      margin-bottom: 14px;
     }
     
     .nav-items {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
     
     .nav-item {
@@ -212,91 +417,133 @@ app.get('/', (c) => {
       align-items: center;
       gap: 14px;
       padding: 14px 16px;
-      border-radius: var(--radius-md);
-      color: var(--text-secondary);
+      border-radius: var(--radius-lg);
+      color: var(--text-muted);
       text-decoration: none;
       font-weight: 500;
       font-size: 14px;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
-      border: none;
+      border: 1px solid transparent;
       background: transparent;
       width: 100%;
       text-align: left;
       position: relative;
+      overflow: hidden;
+    }
+    
+    .nav-item::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-purple);
+      opacity: 0;
+      transition: opacity 0.25s ease;
     }
     
     .nav-item:hover {
-      background: var(--glass-bg);
       color: var(--text-primary);
+      border-color: var(--glass-border-hover);
+      background: var(--glass-bg-hover);
     }
     
     .nav-item.active {
-      background: linear-gradient(135deg, rgba(154, 119, 255, 0.2) 0%, rgba(154, 119, 255, 0.05) 100%);
       color: var(--text-primary);
-      border: 1px solid rgba(154, 119, 255, 0.3);
+      border-color: rgba(168, 85, 247, 0.3);
+      background: rgba(168, 85, 247, 0.1);
+      box-shadow: var(--glow-subtle);
     }
     
     .nav-item.active::before {
+      opacity: 0.1;
+    }
+    
+    .nav-item.active::after {
       content: '';
       position: absolute;
       left: 0;
       top: 50%;
       transform: translateY(-50%);
       width: 3px;
-      height: 24px;
-      background: var(--accent-purple);
+      height: 28px;
+      background: var(--gradient-purple);
       border-radius: 0 3px 3px 0;
+      box-shadow: var(--glow-purple);
     }
     
     .nav-item i {
       width: 20px;
       text-align: center;
       font-size: 16px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .nav-item span {
+      position: relative;
+      z-index: 1;
     }
     
     .nav-item.active i {
-      color: var(--accent-purple);
+      color: var(--neon-purple);
+      filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6));
     }
     
     .nav-badge {
       margin-left: auto;
-      background: var(--accent-pink);
+      background: var(--gradient-pink);
       color: white;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      position: relative;
+      z-index: 1;
+      box-shadow: var(--glow-pink);
     }
     
-    /* Sidebar Profile Card */
+    /* Sidebar User Card */
     .sidebar-profile {
       margin-top: auto;
-      padding: 16px;
+      padding: 18px;
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-xl);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .sidebar-profile::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%);
     }
     
     .sidebar-avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
       background: var(--gradient-cyan);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 16px;
-      border: 2px solid rgba(28, 213, 169, 0.3);
+      border: 2px solid rgba(6, 182, 212, 0.3);
+      box-shadow: var(--glow-cyan);
+      position: relative;
+      z-index: 1;
     }
     
     .sidebar-info {
       flex: 1;
       min-width: 0;
+      position: relative;
+      z-index: 1;
     }
     
     .sidebar-name {
@@ -314,7 +561,7 @@ app.get('/', (c) => {
     }
     
     /* ============================================
-       MAIN CONTENT AREA
+       MAIN CONTENT
        ============================================ */
     .main {
       flex: 1;
@@ -326,19 +573,34 @@ app.get('/', (c) => {
     /* Header */
     .header {
       height: var(--header-height);
-      padding: 0 32px;
+      padding: 0 40px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--glass-border);
-      background: rgba(15, 10, 30, 0.5);
-      backdrop-filter: blur(10px);
+      background: rgba(10, 10, 31, 0.6);
+      backdrop-filter: blur(20px);
+      position: relative;
+    }
+    
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon-purple), var(--neon-pink), transparent);
+      opacity: 0.3;
     }
     
     .header-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 24px;
-      font-weight: 600;
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     
     .header-actions {
@@ -350,17 +612,21 @@ app.get('/', (c) => {
     .header-search {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 10px 20px;
+      gap: 14px;
+      padding: 12px 22px;
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      min-width: 280px;
+      border-radius: var(--radius-xl);
+      min-width: 300px;
+      transition: all 0.25s ease;
     }
     
-    .header-search i {
-      color: var(--text-muted);
+    .header-search:focus-within {
+      border-color: var(--neon-purple);
+      box-shadow: var(--glow-subtle);
     }
+    
+    .header-search i { color: var(--text-dim); }
     
     .header-search input {
       background: transparent;
@@ -371,109 +637,106 @@ app.get('/', (c) => {
       width: 100%;
     }
     
-    .header-search input::placeholder {
-      color: var(--text-muted);
-    }
+    .header-search input::placeholder { color: var(--text-dim); }
     
     .header-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: var(--radius-md);
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-lg);
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
-      color: var(--text-secondary);
+      color: var(--text-muted);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
       position: relative;
     }
     
     .header-btn:hover {
-      background: var(--glass-highlight);
+      background: var(--glass-bg-hover);
       color: var(--text-primary);
+      border-color: var(--glass-border-hover);
+      transform: translateY(-2px);
     }
     
     .header-btn .badge {
       position: absolute;
       top: -4px;
       right: -4px;
-      width: 18px;
-      height: 18px;
-      background: var(--accent-pink);
+      width: 20px;
+      height: 20px;
+      background: var(--gradient-pink);
       border-radius: 50%;
       font-size: 10px;
-      font-weight: 600;
+      font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: var(--glow-pink);
     }
     
-    /* Content Area */
+    /* Content */
     .content {
       flex: 1;
       overflow-y: auto;
-      padding: 32px;
+      padding: 40px;
     }
     
     /* ============================================
-       CARDS
+       PREMIUM CARDS
        ============================================ */
     .card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
+      background: rgba(18, 18, 46, 0.7);
+      backdrop-filter: blur(40px);
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      padding: 24px;
-      transition: all 0.3s ease;
+      border-radius: var(--radius-2xl);
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
     }
     
     .card:hover {
-      border-color: rgba(154, 119, 255, 0.3);
-      box-shadow: var(--shadow-glow);
+      border-color: rgba(168, 85, 247, 0.25);
+      box-shadow: var(--glow-subtle), var(--shadow-lg);
+      transform: translateY(-2px);
     }
     
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 28px;
     }
     
     .card-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     
     .card-title i {
-      color: var(--accent-purple);
-    }
-    
-    .card-action {
-      padding: 8px 16px;
-      background: transparent;
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
-      color: var(--text-secondary);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    .card-action:hover {
-      background: var(--glass-bg);
-      color: var(--text-primary);
-      border-color: var(--accent-purple);
+      color: var(--neon-purple);
+      filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
     }
     
     /* ============================================
-       STAT CARDS
+       STAT CARDS - Glassmorphism Style
        ============================================ */
     .stats-grid {
       display: grid;
@@ -483,98 +746,120 @@ app.get('/', (c) => {
     }
     
     .stat-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
+      background: rgba(18, 18, 46, 0.6);
+      backdrop-filter: blur(40px);
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      padding: 24px;
+      border-radius: var(--radius-2xl);
+      padding: 28px;
       position: relative;
       overflow: hidden;
-      transition: all 0.3s ease;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .stat-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      right: 0;
-      width: 100px;
-      height: 100px;
+      top: -50%;
+      right: -50%;
+      width: 150px;
+      height: 150px;
       border-radius: 50%;
-      filter: blur(40px);
-      opacity: 0.3;
+      filter: blur(60px);
+      opacity: 0.4;
+      transition: opacity 0.35s ease;
     }
     
-    .stat-card.purple::before { background: var(--accent-purple); }
-    .stat-card.pink::before { background: var(--accent-pink); }
-    .stat-card.cyan::before { background: var(--accent-cyan); }
-    .stat-card.orange::before { background: var(--accent-orange); }
+    .stat-card:hover::before { opacity: 0.6; }
+    
+    .stat-card.purple::before { background: var(--neon-purple); }
+    .stat-card.pink::before { background: var(--neon-pink); }
+    .stat-card.cyan::before { background: var(--neon-cyan); }
+    .stat-card.gold::before { background: var(--neon-gold); }
     
     .stat-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(154, 119, 255, 0.3);
-      box-shadow: var(--shadow-glow);
+      transform: translateY(-6px);
+      border-color: rgba(168, 85, 247, 0.3);
+      box-shadow: var(--glow-purple), var(--shadow-lg);
     }
     
     .stat-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-md);
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      margin-bottom: 16px;
+      font-size: 22px;
+      margin-bottom: 20px;
+      position: relative;
     }
     
-    .stat-card.purple .stat-icon { background: rgba(154, 119, 255, 0.2); color: var(--accent-purple); }
-    .stat-card.pink .stat-icon { background: rgba(241, 91, 181, 0.2); color: var(--accent-pink); }
-    .stat-card.cyan .stat-icon { background: rgba(28, 213, 169, 0.2); color: var(--accent-cyan); }
-    .stat-card.orange .stat-icon { background: rgba(255, 159, 67, 0.2); color: var(--accent-orange); }
+    .stat-card.purple .stat-icon { 
+      background: rgba(168, 85, 247, 0.15); 
+      color: var(--neon-purple);
+      box-shadow: inset 0 0 20px rgba(168, 85, 247, 0.1);
+    }
+    .stat-card.pink .stat-icon { 
+      background: rgba(236, 72, 153, 0.15); 
+      color: var(--neon-pink);
+      box-shadow: inset 0 0 20px rgba(236, 72, 153, 0.1);
+    }
+    .stat-card.cyan .stat-icon { 
+      background: rgba(6, 182, 212, 0.15); 
+      color: var(--neon-cyan);
+      box-shadow: inset 0 0 20px rgba(6, 182, 212, 0.1);
+    }
+    .stat-card.gold .stat-icon { 
+      background: rgba(251, 191, 36, 0.15); 
+      color: var(--neon-gold);
+      box-shadow: inset 0 0 20px rgba(251, 191, 36, 0.1);
+    }
     
     .stat-value {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 32px;
+      font-size: 36px;
       font-weight: 700;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      letter-spacing: -1px;
     }
     
     .stat-label {
       color: var(--text-muted);
       font-size: 14px;
+      font-weight: 500;
     }
     
     .stat-change {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       font-size: 13px;
-      font-weight: 500;
-      margin-top: 8px;
-      padding: 4px 10px;
-      border-radius: 20px;
+      font-weight: 600;
+      margin-top: 12px;
+      padding: 6px 14px;
+      border-radius: 30px;
     }
     
     .stat-change.up {
-      background: rgba(28, 213, 169, 0.15);
-      color: var(--accent-cyan);
+      background: rgba(34, 197, 94, 0.12);
+      color: var(--neon-green);
     }
     
     .stat-change.down {
-      background: rgba(255, 107, 107, 0.15);
-      color: var(--accent-red);
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--neon-red);
     }
     
     /* ============================================
-       UPLOAD ZONE
+       UPLOAD ZONE - Premium Design
        ============================================ */
     .upload-zone {
       border: 2px dashed var(--glass-border);
-      border-radius: var(--radius-xl);
-      padding: 60px 40px;
+      border-radius: var(--radius-2xl);
+      padding: 80px 50px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       background: var(--glass-bg);
       position: relative;
       overflow: hidden;
@@ -584,14 +869,14 @@ app.get('/', (c) => {
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 50% 50%, rgba(154, 119, 255, 0.1) 0%, transparent 70%);
+      background: radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 60%);
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.35s ease;
     }
     
     .upload-zone:hover, .upload-zone.drag-over {
-      border-color: var(--accent-purple);
-      background: rgba(154, 119, 255, 0.05);
+      border-color: var(--neon-purple);
+      background: rgba(168, 85, 247, 0.05);
     }
     
     .upload-zone:hover::before, .upload-zone.drag-over::before {
@@ -600,137 +885,221 @@ app.get('/', (c) => {
     
     .upload-zone.drag-over {
       border-style: solid;
-      transform: scale(1.02);
-      box-shadow: var(--shadow-glow);
+      transform: scale(1.01);
+      box-shadow: var(--glow-purple);
     }
     
     .upload-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 24px;
-      background: var(--gradient-purple);
-      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 32px;
+      background: var(--gradient-aurora);
+      border-radius: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
+      font-size: 40px;
       color: white;
-      box-shadow: var(--shadow-glow);
+      box-shadow: var(--glow-purple), var(--shadow-lg);
       position: relative;
+      overflow: hidden;
+    }
+    
+    .upload-icon::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+    }
+    
+    .upload-icon i {
+      position: relative;
+      z-index: 1;
+      animation: uploadBounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes uploadBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
     }
     
     .upload-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 8px;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     
     .upload-desc {
       color: var(--text-muted);
-      margin-bottom: 24px;
+      font-size: 16px;
+      margin-bottom: 32px;
     }
     
     .upload-formats {
       display: flex;
-      gap: 12px;
+      gap: 16px;
       justify-content: center;
     }
     
     .format-tag {
-      padding: 8px 16px;
+      padding: 12px 22px;
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      font-size: 13px;
-      font-weight: 500;
+      border-radius: var(--radius-xl);
+      font-size: 14px;
+      font-weight: 600;
       color: var(--text-secondary);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      transition: all 0.25s ease;
     }
     
-    .format-tag i {
-      color: var(--accent-purple);
+    .format-tag:hover {
+      border-color: var(--neon-purple);
+      color: var(--text-primary);
     }
+    
+    .format-tag i { color: var(--neon-purple); }
     
     /* ============================================
-       PROGRESS BAR
+       PROGRESS - AI Processing Animation
        ============================================ */
     .progress-container {
-      padding: 32px;
+      padding: 48px;
     }
     
     .progress-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
     }
     
     .progress-title {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
       font-weight: 600;
     }
     
-    .progress-spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid var(--glass-border);
-      border-top-color: var(--accent-purple);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+    .ai-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background: var(--gradient-aurora);
+      border-radius: var(--radius-xl);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: var(--glow-purple);
     }
     
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .ai-dot {
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      animation: aiPulse 1s ease-in-out infinite;
     }
+    
+    @keyframes aiPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+    
+    .progress-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--glass-border);
+      border-top-color: var(--neon-purple);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
     
     .progress-percent {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
-      color: var(--accent-purple);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--neon-purple);
+      text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
     }
     
     .progress-bar {
-      height: 8px;
+      height: 12px;
       background: var(--glass-bg);
-      border-radius: 4px;
+      border-radius: 6px;
       overflow: hidden;
-      margin-bottom: 24px;
+      margin-bottom: 36px;
+      border: 1px solid var(--glass-border);
     }
     
     .progress-fill {
       height: 100%;
-      background: var(--gradient-purple);
-      border-radius: 4px;
+      background: var(--gradient-aurora);
+      border-radius: 6px;
       transition: width 0.3s ease;
-      box-shadow: var(--shadow-glow);
+      box-shadow: var(--glow-purple);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
     }
     
     .progress-steps {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
     }
     
     .progress-step {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 14px;
-      color: var(--text-muted);
+      gap: 16px;
+      font-size: 15px;
+      color: var(--text-dim);
+      padding: 14px 18px;
+      border-radius: var(--radius-lg);
+      background: var(--glass-bg);
+      border: 1px solid transparent;
+      transition: all 0.25s ease;
     }
     
-    .progress-step.complete { color: var(--accent-cyan); }
-    .progress-step.active { color: var(--accent-purple); }
-    
-    .progress-step i {
-      width: 20px;
-      text-align: center;
+    .progress-step.complete { 
+      color: var(--neon-green);
+      border-color: rgba(34, 197, 94, 0.2);
+      background: rgba(34, 197, 94, 0.05);
     }
+    
+    .progress-step.active { 
+      color: var(--neon-purple);
+      border-color: rgba(168, 85, 247, 0.3);
+      background: rgba(168, 85, 247, 0.08);
+      box-shadow: var(--glow-subtle);
+    }
+    
+    .progress-step i { width: 24px; text-align: center; font-size: 18px; }
     
     /* ============================================
        FORM ELEMENTS
@@ -738,69 +1107,75 @@ app.get('/', (c) => {
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
+      gap: 24px;
     }
     
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
     
-    .form-group.full {
-      grid-column: 1 / -1;
-    }
+    .form-group.full { grid-column: 1 / -1; }
     
     .form-label {
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--text-secondary);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     
     .form-label i {
-      color: var(--accent-purple);
+      color: var(--neon-purple);
       font-size: 12px;
     }
     
     .form-input, .form-textarea, .form-select {
-      padding: 14px 18px;
+      padding: 16px 20px;
       background: var(--bg-tertiary);
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       color: var(--text-primary);
-      font-size: 14px;
+      font-size: 15px;
       font-family: inherit;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
     }
     
     .form-input:focus, .form-textarea:focus, .form-select:focus {
       outline: none;
-      border-color: var(--accent-purple);
-      box-shadow: 0 0 0 3px rgba(154, 119, 255, 0.1);
+      border-color: var(--neon-purple);
+      box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1), var(--glow-subtle);
     }
     
     .form-input::placeholder, .form-textarea::placeholder {
-      color: var(--text-muted);
+      color: var(--text-dim);
     }
     
     .form-textarea {
-      min-height: 100px;
+      min-height: 120px;
       resize: vertical;
+      line-height: 1.7;
     }
     
     /* ============================================
-       EXPERIENCE CARD
+       EXPERIENCE ENTRY
        ============================================ */
     .experience-entry {
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      margin-bottom: 20px;
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      margin-bottom: 24px;
       position: relative;
+      transition: all 0.25s ease;
+    }
+    
+    .experience-entry:hover {
+      border-color: var(--glass-border-hover);
     }
     
     .experience-entry::before {
@@ -809,40 +1184,37 @@ app.get('/', (c) => {
       left: 0;
       top: 0;
       bottom: 0;
-      width: 3px;
-      background: var(--gradient-purple);
-      border-radius: 3px 0 0 3px;
+      width: 4px;
+      background: var(--gradient-aurora);
+      border-radius: 4px 0 0 4px;
     }
     
     .experience-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
     }
     
     .experience-number {
-      width: 36px;
-      height: 36px;
+      width: 44px;
+      height: 44px;
       background: var(--gradient-purple);
-      border-radius: 50%;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 14px;
-      box-shadow: var(--shadow-glow);
+      font-size: 16px;
+      box-shadow: var(--glow-purple);
     }
     
-    .experience-actions {
-      display: flex;
-      gap: 8px;
-    }
+    .experience-actions { display: flex; gap: 10px; }
     
     .btn-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: var(--radius-sm);
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
       color: var(--text-muted);
@@ -850,18 +1222,18 @@ app.get('/', (c) => {
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
     }
     
     .btn-icon:hover {
-      background: var(--glass-highlight);
+      background: var(--glass-bg-hover);
       color: var(--text-primary);
     }
     
     .btn-icon.danger:hover {
-      background: rgba(255, 107, 107, 0.15);
-      color: var(--accent-red);
-      border-color: var(--accent-red);
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--neon-red);
+      border-color: rgba(239, 68, 68, 0.3);
     }
     
     /* ============================================
@@ -871,20 +1243,21 @@ app.get('/', (c) => {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
-      margin-top: 20px;
+      margin-top: 24px;
     }
     
     .metric-input {
       background: var(--bg-tertiary);
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
-      padding: 16px;
+      border-radius: var(--radius-lg);
+      padding: 20px;
       text-align: center;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
     }
     
-    .metric-input:hover {
-      border-color: var(--accent-purple);
+    .metric-input:hover, .metric-input:focus-within {
+      border-color: var(--neon-purple);
+      box-shadow: var(--glow-subtle);
     }
     
     .metric-input input {
@@ -894,15 +1267,15 @@ app.get('/', (c) => {
       outline: none;
       text-align: center;
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 24px;
+      font-size: 28px;
       font-weight: 700;
-      color: var(--accent-purple);
-      margin-bottom: 4px;
+      color: var(--neon-purple);
+      margin-bottom: 6px;
     }
     
     .metric-input input::placeholder {
-      color: var(--text-muted);
-      font-size: 18px;
+      color: var(--text-dim);
+      font-size: 20px;
     }
     
     .metric-input-label {
@@ -919,26 +1292,39 @@ app.get('/', (c) => {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      padding: 14px 28px;
-      border-radius: var(--radius-md);
+      gap: 12px;
+      padding: 16px 32px;
+      border-radius: var(--radius-lg);
       font-weight: 600;
-      font-size: 14px;
+      font-size: 15px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       border: none;
       text-decoration: none;
+      position: relative;
+      overflow: hidden;
     }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    
+    .btn:hover::before { opacity: 1; }
     
     .btn-primary {
       background: var(--gradient-purple);
       color: white;
-      box-shadow: var(--shadow-glow);
+      box-shadow: var(--glow-purple), var(--shadow-md);
     }
     
     .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 40px rgba(154, 119, 255, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 50px rgba(168, 85, 247, 0.5), var(--shadow-lg);
     }
     
     .btn-secondary {
@@ -948,131 +1334,146 @@ app.get('/', (c) => {
     }
     
     .btn-secondary:hover {
-      background: var(--glass-highlight);
-      border-color: var(--accent-purple);
+      background: var(--glass-bg-hover);
+      border-color: var(--neon-purple);
     }
     
     .btn-pink {
       background: var(--gradient-pink);
       color: white;
-      box-shadow: var(--shadow-glow-pink);
+      box-shadow: var(--glow-pink);
     }
     
     .btn-cyan {
       background: var(--gradient-cyan);
       color: white;
-      box-shadow: var(--shadow-glow-cyan);
+      box-shadow: var(--glow-cyan);
     }
     
     .btn-add {
       width: 100%;
-      padding: 16px;
+      padding: 20px;
       background: var(--glass-bg);
       border: 2px dashed var(--glass-border);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-xl);
       color: var(--text-muted);
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
     }
     
     .btn-add:hover {
-      border-color: var(--accent-purple);
+      border-color: var(--neon-purple);
       color: var(--text-primary);
-      background: rgba(154, 119, 255, 0.05);
+      background: rgba(168, 85, 247, 0.05);
     }
     
     /* ============================================
-       TIMELINE
+       TIMELINE - Premium Design
        ============================================ */
     .timeline {
       position: relative;
-      padding-left: 40px;
+      padding-left: 48px;
     }
     
     .timeline::before {
       content: '';
       position: absolute;
-      left: 12px;
+      left: 14px;
       top: 0;
       bottom: 0;
-      width: 2px;
-      background: linear-gradient(180deg, var(--accent-purple), var(--accent-pink), var(--accent-cyan));
+      width: 3px;
+      background: linear-gradient(180deg, var(--neon-purple), var(--neon-pink), var(--neon-cyan));
+      border-radius: 2px;
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
     }
     
     .timeline-entry {
       position: relative;
       margin-bottom: 32px;
-      padding: 24px;
-      background: var(--bg-card);
+      padding: 28px;
+      background: var(--glass-bg);
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-xl);
+      transition: all 0.25s ease;
+    }
+    
+    .timeline-entry:hover {
+      border-color: var(--glass-border-hover);
+      box-shadow: var(--glow-subtle);
     }
     
     .timeline-entry::before {
       content: '';
       position: absolute;
-      left: -34px;
-      top: 28px;
-      width: 16px;
-      height: 16px;
-      background: var(--accent-purple);
+      left: -42px;
+      top: 32px;
+      width: 20px;
+      height: 20px;
+      background: var(--gradient-purple);
       border-radius: 50%;
-      border: 3px solid var(--bg-primary);
-      box-shadow: var(--shadow-glow);
+      border: 4px solid var(--bg-primary);
+      box-shadow: var(--glow-purple);
     }
     
     .timeline-company {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 4px;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
     }
     
     .timeline-role {
-      color: var(--accent-purple);
-      font-weight: 500;
-      margin-bottom: 8px;
+      color: var(--neon-purple);
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 10px;
     }
     
     .timeline-dates {
       display: inline-block;
-      padding: 4px 12px;
+      padding: 6px 16px;
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
-      border-radius: 20px;
+      border-radius: 30px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
       color: var(--text-muted);
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
     
     .timeline-desc {
       color: var(--text-secondary);
-      line-height: 1.7;
+      line-height: 1.8;
     }
     
     /* Preview Metrics */
     .preview-metrics {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-top: 20px;
+      gap: 16px;
+      margin-top: 24px;
     }
     
     .preview-metric {
-      background: var(--glass-bg);
+      background: var(--bg-tertiary);
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
-      padding: 16px;
+      border-radius: var(--radius-lg);
+      padding: 20px;
       text-align: center;
+      transition: all 0.25s ease;
+    }
+    
+    .preview-metric:hover {
+      border-color: var(--neon-purple);
+      transform: translateY(-2px);
     }
     
     .preview-metric-value {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 24px;
+      font-size: 28px;
       font-weight: 700;
-      background: var(--gradient-purple);
+      background: var(--gradient-aurora);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -1081,345 +1482,153 @@ app.get('/', (c) => {
       font-size: 11px;
       color: var(--text-muted);
       text-transform: uppercase;
-      margin-top: 4px;
+      margin-top: 6px;
+      letter-spacing: 0.5px;
+    }
+    
+    /* ============================================
+       DAY IN LIFE
+       ============================================ */
+    .day-in-life {
+      margin-top: 28px;
+      padding: 24px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--glass-border);
+    }
+    
+    .day-in-life h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .day-in-life h4 i {
+      color: var(--neon-gold);
+    }
+    
+    .day-item {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .day-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--neon-purple);
+      width: 90px;
+      flex-shrink: 0;
+      font-weight: 500;
+    }
+    
+    .day-input {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 14px;
+      transition: all 0.25s ease;
+    }
+    
+    .day-input:focus {
+      outline: none;
+      border-color: var(--neon-purple);
+      box-shadow: var(--glow-subtle);
     }
     
     /* ============================================
        RESPONSIVE
        ============================================ */
+    @media (max-width: 1400px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    
     @media (max-width: 1200px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      .metrics-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      .preview-metrics {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .metrics-grid, .preview-metrics { grid-template-columns: repeat(2, 1fr); }
     }
     
     @media (max-width: 768px) {
-      .sidebar {
-        display: none;
-      }
-      
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .metrics-grid, .preview-metrics {
-        grid-template-columns: 1fr 1fr;
-      }
+      .sidebar { display: none; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .content { padding: 20px; }
     }
     
     /* ============================================
        ANIMATIONS
        ============================================ */
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
     
-    .fade-in {
-      animation: fadeIn 0.4s ease forwards;
-    }
+    .fade-in { animation: fadeIn 0.5s ease forwards; }
     
     @keyframes slideIn {
       from { opacity: 0; transform: translateX(-20px); }
       to { opacity: 1; transform: translateX(0); }
     }
     
-    .slide-in {
-      animation: slideIn 0.4s ease forwards;
+    .slide-in { animation: slideIn 0.4s ease forwards; }
+    
+    /* Success state */
+    .success-flash {
+      animation: successPulse 0.5s ease;
+    }
+    
+    @keyframes successPulse {
+      0%, 100% { box-shadow: var(--shadow-md); }
+      50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.5); }
     }
   </style>
 </head>
 <body>
+  <!-- Animated Background -->
+  <div class="cosmic-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+  
   <div id="root"></div>
   
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
     
     // ============================================
-    // REAL RESUME PARSER
+    // REAL RESUME PARSER (Client-side extraction)
     // ============================================
     const ResumeParser = {
-      // Extract text from PDF using PDF.js
       async parsePDF(file) {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         let fullText = '';
-        
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
           const pageText = textContent.items.map(item => item.str).join(' ');
           fullText += pageText + '\\n';
         }
-        
         return fullText;
       },
       
-      // Extract text from DOCX using Mammoth
       async parseDOCX(file) {
         const arrayBuffer = await file.arrayBuffer();
         const result = await mammoth.extractRawText({ arrayBuffer });
         return result.value;
       },
       
-      // Parse plain text
       async parseTXT(file) {
         return await file.text();
-      },
-      
-      // Main extraction logic
-      extractData(text) {
-        const lines = text.split('\\n').map(l => l.trim()).filter(l => l);
-        
-        // Extract email
-        const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/);
-        const email = emailMatch ? emailMatch[0] : '';
-        
-        // Extract phone
-        const phoneMatch = text.match(/(?:\\+?1[-.]?)?\\(?\\d{3}\\)?[-.]?\\d{3}[-.]?\\d{4}/);
-        const phone = phoneMatch ? phoneMatch[0] : '';
-        
-        // Extract LinkedIn
-        const linkedinMatch = text.match(/linkedin\\.com\\/in\\/[a-zA-Z0-9-]+/i);
-        const linkedin = linkedinMatch ? linkedinMatch[0] : '';
-        
-        // Extract name (usually first line or after common headers)
-        let name = '';
-        for (const line of lines.slice(0, 5)) {
-          if (line.length > 2 && line.length < 50 && !line.includes('@') && !line.includes('http')) {
-            const words = line.split(' ').filter(w => w.length > 0);
-            if (words.length >= 2 && words.length <= 4) {
-              const isName = words.every(w => /^[A-Z][a-z]+$/.test(w) || /^[A-Z]+$/.test(w));
-              if (isName || words.length === 2) {
-                name = line;
-                break;
-              }
-            }
-          }
-        }
-        if (!name) name = lines[0] || '';
-        
-        // Extract experiences
-        const experiences = this.extractExperiences(text, lines);
-        
-        // Extract skills
-        const skills = this.extractSkills(text);
-        
-        // Extract education
-        const education = this.extractEducation(text, lines);
-        
-        // Try to determine title from first experience or context
-        let title = '';
-        if (experiences.length > 0) {
-          title = experiences[0].role;
-        }
-        
-        return {
-          basics: {
-            name,
-            title,
-            tagline: '',
-            email,
-            phone,
-            location: this.extractLocation(text),
-            linkedin,
-            website: ''
-          },
-          experience: experiences,
-          skills,
-          education,
-          achievements: [],
-          awards: [],
-          reviews: [],
-          payHistory: [],
-          projects: [],
-          photos: [],
-          videos: []
-        };
-      },
-      
-      extractExperiences(text, lines) {
-        const experiences = [];
-        
-        // Common job title patterns
-        const titlePatterns = [
-          /(?:senior|sr\\.?|junior|jr\\.?|lead|principal|staff|chief|head|director|vp|vice president|manager|engineer|developer|designer|analyst|consultant|specialist|coordinator|associate|assistant)/i
-        ];
-        
-        // Date patterns
-        const datePattern = /(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)[\\s,]*\\d{4}|\\d{1,2}\\/\\d{4}|\\d{4}/gi;
-        
-        // Find sections that look like experience entries
-        const expKeywords = ['experience', 'employment', 'work history', 'professional experience'];
-        let inExperienceSection = false;
-        let currentExp = null;
-        
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i];
-          const lowerLine = line.toLowerCase();
-          
-          // Check if entering experience section
-          if (expKeywords.some(kw => lowerLine.includes(kw))) {
-            inExperienceSection = true;
-            continue;
-          }
-          
-          // Check if leaving experience section
-          if (inExperienceSection && ['education', 'skills', 'certifications', 'projects'].some(kw => lowerLine.startsWith(kw))) {
-            if (currentExp) experiences.push(currentExp);
-            break;
-          }
-          
-          if (!inExperienceSection) continue;
-          
-          // Look for company/role patterns
-          const dates = line.match(datePattern);
-          const hasTitle = titlePatterns.some(p => p.test(line));
-          
-          if (dates && dates.length >= 1) {
-            // This line likely contains a new job entry
-            if (currentExp) experiences.push(currentExp);
-            
-            // Extract dates
-            const allDates = dates.map(d => d);
-            const startDate = allDates[0] || '';
-            const endDate = allDates.length > 1 ? allDates[1] : 'Present';
-            
-            // Try to extract company and role
-            let cleanLine = line;
-            dates.forEach(d => cleanLine = cleanLine.replace(d, ''));
-            cleanLine = cleanLine.replace(/[-–—|,]/g, ' ').trim();
-            
-            const parts = cleanLine.split(/\\s{2,}/).filter(p => p.trim());
-            
-            currentExp = {
-              id: Date.now() + i,
-              company: parts[0] || 'Company',
-              role: parts[1] || parts[0] || 'Role',
-              startDate,
-              endDate,
-              description: '',
-              tasks: '',
-              dayInLife: [
-                { time: '9:00 AM', activity: '' },
-                { time: '11:00 AM', activity: '' },
-                { time: '1:00 PM', activity: '' },
-                { time: '3:00 PM', activity: '' },
-                { time: '5:00 PM', activity: '' }
-              ],
-              metrics: [
-                { value: '', label: 'Impact' },
-                { value: '', label: 'Growth' },
-                { value: '', label: 'Efficiency' },
-                { value: '', label: 'Team' }
-              ],
-              toxicity: 5
-            };
-          } else if (currentExp && line.length > 20) {
-            // Add to description
-            currentExp.description += (currentExp.description ? ' ' : '') + line;
-          }
-        }
-        
-        if (currentExp) experiences.push(currentExp);
-        
-        // If no experiences found, try alternative parsing
-        if (experiences.length === 0) {
-          // Look for any date ranges in the document
-          const allDates = text.match(datePattern) || [];
-          if (allDates.length >= 2) {
-            experiences.push({
-              id: Date.now(),
-              company: 'Company Name',
-              role: 'Your Role',
-              startDate: allDates[0],
-              endDate: allDates[1] || 'Present',
-              description: 'Please add your job description here.',
-              tasks: '',
-              dayInLife: [
-                { time: '9:00 AM', activity: '' },
-                { time: '11:00 AM', activity: '' },
-                { time: '1:00 PM', activity: '' },
-                { time: '3:00 PM', activity: '' },
-                { time: '5:00 PM', activity: '' }
-              ],
-              metrics: [
-                { value: '', label: 'Impact' },
-                { value: '', label: 'Growth' },
-                { value: '', label: 'Efficiency' },
-                { value: '', label: 'Team' }
-              ],
-              toxicity: 5
-            });
-          }
-        }
-        
-        return experiences;
-      },
-      
-      extractSkills(text) {
-        const skillsKeywords = ['skills', 'technologies', 'proficiencies', 'competencies', 'expertise'];
-        const commonSkills = [
-          'JavaScript', 'Python', 'Java', 'React', 'Node.js', 'AWS', 'SQL', 'Git',
-          'TypeScript', 'HTML', 'CSS', 'Docker', 'Kubernetes', 'MongoDB', 'PostgreSQL',
-          'Agile', 'Scrum', 'Project Management', 'Leadership', 'Communication',
-          'Excel', 'PowerPoint', 'Salesforce', 'Tableau', 'Power BI', 'SAP'
-        ];
-        
-        const foundSkills = [];
-        commonSkills.forEach(skill => {
-          if (text.toLowerCase().includes(skill.toLowerCase())) {
-            foundSkills.push(skill);
-          }
-        });
-        
-        return foundSkills;
-      },
-      
-      extractEducation(text, lines) {
-        const education = [];
-        const eduKeywords = ['education', 'academic', 'degree', 'university', 'college', 'bachelor', 'master', 'phd', 'mba'];
-        
-        let inEduSection = false;
-        
-        for (const line of lines) {
-          const lowerLine = line.toLowerCase();
-          
-          if (eduKeywords.some(kw => lowerLine.includes(kw))) {
-            inEduSection = true;
-          }
-          
-          if (inEduSection && line.length > 10) {
-            const degreeMatch = line.match(/(?:Bachelor|Master|PhD|MBA|B\\.S\\.|M\\.S\\.|B\\.A\\.|M\\.A\\.)[^,]*/i);
-            if (degreeMatch) {
-              education.push({
-                degree: degreeMatch[0],
-                school: line.replace(degreeMatch[0], '').trim()
-              });
-            }
-          }
-        }
-        
-        return education;
-      },
-      
-      extractLocation(text) {
-        // Common US city patterns
-        const cityStatePattern = /([A-Z][a-z]+(?:\\s[A-Z][a-z]+)?),?\\s*([A-Z]{2})(?:\\s+\\d{5})?/;
-        const match = text.match(cityStatePattern);
-        return match ? match[0] : '';
       }
     };
     
@@ -1442,16 +1651,17 @@ app.get('/', (c) => {
       const [isProcessing, setIsProcessing] = useState(false);
       const [progress, setProgress] = useState(0);
       const [progressSteps, setProgressSteps] = useState([
-        { label: 'Reading file...', status: 'pending' },
+        { label: 'Reading document...', status: 'pending' },
         { label: 'Extracting text content...', status: 'pending' },
-        { label: 'Parsing resume structure...', status: 'pending' },
-        { label: 'Identifying experience...', status: 'pending' },
-        { label: 'Building profile...', status: 'pending' }
+        { label: 'AI analyzing resume structure...', status: 'pending' },
+        { label: 'Identifying work experiences...', status: 'pending' },
+        { label: 'Generating day-in-life insights...', status: 'pending' },
+        { label: 'Building your profile...', status: 'pending' }
       ]);
       const [activeSection, setActiveSection] = useState('basics');
       const [rawText, setRawText] = useState('');
       
-      // REAL file upload handler
+      // REAL file upload handler with AI parsing
       const handleFileUpload = async (file) => {
         setIsProcessing(true);
         setProgress(0);
@@ -1463,7 +1673,7 @@ app.get('/', (c) => {
           // Step 1: Reading file
           steps[0].status = 'active';
           setProgressSteps([...steps]);
-          await new Promise(r => setTimeout(r, 300));
+          await new Promise(r => setTimeout(r, 400));
           
           let text = '';
           const fileType = file.name.split('.').pop().toLowerCase();
@@ -1472,49 +1682,128 @@ app.get('/', (c) => {
           steps[0].status = 'complete';
           steps[1].status = 'active';
           setProgressSteps([...steps]);
-          setProgress(20);
+          setProgress(15);
           
           if (fileType === 'pdf') {
             text = await ResumeParser.parsePDF(file);
-          } else if (fileType === 'docx') {
+          } else if (fileType === 'docx' || fileType === 'doc') {
             text = await ResumeParser.parseDOCX(file);
           } else {
             text = await ResumeParser.parseTXT(file);
           }
           
           setRawText(text);
-          console.log('Extracted text:', text.substring(0, 500));
+          console.log('Extracted text:', text.substring(0, 1000));
           
-          // Step 3: Parse structure
+          // Step 3: AI Analysis
           steps[1].status = 'complete';
           steps[2].status = 'active';
           setProgressSteps([...steps]);
-          setProgress(40);
-          await new Promise(r => setTimeout(r, 300));
+          setProgress(30);
           
-          // Step 4: Identify experience
+          // Call Gemini AI for intelligent parsing
+          let aiParsed = null;
+          try {
+            const response = await fetch('/api/parse-resume', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text })
+            });
+            
+            if (response.ok) {
+              aiParsed = await response.json();
+              console.log('AI Parsed data:', aiParsed);
+            }
+          } catch (aiError) {
+            console.warn('AI parsing failed, using fallback:', aiError);
+          }
+          
+          // Step 4: Identifying experiences
           steps[2].status = 'complete';
           steps[3].status = 'active';
           setProgressSteps([...steps]);
-          setProgress(60);
-          await new Promise(r => setTimeout(r, 300));
+          setProgress(55);
+          await new Promise(r => setTimeout(r, 400));
           
-          // Step 5: Build profile
+          // Step 5: Generating insights
           steps[3].status = 'complete';
           steps[4].status = 'active';
           setProgressSteps([...steps]);
-          setProgress(80);
+          setProgress(75);
+          await new Promise(r => setTimeout(r, 400));
           
-          const extractedData = ResumeParser.extractData(text);
-          console.log('Extracted data:', extractedData);
-          
+          // Step 6: Building profile
           steps[4].status = 'complete';
+          steps[5].status = 'active';
+          setProgressSteps([...steps]);
+          setProgress(90);
+          
+          // Build final profile from AI response or fallback
+          let finalProfile;
+          
+          if (aiParsed && !aiParsed.error) {
+            // Transform AI response to our format
+            finalProfile = {
+              basics: {
+                name: aiParsed.basics?.name || '',
+                title: aiParsed.basics?.title || '',
+                tagline: aiParsed.basics?.tagline || '',
+                email: aiParsed.basics?.email || '',
+                phone: aiParsed.basics?.phone || '',
+                location: aiParsed.basics?.location || '',
+                linkedin: aiParsed.basics?.linkedin || '',
+                website: aiParsed.basics?.website || ''
+              },
+              experience: (aiParsed.experience || []).map((exp, i) => ({
+                id: Date.now() + i,
+                company: exp.company || '',
+                role: exp.role || '',
+                startDate: exp.startDate || '',
+                endDate: exp.endDate || '',
+                description: exp.description || '',
+                tasks: exp.tasks || '',
+                dayInLife: exp.dayInLife || [
+                  { time: '9:00 AM', activity: '' },
+                  { time: '11:00 AM', activity: '' },
+                  { time: '1:00 PM', activity: '' },
+                  { time: '3:00 PM', activity: '' },
+                  { time: '5:00 PM', activity: '' }
+                ],
+                metrics: exp.metrics || [
+                  { value: '', label: 'Impact' },
+                  { value: '', label: 'Growth' },
+                  { value: '', label: 'Efficiency' },
+                  { value: '', label: 'Team' }
+                ],
+                toxicity: 5
+              })),
+              skills: aiParsed.skills || [],
+              education: aiParsed.education || [],
+              achievements: (aiParsed.achievements || []).map((a, i) => ({
+                id: Date.now() + i + 1000,
+                title: a.title || '',
+                description: a.description || ''
+              })),
+              certifications: aiParsed.certifications || [],
+              awards: [],
+              reviews: [],
+              payHistory: [],
+              projects: [],
+              photos: [],
+              videos: []
+            };
+          } else {
+            // Fallback to basic parsing
+            finalProfile = fallbackParse(text);
+          }
+          
+          steps[5].status = 'complete';
           setProgressSteps([...steps]);
           setProgress(100);
           
           await new Promise(r => setTimeout(r, 500));
           
-          setProfile(extractedData);
+          setProfile(finalProfile);
           setIsProcessing(false);
           setView(VIEWS.BUILDER);
           
@@ -1526,9 +1815,67 @@ app.get('/', (c) => {
         }
       };
       
+      // Fallback parser when AI fails
+      const fallbackParse = (text) => {
+        const lines = text.split('\\n').map(l => l.trim()).filter(l => l);
+        
+        // Extract email
+        const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/);
+        const email = emailMatch ? emailMatch[0] : '';
+        
+        // Extract phone
+        const phoneMatch = text.match(/(?:\\+?1[-.]?)?\\(?\\d{3}\\)?[-.]?\\d{3}[-.]?\\d{4}/);
+        const phone = phoneMatch ? phoneMatch[0] : '';
+        
+        // Extract name (first substantial line)
+        let name = '';
+        for (const line of lines.slice(0, 5)) {
+          if (line.length > 2 && line.length < 50 && !line.includes('@')) {
+            name = line;
+            break;
+          }
+        }
+        
+        return {
+          basics: { name, title: '', tagline: '', email, phone, location: '', linkedin: '', website: '' },
+          experience: [{
+            id: Date.now(),
+            company: 'Your Company',
+            role: 'Your Role',
+            startDate: '',
+            endDate: 'Present',
+            description: 'Add your job description...',
+            tasks: '',
+            dayInLife: [
+              { time: '9:00 AM', activity: '' },
+              { time: '11:00 AM', activity: '' },
+              { time: '1:00 PM', activity: '' },
+              { time: '3:00 PM', activity: '' },
+              { time: '5:00 PM', activity: '' }
+            ],
+            metrics: [
+              { value: '', label: 'Impact' },
+              { value: '', label: 'Growth' },
+              { value: '', label: 'Efficiency' },
+              { value: '', label: 'Team' }
+            ],
+            toxicity: 5
+          }],
+          skills: [],
+          education: [],
+          achievements: [],
+          certifications: [],
+          awards: [],
+          reviews: [],
+          payHistory: [],
+          projects: [],
+          photos: [],
+          videos: []
+        };
+      };
+      
       return (
         <div className="app">
-          {/* Sidebar */}
           <Sidebar 
             view={view} 
             setView={setView} 
@@ -1537,7 +1884,6 @@ app.get('/', (c) => {
             setActiveSection={setActiveSection}
           />
           
-          {/* Main Content */}
           <div className="main">
             <Header view={view} profile={profile} />
             
@@ -1585,10 +1931,12 @@ app.get('/', (c) => {
       const builderNav = [
         { id: 'basics', icon: 'fa-user', label: 'Basic Info' },
         { id: 'experience', icon: 'fa-briefcase', label: 'Experience' },
+        { id: 'skills', icon: 'fa-code', label: 'Skills' },
         { id: 'achievements', icon: 'fa-trophy', label: 'Achievements' },
         { id: 'awards', icon: 'fa-award', label: 'Awards' },
         { id: 'reviews', icon: 'fa-star', label: 'Reviews' },
         { id: 'pay', icon: 'fa-dollar-sign', label: 'Pay History' },
+        { id: 'projects', icon: 'fa-project-diagram', label: 'Projects' },
         { id: 'media', icon: 'fa-image', label: 'Media' }
       ];
       
@@ -1600,7 +1948,7 @@ app.get('/', (c) => {
           </div>
           
           <nav className="nav-section">
-            <div className="nav-label">Main</div>
+            <div className="nav-label">Main Menu</div>
             <div className="nav-items">
               {mainNav.map(item => (
                 <button
@@ -1609,7 +1957,7 @@ app.get('/', (c) => {
                   onClick={() => setView(item.id)}
                 >
                   <i className={"fas " + item.icon}></i>
-                  {item.label}
+                  <span>{item.label}</span>
                 </button>
               ))}
             </div>
@@ -1626,7 +1974,7 @@ app.get('/', (c) => {
                     onClick={() => { setView(VIEWS.BUILDER); setActiveSection(item.id); }}
                   >
                     <i className={"fas " + item.icon}></i>
-                    {item.label}
+                    <span>{item.label}</span>
                   </button>
                 ))}
                 <button
@@ -1634,7 +1982,7 @@ app.get('/', (c) => {
                   onClick={() => setView(VIEWS.PREVIEW)}
                 >
                   <i className="fas fa-eye"></i>
-                  Preview
+                  <span>Preview</span>
                   <span className="nav-badge">Live</span>
                 </button>
               </div>
@@ -1644,7 +1992,7 @@ app.get('/', (c) => {
           {profile && (
             <div className="sidebar-profile">
               <div className="sidebar-avatar">
-                {profile.basics.name ? profile.basics.name.split(' ').map(n => n[0]).join('').substring(0, 2) : '?'}
+                {profile.basics.name ? profile.basics.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?'}
               </div>
               <div className="sidebar-info">
                 <div className="sidebar-name">{profile.basics.name || 'Your Name'}</div>
@@ -1695,13 +2043,12 @@ app.get('/', (c) => {
       const stats = [
         { icon: 'fa-briefcase', value: profile?.experience?.length || 0, label: 'Experiences', change: '+2', up: true, color: 'purple' },
         { icon: 'fa-trophy', value: profile?.achievements?.length || 0, label: 'Achievements', change: '+5', up: true, color: 'pink' },
-        { icon: 'fa-star', value: profile?.reviews?.length || 0, label: 'Reviews', change: '+3', up: true, color: 'cyan' },
-        { icon: 'fa-chart-line', value: '94%', label: 'Profile Score', change: '+12%', up: true, color: 'orange' }
+        { icon: 'fa-code', value: profile?.skills?.length || 0, label: 'Skills', change: '+8', up: true, color: 'cyan' },
+        { icon: 'fa-chart-line', value: '94%', label: 'Profile Score', change: '+12%', up: true, color: 'gold' }
       ];
       
       return (
         <div className="fade-in">
-          {/* Stats */}
           <div className="stats-grid">
             {stats.map((stat, i) => (
               <div key={i} className={"stat-card " + stat.color}>
@@ -1718,7 +2065,6 @@ app.get('/', (c) => {
             ))}
           </div>
           
-          {/* Quick Actions */}
           <div className="card">
             <div className="card-header">
               <h2 className="card-title">
@@ -1727,7 +2073,7 @@ app.get('/', (c) => {
               </h2>
             </div>
             
-            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
               <button className="btn btn-primary" onClick={() => setView(VIEWS.UPLOAD)}>
                 <i className="fas fa-upload"></i>
                 Upload Resume
@@ -1748,11 +2094,22 @@ app.get('/', (c) => {
           </div>
           
           {!profile && (
-            <div className="card" style={{ marginTop: '24px', textAlign: 'center', padding: '60px' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📄</div>
-              <h3 style={{ marginBottom: '8px', fontFamily: 'Space Grotesk' }}>No Resume Uploaded</h3>
-              <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>
-                Upload your resume to get started. We'll extract all your information automatically.
+            <div className="card" style={{ marginTop: '32px', textAlign: 'center', padding: '80px' }}>
+              <div style={{ 
+                width: '100px', 
+                height: '100px', 
+                margin: '0 auto 28px',
+                background: 'var(--gradient-aurora)',
+                borderRadius: '28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '40px',
+                boxShadow: 'var(--glow-purple)'
+              }}>📄</div>
+              <h3 style={{ fontFamily: 'Space Grotesk', fontSize: '28px', marginBottom: '12px' }}>No Resume Uploaded</h3>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '32px', fontSize: '16px', maxWidth: '400px', margin: '0 auto 32px' }}>
+                Upload your resume to get started. Our AI will extract all your information and build your profile automatically.
               </p>
               <button className="btn btn-primary" onClick={() => setView(VIEWS.UPLOAD)}>
                 <i className="fas fa-upload"></i>
@@ -1790,7 +2147,11 @@ app.get('/', (c) => {
               <div className="progress-header">
                 <div className="progress-title">
                   <div className="progress-spinner"></div>
-                  Analyzing Resume...
+                  <span>Analyzing Your Resume</span>
+                  <div className="ai-indicator">
+                    <div className="ai-dot"></div>
+                    Gemini AI
+                  </div>
                 </div>
                 <span className="progress-percent">{Math.round(progress)}%</span>
               </div>
@@ -1823,6 +2184,10 @@ app.get('/', (c) => {
               <i className="fas fa-file-upload"></i>
               Upload Your Resume
             </h2>
+            <div className="ai-indicator">
+              <div className="ai-dot"></div>
+              AI-Powered
+            </div>
           </div>
           
           <div 
@@ -1854,10 +2219,10 @@ app.get('/', (c) => {
             </div>
           </div>
           
-          <div style={{ marginTop: '24px', padding: '16px', background: 'var(--glass-bg)', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
-            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <i className="fas fa-info-circle" style={{ color: 'var(--accent-cyan)' }}></i>
-              Your resume is parsed locally in your browser. No data is sent to any server.
+          <div style={{ marginTop: '28px', padding: '20px', background: 'var(--glass-bg)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--glass-border)' }}>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <i className="fas fa-shield-alt" style={{ color: 'var(--neon-cyan)' }}></i>
+              <span><strong>AI-Powered Extraction:</strong> Gemini AI analyzes your resume and extracts all information including experiences, skills, and achievements automatically.</span>
             </p>
           </div>
         </div>
@@ -1893,6 +2258,13 @@ app.get('/', (c) => {
             <ExperienceEditor 
               experience={profile.experience}
               setExperience={updateExperience}
+            />
+          )}
+          
+          {activeSection === 'skills' && (
+            <SkillsEditor
+              skills={profile.skills}
+              setSkills={(skills) => updateList('skills', skills)}
             />
           )}
           
@@ -1952,6 +2324,21 @@ app.get('/', (c) => {
             />
           )}
           
+          {activeSection === 'projects' && (
+            <ListEditor
+              title="Projects"
+              icon="fa-project-diagram"
+              items={profile.projects}
+              setItems={(items) => updateList('projects', items)}
+              fields={[
+                { key: 'name', label: 'Project Name', placeholder: 'Project title' },
+                { key: 'description', label: 'Description', placeholder: 'What you built', type: 'textarea' },
+                { key: 'url', label: 'URL', placeholder: 'https://...' },
+                { key: 'tech', label: 'Technologies', placeholder: 'React, Node.js, etc.' }
+              ]}
+            />
+          )}
+          
           {activeSection === 'media' && (
             <MediaEditor 
               photos={profile.photos}
@@ -2000,13 +2387,13 @@ app.get('/', (c) => {
           </div>
           
           <div className="form-group full">
-            <label className="form-label"><i className="fas fa-quote-left"></i> Tagline</label>
+            <label className="form-label"><i className="fas fa-quote-left"></i> Professional Tagline</label>
             <input 
               type="text"
               className="form-input"
               value={profile.basics.tagline}
               onChange={(e) => updateBasics('tagline', e.target.value)}
-              placeholder="10+ years driving product innovation"
+              placeholder="10+ years driving product innovation and growth"
             />
           </div>
           
@@ -2056,21 +2443,24 @@ app.get('/', (c) => {
         </div>
         
         {rawText && (
-          <div style={{ marginTop: '24px' }}>
+          <div style={{ marginTop: '28px' }}>
             <details>
-              <summary style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '14px' }}>
-                View extracted raw text
+              <summary style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '14px', fontWeight: '500' }}>
+                <i className="fas fa-file-alt" style={{ marginRight: '8px' }}></i>
+                View Extracted Raw Text
               </summary>
               <pre style={{ 
-                marginTop: '12px', 
-                padding: '16px', 
+                marginTop: '16px', 
+                padding: '20px', 
                 background: 'var(--bg-tertiary)', 
-                borderRadius: 'var(--radius-md)',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--glass-border)',
                 fontSize: '12px',
                 color: 'var(--text-secondary)',
-                maxHeight: '200px',
+                maxHeight: '250px',
                 overflow: 'auto',
-                whiteSpace: 'pre-wrap'
+                whiteSpace: 'pre-wrap',
+                fontFamily: 'JetBrains Mono, monospace'
               }}>
                 {rawText}
               </pre>
@@ -2079,6 +2469,85 @@ app.get('/', (c) => {
         )}
       </div>
     );
+    
+    // ============================================
+    // SKILLS EDITOR
+    // ============================================
+    const SkillsEditor = ({ skills, setSkills }) => {
+      const [newSkill, setNewSkill] = useState('');
+      
+      const addSkill = () => {
+        if (newSkill.trim()) {
+          setSkills([...skills, newSkill.trim()]);
+          setNewSkill('');
+        }
+      };
+      
+      const removeSkill = (index) => {
+        setSkills(skills.filter((_, i) => i !== index));
+      };
+      
+      return (
+        <div className="card">
+          <div className="card-header">
+            <h2 className="card-title">
+              <i className="fas fa-code"></i>
+              Skills
+            </h2>
+            <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
+              {skills.length} skills
+            </span>
+          </div>
+          
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+            <input
+              type="text"
+              className="form-input"
+              value={newSkill}
+              onChange={(e) => setNewSkill(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && addSkill()}
+              placeholder="Add a skill..."
+              style={{ flex: 1 }}
+            />
+            <button className="btn btn-primary" onClick={addSkill}>
+              <i className="fas fa-plus"></i>
+              Add
+            </button>
+          </div>
+          
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+            {skills.map((skill, index) => (
+              <div key={index} style={{
+                padding: '12px 20px',
+                background: 'var(--glass-bg)',
+                border: '1px solid var(--glass-border)',
+                borderRadius: 'var(--radius-xl)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                transition: 'all 0.25s ease'
+              }}>
+                <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{skill}</span>
+                <button
+                  onClick={() => removeSkill(index)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-dim)',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
     
     // ============================================
     // EXPERIENCE EDITOR
@@ -2206,7 +2675,7 @@ app.get('/', (c) => {
                     className="form-textarea"
                     value={exp.description}
                     onChange={(e) => updateExp(index, 'description', e.target.value)}
-                    placeholder="Describe your role and accomplishments..."
+                    placeholder="Describe your role and key accomplishments..."
                   />
                 </div>
                 
@@ -2220,50 +2689,42 @@ app.get('/', (c) => {
                     max="10"
                     value={exp.toxicity}
                     onChange={(e) => updateExp(index, 'toxicity', parseInt(e.target.value))}
-                    style={{ width: '100%' }}
+                    style={{ 
+                      width: '100%', 
+                      accentColor: exp.toxicity <= 3 ? 'var(--neon-green)' : exp.toxicity <= 6 ? 'var(--neon-gold)' : 'var(--neon-red)'
+                    }}
                   />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)' }}>
-                    <span style={{ color: 'var(--accent-cyan)' }}>Great Culture</span>
-                    <span style={{ color: 'var(--accent-red)' }}>Toxic</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginTop: '8px' }}>
+                    <span style={{ color: 'var(--neon-green)' }}>Great Culture</span>
+                    <span style={{ color: 'var(--neon-red)' }}>Toxic</span>
                   </div>
                 </div>
               </div>
               
               {/* Day in Life */}
-              <div style={{ marginTop: '24px' }}>
-                <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: 'var(--text-secondary)' }}>
-                  <i className="fas fa-sun" style={{ color: 'var(--accent-orange)', marginRight: '8px' }}></i>
+              <div className="day-in-life">
+                <h4>
+                  <i className="fas fa-sun"></i>
                   A Day in the Life
                 </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {exp.dayInLife.map((item, dayIndex) => (
-                    <div key={dayIndex} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                      <span style={{ 
-                        fontFamily: 'JetBrains Mono', 
-                        fontSize: '12px', 
-                        color: 'var(--accent-purple)',
-                        width: '80px',
-                        flexShrink: 0
-                      }}>
-                        {item.time}
-                      </span>
-                      <input 
-                        type="text"
-                        className="form-input"
-                        value={item.activity}
-                        onChange={(e) => updateDayInLife(index, dayIndex, e.target.value)}
-                        placeholder="What do you typically do?"
-                        style={{ padding: '10px 14px', fontSize: '13px' }}
-                      />
-                    </div>
-                  ))}
-                </div>
+                {exp.dayInLife.map((item, dayIndex) => (
+                  <div key={dayIndex} className="day-item">
+                    <span className="day-time">{item.time}</span>
+                    <input 
+                      type="text"
+                      className="day-input"
+                      value={item.activity}
+                      onChange={(e) => updateDayInLife(index, dayIndex, e.target.value)}
+                      placeholder="What did you typically do?"
+                    />
+                  </div>
+                ))}
               </div>
               
               {/* Metrics */}
               <div style={{ marginTop: '24px' }}>
-                <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: 'var(--text-secondary)' }}>
-                  <i className="fas fa-chart-line" style={{ color: 'var(--accent-cyan)', marginRight: '8px' }}></i>
+                <h4 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <i className="fas fa-chart-line" style={{ color: 'var(--neon-cyan)' }}></i>
                   Impact Metrics
                 </h4>
                 <div className="metrics-grid">
@@ -2285,7 +2746,8 @@ app.get('/', (c) => {
                           border: 'none', 
                           textAlign: 'center',
                           width: '100%',
-                          color: 'var(--text-muted)'
+                          color: 'var(--text-muted)',
+                          outline: 'none'
                         }}
                       />
                     </div>
@@ -2412,17 +2874,17 @@ app.get('/', (c) => {
             </h2>
           </div>
           
-          <div style={{ marginBottom: '32px' }}>
-            <h3 style={{ fontSize: '16px', marginBottom: '16px', color: 'var(--text-secondary)' }}>
-              <i className="fas fa-camera" style={{ color: 'var(--accent-purple)', marginRight: '8px' }}></i>
+          <div style={{ marginBottom: '40px' }}>
+            <h3 style={{ fontSize: '16px', marginBottom: '20px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <i className="fas fa-camera" style={{ color: 'var(--neon-purple)' }}></i>
               Photos
             </h3>
             <input type="file" ref={photoRef} onChange={handlePhotoUpload} accept="image/*" multiple style={{ display: 'none' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px' }}>
               {photos.map(photo => (
                 <div key={photo.id} style={{ 
                   aspectRatio: '1', 
-                  borderRadius: 'var(--radius-lg)', 
+                  borderRadius: 'var(--radius-xl)', 
                   overflow: 'hidden',
                   position: 'relative',
                   border: '1px solid var(--glass-border)'
@@ -2432,10 +2894,10 @@ app.get('/', (c) => {
                     onClick={() => setPhotos(photos.filter(p => p.id !== photo.id))}
                     style={{
                       position: 'absolute',
-                      top: '8px',
-                      right: '8px',
-                      width: '28px',
-                      height: '28px',
+                      top: '10px',
+                      right: '10px',
+                      width: '32px',
+                      height: '32px',
                       borderRadius: '50%',
                       background: 'rgba(0,0,0,0.7)',
                       border: 'none',
@@ -2451,7 +2913,7 @@ app.get('/', (c) => {
                 onClick={() => photoRef.current?.click()}
                 style={{
                   aspectRatio: '1',
-                  borderRadius: 'var(--radius-lg)',
+                  borderRadius: 'var(--radius-xl)',
                   border: '2px dashed var(--glass-border)',
                   background: 'var(--glass-bg)',
                   cursor: 'pointer',
@@ -2459,27 +2921,28 @@ app.get('/', (c) => {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px',
-                  color: 'var(--text-muted)'
+                  gap: '10px',
+                  color: 'var(--text-muted)',
+                  transition: 'all 0.25s ease'
                 }}
               >
-                <i className="fas fa-plus" style={{ fontSize: '24px' }}></i>
-                <span style={{ fontSize: '12px' }}>Add Photo</span>
+                <i className="fas fa-plus" style={{ fontSize: '28px' }}></i>
+                <span style={{ fontSize: '13px' }}>Add Photo</span>
               </button>
             </div>
           </div>
           
           <div>
-            <h3 style={{ fontSize: '16px', marginBottom: '16px', color: 'var(--text-secondary)' }}>
-              <i className="fas fa-video" style={{ color: 'var(--accent-pink)', marginRight: '8px' }}></i>
+            <h3 style={{ fontSize: '16px', marginBottom: '20px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <i className="fas fa-video" style={{ color: 'var(--neon-pink)' }}></i>
               Videos
             </h3>
             <input type="file" ref={videoRef} onChange={handleVideoUpload} accept="video/*" multiple style={{ display: 'none' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
               {videos.map(video => (
                 <div key={video.id} style={{ 
                   aspectRatio: '16/9', 
-                  borderRadius: 'var(--radius-lg)', 
+                  borderRadius: 'var(--radius-xl)', 
                   overflow: 'hidden',
                   position: 'relative',
                   border: '1px solid var(--glass-border)',
@@ -2490,10 +2953,10 @@ app.get('/', (c) => {
                     onClick={() => setVideos(videos.filter(v => v.id !== video.id))}
                     style={{
                       position: 'absolute',
-                      top: '8px',
-                      right: '8px',
-                      width: '28px',
-                      height: '28px',
+                      top: '10px',
+                      right: '10px',
+                      width: '32px',
+                      height: '32px',
                       borderRadius: '50%',
                       background: 'rgba(0,0,0,0.7)',
                       border: 'none',
@@ -2509,7 +2972,7 @@ app.get('/', (c) => {
                 onClick={() => videoRef.current?.click()}
                 style={{
                   aspectRatio: '16/9',
-                  borderRadius: 'var(--radius-lg)',
+                  borderRadius: 'var(--radius-xl)',
                   border: '2px dashed var(--glass-border)',
                   background: 'var(--glass-bg)',
                   cursor: 'pointer',
@@ -2517,12 +2980,13 @@ app.get('/', (c) => {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px',
-                  color: 'var(--text-muted)'
+                  gap: '10px',
+                  color: 'var(--text-muted)',
+                  transition: 'all 0.25s ease'
                 }}
               >
-                <i className="fas fa-plus" style={{ fontSize: '24px' }}></i>
-                <span style={{ fontSize: '12px' }}>Add Video</span>
+                <i className="fas fa-plus" style={{ fontSize: '28px' }}></i>
+                <span style={{ fontSize: '13px' }}>Add Video</span>
               </button>
             </div>
           </div>
@@ -2535,13 +2999,13 @@ app.get('/', (c) => {
     // ============================================
     const PreviewView = ({ profile, setView }) => (
       <div className="fade-in">
-        <div className="card" style={{ marginBottom: '24px' }}>
+        <div className="card" style={{ marginBottom: '28px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h2 style={{ fontFamily: 'Space Grotesk', marginBottom: '4px' }}>Live Preview</h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>This is how your profile will appear</p>
+              <h2 style={{ fontFamily: 'Space Grotesk', marginBottom: '6px', fontSize: '24px' }}>Live Preview</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>This is how your profile will appear to recruiters</p>
             </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '16px' }}>
               <button className="btn btn-secondary" onClick={() => setView(VIEWS.BUILDER)}>
                 <i className="fas fa-edit"></i> Edit
               </button>
@@ -2553,31 +3017,46 @@ app.get('/', (c) => {
         </div>
         
         {/* Profile Header */}
-        <div className="card" style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <div className="card" style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div style={{
-            width: '100px',
-            height: '100px',
-            margin: '0 auto 20px',
-            borderRadius: '50%',
-            background: 'var(--gradient-purple)',
+            width: '120px',
+            height: '120px',
+            margin: '0 auto 28px',
+            borderRadius: '28px',
+            background: 'var(--gradient-aurora)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '36px',
+            fontSize: '42px',
             fontWeight: '700',
-            boxShadow: 'var(--shadow-glow)'
+            boxShadow: 'var(--glow-purple)'
           }}>
-            {profile.basics.name ? profile.basics.name.split(' ').map(n => n[0]).join('').substring(0, 2) : '?'}
+            {profile.basics.name ? profile.basics.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?'}
           </div>
-          <h2 style={{ fontFamily: 'Space Grotesk', fontSize: '28px', marginBottom: '4px' }}>
+          <h2 style={{ fontFamily: 'Space Grotesk', fontSize: '32px', marginBottom: '8px' }}>
             {profile.basics.name || 'Your Name'}
           </h2>
-          <p style={{ color: 'var(--accent-purple)', fontSize: '18px', fontWeight: '500', marginBottom: '8px' }}>
+          <p style={{ color: 'var(--neon-purple)', fontSize: '20px', fontWeight: '600', marginBottom: '12px' }}>
             {profile.basics.title || 'Your Title'}
           </p>
-          <p style={{ color: 'var(--text-muted)', maxWidth: '500px', margin: '0 auto' }}>
+          <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto', fontSize: '16px' }}>
             {profile.basics.tagline || 'Your professional tagline'}
           </p>
+          
+          {profile.skills?.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginTop: '24px' }}>
+              {profile.skills.slice(0, 8).map((skill, i) => (
+                <span key={i} style={{
+                  padding: '8px 18px',
+                  background: 'var(--glass-bg)',
+                  border: '1px solid var(--glass-border)',
+                  borderRadius: 'var(--radius-xl)',
+                  fontSize: '13px',
+                  color: 'var(--text-secondary)'
+                }}>{skill}</span>
+              ))}
+            </div>
+          )}
         </div>
         
         {/* Timeline */}
@@ -2593,10 +3072,10 @@ app.get('/', (c) => {
             <div className="timeline">
               {profile.experience.map((exp, index) => (
                 <div key={exp.id} className="timeline-entry">
-                  <h3 className="timeline-company">{exp.company}</h3>
-                  <p className="timeline-role">{exp.role}</p>
-                  <span className="timeline-dates">{exp.startDate} - {exp.endDate}</span>
-                  <p className="timeline-desc">{exp.description}</p>
+                  <h3 className="timeline-company">{exp.company || 'Company'}</h3>
+                  <p className="timeline-role">{exp.role || 'Role'}</p>
+                  <span className="timeline-dates">{exp.startDate || 'Start'} - {exp.endDate || 'End'}</span>
+                  <p className="timeline-desc">{exp.description || 'Description...'}</p>
                   
                   {exp.metrics.some(m => m.value) && (
                     <div className="preview-metrics">
@@ -2604,6 +3083,18 @@ app.get('/', (c) => {
                         <div key={i} className="preview-metric">
                           <div className="preview-metric-value">{metric.value}</div>
                           <div className="preview-metric-label">{metric.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {exp.dayInLife.some(d => d.activity) && (
+                    <div className="day-in-life" style={{ marginTop: '24px' }}>
+                      <h4><i className="fas fa-sun"></i> A Day in the Life</h4>
+                      {exp.dayInLife.filter(d => d.activity).map((item, i) => (
+                        <div key={i} className="day-item">
+                          <span className="day-time">{item.time}</span>
+                          <span style={{ color: 'var(--text-secondary)' }}>{item.activity}</span>
                         </div>
                       ))}
                     </div>
