@@ -248,35 +248,35 @@ app.get('/', (c) => {
        Semi-transparent cards with blur effect
        =========================================================== */
     .glass {
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 20px;
     }
     
     .glass-card {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 24px;
       box-shadow: 
-        0 4px 20px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        0 4px 16px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
     
     .glass-sidebar {
-      background: rgba(15, 8, 24, 0.6);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(15, 8, 24, 0.5);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
     
     .glass-input {
-      background: rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
       padding: 14px 18px;
@@ -1273,6 +1273,15 @@ app.get('/', (c) => {
       { id: 'minimal', name: 'Minimal', desc: 'Clean & elegant simplicity', color: '#10B981', icon: 'fa-feather' }
     ];
     
+    // Storage keys
+    const STORAGE_KEYS = {
+      PROFILE: 'webume_profile',
+      PHOTO: 'webume_photo',
+      TEMPLATE: 'webume_template',
+      RAW_TEXT: 'webume_rawtext',
+      LAST_SAVED: 'webume_last_saved'
+    };
+    
     const App = () => {
       const [view, setView] = useState(VIEW.UPLOAD);
       const [profile, setProfile] = useState(null);
@@ -1282,6 +1291,8 @@ app.get('/', (c) => {
       const [rawText, setRawText] = useState('');
       const [selectedTemplate, setTemplate] = useState('executive');
       const [profilePhoto, setProfilePhoto] = useState(null);
+      const [lastSaved, setLastSaved] = useState(null);
+      const [saveStatus, setSaveStatus] = useState(''); // 'saving', 'saved', 'error'
       const [steps, setSteps] = useState([
         { text: 'Reading file', state: 'pending' },
         { text: 'Extracting text', state: 'pending' },
@@ -1290,6 +1301,122 @@ app.get('/', (c) => {
         { text: 'Generating descriptions', state: 'pending' },
         { text: 'Building rich profile', state: 'pending' }
       ]);
+      
+      // Load saved data on mount
+      React.useEffect(() => {
+        try {
+          const savedProfile = localStorage.getItem(STORAGE_KEYS.PROFILE);
+          const savedPhoto = localStorage.getItem(STORAGE_KEYS.PHOTO);
+          const savedTemplate = localStorage.getItem(STORAGE_KEYS.TEMPLATE);
+          const savedRawText = localStorage.getItem(STORAGE_KEYS.RAW_TEXT);
+          const savedTimestamp = localStorage.getItem(STORAGE_KEYS.LAST_SAVED);
+          
+          if (savedProfile) {
+            const parsed = JSON.parse(savedProfile);
+            setProfile(parsed);
+            setView(VIEW.BUILDER);
+            console.log('✅ Loaded saved profile');
+          }
+          if (savedPhoto) setProfilePhoto(savedPhoto);
+          if (savedTemplate) setTemplate(savedTemplate);
+          if (savedRawText) setRawText(savedRawText);
+          if (savedTimestamp) setLastSaved(new Date(savedTimestamp));
+        } catch (e) {
+          console.error('Error loading saved data:', e);
+        }
+      }, []);
+      
+      // Auto-save profile when it changes
+      React.useEffect(() => {
+        if (profile) {
+          const saveTimeout = setTimeout(() => {
+            try {
+              setSaveStatus('saving');
+              localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
+              const now = new Date();
+              localStorage.setItem(STORAGE_KEYS.LAST_SAVED, now.toISOString());
+              setLastSaved(now);
+              setSaveStatus('saved');
+              setTimeout(() => setSaveStatus(''), 2000);
+            } catch (e) {
+              console.error('Error saving profile:', e);
+              setSaveStatus('error');
+            }
+          }, 1000); // Debounce saves by 1 second
+          return () => clearTimeout(saveTimeout);
+        }
+      }, [profile]);
+      
+      // Save photo when it changes
+      React.useEffect(() => {
+        if (profilePhoto) {
+          try {
+            localStorage.setItem(STORAGE_KEYS.PHOTO, profilePhoto);
+          } catch (e) {
+            console.error('Error saving photo:', e);
+          }
+        }
+      }, [profilePhoto]);
+      
+      // Save template when it changes
+      React.useEffect(() => {
+        localStorage.setItem(STORAGE_KEYS.TEMPLATE, selectedTemplate);
+      }, [selectedTemplate]);
+      
+      // Save raw text when it changes
+      React.useEffect(() => {
+        if (rawText) {
+          localStorage.setItem(STORAGE_KEYS.RAW_TEXT, rawText);
+        }
+      }, [rawText]);
+      
+      // Manual save function
+      const saveProgress = () => {
+        if (!profile) {
+          alert('No profile to save yet. Upload a resume first.');
+          return;
+        }
+        try {
+          setSaveStatus('saving');
+          localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
+          if (profilePhoto) localStorage.setItem(STORAGE_KEYS.PHOTO, profilePhoto);
+          localStorage.setItem(STORAGE_KEYS.TEMPLATE, selectedTemplate);
+          if (rawText) localStorage.setItem(STORAGE_KEYS.RAW_TEXT, rawText);
+          const now = new Date();
+          localStorage.setItem(STORAGE_KEYS.LAST_SAVED, now.toISOString());
+          setLastSaved(now);
+          setSaveStatus('saved');
+          alert('✅ Progress saved successfully! You can close the browser and return later.');
+        } catch (e) {
+          setSaveStatus('error');
+          alert('❌ Error saving progress: ' + e.message);
+        }
+      };
+      
+      // Clear saved data
+      const clearSavedData = () => {
+        if (confirm('Are you sure you want to clear ALL saved data? This cannot be undone.')) {
+          Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+          setProfile(null);
+          setProfilePhoto(null);
+          setRawText('');
+          setTemplate('executive');
+          setLastSaved(null);
+          setView(VIEW.UPLOAD);
+          alert('All saved data has been cleared.');
+        }
+      };
+      
+      // Format last saved time
+      const formatLastSaved = (date) => {
+        if (!date) return null;
+        const now = new Date();
+        const diff = Math.floor((now - date) / 1000);
+        if (diff < 60) return 'Just now';
+        if (diff < 3600) return Math.floor(diff / 60) + ' min ago';
+        if (diff < 86400) return Math.floor(diff / 3600) + ' hours ago';
+        return date.toLocaleDateString();
+      };
       
       const processFile = async (file) => {
         setLoading(true);
@@ -1516,6 +1643,64 @@ app.get('/', (c) => {
               </button>
             </div>
             
+            {/* Save/Load Section */}
+            <div className="nav-group">
+              <div className="nav-label">Save Progress</div>
+              <button 
+                className="nav-btn" 
+                onClick={saveProgress}
+                style={{ background: 'rgba(16,185,129,0.15)', borderColor: 'rgba(16,185,129,0.3)' }}
+              >
+                <i className="fas fa-save" style={{ color: 'var(--green-main)' }}></i>
+                <span style={{ color: 'var(--green-main)' }}>Save Now</span>
+              </button>
+              <button 
+                className="nav-btn" 
+                onClick={clearSavedData}
+                style={{ opacity: 0.7 }}
+              >
+                <i className="fas fa-trash-alt"></i>
+                Clear Saved Data
+              </button>
+              
+              {/* Save Status */}
+              {(lastSaved || saveStatus) && (
+                <div style={{ 
+                  padding: '10px 16px', 
+                  fontSize: '11px',
+                  color: saveStatus === 'error' ? '#EF4444' : 'rgba(255,255,255,0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  {saveStatus === 'saving' && (
+                    <>
+                      <i className="fas fa-spinner fa-spin" style={{ color: 'var(--cyan-main)' }}></i>
+                      Saving...
+                    </>
+                  )}
+                  {saveStatus === 'saved' && (
+                    <>
+                      <i className="fas fa-check-circle" style={{ color: 'var(--green-main)' }}></i>
+                      Saved!
+                    </>
+                  )}
+                  {saveStatus === 'error' && (
+                    <>
+                      <i className="fas fa-exclamation-circle"></i>
+                      Save failed
+                    </>
+                  )}
+                  {!saveStatus && lastSaved && (
+                    <>
+                      <i className="fas fa-clock"></i>
+                      Last saved: {formatLastSaved(lastSaved)}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+            
             <div className="sidebar-footer">
               <div className="stat-row">
                 <span className="stat-name">Experiences</span>
@@ -1527,7 +1712,16 @@ app.get('/', (c) => {
               </div>
               <div className="stat-row">
                 <span className="stat-name">Completeness</span>
-                <span className="stat-num">94%</span>
+                <span className="stat-num">{profile ? Math.min(100, Math.round((
+                  (profile.basics?.name ? 10 : 0) +
+                  (profile.basics?.title ? 10 : 0) +
+                  (profile.basics?.tagline ? 10 : 0) +
+                  (profile.basics?.email ? 5 : 0) +
+                  (profile.experience?.length > 0 ? 25 : 0) +
+                  (profile.skills?.length > 0 ? 20 : 0) +
+                  (profile.achievements?.length > 0 ? 10 : 0) +
+                  (profile.education?.length > 0 ? 10 : 0)
+                ))) : 0}%</span>
               </div>
             </div>
           </aside>
@@ -1540,6 +1734,9 @@ app.get('/', (c) => {
                 loading={loading}
                 progress={progress}
                 steps={steps}
+                hasSavedData={!!profile}
+                savedName={profile?.basics?.name}
+                onContinue={() => setView(VIEW.BUILDER)}
               />
             )}
             {view === VIEW.BUILDER && profile && (
@@ -1568,7 +1765,7 @@ app.get('/', (c) => {
     };
     
     // Upload View Component
-    const UploadView = ({ onUpload, loading, progress, steps }) => {
+    const UploadView = ({ onUpload, loading, progress, steps, hasSavedData, savedName, onContinue }) => {
       const [isDragging, setDragging] = useState(false);
       const fileInputRef = useRef(null);
       
@@ -1628,6 +1825,48 @@ app.get('/', (c) => {
               <p className="page-desc">Drop your resume to begin the AI-powered analysis</p>
             </div>
           </div>
+          
+          {/* Welcome Back Card - Show if there's saved data */}
+          {hasSavedData && (
+            <div className="glass-card" style={{ 
+              padding: '24px 28px', 
+              marginBottom: '24px',
+              background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.05))',
+              border: '1px solid rgba(16,185,129,0.25)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{
+                    width: '52px',
+                    height: '52px',
+                    borderRadius: '14px',
+                    background: 'rgba(16,185,129,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <i className="fas fa-user-check" style={{ fontSize: '22px', color: 'var(--green-main)' }}></i>
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '4px' }}>
+                      Welcome back{savedName ? ', ' + savedName.split(' ')[0] : ''}!
+                    </h3>
+                    <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
+                      You have a saved profile. Continue where you left off or start fresh.
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  className="btn btn-primary"
+                  onClick={onContinue}
+                  style={{ background: 'linear-gradient(135deg, var(--green-main), var(--cyan-main))' }}
+                >
+                  <i className="fas fa-arrow-right"></i>
+                  Continue Editing
+                </button>
+              </div>
+            </div>
+          )}
           
           <div className="glass-card upload-zone">
             <div
