@@ -2,79 +2,75 @@ import { Hono } from 'hono'
 
 const app = new Hono()
 
-// Gemini API Key for AI-powered resume parsing
+// Gemini API Key
 const GEMINI_API_KEY = 'AIzaSyB9jQaRGkfj4Tyq5y5j45RiYAeb_H2e-2g';
 
 // ============================================
-// AI RESUME PARSING ENDPOINT
+// AI RESUME PARSING ENDPOINT - FIXED MODEL
 // ============================================
 app.post('/api/parse-resume', async (c) => {
   try {
     const { text } = await c.req.json();
     
-    const prompt = `You are an expert resume parser. Analyze this resume text and extract ALL information into a structured JSON format.
+    const prompt = `You are an expert resume parser. Analyze this resume text and extract ALL information into structured JSON.
 
 RESUME TEXT:
 ${text}
 
-EXTRACT THE FOLLOWING INTO JSON:
+Return this EXACT JSON structure with extracted data:
 {
   "basics": {
-    "name": "Full name",
-    "title": "Current/most recent job title",
-    "tagline": "A compelling 1-line professional summary",
-    "email": "Email address",
-    "phone": "Phone number",
-    "location": "City, State",
-    "linkedin": "LinkedIn URL if present",
-    "website": "Personal website if present"
+    "name": "extracted full name",
+    "title": "most recent job title",
+    "tagline": "create a compelling 1-line professional summary based on their experience",
+    "email": "email address",
+    "phone": "phone number",
+    "location": "city, state",
+    "linkedin": "linkedin url if found",
+    "website": "personal website if found"
   },
   "experience": [
     {
-      "company": "Company name",
-      "role": "Job title",
-      "startDate": "Start date (Month Year format)",
-      "endDate": "End date or Present",
-      "description": "Full job description",
-      "tasks": "Key responsibilities and tasks as bullet points",
+      "company": "company name",
+      "role": "job title",
+      "startDate": "start date",
+      "endDate": "end date or Present",
+      "description": "full job description and accomplishments",
+      "tasks": "key responsibilities",
       "dayInLife": [
-        {"time": "9:00 AM", "activity": "Realistic morning activity based on role"},
-        {"time": "11:00 AM", "activity": "Mid-morning activity"},
-        {"time": "1:00 PM", "activity": "Afternoon activity"},
-        {"time": "3:00 PM", "activity": "Late afternoon activity"},
-        {"time": "5:00 PM", "activity": "End of day activity"}
+        {"time": "9:00 AM", "activity": "realistic morning activity for this role"},
+        {"time": "11:00 AM", "activity": "mid-morning activity"},
+        {"time": "1:00 PM", "activity": "afternoon activity"},
+        {"time": "3:00 PM", "activity": "late afternoon activity"},
+        {"time": "5:00 PM", "activity": "end of day activity"}
       ],
       "metrics": [
-        {"value": "+X%", "label": "Key metric 1 - extract from description if mentioned"},
-        {"value": "$XM", "label": "Key metric 2"},
-        {"value": "X+", "label": "Key metric 3"},
-        {"value": "XK", "label": "Key metric 4"}
+        {"value": "extract percentage or number if mentioned", "label": "metric type"},
+        {"value": "", "label": ""},
+        {"value": "", "label": ""},
+        {"value": "", "label": ""}
       ]
     }
   ],
-  "skills": ["Array of all skills mentioned"],
+  "skills": ["array", "of", "all", "skills", "found"],
   "education": [
-    {"degree": "Degree name", "school": "School name", "year": "Graduation year"}
+    {"degree": "degree name", "school": "school name", "year": "year"}
   ],
   "achievements": [
-    {"title": "Achievement title", "description": "Description"}
-  ],
-  "certifications": [
-    {"name": "Certification name", "org": "Issuing organization", "year": "Year"}
+    {"title": "achievement", "description": "details"}
   ]
 }
 
-IMPORTANT:
-1. Extract ALL experiences found, in chronological order (most recent first)
-2. Parse metrics/numbers from job descriptions (revenue, %, headcount, etc.)
-3. Generate realistic "day in the life" activities based on the job role
-4. Create a compelling tagline summarizing career highlights
-5. If information is not available, use empty string "" not null
-
-Return ONLY valid JSON, no markdown or explanation.`;
+IMPORTANT RULES:
+1. Extract EVERY job experience found, most recent first
+2. Find and extract ALL metrics (percentages, dollar amounts, team sizes, etc.)
+3. Generate realistic day-in-life activities based on the actual job role
+4. Create a compelling tagline from their career highlights
+5. Use empty string "" for missing data, never null
+6. Return ONLY valid JSON, no markdown, no explanation`;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -89,27 +85,38 @@ Return ONLY valid JSON, no markdown or explanation.`;
     );
 
     const data = await response.json();
+    
+    if (data.error) {
+      console.error('Gemini API error:', data.error);
+      return c.json({ error: data.error.message }, 500);
+    }
+    
     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     
-    // Clean and parse JSON from response
+    if (!aiText) {
+      return c.json({ error: 'No response from AI', raw: data }, 500);
+    }
+    
+    // Clean and parse JSON
     let parsed;
     try {
-      // Remove markdown code blocks if present
       const jsonStr = aiText.replace(/```json\n?|\n?```/g, '').trim();
       parsed = JSON.parse(jsonStr);
     } catch (e) {
+      console.error('JSON parse error:', e, 'Raw:', aiText);
       return c.json({ error: 'Failed to parse AI response', raw: aiText }, 500);
     }
 
     return c.json(parsed);
   } catch (error: any) {
+    console.error('API error:', error);
     return c.json({ error: error.message }, 500);
   }
 });
 
 // ============================================
-// WEBUME: THE RESUME KILLER
-// Premium Dashboard UI + AI Resume Parsing
+// WEBUME: THE FUTURE OF PROFESSIONAL PROFILES
+// Ultra Premium Futuristic Design
 // ============================================
 
 app.get('/', (c) => {
@@ -118,948 +125,595 @@ app.get('/', (c) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Webume | Employee-for-Hire Empire</title>
-  <meta name="description" content="The resume killer we've needed. Transform your career history into a living, verifiable proof-of-work portfolio.">
+  <title>WEBUME | The Future of Professional Profiles</title>
+  <meta name="description" content="Not a resume. An empire. Transform your career into undeniable proof of impact.">
   
   <!-- React 18 -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
-  <!-- PDF.js for REAL PDF parsing -->
+  <!-- PDF.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
   
-  <!-- Mammoth.js for DOCX parsing -->
+  <!-- Mammoth.js for DOCX -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-  
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
     /* ============================================
-       WEBUME PREMIUM ULTRA DASHBOARD UI
-       Futuristic Glassmorphism Design System
+       WEBUME ULTRA - FUTURISTIC DESIGN SYSTEM
+       The Future of Professional Profiles
        ============================================ */
     
     :root {
-      /* Deep Space Background */
-      --bg-void: #050510;
-      --bg-deep: #0a0a1f;
-      --bg-primary: #0d0d24;
-      --bg-secondary: #12122e;
-      --bg-tertiary: #1a1a3e;
-      --bg-elevated: #222255;
+      /* Void Black Background */
+      --void: #000000;
+      --void-deep: #030308;
+      --void-mid: #08081a;
       
-      /* Glass Effects */
-      --glass-bg: rgba(255, 255, 255, 0.02);
-      --glass-bg-hover: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.06);
-      --glass-border-hover: rgba(255, 255, 255, 0.12);
-      --glass-highlight: rgba(255, 255, 255, 0.08);
-      --glass-glow: rgba(138, 43, 226, 0.15);
+      /* Electric Neon Colors */
+      --neon-violet: #bf5fff;
+      --neon-purple: #9333ea;
+      --neon-magenta: #e11d9b;
+      --neon-pink: #ff2d92;
+      --neon-cyan: #00f0ff;
+      --neon-blue: #0066ff;
+      --neon-green: #00ff88;
+      --neon-yellow: #ffe600;
+      --neon-orange: #ff6600;
+      --neon-red: #ff0055;
       
-      /* Neon Accent Palette */
-      --neon-purple: #a855f7;
-      --neon-violet: #8b5cf6;
-      --neon-pink: #ec4899;
-      --neon-magenta: #d946ef;
-      --neon-cyan: #06b6d4;
-      --neon-teal: #14b8a6;
-      --neon-blue: #3b82f6;
-      --neon-green: #22c55e;
-      --neon-orange: #f97316;
-      --neon-red: #ef4444;
-      --neon-gold: #fbbf24;
-      
-      /* Gradients */
-      --gradient-purple: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
-      --gradient-pink: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
-      --gradient-cyan: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
-      --gradient-gold: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-      --gradient-aurora: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #06b6d4 100%);
-      --gradient-cosmic: linear-gradient(180deg, rgba(138, 43, 226, 0.3) 0%, rgba(236, 72, 153, 0.15) 50%, transparent 100%);
+      /* Glass */
+      --glass-light: rgba(255,255,255,0.03);
+      --glass-medium: rgba(255,255,255,0.06);
+      --glass-border: rgba(255,255,255,0.08);
+      --glass-glow: rgba(255,255,255,0.12);
       
       /* Text */
-      --text-primary: #ffffff;
-      --text-secondary: #c4b5fd;
-      --text-muted: #7c7c9a;
-      --text-dim: #4a4a6a;
-      
-      /* Shadows & Glows */
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
-      --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.6);
-      --shadow-xl: 0 24px 80px rgba(0, 0, 0, 0.7);
-      --glow-purple: 0 0 60px rgba(168, 85, 247, 0.4);
-      --glow-pink: 0 0 60px rgba(236, 72, 153, 0.4);
-      --glow-cyan: 0 0 60px rgba(6, 182, 212, 0.4);
-      --glow-subtle: 0 0 40px rgba(168, 85, 247, 0.2);
-      
-      /* Sizing */
-      --sidebar-width: 280px;
-      --header-height: 80px;
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --radius-xl: 20px;
-      --radius-2xl: 28px;
+      --text-white: #ffffff;
+      --text-silver: #e8e8ff;
+      --text-muted: #8888aa;
+      --text-dim: #555577;
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body, #root { height: 100%; }
+    html { height: 100%; }
     
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--bg-void);
-      color: var(--text-primary);
-      line-height: 1.6;
-      overflow: hidden;
+      min-height: 100%;
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--void);
+      color: var(--text-white);
+      overflow-x: hidden;
     }
     
-    /* Premium Scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
+    #root { min-height: 100vh; }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { 
-      background: linear-gradient(180deg, var(--neon-purple), var(--neon-pink));
-      border-radius: 4px;
+      background: linear-gradient(180deg, var(--neon-violet), var(--neon-cyan));
+      border-radius: 3px;
     }
-    ::-webkit-scrollbar-thumb:hover { opacity: 0.8; }
     
     /* ============================================
-       ANIMATED BACKGROUND
+       ANIMATED CYBER BACKGROUND
        ============================================ */
-    .cosmic-bg {
+    .cyber-bg {
       position: fixed;
       inset: 0;
       z-index: 0;
       overflow: hidden;
-      background: 
-        radial-gradient(ellipse 150% 100% at 0% 0%, rgba(88, 28, 135, 0.4) 0%, transparent 50%),
-        radial-gradient(ellipse 100% 150% at 100% 100%, rgba(157, 23, 77, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse 80% 80% at 50% 50%, rgba(30, 64, 175, 0.2) 0%, transparent 60%),
-        var(--bg-void);
+      background: var(--void);
     }
     
-    .orb {
+    /* Massive gradient orbs */
+    .cyber-bg::before {
+      content: '';
       position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.6;
-      animation: float 20s ease-in-out infinite;
+      width: 150vw;
+      height: 150vh;
+      top: -50%;
+      left: -25%;
+      background: 
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(147,51,234,0.4) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 50% at 80% 20%, rgba(225,29,155,0.3) 0%, transparent 45%),
+        radial-gradient(ellipse 40% 60% at 70% 80%, rgba(0,240,255,0.25) 0%, transparent 45%),
+        radial-gradient(ellipse 50% 40% at 10% 90%, rgba(0,255,136,0.2) 0%, transparent 40%);
+      animation: cosmicDrift 30s ease-in-out infinite;
     }
     
-    .orb-1 {
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%);
-      top: -200px;
-      left: -200px;
-      animation-delay: 0s;
+    @keyframes cosmicDrift {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(5%, -3%) rotate(2deg); }
+      50% { transform: translate(-3%, 5%) rotate(-1deg); }
+      75% { transform: translate(-5%, -2%) rotate(1deg); }
     }
     
-    .orb-2 {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(236, 72, 153, 0.35) 0%, transparent 70%);
-      top: 50%;
-      right: -150px;
-      animation-delay: -7s;
-      animation-duration: 25s;
-    }
-    
-    .orb-3 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, transparent 70%);
-      bottom: -100px;
-      left: 30%;
-      animation-delay: -14s;
-      animation-duration: 22s;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(30px, -30px) scale(1.05); }
-      50% { transform: translate(-20px, 20px) scale(0.95); }
-      75% { transform: translate(40px, 10px) scale(1.02); }
-    }
-    
-    /* Grid overlay */
-    .grid-overlay {
+    /* Cyber grid */
+    .cyber-grid {
       position: absolute;
       inset: 0;
       background-image: 
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 60px 60px;
-      opacity: 0.5;
+        linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+      background-size: 80px 80px;
+      transform: perspective(500px) rotateX(60deg);
+      transform-origin: center top;
+      animation: gridPulse 4s ease-in-out infinite;
     }
     
-    /* ============================================
-       APP LAYOUT
-       ============================================ */
-    .app {
-      display: flex;
-      height: 100vh;
-      position: relative;
-      z-index: 1;
+    @keyframes gridPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 0.8; }
     }
     
-    /* ============================================
-       PREMIUM SIDEBAR
-       ============================================ */
-    .sidebar {
-      width: var(--sidebar-width);
-      background: rgba(10, 10, 31, 0.8);
-      backdrop-filter: blur(40px);
-      border-right: 1px solid var(--glass-border);
-      display: flex;
-      flex-direction: column;
-      padding: 28px 20px;
-      position: relative;
-      z-index: 100;
-    }
-    
-    .sidebar::before {
-      content: '';
+    /* Floating particles */
+    .particle {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 300px;
-      background: var(--gradient-cosmic);
-      pointer-events: none;
-      opacity: 0.5;
-    }
-    
-    .sidebar::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 1px;
-      height: 100%;
-      background: linear-gradient(180deg, var(--neon-purple) 0%, transparent 50%, var(--neon-cyan) 100%);
-      opacity: 0.3;
-    }
-    
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 0 8px;
-      margin-bottom: 48px;
-      position: relative;
-    }
-    
-    .logo-icon {
-      width: 52px;
-      height: 52px;
-      background: var(--gradient-aurora);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      box-shadow: var(--glow-purple), var(--shadow-md);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .logo-icon::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
-    }
-    
-    .logo-text {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 26px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
-    }
-    
-    .nav-section {
-      margin-bottom: 36px;
-    }
-    
-    .nav-label {
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--text-dim);
-      padding: 0 12px;
-      margin-bottom: 14px;
-    }
-    
-    .nav-items {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 16px;
-      border-radius: var(--radius-lg);
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 14px;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: pointer;
-      border: 1px solid transparent;
-      background: transparent;
-      width: 100%;
-      text-align: left;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .nav-item::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: var(--gradient-purple);
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-    
-    .nav-item:hover {
-      color: var(--text-primary);
-      border-color: var(--glass-border-hover);
-      background: var(--glass-bg-hover);
-    }
-    
-    .nav-item.active {
-      color: var(--text-primary);
-      border-color: rgba(168, 85, 247, 0.3);
-      background: rgba(168, 85, 247, 0.1);
-      box-shadow: var(--glow-subtle);
-    }
-    
-    .nav-item.active::before {
-      opacity: 0.1;
-    }
-    
-    .nav-item.active::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 3px;
-      height: 28px;
-      background: var(--gradient-purple);
-      border-radius: 0 3px 3px 0;
-      box-shadow: var(--glow-purple);
-    }
-    
-    .nav-item i {
-      width: 20px;
-      text-align: center;
-      font-size: 16px;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .nav-item span {
-      position: relative;
-      z-index: 1;
-    }
-    
-    .nav-item.active i {
-      color: var(--neon-purple);
-      filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6));
-    }
-    
-    .nav-badge {
-      margin-left: auto;
-      background: var(--gradient-pink);
-      color: white;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 20px;
-      position: relative;
-      z-index: 1;
-      box-shadow: var(--glow-pink);
-    }
-    
-    /* Sidebar User Card */
-    .sidebar-profile {
-      margin-top: auto;
-      padding: 18px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .sidebar-profile::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%);
-    }
-    
-    .sidebar-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      background: var(--gradient-cyan);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 16px;
-      border: 2px solid rgba(6, 182, 212, 0.3);
-      box-shadow: var(--glow-cyan);
-      position: relative;
-      z-index: 1;
-    }
-    
-    .sidebar-info {
-      flex: 1;
-      min-width: 0;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .sidebar-name {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .sidebar-role {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-    
-    /* ============================================
-       MAIN CONTENT
-       ============================================ */
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    
-    /* Header */
-    .header {
-      height: var(--header-height);
-      padding: 0 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--glass-border);
-      background: rgba(10, 10, 31, 0.6);
-      backdrop-filter: blur(20px);
-      position: relative;
-    }
-    
-    .header::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--neon-purple), var(--neon-pink), transparent);
-      opacity: 0.3;
-    }
-    
-    .header-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 28px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    
-    .header-search {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 12px 22px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      min-width: 300px;
-      transition: all 0.25s ease;
-    }
-    
-    .header-search:focus-within {
-      border-color: var(--neon-purple);
-      box-shadow: var(--glow-subtle);
-    }
-    
-    .header-search i { color: var(--text-dim); }
-    
-    .header-search input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text-primary);
-      font-size: 14px;
-      width: 100%;
-    }
-    
-    .header-search input::placeholder { color: var(--text-dim); }
-    
-    .header-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-lg);
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      position: relative;
-    }
-    
-    .header-btn:hover {
-      background: var(--glass-bg-hover);
-      color: var(--text-primary);
-      border-color: var(--glass-border-hover);
-      transform: translateY(-2px);
-    }
-    
-    .header-btn .badge {
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      width: 20px;
-      height: 20px;
-      background: var(--gradient-pink);
+      width: 4px;
+      height: 4px;
+      background: var(--neon-cyan);
       border-radius: 50%;
-      font-size: 10px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: var(--glow-pink);
+      box-shadow: 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-cyan);
+      animation: particleFloat 15s linear infinite;
     }
     
-    /* Content */
-    .content {
-      flex: 1;
-      overflow-y: auto;
+    @keyframes particleFloat {
+      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+    }
+    
+    /* Scan lines */
+    .scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.1) 2px,
+        rgba(0,0,0,0.1) 4px
+      );
+      pointer-events: none;
+      opacity: 0.3;
+    }
+    
+    /* ============================================
+       MAIN CONTAINER
+       ============================================ */
+    .main-container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
       padding: 40px;
     }
     
     /* ============================================
-       PREMIUM CARDS
+       ULTRA HEADER
        ============================================ */
-    .card {
-      background: rgba(18, 18, 46, 0.7);
-      backdrop-filter: blur(40px);
+    .ultra-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 60px;
+      padding: 30px 40px;
+      background: linear-gradient(135deg, rgba(147,51,234,0.15) 0%, rgba(0,240,255,0.08) 100%);
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-2xl);
-      padding: 32px;
+      border-radius: 24px;
       position: relative;
       overflow: hidden;
-      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
-    .card::before {
+    .ultra-header::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      height: 2px;
+      background: linear-gradient(90deg, var(--neon-violet), var(--neon-cyan), var(--neon-pink));
     }
     
-    .card:hover {
-      border-color: rgba(168, 85, 247, 0.25);
-      box-shadow: var(--glow-subtle), var(--shadow-lg);
-      transform: translateY(-2px);
-    }
-    
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 28px;
-    }
-    
-    .card-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 20px;
-      font-weight: 600;
+    .logo-section {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 20px;
     }
     
-    .card-title i {
-      color: var(--neon-purple);
-      filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
-    }
-    
-    /* ============================================
-       STAT CARDS - Glassmorphism Style
-       ============================================ */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      margin-bottom: 32px;
-    }
-    
-    .stat-card {
-      background: rgba(18, 18, 46, 0.6);
-      backdrop-filter: blur(40px);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-2xl);
-      padding: 28px;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      filter: blur(60px);
-      opacity: 0.4;
-      transition: opacity 0.35s ease;
-    }
-    
-    .stat-card:hover::before { opacity: 0.6; }
-    
-    .stat-card.purple::before { background: var(--neon-purple); }
-    .stat-card.pink::before { background: var(--neon-pink); }
-    .stat-card.cyan::before { background: var(--neon-cyan); }
-    .stat-card.gold::before { background: var(--neon-gold); }
-    
-    .stat-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(168, 85, 247, 0.3);
-      box-shadow: var(--glow-purple), var(--shadow-lg);
-    }
-    
-    .stat-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
+    .logo-icon {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta));
+      border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
-      margin-bottom: 20px;
+      font-size: 32px;
       position: relative;
+      box-shadow: 
+        0 0 40px rgba(147,51,234,0.5),
+        inset 0 0 30px rgba(255,255,255,0.1);
+      animation: logoPulse 3s ease-in-out infinite;
     }
     
-    .stat-card.purple .stat-icon { 
-      background: rgba(168, 85, 247, 0.15); 
-      color: var(--neon-purple);
-      box-shadow: inset 0 0 20px rgba(168, 85, 247, 0.1);
-    }
-    .stat-card.pink .stat-icon { 
-      background: rgba(236, 72, 153, 0.15); 
-      color: var(--neon-pink);
-      box-shadow: inset 0 0 20px rgba(236, 72, 153, 0.1);
-    }
-    .stat-card.cyan .stat-icon { 
-      background: rgba(6, 182, 212, 0.15); 
-      color: var(--neon-cyan);
-      box-shadow: inset 0 0 20px rgba(6, 182, 212, 0.1);
-    }
-    .stat-card.gold .stat-icon { 
-      background: rgba(251, 191, 36, 0.15); 
-      color: var(--neon-gold);
-      box-shadow: inset 0 0 20px rgba(251, 191, 36, 0.1);
+    @keyframes logoPulse {
+      0%, 100% { box-shadow: 0 0 40px rgba(147,51,234,0.5), inset 0 0 30px rgba(255,255,255,0.1); }
+      50% { box-shadow: 0 0 60px rgba(147,51,234,0.7), inset 0 0 30px rgba(255,255,255,0.2); }
     }
     
-    .stat-value {
-      font-family: 'Space Grotesk', sans-serif;
+    .logo-text {
+      font-family: 'Orbitron', sans-serif;
       font-size: 36px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      letter-spacing: -1px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, #fff 0%, var(--neon-cyan) 50%, var(--neon-violet) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 40px rgba(0,240,255,0.5);
     }
     
-    .stat-label {
-      color: var(--text-muted);
+    .tagline {
       font-size: 14px;
-      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 4px;
     }
     
-    .stat-change {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-top: 12px;
-      padding: 6px 14px;
-      border-radius: 30px;
+    .header-stats {
+      display: flex;
+      gap: 40px;
     }
     
-    .stat-change.up {
-      background: rgba(34, 197, 94, 0.12);
-      color: var(--neon-green);
+    .header-stat {
+      text-align: center;
     }
     
-    .stat-change.down {
-      background: rgba(239, 68, 68, 0.12);
-      color: var(--neon-red);
+    .header-stat-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .header-stat-label {
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
     }
     
     /* ============================================
-       UPLOAD ZONE - Premium Design
+       NEON CARDS
        ============================================ */
-    .upload-zone {
-      border: 2px dashed var(--glass-border);
-      border-radius: var(--radius-2xl);
-      padding: 80px 50px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      background: var(--glass-bg);
+    .neon-card {
+      background: linear-gradient(135deg, rgba(20,20,40,0.8) 0%, rgba(10,10,25,0.9) 100%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 40px;
       position: relative;
       overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .neon-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon-violet), var(--neon-cyan), transparent);
+      opacity: 0.7;
+    }
+    
+    .neon-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(147,51,234,0.1) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    
+    .neon-card:hover::after {
+      opacity: 1;
+    }
+    
+    .neon-card:hover {
+      border-color: rgba(147,51,234,0.3);
+      box-shadow: 
+        0 0 60px rgba(147,51,234,0.2),
+        0 20px 60px rgba(0,0,0,0.4);
+      transform: translateY(-4px);
+    }
+    
+    .card-glow {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    
+    .card-glow.purple { background: var(--neon-violet); top: -100px; right: -100px; }
+    .card-glow.cyan { background: var(--neon-cyan); bottom: -100px; left: -100px; }
+    .card-glow.pink { background: var(--neon-pink); top: 50%; right: -100px; }
+    
+    /* ============================================
+       UPLOAD ZONE - DRAMATIC
+       ============================================ */
+    .upload-zone {
+      min-height: 500px;
+      border: 3px dashed rgba(147,51,234,0.4);
+      border-radius: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(147,51,234,0.05) 0%, rgba(0,240,255,0.03) 100%);
     }
     
     .upload-zone::before {
       content: '';
       position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.35s ease;
+      inset: 20px;
+      border: 1px solid rgba(147,51,234,0.2);
+      border-radius: 24px;
+      pointer-events: none;
     }
     
     .upload-zone:hover, .upload-zone.drag-over {
-      border-color: var(--neon-purple);
-      background: rgba(168, 85, 247, 0.05);
-    }
-    
-    .upload-zone:hover::before, .upload-zone.drag-over::before {
-      opacity: 1;
+      border-color: var(--neon-violet);
+      background: linear-gradient(135deg, rgba(147,51,234,0.12) 0%, rgba(0,240,255,0.08) 100%);
+      box-shadow: 
+        0 0 100px rgba(147,51,234,0.3),
+        inset 0 0 100px rgba(147,51,234,0.05);
     }
     
     .upload-zone.drag-over {
+      transform: scale(1.02);
       border-style: solid;
-      transform: scale(1.01);
-      box-shadow: var(--glow-purple);
     }
     
-    .upload-icon {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 32px;
-      background: var(--gradient-aurora);
-      border-radius: 28px;
+    .upload-icon-container {
+      width: 160px;
+      height: 160px;
+      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta), var(--neon-cyan));
+      border-radius: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 40px;
-      color: white;
-      box-shadow: var(--glow-purple), var(--shadow-lg);
+      margin-bottom: 40px;
       position: relative;
-      overflow: hidden;
+      box-shadow: 
+        0 0 80px rgba(147,51,234,0.5),
+        0 0 120px rgba(0,240,255,0.3);
+      animation: uploadIconFloat 4s ease-in-out infinite;
     }
     
-    .upload-icon::before {
+    @keyframes uploadIconFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(2deg); }
+    }
+    
+    .upload-icon-container::before {
       content: '';
       position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+      inset: -3px;
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet), var(--neon-pink), var(--neon-cyan));
+      border-radius: 43px;
+      z-index: -1;
+      animation: borderRotate 3s linear infinite;
     }
     
-    .upload-icon i {
-      position: relative;
-      z-index: 1;
-      animation: uploadBounce 2s ease-in-out infinite;
+    @keyframes borderRotate {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
     }
     
-    @keyframes uploadBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+    .upload-icon-container i {
+      font-size: 70px;
+      color: white;
+      filter: drop-shadow(0 0 20px rgba(255,255,255,0.5));
+      animation: iconPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes iconPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
     }
     
     .upload-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 24px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 36px;
       font-weight: 700;
-      margin-bottom: 12px;
-      background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff 0%, var(--neon-cyan) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     
-    .upload-desc {
+    .upload-subtitle {
+      font-size: 18px;
       color: var(--text-muted);
-      font-size: 16px;
-      margin-bottom: 32px;
+      margin-bottom: 40px;
+      letter-spacing: 1px;
     }
     
     .upload-formats {
       display: flex;
-      gap: 16px;
-      justify-content: center;
+      gap: 20px;
     }
     
-    .format-tag {
-      padding: 12px 22px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
+    .format-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 28px;
+      background: rgba(147,51,234,0.15);
+      border: 1px solid rgba(147,51,234,0.3);
+      border-radius: 50px;
+      font-family: 'JetBrains Mono', monospace;
       font-size: 14px;
       font-weight: 600;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.25s ease;
+      color: var(--neon-violet);
+      transition: all 0.3s ease;
     }
     
-    .format-tag:hover {
-      border-color: var(--neon-purple);
-      color: var(--text-primary);
+    .format-chip:hover {
+      background: rgba(147,51,234,0.25);
+      border-color: var(--neon-violet);
+      box-shadow: 0 0 30px rgba(147,51,234,0.3);
     }
     
-    .format-tag i { color: var(--neon-purple); }
+    .format-chip i {
+      font-size: 18px;
+    }
     
     /* ============================================
-       PROGRESS - AI Processing Animation
+       AI PROCESSING ANIMATION
        ============================================ */
-    .progress-container {
-      padding: 48px;
+    .ai-processing {
+      text-align: center;
+      padding: 80px 40px;
     }
     
-    .progress-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
+    .ai-brain {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 50px;
+      position: relative;
     }
     
-    .progress-title {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 20px;
-      font-weight: 600;
+    .ai-brain-core {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, var(--neon-violet), var(--neon-cyan));
+      border-radius: 50%;
+      box-shadow: 
+        0 0 60px var(--neon-violet),
+        0 0 100px var(--neon-cyan);
+      animation: brainPulse 1.5s ease-in-out infinite;
     }
     
-    .ai-indicator {
-      display: flex;
+    @keyframes brainPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 60px var(--neon-violet), 0 0 100px var(--neon-cyan); }
+      50% { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 0 80px var(--neon-violet), 0 0 140px var(--neon-cyan); }
+    }
+    
+    .ai-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 2px solid var(--neon-violet);
+      border-radius: 50%;
+      animation: ringExpand 2s ease-out infinite;
+    }
+    
+    .ai-ring:nth-child(1) { animation-delay: 0s; }
+    .ai-ring:nth-child(2) { animation-delay: 0.5s; }
+    .ai-ring:nth-child(3) { animation-delay: 1s; }
+    
+    @keyframes ringExpand {
+      0% { width: 100px; height: 100px; opacity: 1; }
+      100% { width: 200px; height: 200px; opacity: 0; }
+    }
+    
+    .ai-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-violet) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .ai-badge {
+      display: inline-flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 16px;
-      background: var(--gradient-aurora);
-      border-radius: var(--radius-xl);
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      box-shadow: var(--glow-purple);
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta));
+      border-radius: 50px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      margin-bottom: 40px;
+      box-shadow: 0 0 40px rgba(147,51,234,0.5);
     }
     
     .ai-dot {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       background: white;
       border-radius: 50%;
-      animation: aiPulse 1s ease-in-out infinite;
+      animation: aiDotPulse 0.8s ease-in-out infinite;
     }
     
-    @keyframes aiPulse {
+    @keyframes aiDotPulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
+      50% { opacity: 0.5; transform: scale(0.7); }
     }
     
-    .progress-spinner {
-      width: 32px;
-      height: 32px;
-      border: 3px solid var(--glass-border);
-      border-top-color: var(--neon-purple);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+    .progress-bar-container {
+      max-width: 600px;
+      margin: 0 auto 40px;
     }
     
-    @keyframes spin { to { transform: rotate(360deg); } }
-    
-    .progress-percent {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--neon-purple);
-      text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
-    }
-    
-    .progress-bar {
-      height: 12px;
-      background: var(--glass-bg);
-      border-radius: 6px;
+    .progress-bar-bg {
+      height: 16px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
       overflow: hidden;
-      margin-bottom: 36px;
-      border: 1px solid var(--glass-border);
-    }
-    
-    .progress-fill {
-      height: 100%;
-      background: var(--gradient-aurora);
-      border-radius: 6px;
-      transition: width 0.3s ease;
-      box-shadow: var(--glow-purple);
       position: relative;
-      overflow: hidden;
     }
     
-    .progress-fill::after {
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-violet), var(--neon-cyan), var(--neon-green));
+      border-radius: 8px;
+      transition: width 0.3s ease;
+      position: relative;
+      box-shadow: 0 0 30px var(--neon-cyan);
+    }
+    
+    .progress-bar-fill::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      animation: shimmer 1.5s ease-in-out infinite;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: shimmer 1.5s infinite;
     }
     
     @keyframes shimmer {
@@ -1067,42 +721,182 @@ app.get('/', (c) => {
       100% { transform: translateX(100%); }
     }
     
+    .progress-percent {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 40px var(--neon-cyan);
+      margin-bottom: 30px;
+    }
+    
     .progress-steps {
       display: flex;
       flex-direction: column;
       gap: 16px;
+      max-width: 500px;
+      margin: 0 auto;
     }
     
     .progress-step {
       display: flex;
       align-items: center;
       gap: 16px;
-      font-size: 15px;
+      padding: 16px 24px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      font-size: 16px;
       color: var(--text-dim);
-      padding: 14px 18px;
-      border-radius: var(--radius-lg);
-      background: var(--glass-bg);
-      border: 1px solid transparent;
-      transition: all 0.25s ease;
+      transition: all 0.3s ease;
     }
     
-    .progress-step.complete { 
+    .progress-step.active {
+      background: rgba(147,51,234,0.1);
+      border-color: rgba(147,51,234,0.3);
+      color: var(--neon-violet);
+      box-shadow: 0 0 30px rgba(147,51,234,0.2);
+    }
+    
+    .progress-step.complete {
+      background: rgba(0,255,136,0.08);
+      border-color: rgba(0,255,136,0.3);
       color: var(--neon-green);
-      border-color: rgba(34, 197, 94, 0.2);
-      background: rgba(34, 197, 94, 0.05);
     }
     
-    .progress-step.active { 
-      color: var(--neon-purple);
-      border-color: rgba(168, 85, 247, 0.3);
-      background: rgba(168, 85, 247, 0.08);
-      box-shadow: var(--glow-subtle);
+    .progress-step i {
+      width: 24px;
+      font-size: 18px;
     }
-    
-    .progress-step i { width: 24px; text-align: center; font-size: 18px; }
     
     /* ============================================
-       FORM ELEMENTS
+       STAT CARDS - CYBERPUNK STYLE
+       ============================================ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(20,20,40,0.9) 0%, rgba(10,10,25,0.95) 100%);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+    
+    .stat-card.violet::before { background: linear-gradient(90deg, transparent, var(--neon-violet), transparent); }
+    .stat-card.cyan::before { background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); }
+    .stat-card.pink::before { background: linear-gradient(90deg, transparent, var(--neon-pink), transparent); }
+    .stat-card.green::before { background: linear-gradient(90deg, transparent, var(--neon-green), transparent); }
+    
+    .stat-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    
+    .stat-card.violet:hover { border-color: var(--neon-violet); box-shadow: 0 0 60px rgba(147,51,234,0.3); }
+    .stat-card.cyan:hover { border-color: var(--neon-cyan); box-shadow: 0 0 60px rgba(0,240,255,0.3); }
+    .stat-card.pink:hover { border-color: var(--neon-pink); box-shadow: 0 0 60px rgba(255,45,146,0.3); }
+    .stat-card.green:hover { border-color: var(--neon-green); box-shadow: 0 0 60px rgba(0,255,136,0.3); }
+    
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-card.violet .stat-icon { background: rgba(147,51,234,0.2); color: var(--neon-violet); }
+    .stat-card.cyan .stat-icon { background: rgba(0,240,255,0.2); color: var(--neon-cyan); }
+    .stat-card.pink .stat-icon { background: rgba(255,45,146,0.2); color: var(--neon-pink); }
+    .stat-card.green .stat-icon { background: rgba(0,255,136,0.2); color: var(--neon-green); }
+    
+    .stat-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .stat-card.violet .stat-value { color: var(--neon-violet); text-shadow: 0 0 30px var(--neon-violet); }
+    .stat-card.cyan .stat-value { color: var(--neon-cyan); text-shadow: 0 0 30px var(--neon-cyan); }
+    .stat-card.pink .stat-value { color: var(--neon-pink); text-shadow: 0 0 30px var(--neon-pink); }
+    .stat-card.green .stat-value { color: var(--neon-green); text-shadow: 0 0 30px var(--neon-green); }
+    
+    .stat-label {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+    }
+    
+    /* ============================================
+       NAV TABS
+       ============================================ */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      margin-bottom: 40px;
+      overflow-x: auto;
+    }
+    
+    .nav-tab {
+      padding: 16px 28px;
+      background: transparent;
+      border: none;
+      border-radius: 14px;
+      color: var(--text-muted);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    
+    .nav-tab:hover {
+      color: var(--text-white);
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .nav-tab.active {
+      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta));
+      color: white;
+      box-shadow: 0 0 40px rgba(147,51,234,0.4);
+    }
+    
+    .nav-tab i {
+      font-size: 16px;
+    }
+    
+    /* ============================================
+       FORM ELEMENTS - CYBER STYLE
        ============================================ */
     .form-grid {
       display: grid;
@@ -1121,34 +915,33 @@ app.get('/', (c) => {
     .form-label {
       font-size: 13px;
       font-weight: 600;
-      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
       display: flex;
       align-items: center;
       gap: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
     
     .form-label i {
-      color: var(--neon-purple);
-      font-size: 12px;
+      color: var(--neon-violet);
     }
     
-    .form-input, .form-textarea, .form-select {
-      padding: 16px 20px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      color: var(--text-primary);
-      font-size: 15px;
-      font-family: inherit;
-      transition: all 0.25s ease;
+    .form-input, .form-textarea {
+      padding: 18px 22px;
+      background: rgba(10,10,25,0.8);
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      color: var(--text-white);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      transition: all 0.3s ease;
     }
     
-    .form-input:focus, .form-textarea:focus, .form-select:focus {
+    .form-input:focus, .form-textarea:focus {
       outline: none;
-      border-color: var(--neon-purple);
-      box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1), var(--glow-subtle);
+      border-color: var(--neon-violet);
+      box-shadow: 0 0 30px rgba(147,51,234,0.2);
     }
     
     .form-input::placeholder, .form-textarea::placeholder {
@@ -1156,151 +949,29 @@ app.get('/', (c) => {
     }
     
     .form-textarea {
-      min-height: 120px;
+      min-height: 140px;
       resize: vertical;
       line-height: 1.7;
     }
     
     /* ============================================
-       EXPERIENCE ENTRY
-       ============================================ */
-    .experience-entry {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      padding: 28px;
-      margin-bottom: 24px;
-      position: relative;
-      transition: all 0.25s ease;
-    }
-    
-    .experience-entry:hover {
-      border-color: var(--glass-border-hover);
-    }
-    
-    .experience-entry::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 4px;
-      background: var(--gradient-aurora);
-      border-radius: 4px 0 0 4px;
-    }
-    
-    .experience-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 24px;
-    }
-    
-    .experience-number {
-      width: 44px;
-      height: 44px;
-      background: var(--gradient-purple);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 16px;
-      box-shadow: var(--glow-purple);
-    }
-    
-    .experience-actions { display: flex; gap: 10px; }
-    
-    .btn-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: var(--radius-md);
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      color: var(--text-muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.25s ease;
-    }
-    
-    .btn-icon:hover {
-      background: var(--glass-bg-hover);
-      color: var(--text-primary);
-    }
-    
-    .btn-icon.danger:hover {
-      background: rgba(239, 68, 68, 0.12);
-      color: var(--neon-red);
-      border-color: rgba(239, 68, 68, 0.3);
-    }
-    
-    /* ============================================
-       METRICS GRID
-       ============================================ */
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-top: 24px;
-    }
-    
-    .metric-input {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      text-align: center;
-      transition: all 0.25s ease;
-    }
-    
-    .metric-input:hover, .metric-input:focus-within {
-      border-color: var(--neon-purple);
-      box-shadow: var(--glow-subtle);
-    }
-    
-    .metric-input input {
-      width: 100%;
-      background: transparent;
-      border: none;
-      outline: none;
-      text-align: center;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--neon-purple);
-      margin-bottom: 6px;
-    }
-    
-    .metric-input input::placeholder {
-      color: var(--text-dim);
-      font-size: 20px;
-    }
-    
-    .metric-input-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    /* ============================================
-       BUTTONS
+       BUTTONS - NEON STYLE
        ============================================ */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 12px;
-      padding: 16px 32px;
-      border-radius: var(--radius-lg);
-      font-weight: 600;
-      font-size: 15px;
+      padding: 18px 36px;
+      border-radius: 14px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border: none;
-      text-decoration: none;
       position: relative;
       overflow: hidden;
     }
@@ -1309,145 +980,359 @@ app.get('/', (c) => {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
       opacity: 0;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.3s ease;
     }
     
     .btn:hover::before { opacity: 1; }
     
     .btn-primary {
-      background: var(--gradient-purple);
+      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta));
       color: white;
-      box-shadow: var(--glow-purple), var(--shadow-md);
+      box-shadow: 0 0 40px rgba(147,51,234,0.4);
     }
     
     .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 50px rgba(168, 85, 247, 0.5), var(--shadow-lg);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 60px rgba(147,51,234,0.5);
     }
     
     .btn-secondary {
-      background: var(--glass-bg);
-      color: var(--text-primary);
-      border: 1px solid var(--glass-border);
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(255,255,255,0.1);
+      color: var(--text-white);
     }
     
     .btn-secondary:hover {
-      background: var(--glass-bg-hover);
-      border-color: var(--neon-purple);
-    }
-    
-    .btn-pink {
-      background: var(--gradient-pink);
-      color: white;
-      box-shadow: var(--glow-pink);
+      border-color: var(--neon-violet);
+      box-shadow: 0 0 40px rgba(147,51,234,0.2);
     }
     
     .btn-cyan {
-      background: var(--gradient-cyan);
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
       color: white;
-      box-shadow: var(--glow-cyan);
+      box-shadow: 0 0 40px rgba(0,240,255,0.4);
     }
     
     .btn-add {
       width: 100%;
-      padding: 20px;
-      background: var(--glass-bg);
-      border: 2px dashed var(--glass-border);
-      border-radius: var(--radius-xl);
+      padding: 24px;
+      background: transparent;
+      border: 2px dashed rgba(147,51,234,0.3);
+      border-radius: 16px;
       color: var(--text-muted);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.25s ease;
+      transition: all 0.3s ease;
     }
     
     .btn-add:hover {
-      border-color: var(--neon-purple);
-      color: var(--text-primary);
-      background: rgba(168, 85, 247, 0.05);
+      border-color: var(--neon-violet);
+      color: var(--neon-violet);
+      background: rgba(147,51,234,0.05);
     }
     
     /* ============================================
-       TIMELINE - Premium Design
+       EXPERIENCE ENTRIES
        ============================================ */
-    .timeline {
+    .experience-entry {
+      background: rgba(20,20,40,0.6);
+      border: 1px solid var(--glass-border);
+      border-left: 4px solid var(--neon-violet);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 24px;
       position: relative;
-      padding-left: 48px;
+      transition: all 0.3s ease;
     }
     
-    .timeline::before {
+    .experience-entry:hover {
+      border-color: rgba(147,51,234,0.3);
+      box-shadow: 0 0 40px rgba(147,51,234,0.1);
+    }
+    
+    .experience-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 28px;
+    }
+    
+    .experience-number {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      box-shadow: 0 0 30px rgba(147,51,234,0.4);
+    }
+    
+    .btn-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-icon:hover {
+      background: rgba(255,255,255,0.1);
+      color: var(--text-white);
+    }
+    
+    .btn-icon.danger:hover {
+      background: rgba(255,0,85,0.15);
+      border-color: var(--neon-red);
+      color: var(--neon-red);
+    }
+    
+    /* ============================================
+       METRICS
+       ============================================ */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 28px;
+    }
+    
+    .metric-box {
+      background: rgba(10,10,25,0.8);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .metric-box:hover {
+      border-color: var(--neon-violet);
+      box-shadow: 0 0 30px rgba(147,51,234,0.15);
+    }
+    
+    .metric-box input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      margin-bottom: 8px;
+    }
+    
+    .metric-box input::placeholder {
+      color: var(--text-dim);
+      font-size: 20px;
+    }
+    
+    .metric-label-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      text-align: center;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+    }
+    
+    /* ============================================
+       DAY IN LIFE
+       ============================================ */
+    .day-in-life-section {
+      margin-top: 28px;
+      padding: 24px;
+      background: rgba(0,240,255,0.03);
+      border: 1px solid rgba(0,240,255,0.1);
+      border-radius: 16px;
+    }
+    
+    .day-in-life-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--neon-cyan);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .day-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .day-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--neon-violet);
+      width: 100px;
+      flex-shrink: 0;
+    }
+    
+    .day-input {
+      flex: 1;
+      padding: 12px 16px;
+      background: rgba(10,10,25,0.8);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      color: var(--text-white);
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    
+    .day-input:focus {
+      outline: none;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(0,240,255,0.1);
+    }
+    
+    /* ============================================
+       SKILL TAGS
+       ============================================ */
+    .skills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .skill-tag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, rgba(147,51,234,0.15), rgba(0,240,255,0.1));
+      border: 1px solid rgba(147,51,234,0.3);
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-silver);
+      transition: all 0.3s ease;
+    }
+    
+    .skill-tag:hover {
+      border-color: var(--neon-violet);
+      box-shadow: 0 0 20px rgba(147,51,234,0.2);
+    }
+    
+    .skill-remove {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      transition: color 0.3s ease;
+    }
+    
+    .skill-remove:hover {
+      color: var(--neon-red);
+    }
+    
+    /* ============================================
+       TIMELINE PREVIEW
+       ============================================ */
+    .timeline-preview {
+      position: relative;
+      padding-left: 60px;
+    }
+    
+    .timeline-preview::before {
       content: '';
       position: absolute;
-      left: 14px;
+      left: 20px;
       top: 0;
       bottom: 0;
-      width: 3px;
-      background: linear-gradient(180deg, var(--neon-purple), var(--neon-pink), var(--neon-cyan));
+      width: 4px;
+      background: linear-gradient(180deg, var(--neon-violet), var(--neon-cyan), var(--neon-pink));
       border-radius: 2px;
-      box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+      box-shadow: 0 0 20px rgba(147,51,234,0.5);
     }
     
-    .timeline-entry {
+    .timeline-item {
       position: relative;
-      margin-bottom: 32px;
+      margin-bottom: 40px;
       padding: 28px;
-      background: var(--glass-bg);
+      background: rgba(20,20,40,0.7);
       border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      transition: all 0.25s ease;
+      border-radius: 20px;
+      transition: all 0.3s ease;
     }
     
-    .timeline-entry:hover {
-      border-color: var(--glass-border-hover);
-      box-shadow: var(--glow-subtle);
+    .timeline-item:hover {
+      border-color: rgba(147,51,234,0.3);
+      transform: translateX(8px);
     }
     
-    .timeline-entry::before {
+    .timeline-item::before {
       content: '';
       position: absolute;
-      left: -42px;
+      left: -52px;
       top: 32px;
-      width: 20px;
-      height: 20px;
-      background: var(--gradient-purple);
+      width: 24px;
+      height: 24px;
+      background: var(--neon-violet);
       border-radius: 50%;
-      border: 4px solid var(--bg-primary);
-      box-shadow: var(--glow-purple);
+      border: 4px solid var(--void);
+      box-shadow: 0 0 30px var(--neon-violet);
     }
     
     .timeline-company {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 22px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 24px;
       font-weight: 700;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     
     .timeline-role {
-      color: var(--neon-purple);
+      font-size: 18px;
       font-weight: 600;
-      font-size: 16px;
-      margin-bottom: 10px;
+      color: var(--neon-cyan);
+      margin-bottom: 12px;
     }
     
     .timeline-dates {
       display: inline-block;
-      padding: 6px 16px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 30px;
+      padding: 8px 18px;
+      background: rgba(147,51,234,0.15);
+      border: 1px solid rgba(147,51,234,0.3);
+      border-radius: 50px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 18px;
+      font-size: 13px;
+      color: var(--neon-violet);
+      margin-bottom: 16px;
     }
     
     .timeline-desc {
-      color: var(--text-secondary);
+      color: var(--text-muted);
       line-height: 1.8;
     }
     
-    /* Preview Metrics */
+    /* ============================================
+       PREVIEW METRICS
+       ============================================ */
     .preview-metrics {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -1456,147 +1341,126 @@ app.get('/', (c) => {
     }
     
     .preview-metric {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
+      background: rgba(0,240,255,0.05);
+      border: 1px solid rgba(0,240,255,0.2);
+      border-radius: 14px;
       padding: 20px;
       text-align: center;
-      transition: all 0.25s ease;
+      transition: all 0.3s ease;
     }
     
     .preview-metric:hover {
-      border-color: var(--neon-purple);
-      transform: translateY(-2px);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 30px rgba(0,240,255,0.15);
     }
     
     .preview-metric-value {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Orbitron', sans-serif;
       font-size: 28px;
       font-weight: 700;
-      background: var(--gradient-aurora);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 20px var(--neon-cyan);
     }
     
     .preview-metric-label {
       font-size: 11px;
-      color: var(--text-muted);
       text-transform: uppercase;
-      margin-top: 6px;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-top: 8px;
     }
     
     /* ============================================
-       DAY IN LIFE
+       EMPTY STATE
        ============================================ */
-    .day-in-life {
-      margin-top: 28px;
-      padding: 24px;
-      background: var(--bg-tertiary);
-      border-radius: var(--radius-xl);
-      border: 1px solid var(--glass-border);
+    .empty-state {
+      text-align: center;
+      padding: 100px 40px;
     }
     
-    .day-in-life h4 {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: var(--text-secondary);
+    .empty-icon {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 40px;
+      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta), var(--neon-cyan));
+      border-radius: 35px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
+      font-size: 60px;
+      box-shadow: 0 0 80px rgba(147,51,234,0.4);
+      animation: emptyFloat 4s ease-in-out infinite;
     }
     
-    .day-in-life h4 i {
-      color: var(--neon-gold);
+    @keyframes emptyFloat {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-20px) rotate(2deg); }
     }
     
-    .day-item {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      margin-bottom: 12px;
+    .empty-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff 0%, var(--neon-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     
-    .day-time {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--neon-purple);
-      width: 90px;
-      flex-shrink: 0;
-      font-weight: 500;
-    }
-    
-    .day-input {
-      flex: 1;
-      padding: 12px 16px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
-      color: var(--text-primary);
-      font-size: 14px;
-      transition: all 0.25s ease;
-    }
-    
-    .day-input:focus {
-      outline: none;
-      border-color: var(--neon-purple);
-      box-shadow: var(--glow-subtle);
+    .empty-subtitle {
+      color: var(--text-muted);
+      font-size: 18px;
+      margin-bottom: 40px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     /* ============================================
        RESPONSIVE
        ============================================ */
-    @media (max-width: 1400px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    
     @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .metrics-grid, .preview-metrics { grid-template-columns: repeat(2, 1fr); }
     }
     
     @media (max-width: 768px) {
-      .sidebar { display: none; }
+      .main-container { padding: 20px; }
+      .ultra-header { flex-direction: column; gap: 24px; padding: 24px; }
+      .header-stats { gap: 24px; }
       .stats-grid { grid-template-columns: 1fr; }
       .form-grid { grid-template-columns: 1fr; }
-      .content { padding: 20px; }
+      .nav-tabs { flex-wrap: wrap; }
     }
     
     /* ============================================
        ANIMATIONS
        ============================================ */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
       to { opacity: 1; transform: translateY(0); }
     }
     
-    .fade-in { animation: fadeIn 0.5s ease forwards; }
-    
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease forwards;
     }
     
-    .slide-in { animation: slideIn 0.4s ease forwards; }
-    
-    /* Success state */
-    .success-flash {
-      animation: successPulse 0.5s ease;
+    @keyframes glowPulse {
+      0%, 100% { filter: drop-shadow(0 0 20px currentColor); }
+      50% { filter: drop-shadow(0 0 40px currentColor); }
     }
     
-    @keyframes successPulse {
-      0%, 100% { box-shadow: var(--shadow-md); }
-      50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.5); }
+    .glow-pulse {
+      animation: glowPulse 2s ease-in-out infinite;
     }
   </style>
 </head>
 <body>
-  <!-- Animated Background -->
-  <div class="cosmic-bg">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="grid-overlay"></div>
+  <!-- Cyber Background -->
+  <div class="cyber-bg">
+    <div class="cyber-grid"></div>
+    <div class="scanlines"></div>
+    ${[...Array(15)].map((_, i) => `<div class="particle" style="left: ${Math.random() * 100}%; animation-delay: ${Math.random() * 15}s;"></div>`).join('')}
   </div>
   
   <div id="root"></div>
@@ -1604,267 +1468,203 @@ app.get('/', (c) => {
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
     
-    // ============================================
-    // REAL RESUME PARSER (Client-side extraction)
-    // ============================================
+    // Resume Parser
     const ResumeParser = {
       async parsePDF(file) {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        let fullText = '';
+        let text = '';
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          const pageText = textContent.items.map(item => item.str).join(' ');
-          fullText += pageText + '\\n';
+          const content = await page.getTextContent();
+          text += content.items.map(item => item.str).join(' ') + '\\n';
         }
-        return fullText;
+        return text;
       },
-      
       async parseDOCX(file) {
         const arrayBuffer = await file.arrayBuffer();
         const result = await mammoth.extractRawText({ arrayBuffer });
         return result.value;
       },
-      
       async parseTXT(file) {
         return await file.text();
       }
     };
     
-    // ============================================
-    // VIEWS
-    // ============================================
-    const VIEWS = {
-      DASHBOARD: 'dashboard',
-      UPLOAD: 'upload',
-      BUILDER: 'builder',
-      PREVIEW: 'preview'
-    };
+    // Views
+    const VIEWS = { UPLOAD: 'upload', BUILDER: 'builder', PREVIEW: 'preview' };
     
-    // ============================================
-    // MAIN APP
-    // ============================================
+    // Main App
     const App = () => {
-      const [view, setView] = useState(VIEWS.DASHBOARD);
+      const [view, setView] = useState(VIEWS.UPLOAD);
       const [profile, setProfile] = useState(null);
-      const [isProcessing, setIsProcessing] = useState(false);
+      const [processing, setProcessing] = useState(false);
       const [progress, setProgress] = useState(0);
-      const [progressSteps, setProgressSteps] = useState([
-        { label: 'Reading document...', status: 'pending' },
-        { label: 'Extracting text content...', status: 'pending' },
-        { label: 'AI analyzing resume structure...', status: 'pending' },
-        { label: 'Identifying work experiences...', status: 'pending' },
-        { label: 'Generating day-in-life insights...', status: 'pending' },
-        { label: 'Building your profile...', status: 'pending' }
-      ]);
-      const [activeSection, setActiveSection] = useState('basics');
+      const [activeTab, setActiveTab] = useState('basics');
       const [rawText, setRawText] = useState('');
+      const [steps, setSteps] = useState([
+        { label: 'Reading document', status: 'pending' },
+        { label: 'Extracting text content', status: 'pending' },
+        { label: 'AI analyzing structure', status: 'pending' },
+        { label: 'Identifying experiences', status: 'pending' },
+        { label: 'Generating insights', status: 'pending' },
+        { label: 'Building profile', status: 'pending' }
+      ]);
       
-      // REAL file upload handler with AI parsing
-      const handleFileUpload = async (file) => {
-        setIsProcessing(true);
+      const handleUpload = async (file) => {
+        setProcessing(true);
         setProgress(0);
-        setView(VIEWS.UPLOAD);
-        
-        const steps = [...progressSteps];
+        const s = [...steps];
         
         try {
-          // Step 1: Reading file
-          steps[0].status = 'active';
-          setProgressSteps([...steps]);
+          // Step 1: Read file
+          s[0].status = 'active';
+          setSteps([...s]);
           await new Promise(r => setTimeout(r, 400));
           
+          const ext = file.name.split('.').pop().toLowerCase();
           let text = '';
-          const fileType = file.name.split('.').pop().toLowerCase();
           
-          // Step 2: Extract text based on file type
-          steps[0].status = 'complete';
-          steps[1].status = 'active';
-          setProgressSteps([...steps]);
+          // Step 2: Extract text
+          s[0].status = 'complete';
+          s[1].status = 'active';
+          setSteps([...s]);
           setProgress(15);
           
-          if (fileType === 'pdf') {
-            text = await ResumeParser.parsePDF(file);
-          } else if (fileType === 'docx' || fileType === 'doc') {
-            text = await ResumeParser.parseDOCX(file);
-          } else {
-            text = await ResumeParser.parseTXT(file);
-          }
+          if (ext === 'pdf') text = await ResumeParser.parsePDF(file);
+          else if (ext === 'docx' || ext === 'doc') text = await ResumeParser.parseDOCX(file);
+          else text = await ResumeParser.parseTXT(file);
           
           setRawText(text);
-          console.log('Extracted text:', text.substring(0, 1000));
+          console.log('Extracted text:', text);
           
           // Step 3: AI Analysis
-          steps[1].status = 'complete';
-          steps[2].status = 'active';
-          setProgressSteps([...steps]);
+          s[1].status = 'complete';
+          s[2].status = 'active';
+          setSteps([...s]);
           setProgress(30);
           
-          // Call Gemini AI for intelligent parsing
-          let aiParsed = null;
+          let aiData = null;
           try {
-            const response = await fetch('/api/parse-resume', {
+            const res = await fetch('/api/parse-resume', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ text })
             });
             
-            if (response.ok) {
-              aiParsed = await response.json();
-              console.log('AI Parsed data:', aiParsed);
+            if (res.ok) {
+              aiData = await res.json();
+              console.log('AI parsed:', aiData);
+            } else {
+              const err = await res.json();
+              console.error('AI error:', err);
             }
-          } catch (aiError) {
-            console.warn('AI parsing failed, using fallback:', aiError);
+          } catch (e) {
+            console.error('AI request failed:', e);
           }
           
-          // Step 4: Identifying experiences
-          steps[2].status = 'complete';
-          steps[3].status = 'active';
-          setProgressSteps([...steps]);
-          setProgress(55);
+          // Step 4-6: Process
+          s[2].status = 'complete';
+          s[3].status = 'active';
+          setSteps([...s]);
+          setProgress(50);
           await new Promise(r => setTimeout(r, 400));
           
-          // Step 5: Generating insights
-          steps[3].status = 'complete';
-          steps[4].status = 'active';
-          setProgressSteps([...steps]);
-          setProgress(75);
+          s[3].status = 'complete';
+          s[4].status = 'active';
+          setSteps([...s]);
+          setProgress(70);
           await new Promise(r => setTimeout(r, 400));
           
-          // Step 6: Building profile
-          steps[4].status = 'complete';
-          steps[5].status = 'active';
-          setProgressSteps([...steps]);
+          s[4].status = 'complete';
+          s[5].status = 'active';
+          setSteps([...s]);
           setProgress(90);
           
-          // Build final profile from AI response or fallback
-          let finalProfile;
+          // Build profile
+          const finalProfile = buildProfile(aiData, text);
           
-          if (aiParsed && !aiParsed.error) {
-            // Transform AI response to our format
-            finalProfile = {
-              basics: {
-                name: aiParsed.basics?.name || '',
-                title: aiParsed.basics?.title || '',
-                tagline: aiParsed.basics?.tagline || '',
-                email: aiParsed.basics?.email || '',
-                phone: aiParsed.basics?.phone || '',
-                location: aiParsed.basics?.location || '',
-                linkedin: aiParsed.basics?.linkedin || '',
-                website: aiParsed.basics?.website || ''
-              },
-              experience: (aiParsed.experience || []).map((exp, i) => ({
-                id: Date.now() + i,
-                company: exp.company || '',
-                role: exp.role || '',
-                startDate: exp.startDate || '',
-                endDate: exp.endDate || '',
-                description: exp.description || '',
-                tasks: exp.tasks || '',
-                dayInLife: exp.dayInLife || [
-                  { time: '9:00 AM', activity: '' },
-                  { time: '11:00 AM', activity: '' },
-                  { time: '1:00 PM', activity: '' },
-                  { time: '3:00 PM', activity: '' },
-                  { time: '5:00 PM', activity: '' }
-                ],
-                metrics: exp.metrics || [
-                  { value: '', label: 'Impact' },
-                  { value: '', label: 'Growth' },
-                  { value: '', label: 'Efficiency' },
-                  { value: '', label: 'Team' }
-                ],
-                toxicity: 5
-              })),
-              skills: aiParsed.skills || [],
-              education: aiParsed.education || [],
-              achievements: (aiParsed.achievements || []).map((a, i) => ({
-                id: Date.now() + i + 1000,
-                title: a.title || '',
-                description: a.description || ''
-              })),
-              certifications: aiParsed.certifications || [],
-              awards: [],
-              reviews: [],
-              payHistory: [],
-              projects: [],
-              photos: [],
-              videos: []
-            };
-          } else {
-            // Fallback to basic parsing
-            finalProfile = fallbackParse(text);
-          }
-          
-          steps[5].status = 'complete';
-          setProgressSteps([...steps]);
+          s[5].status = 'complete';
+          setSteps([...s]);
           setProgress(100);
           
           await new Promise(r => setTimeout(r, 500));
           
           setProfile(finalProfile);
-          setIsProcessing(false);
+          setProcessing(false);
           setView(VIEWS.BUILDER);
           
-        } catch (error) {
-          console.error('Error parsing resume:', error);
-          alert('Error parsing resume: ' + error.message);
-          setIsProcessing(false);
-          setView(VIEWS.DASHBOARD);
+        } catch (err) {
+          console.error('Error:', err);
+          alert('Error: ' + err.message);
+          setProcessing(false);
         }
       };
       
-      // Fallback parser when AI fails
-      const fallbackParse = (text) => {
-        const lines = text.split('\\n').map(l => l.trim()).filter(l => l);
-        
-        // Extract email
-        const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/);
-        const email = emailMatch ? emailMatch[0] : '';
-        
-        // Extract phone
-        const phoneMatch = text.match(/(?:\\+?1[-.]?)?\\(?\\d{3}\\)?[-.]?\\d{3}[-.]?\\d{4}/);
-        const phone = phoneMatch ? phoneMatch[0] : '';
-        
-        // Extract name (first substantial line)
-        let name = '';
-        for (const line of lines.slice(0, 5)) {
-          if (line.length > 2 && line.length < 50 && !line.includes('@')) {
-            name = line;
-            break;
-          }
+      const buildProfile = (ai, text) => {
+        if (ai && !ai.error && ai.basics) {
+          return {
+            basics: {
+              name: ai.basics?.name || '',
+              title: ai.basics?.title || '',
+              tagline: ai.basics?.tagline || '',
+              email: ai.basics?.email || '',
+              phone: ai.basics?.phone || '',
+              location: ai.basics?.location || '',
+              linkedin: ai.basics?.linkedin || '',
+              website: ai.basics?.website || ''
+            },
+            experience: (ai.experience || []).map((e, i) => ({
+              id: Date.now() + i,
+              company: e.company || '',
+              role: e.role || '',
+              startDate: e.startDate || '',
+              endDate: e.endDate || '',
+              description: e.description || '',
+              tasks: e.tasks || '',
+              dayInLife: e.dayInLife || [
+                { time: '9:00 AM', activity: '' },
+                { time: '11:00 AM', activity: '' },
+                { time: '1:00 PM', activity: '' },
+                { time: '3:00 PM', activity: '' },
+                { time: '5:00 PM', activity: '' }
+              ],
+              metrics: e.metrics || [
+                { value: '', label: '' },
+                { value: '', label: '' },
+                { value: '', label: '' },
+                { value: '', label: '' }
+              ],
+              toxicity: 5
+            })),
+            skills: ai.skills || [],
+            education: ai.education || [],
+            achievements: (ai.achievements || []).map((a, i) => ({
+              id: Date.now() + i + 1000,
+              title: a.title || '',
+              description: a.description || ''
+            })),
+            awards: [],
+            reviews: [],
+            payHistory: [],
+            projects: [],
+            photos: [],
+            videos: []
+          };
         }
         
+        // Fallback parsing
+        const emailMatch = text.match(/[\\w.-]+@[\\w.-]+\\.\\w+/);
+        const phoneMatch = text.match(/[\\+]?[(]?[0-9]{3}[)]?[-\\s.]?[0-9]{3}[-\\s.]?[0-9]{4}/);
+        const lines = text.split('\\n').filter(l => l.trim());
+        const name = lines[0]?.trim() || '';
+        
         return {
-          basics: { name, title: '', tagline: '', email, phone, location: '', linkedin: '', website: '' },
-          experience: [{
-            id: Date.now(),
-            company: 'Your Company',
-            role: 'Your Role',
-            startDate: '',
-            endDate: 'Present',
-            description: 'Add your job description...',
-            tasks: '',
-            dayInLife: [
-              { time: '9:00 AM', activity: '' },
-              { time: '11:00 AM', activity: '' },
-              { time: '1:00 PM', activity: '' },
-              { time: '3:00 PM', activity: '' },
-              { time: '5:00 PM', activity: '' }
-            ],
-            metrics: [
-              { value: '', label: 'Impact' },
-              { value: '', label: 'Growth' },
-              { value: '', label: 'Efficiency' },
-              { value: '', label: 'Team' }
-            ],
-            toxicity: 5
-          }],
+          basics: { name, title: '', tagline: '', email: emailMatch?.[0] || '', phone: phoneMatch?.[0] || '', location: '', linkedin: '', website: '' },
+          experience: [],
           skills: [],
           education: [],
           achievements: [],
-          certifications: [],
           awards: [],
           reviews: [],
           payHistory: [],
@@ -1875,294 +1675,107 @@ app.get('/', (c) => {
       };
       
       return (
-        <div className="app">
-          <Sidebar 
-            view={view} 
-            setView={setView} 
-            profile={profile}
-            activeSection={activeSection}
-            setActiveSection={setActiveSection}
-          />
+        <div className="main-container">
+          <Header profile={profile} view={view} />
           
-          <div className="main">
-            <Header view={view} profile={profile} />
-            
-            <div className="content">
-              {view === VIEWS.DASHBOARD && (
-                <Dashboard setView={setView} profile={profile} />
-              )}
-              
-              {view === VIEWS.UPLOAD && (
-                <UploadView 
-                  onUpload={handleFileUpload}
-                  isProcessing={isProcessing}
-                  progress={progress}
-                  progressSteps={progressSteps}
-                />
-              )}
-              
-              {view === VIEWS.BUILDER && profile && (
-                <BuilderView 
-                  profile={profile}
-                  setProfile={setProfile}
-                  activeSection={activeSection}
-                  rawText={rawText}
-                />
-              )}
-              
-              {view === VIEWS.PREVIEW && profile && (
-                <PreviewView profile={profile} setView={setView} />
-              )}
-            </div>
-          </div>
-        </div>
-      );
-    };
-    
-    // ============================================
-    // SIDEBAR
-    // ============================================
-    const Sidebar = ({ view, setView, profile, activeSection, setActiveSection }) => {
-      const mainNav = [
-        { id: VIEWS.DASHBOARD, icon: 'fa-th-large', label: 'Dashboard' },
-        { id: VIEWS.UPLOAD, icon: 'fa-cloud-upload-alt', label: 'Upload Resume' }
-      ];
-      
-      const builderNav = [
-        { id: 'basics', icon: 'fa-user', label: 'Basic Info' },
-        { id: 'experience', icon: 'fa-briefcase', label: 'Experience' },
-        { id: 'skills', icon: 'fa-code', label: 'Skills' },
-        { id: 'achievements', icon: 'fa-trophy', label: 'Achievements' },
-        { id: 'awards', icon: 'fa-award', label: 'Awards' },
-        { id: 'reviews', icon: 'fa-star', label: 'Reviews' },
-        { id: 'pay', icon: 'fa-dollar-sign', label: 'Pay History' },
-        { id: 'projects', icon: 'fa-project-diagram', label: 'Projects' },
-        { id: 'media', icon: 'fa-image', label: 'Media' }
-      ];
-      
-      return (
-        <aside className="sidebar">
-          <div className="logo">
-            <div className="logo-icon">⚡</div>
-            <span className="logo-text">Webume</span>
-          </div>
-          
-          <nav className="nav-section">
-            <div className="nav-label">Main Menu</div>
-            <div className="nav-items">
-              {mainNav.map(item => (
-                <button
-                  key={item.id}
-                  className={"nav-item" + (view === item.id ? " active" : "")}
-                  onClick={() => setView(item.id)}
-                >
-                  <i className={"fas " + item.icon}></i>
-                  <span>{item.label}</span>
-                </button>
-              ))}
-            </div>
-          </nav>
-          
-          {profile && (
-            <nav className="nav-section">
-              <div className="nav-label">Profile Builder</div>
-              <div className="nav-items">
-                {builderNav.map(item => (
-                  <button
-                    key={item.id}
-                    className={"nav-item" + (view === VIEWS.BUILDER && activeSection === item.id ? " active" : "")}
-                    onClick={() => { setView(VIEWS.BUILDER); setActiveSection(item.id); }}
-                  >
-                    <i className={"fas " + item.icon}></i>
-                    <span>{item.label}</span>
-                  </button>
-                ))}
-                <button
-                  className={"nav-item" + (view === VIEWS.PREVIEW ? " active" : "")}
-                  onClick={() => setView(VIEWS.PREVIEW)}
-                >
-                  <i className="fas fa-eye"></i>
-                  <span>Preview</span>
-                  <span className="nav-badge">Live</span>
-                </button>
-              </div>
-            </nav>
+          {view === VIEWS.UPLOAD && (
+            <UploadView 
+              onUpload={handleUpload}
+              processing={processing}
+              progress={progress}
+              steps={steps}
+            />
           )}
           
-          {profile && (
-            <div className="sidebar-profile">
-              <div className="sidebar-avatar">
-                {profile.basics.name ? profile.basics.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?'}
-              </div>
-              <div className="sidebar-info">
-                <div className="sidebar-name">{profile.basics.name || 'Your Name'}</div>
-                <div className="sidebar-role">{profile.basics.title || 'Your Title'}</div>
-              </div>
-            </div>
+          {view === VIEWS.BUILDER && profile && (
+            <BuilderView
+              profile={profile}
+              setProfile={setProfile}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              rawText={rawText}
+              setView={setView}
+            />
           )}
-        </aside>
-      );
-    };
-    
-    // ============================================
-    // HEADER
-    // ============================================
-    const Header = ({ view, profile }) => {
-      const titles = {
-        [VIEWS.DASHBOARD]: 'Dashboard',
-        [VIEWS.UPLOAD]: 'Upload Resume',
-        [VIEWS.BUILDER]: 'Profile Builder',
-        [VIEWS.PREVIEW]: 'Live Preview'
-      };
-      
-      return (
-        <header className="header">
-          <h1 className="header-title">{titles[view]}</h1>
           
-          <div className="header-actions">
-            <div className="header-search">
-              <i className="fas fa-search"></i>
-              <input type="text" placeholder="Search..." />
-            </div>
-            <button className="header-btn">
-              <i className="fas fa-bell"></i>
-              <span className="badge">3</span>
-            </button>
-            <button className="header-btn">
-              <i className="fas fa-cog"></i>
-            </button>
-          </div>
-        </header>
-      );
-    };
-    
-    // ============================================
-    // DASHBOARD
-    // ============================================
-    const Dashboard = ({ setView, profile }) => {
-      const stats = [
-        { icon: 'fa-briefcase', value: profile?.experience?.length || 0, label: 'Experiences', change: '+2', up: true, color: 'purple' },
-        { icon: 'fa-trophy', value: profile?.achievements?.length || 0, label: 'Achievements', change: '+5', up: true, color: 'pink' },
-        { icon: 'fa-code', value: profile?.skills?.length || 0, label: 'Skills', change: '+8', up: true, color: 'cyan' },
-        { icon: 'fa-chart-line', value: '94%', label: 'Profile Score', change: '+12%', up: true, color: 'gold' }
-      ];
-      
-      return (
-        <div className="fade-in">
-          <div className="stats-grid">
-            {stats.map((stat, i) => (
-              <div key={i} className={"stat-card " + stat.color}>
-                <div className="stat-icon">
-                  <i className={"fas " + stat.icon}></i>
-                </div>
-                <div className="stat-value">{stat.value}</div>
-                <div className="stat-label">{stat.label}</div>
-                <div className={"stat-change " + (stat.up ? "up" : "down")}>
-                  <i className={"fas fa-arrow-" + (stat.up ? "up" : "down")}></i>
-                  {stat.change}
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="card">
-            <div className="card-header">
-              <h2 className="card-title">
-                <i className="fas fa-rocket"></i>
-                Quick Actions
-              </h2>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-              <button className="btn btn-primary" onClick={() => setView(VIEWS.UPLOAD)}>
-                <i className="fas fa-upload"></i>
-                Upload Resume
-              </button>
-              {profile && (
-                <>
-                  <button className="btn btn-secondary" onClick={() => setView(VIEWS.BUILDER)}>
-                    <i className="fas fa-edit"></i>
-                    Edit Profile
-                  </button>
-                  <button className="btn btn-cyan" onClick={() => setView(VIEWS.PREVIEW)}>
-                    <i className="fas fa-eye"></i>
-                    Preview
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-          
-          {!profile && (
-            <div className="card" style={{ marginTop: '32px', textAlign: 'center', padding: '80px' }}>
-              <div style={{ 
-                width: '100px', 
-                height: '100px', 
-                margin: '0 auto 28px',
-                background: 'var(--gradient-aurora)',
-                borderRadius: '28px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '40px',
-                boxShadow: 'var(--glow-purple)'
-              }}>📄</div>
-              <h3 style={{ fontFamily: 'Space Grotesk', fontSize: '28px', marginBottom: '12px' }}>No Resume Uploaded</h3>
-              <p style={{ color: 'var(--text-muted)', marginBottom: '32px', fontSize: '16px', maxWidth: '400px', margin: '0 auto 32px' }}>
-                Upload your resume to get started. Our AI will extract all your information and build your profile automatically.
-              </p>
-              <button className="btn btn-primary" onClick={() => setView(VIEWS.UPLOAD)}>
-                <i className="fas fa-upload"></i>
-                Upload Your Resume
-              </button>
-            </div>
+          {view === VIEWS.PREVIEW && profile && (
+            <PreviewView profile={profile} setView={setView} />
           )}
         </div>
       );
     };
     
-    // ============================================
-    // UPLOAD VIEW
-    // ============================================
-    const UploadView = ({ onUpload, isProcessing, progress, progressSteps }) => {
-      const [isDragOver, setIsDragOver] = useState(false);
-      const fileInputRef = useRef(null);
+    // Header
+    const Header = ({ profile, view }) => (
+      <header className="ultra-header fade-in-up">
+        <div className="logo-section">
+          <div className="logo-icon">⚡</div>
+          <div>
+            <div className="logo-text">WEBUME</div>
+            <div className="tagline">The Future of Professional Profiles</div>
+          </div>
+        </div>
+        
+        <div className="header-stats">
+          <div className="header-stat">
+            <div className="header-stat-value">{profile?.experience?.length || 0}</div>
+            <div className="header-stat-label">Experiences</div>
+          </div>
+          <div className="header-stat">
+            <div className="header-stat-value">{profile?.skills?.length || 0}</div>
+            <div className="header-stat-label">Skills</div>
+          </div>
+          <div className="header-stat">
+            <div className="header-stat-value">{profile?.achievements?.length || 0}</div>
+            <div className="header-stat-label">Achievements</div>
+          </div>
+        </div>
+      </header>
+    );
+    
+    // Upload View
+    const UploadView = ({ onUpload, processing, progress, steps }) => {
+      const [dragOver, setDragOver] = useState(false);
+      const inputRef = useRef(null);
       
       const handleDrop = (e) => {
         e.preventDefault();
-        setIsDragOver(false);
-        const file = e.dataTransfer.files[0];
-        if (file) onUpload(file);
+        setDragOver(false);
+        if (e.dataTransfer.files[0]) onUpload(e.dataTransfer.files[0]);
       };
       
-      const handleChange = (e) => {
-        const file = e.target.files[0];
-        if (file) onUpload(file);
-      };
-      
-      if (isProcessing) {
+      if (processing) {
         return (
-          <div className="card fade-in">
-            <div className="progress-container">
-              <div className="progress-header">
-                <div className="progress-title">
-                  <div className="progress-spinner"></div>
-                  <span>Analyzing Your Resume</span>
-                  <div className="ai-indicator">
-                    <div className="ai-dot"></div>
-                    Gemini AI
-                  </div>
-                </div>
-                <span className="progress-percent">{Math.round(progress)}%</span>
+          <div className="neon-card fade-in-up">
+            <div className="card-glow purple"></div>
+            <div className="card-glow cyan"></div>
+            
+            <div className="ai-processing">
+              <div className="ai-brain">
+                <div className="ai-brain-core"></div>
+                <div className="ai-ring"></div>
+                <div className="ai-ring"></div>
+                <div className="ai-ring"></div>
               </div>
               
-              <div className="progress-bar">
-                <div className="progress-fill" style={{ width: progress + '%' }}></div>
+              <div className="ai-badge">
+                <div className="ai-dot"></div>
+                GEMINI AI PROCESSING
+              </div>
+              
+              <div className="ai-title">Analyzing Your Resume</div>
+              
+              <div className="progress-percent">{Math.round(progress)}%</div>
+              
+              <div className="progress-bar-container">
+                <div className="progress-bar-bg">
+                  <div className="progress-bar-fill" style={{ width: progress + '%' }}></div>
+                </div>
               </div>
               
               <div className="progress-steps">
-                {progressSteps.map((step, i) => (
-                  <div key={i} className={"progress-step " + step.status}>
+                {steps.map((step, i) => (
+                  <div key={i} className={'progress-step ' + step.status}>
                     <i className={
                       step.status === 'complete' ? 'fas fa-check-circle' :
                       step.status === 'active' ? 'fas fa-circle-notch fa-spin' :
@@ -2178,578 +1791,265 @@ app.get('/', (c) => {
       }
       
       return (
-        <div className="card fade-in">
-          <div className="card-header">
-            <h2 className="card-title">
-              <i className="fas fa-file-upload"></i>
-              Upload Your Resume
-            </h2>
-            <div className="ai-indicator">
-              <div className="ai-dot"></div>
-              AI-Powered
-            </div>
-          </div>
+        <div className="neon-card fade-in-up">
+          <div className="card-glow purple"></div>
+          <div className="card-glow cyan"></div>
           
-          <div 
-            className={"upload-zone" + (isDragOver ? " drag-over" : "")}
-            onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
-            onDragLeave={() => setIsDragOver(false)}
+          <div
+            className={'upload-zone' + (dragOver ? ' drag-over' : '')}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
             onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => inputRef.current?.click()}
           >
-            <input 
+            <input
               type="file"
-              ref={fileInputRef}
-              onChange={handleChange}
+              ref={inputRef}
+              onChange={(e) => e.target.files[0] && onUpload(e.target.files[0])}
               accept=".pdf,.docx,.doc,.txt"
               style={{ display: 'none' }}
             />
             
-            <div className="upload-icon">
+            <div className="upload-icon-container">
               <i className="fas fa-cloud-upload-alt"></i>
             </div>
             
-            <h3 className="upload-title">Drop your resume here</h3>
-            <p className="upload-desc">or click to browse files</p>
+            <h2 className="upload-title">DROP YOUR RESUME</h2>
+            <p className="upload-subtitle">Powered by Gemini AI • Instant extraction</p>
             
             <div className="upload-formats">
-              <span className="format-tag"><i className="fas fa-file-pdf"></i> PDF</span>
-              <span className="format-tag"><i className="fas fa-file-word"></i> DOCX</span>
-              <span className="format-tag"><i className="fas fa-file-alt"></i> TXT</span>
+              <span className="format-chip"><i className="fas fa-file-pdf"></i> PDF</span>
+              <span className="format-chip"><i className="fas fa-file-word"></i> DOCX</span>
+              <span className="format-chip"><i className="fas fa-file-alt"></i> TXT</span>
+            </div>
+          </div>
+        </div>
+      );
+    };
+    
+    // Builder View
+    const BuilderView = ({ profile, setProfile, activeTab, setActiveTab, rawText, setView }) => {
+      const tabs = [
+        { id: 'basics', icon: 'fa-user', label: 'Basic Info' },
+        { id: 'experience', icon: 'fa-briefcase', label: 'Experience' },
+        { id: 'skills', icon: 'fa-code', label: 'Skills' },
+        { id: 'achievements', icon: 'fa-trophy', label: 'Achievements' },
+        { id: 'awards', icon: 'fa-award', label: 'Awards' },
+        { id: 'reviews', icon: 'fa-star', label: 'Reviews' },
+        { id: 'pay', icon: 'fa-dollar-sign', label: 'Pay History' },
+        { id: 'projects', icon: 'fa-project-diagram', label: 'Projects' },
+        { id: 'media', icon: 'fa-image', label: 'Media' }
+      ];
+      
+      const update = (key, value) => setProfile(p => ({ ...p, [key]: value }));
+      const updateBasics = (field, value) => setProfile(p => ({ ...p, basics: { ...p.basics, [field]: value } }));
+      
+      return (
+        <div className="fade-in-up">
+          {/* Stats */}
+          <div className="stats-grid">
+            <div className="stat-card violet">
+              <div className="stat-icon"><i className="fas fa-briefcase"></i></div>
+              <div className="stat-value">{profile.experience.length}</div>
+              <div className="stat-label">Experiences</div>
+            </div>
+            <div className="stat-card cyan">
+              <div className="stat-icon"><i className="fas fa-code"></i></div>
+              <div className="stat-value">{profile.skills.length}</div>
+              <div className="stat-label">Skills</div>
+            </div>
+            <div className="stat-card pink">
+              <div className="stat-icon"><i className="fas fa-trophy"></i></div>
+              <div className="stat-value">{profile.achievements.length}</div>
+              <div className="stat-label">Achievements</div>
+            </div>
+            <div className="stat-card green">
+              <div className="stat-icon"><i className="fas fa-check-double"></i></div>
+              <div className="stat-value">94%</div>
+              <div className="stat-label">Complete</div>
             </div>
           </div>
           
-          <div style={{ marginTop: '28px', padding: '20px', background: 'var(--glass-bg)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--glass-border)' }}>
-            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <i className="fas fa-shield-alt" style={{ color: 'var(--neon-cyan)' }}></i>
-              <span><strong>AI-Powered Extraction:</strong> Gemini AI analyzes your resume and extracts all information including experiences, skills, and achievements automatically.</span>
-            </p>
+          {/* Nav Tabs */}
+          <div className="nav-tabs">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                className={'nav-tab' + (activeTab === tab.id ? ' active' : '')}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <i className={'fas ' + tab.icon}></i>
+                {tab.label}
+              </button>
+            ))}
+            <button className="nav-tab" onClick={() => setView(VIEWS.PREVIEW)}>
+              <i className="fas fa-eye"></i>
+              Preview
+            </button>
+          </div>
+          
+          {/* Content */}
+          <div className="neon-card">
+            <div className="card-glow purple"></div>
+            
+            {activeTab === 'basics' && <BasicsEditor profile={profile} updateBasics={updateBasics} rawText={rawText} />}
+            {activeTab === 'experience' && <ExperienceEditor experience={profile.experience} setExperience={(e) => update('experience', e)} />}
+            {activeTab === 'skills' && <SkillsEditor skills={profile.skills} setSkills={(s) => update('skills', s)} />}
+            {activeTab === 'achievements' && <ListEditor title="Achievements" icon="fa-trophy" items={profile.achievements} setItems={(i) => update('achievements', i)} fields={[{key:'title',label:'Title',placeholder:'Achievement title'},{key:'description',label:'Description',placeholder:'Details',type:'textarea'}]} />}
+            {activeTab === 'awards' && <ListEditor title="Awards" icon="fa-award" items={profile.awards} setItems={(i) => update('awards', i)} fields={[{key:'title',label:'Award',placeholder:'Award name'},{key:'org',label:'Organization',placeholder:'Issuing org'},{key:'year',label:'Year',placeholder:'2024'}]} />}
+            {activeTab === 'reviews' && <ListEditor title="Reviews" icon="fa-star" items={profile.reviews} setItems={(i) => update('reviews', i)} fields={[{key:'quote',label:'Quote',placeholder:'What they said',type:'textarea'},{key:'author',label:'Author',placeholder:'Name'},{key:'role',label:'Role',placeholder:'Title at Company'}]} />}
+            {activeTab === 'pay' && <ListEditor title="Pay History" icon="fa-dollar-sign" items={profile.payHistory} setItems={(i) => update('payHistory', i)} fields={[{key:'year',label:'Year',placeholder:'2024'},{key:'base',label:'Base',placeholder:'$150,000'},{key:'bonus',label:'Bonus',placeholder:'$30,000'},{key:'equity',label:'Equity',placeholder:'$50,000'}]} />}
+            {activeTab === 'projects' && <ListEditor title="Projects" icon="fa-project-diagram" items={profile.projects} setItems={(i) => update('projects', i)} fields={[{key:'name',label:'Name',placeholder:'Project name'},{key:'description',label:'Description',placeholder:'What you built',type:'textarea'},{key:'url',label:'URL',placeholder:'https://...'},{key:'tech',label:'Tech',placeholder:'React, Node, etc'}]} />}
+            {activeTab === 'media' && <MediaEditor photos={profile.photos} videos={profile.videos} setPhotos={(p) => update('photos', p)} setVideos={(v) => update('videos', v)} />}
           </div>
         </div>
       );
     };
     
-    // ============================================
-    // BUILDER VIEW
-    // ============================================
-    const BuilderView = ({ profile, setProfile, activeSection, rawText }) => {
-      const updateBasics = (field, value) => {
-        setProfile(prev => ({
-          ...prev,
-          basics: { ...prev.basics, [field]: value }
-        }));
-      };
-      
-      const updateExperience = (experiences) => {
-        setProfile(prev => ({ ...prev, experience: experiences }));
-      };
-      
-      const updateList = (key, items) => {
-        setProfile(prev => ({ ...prev, [key]: items }));
-      };
-      
-      return (
-        <div className="fade-in">
-          {activeSection === 'basics' && (
-            <BasicsEditor profile={profile} updateBasics={updateBasics} rawText={rawText} />
-          )}
-          
-          {activeSection === 'experience' && (
-            <ExperienceEditor 
-              experience={profile.experience}
-              setExperience={updateExperience}
-            />
-          )}
-          
-          {activeSection === 'skills' && (
-            <SkillsEditor
-              skills={profile.skills}
-              setSkills={(skills) => updateList('skills', skills)}
-            />
-          )}
-          
-          {activeSection === 'achievements' && (
-            <ListEditor
-              title="Achievements"
-              icon="fa-trophy"
-              items={profile.achievements}
-              setItems={(items) => updateList('achievements', items)}
-              fields={[
-                { key: 'title', label: 'Title', placeholder: 'Achievement title' },
-                { key: 'description', label: 'Description', placeholder: 'Describe the achievement', type: 'textarea' }
-              ]}
-            />
-          )}
-          
-          {activeSection === 'awards' && (
-            <ListEditor
-              title="Awards"
-              icon="fa-award"
-              items={profile.awards}
-              setItems={(items) => updateList('awards', items)}
-              fields={[
-                { key: 'title', label: 'Award Name', placeholder: 'Award title' },
-                { key: 'org', label: 'Organization', placeholder: 'Awarding organization' },
-                { key: 'year', label: 'Year', placeholder: '2024' }
-              ]}
-            />
-          )}
-          
-          {activeSection === 'reviews' && (
-            <ListEditor
-              title="Reviews & Testimonials"
-              icon="fa-star"
-              items={profile.reviews}
-              setItems={(items) => updateList('reviews', items)}
-              fields={[
-                { key: 'quote', label: 'Quote', placeholder: 'What they said about you', type: 'textarea' },
-                { key: 'author', label: 'Author', placeholder: 'Person name' },
-                { key: 'role', label: 'Role/Company', placeholder: 'CEO at Company' }
-              ]}
-            />
-          )}
-          
-          {activeSection === 'pay' && (
-            <ListEditor
-              title="Pay History"
-              icon="fa-dollar-sign"
-              items={profile.payHistory}
-              setItems={(items) => updateList('payHistory', items)}
-              fields={[
-                { key: 'year', label: 'Year', placeholder: '2024' },
-                { key: 'base', label: 'Base Salary', placeholder: '$150,000' },
-                { key: 'bonus', label: 'Bonus', placeholder: '$30,000' },
-                { key: 'equity', label: 'Equity', placeholder: '$50,000' }
-              ]}
-            />
-          )}
-          
-          {activeSection === 'projects' && (
-            <ListEditor
-              title="Projects"
-              icon="fa-project-diagram"
-              items={profile.projects}
-              setItems={(items) => updateList('projects', items)}
-              fields={[
-                { key: 'name', label: 'Project Name', placeholder: 'Project title' },
-                { key: 'description', label: 'Description', placeholder: 'What you built', type: 'textarea' },
-                { key: 'url', label: 'URL', placeholder: 'https://...' },
-                { key: 'tech', label: 'Technologies', placeholder: 'React, Node.js, etc.' }
-              ]}
-            />
-          )}
-          
-          {activeSection === 'media' && (
-            <MediaEditor 
-              photos={profile.photos}
-              videos={profile.videos}
-              setPhotos={(p) => updateList('photos', p)}
-              setVideos={(v) => updateList('videos', v)}
-            />
-          )}
-        </div>
-      );
-    };
-    
-    // ============================================
-    // BASICS EDITOR
-    // ============================================
+    // Basics Editor
     const BasicsEditor = ({ profile, updateBasics, rawText }) => (
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">
-            <i className="fas fa-user"></i>
-            Basic Information
-          </h2>
-        </div>
+      <div>
+        <h2 style={{ fontFamily: 'Orbitron', fontSize: '24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <i className="fas fa-user" style={{ color: 'var(--neon-violet)' }}></i>
+          Basic Information
+        </h2>
         
         <div className="form-grid">
           <div className="form-group">
             <label className="form-label"><i className="fas fa-id-card"></i> Full Name</label>
-            <input 
-              type="text"
-              className="form-input"
-              value={profile.basics.name}
-              onChange={(e) => updateBasics('name', e.target.value)}
-              placeholder="John Smith"
-            />
+            <input type="text" className="form-input" value={profile.basics.name} onChange={(e) => updateBasics('name', e.target.value)} placeholder="John Smith" />
           </div>
-          
           <div className="form-group">
             <label className="form-label"><i className="fas fa-briefcase"></i> Job Title</label>
-            <input 
-              type="text"
-              className="form-input"
-              value={profile.basics.title}
-              onChange={(e) => updateBasics('title', e.target.value)}
-              placeholder="Senior Product Manager"
-            />
+            <input type="text" className="form-input" value={profile.basics.title} onChange={(e) => updateBasics('title', e.target.value)} placeholder="Senior Engineer" />
           </div>
-          
           <div className="form-group full">
             <label className="form-label"><i className="fas fa-quote-left"></i> Professional Tagline</label>
-            <input 
-              type="text"
-              className="form-input"
-              value={profile.basics.tagline}
-              onChange={(e) => updateBasics('tagline', e.target.value)}
-              placeholder="10+ years driving product innovation and growth"
-            />
+            <input type="text" className="form-input" value={profile.basics.tagline} onChange={(e) => updateBasics('tagline', e.target.value)} placeholder="10+ years driving innovation..." />
           </div>
-          
           <div className="form-group">
             <label className="form-label"><i className="fas fa-envelope"></i> Email</label>
-            <input 
-              type="email"
-              className="form-input"
-              value={profile.basics.email}
-              onChange={(e) => updateBasics('email', e.target.value)}
-              placeholder="john@email.com"
-            />
+            <input type="email" className="form-input" value={profile.basics.email} onChange={(e) => updateBasics('email', e.target.value)} placeholder="john@email.com" />
           </div>
-          
           <div className="form-group">
             <label className="form-label"><i className="fas fa-phone"></i> Phone</label>
-            <input 
-              type="tel"
-              className="form-input"
-              value={profile.basics.phone}
-              onChange={(e) => updateBasics('phone', e.target.value)}
-              placeholder="+1 (555) 123-4567"
-            />
+            <input type="tel" className="form-input" value={profile.basics.phone} onChange={(e) => updateBasics('phone', e.target.value)} placeholder="+1 555 123 4567" />
           </div>
-          
           <div className="form-group">
             <label className="form-label"><i className="fas fa-map-marker-alt"></i> Location</label>
-            <input 
-              type="text"
-              className="form-input"
-              value={profile.basics.location}
-              onChange={(e) => updateBasics('location', e.target.value)}
-              placeholder="San Francisco, CA"
-            />
+            <input type="text" className="form-input" value={profile.basics.location} onChange={(e) => updateBasics('location', e.target.value)} placeholder="San Francisco, CA" />
           </div>
-          
           <div className="form-group">
             <label className="form-label"><i className="fab fa-linkedin"></i> LinkedIn</label>
-            <input 
-              type="text"
-              className="form-input"
-              value={profile.basics.linkedin}
-              onChange={(e) => updateBasics('linkedin', e.target.value)}
-              placeholder="linkedin.com/in/yourprofile"
-            />
+            <input type="text" className="form-input" value={profile.basics.linkedin} onChange={(e) => updateBasics('linkedin', e.target.value)} placeholder="linkedin.com/in/..." />
           </div>
         </div>
         
         {rawText && (
-          <div style={{ marginTop: '28px' }}>
-            <details>
-              <summary style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '14px', fontWeight: '500' }}>
-                <i className="fas fa-file-alt" style={{ marginRight: '8px' }}></i>
-                View Extracted Raw Text
-              </summary>
-              <pre style={{ 
-                marginTop: '16px', 
-                padding: '20px', 
-                background: 'var(--bg-tertiary)', 
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--glass-border)',
-                fontSize: '12px',
-                color: 'var(--text-secondary)',
-                maxHeight: '250px',
-                overflow: 'auto',
-                whiteSpace: 'pre-wrap',
-                fontFamily: 'JetBrains Mono, monospace'
-              }}>
-                {rawText}
-              </pre>
-            </details>
-          </div>
+          <details style={{ marginTop: '32px' }}>
+            <summary style={{ cursor: 'pointer', color: 'var(--text-muted)', fontWeight: '600' }}>
+              View extracted raw text
+            </summary>
+            <pre style={{ marginTop: '16px', padding: '20px', background: 'rgba(10,10,25,0.8)', borderRadius: '12px', fontSize: '12px', color: 'var(--text-muted)', maxHeight: '200px', overflow: 'auto', whiteSpace: 'pre-wrap', fontFamily: 'JetBrains Mono' }}>
+              {rawText}
+            </pre>
+          </details>
         )}
       </div>
     );
     
-    // ============================================
-    // SKILLS EDITOR
-    // ============================================
-    const SkillsEditor = ({ skills, setSkills }) => {
-      const [newSkill, setNewSkill] = useState('');
-      
-      const addSkill = () => {
-        if (newSkill.trim()) {
-          setSkills([...skills, newSkill.trim()]);
-          setNewSkill('');
-        }
-      };
-      
-      const removeSkill = (index) => {
-        setSkills(skills.filter((_, i) => i !== index));
-      };
-      
-      return (
-        <div className="card">
-          <div className="card-header">
-            <h2 className="card-title">
-              <i className="fas fa-code"></i>
-              Skills
-            </h2>
-            <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
-              {skills.length} skills
-            </span>
-          </div>
-          
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-            <input
-              type="text"
-              className="form-input"
-              value={newSkill}
-              onChange={(e) => setNewSkill(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && addSkill()}
-              placeholder="Add a skill..."
-              style={{ flex: 1 }}
-            />
-            <button className="btn btn-primary" onClick={addSkill}>
-              <i className="fas fa-plus"></i>
-              Add
-            </button>
-          </div>
-          
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-            {skills.map((skill, index) => (
-              <div key={index} style={{
-                padding: '12px 20px',
-                background: 'var(--glass-bg)',
-                border: '1px solid var(--glass-border)',
-                borderRadius: 'var(--radius-xl)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                transition: 'all 0.25s ease'
-              }}>
-                <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{skill}</span>
-                <button
-                  onClick={() => removeSkill(index)}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--text-dim)',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  <i className="fas fa-times"></i>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    };
-    
-    // ============================================
-    // EXPERIENCE EDITOR
-    // ============================================
+    // Experience Editor
     const ExperienceEditor = ({ experience, setExperience }) => {
-      const addExp = () => {
-        setExperience([...experience, {
-          id: Date.now(),
-          company: '',
-          role: '',
-          startDate: '',
-          endDate: '',
-          description: '',
-          tasks: '',
-          dayInLife: [
-            { time: '9:00 AM', activity: '' },
-            { time: '11:00 AM', activity: '' },
-            { time: '1:00 PM', activity: '' },
-            { time: '3:00 PM', activity: '' },
-            { time: '5:00 PM', activity: '' }
-          ],
-          metrics: [
-            { value: '', label: 'Impact' },
-            { value: '', label: 'Growth' },
-            { value: '', label: 'Efficiency' },
-            { value: '', label: 'Team' }
-          ],
-          toxicity: 5
-        }]);
+      const add = () => setExperience([...experience, {
+        id: Date.now(), company: '', role: '', startDate: '', endDate: '', description: '', tasks: '',
+        dayInLife: [{time:'9:00 AM',activity:''},{time:'11:00 AM',activity:''},{time:'1:00 PM',activity:''},{time:'3:00 PM',activity:''},{time:'5:00 PM',activity:''}],
+        metrics: [{value:'',label:''},{value:'',label:''},{value:'',label:''},{value:'',label:''}],
+        toxicity: 5
+      }]);
+      
+      const update = (i, field, val) => {
+        const u = [...experience];
+        u[i] = { ...u[i], [field]: val };
+        setExperience(u);
       };
       
-      const updateExp = (index, field, value) => {
-        const updated = [...experience];
-        updated[index] = { ...updated[index], [field]: value };
-        setExperience(updated);
+      const remove = (i) => setExperience(experience.filter((_, idx) => idx !== i));
+      
+      const updateMetric = (ei, mi, field, val) => {
+        const u = [...experience];
+        u[ei].metrics[mi][field] = val;
+        setExperience(u);
       };
       
-      const removeExp = (index) => {
-        setExperience(experience.filter((_, i) => i !== index));
-      };
-      
-      const updateMetric = (expIndex, metricIndex, field, value) => {
-        const updated = [...experience];
-        updated[expIndex].metrics[metricIndex][field] = value;
-        setExperience(updated);
-      };
-      
-      const updateDayInLife = (expIndex, dayIndex, value) => {
-        const updated = [...experience];
-        updated[expIndex].dayInLife[dayIndex].activity = value;
-        setExperience(updated);
+      const updateDay = (ei, di, val) => {
+        const u = [...experience];
+        u[ei].dayInLife[di].activity = val;
+        setExperience(u);
       };
       
       return (
-        <div className="card">
-          <div className="card-header">
-            <h2 className="card-title">
-              <i className="fas fa-briefcase"></i>
-              Work Experience
-            </h2>
-            <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
-              {experience.length} entries
-            </span>
-          </div>
+        <div>
+          <h2 style={{ fontFamily: 'Orbitron', fontSize: '24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <i className="fas fa-briefcase" style={{ color: 'var(--neon-violet)' }}></i>
+            Work Experience
+            <span style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'Rajdhani' }}>{experience.length} entries</span>
+          </h2>
           
-          {experience.map((exp, index) => (
-            <div key={exp.id} className="experience-entry slide-in">
+          {experience.map((exp, i) => (
+            <div key={exp.id} className="experience-entry">
               <div className="experience-header">
-                <div className="experience-number">{index + 1}</div>
-                <div className="experience-actions">
-                  <button className="btn-icon danger" onClick={() => removeExp(index)}>
-                    <i className="fas fa-trash"></i>
-                  </button>
-                </div>
+                <div className="experience-number">{i + 1}</div>
+                <button className="btn-icon danger" onClick={() => remove(i)}><i className="fas fa-trash"></i></button>
               </div>
               
               <div className="form-grid">
                 <div className="form-group">
                   <label className="form-label">Company</label>
-                  <input 
-                    type="text"
-                    className="form-input"
-                    value={exp.company}
-                    onChange={(e) => updateExp(index, 'company', e.target.value)}
-                    placeholder="Company Name"
-                  />
+                  <input type="text" className="form-input" value={exp.company} onChange={(e) => update(i, 'company', e.target.value)} placeholder="Company Name" />
                 </div>
-                
                 <div className="form-group">
                   <label className="form-label">Role</label>
-                  <input 
-                    type="text"
-                    className="form-input"
-                    value={exp.role}
-                    onChange={(e) => updateExp(index, 'role', e.target.value)}
-                    placeholder="Job Title"
-                  />
+                  <input type="text" className="form-input" value={exp.role} onChange={(e) => update(i, 'role', e.target.value)} placeholder="Job Title" />
                 </div>
-                
                 <div className="form-group">
                   <label className="form-label">Start Date</label>
-                  <input 
-                    type="text"
-                    className="form-input"
-                    value={exp.startDate}
-                    onChange={(e) => updateExp(index, 'startDate', e.target.value)}
-                    placeholder="Jan 2020"
-                  />
+                  <input type="text" className="form-input" value={exp.startDate} onChange={(e) => update(i, 'startDate', e.target.value)} placeholder="Jan 2020" />
                 </div>
-                
                 <div className="form-group">
                   <label className="form-label">End Date</label>
-                  <input 
-                    type="text"
-                    className="form-input"
-                    value={exp.endDate}
-                    onChange={(e) => updateExp(index, 'endDate', e.target.value)}
-                    placeholder="Present"
-                  />
+                  <input type="text" className="form-input" value={exp.endDate} onChange={(e) => update(i, 'endDate', e.target.value)} placeholder="Present" />
                 </div>
-                
                 <div className="form-group full">
                   <label className="form-label">Description</label>
-                  <textarea 
-                    className="form-textarea"
-                    value={exp.description}
-                    onChange={(e) => updateExp(index, 'description', e.target.value)}
-                    placeholder="Describe your role and key accomplishments..."
-                  />
-                </div>
-                
-                <div className="form-group full">
-                  <label className="form-label">
-                    <i className="fas fa-shield-alt"></i> Truth Vault - Toxicity: {exp.toxicity}/10
-                  </label>
-                  <input 
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={exp.toxicity}
-                    onChange={(e) => updateExp(index, 'toxicity', parseInt(e.target.value))}
-                    style={{ 
-                      width: '100%', 
-                      accentColor: exp.toxicity <= 3 ? 'var(--neon-green)' : exp.toxicity <= 6 ? 'var(--neon-gold)' : 'var(--neon-red)'
-                    }}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginTop: '8px' }}>
-                    <span style={{ color: 'var(--neon-green)' }}>Great Culture</span>
-                    <span style={{ color: 'var(--neon-red)' }}>Toxic</span>
-                  </div>
+                  <textarea className="form-textarea" value={exp.description} onChange={(e) => update(i, 'description', e.target.value)} placeholder="Describe your role and accomplishments..." />
                 </div>
               </div>
               
               {/* Day in Life */}
-              <div className="day-in-life">
-                <h4>
+              <div className="day-in-life-section">
+                <div className="day-in-life-title">
                   <i className="fas fa-sun"></i>
                   A Day in the Life
-                </h4>
-                {exp.dayInLife.map((item, dayIndex) => (
-                  <div key={dayIndex} className="day-item">
-                    <span className="day-time">{item.time}</span>
-                    <input 
-                      type="text"
-                      className="day-input"
-                      value={item.activity}
-                      onChange={(e) => updateDayInLife(index, dayIndex, e.target.value)}
-                      placeholder="What did you typically do?"
-                    />
+                </div>
+                {exp.dayInLife.map((d, di) => (
+                  <div key={di} className="day-item">
+                    <span className="day-time">{d.time}</span>
+                    <input type="text" className="day-input" value={d.activity} onChange={(e) => updateDay(i, di, e.target.value)} placeholder="What did you typically do?" />
                   </div>
                 ))}
               </div>
               
               {/* Metrics */}
-              <div style={{ marginTop: '24px' }}>
-                <h4 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <i className="fas fa-chart-line" style={{ color: 'var(--neon-cyan)' }}></i>
+              <div style={{ marginTop: '28px' }}>
+                <div style={{ fontSize: '15px', fontWeight: '600', color: 'var(--neon-cyan)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <i className="fas fa-chart-line"></i>
                   Impact Metrics
-                </h4>
+                </div>
                 <div className="metrics-grid">
-                  {exp.metrics.map((metric, metricIndex) => (
-                    <div key={metricIndex} className="metric-input">
-                      <input 
-                        type="text"
-                        value={metric.value}
-                        onChange={(e) => updateMetric(index, metricIndex, 'value', e.target.value)}
-                        placeholder="+40%"
-                      />
-                      <input 
-                        type="text"
-                        value={metric.label}
-                        onChange={(e) => updateMetric(index, metricIndex, 'label', e.target.value)}
-                        className="metric-input-label"
-                        style={{ 
-                          background: 'transparent', 
-                          border: 'none', 
-                          textAlign: 'center',
-                          width: '100%',
-                          color: 'var(--text-muted)',
-                          outline: 'none'
-                        }}
-                      />
+                  {exp.metrics.map((m, mi) => (
+                    <div key={mi} className="metric-box">
+                      <input type="text" value={m.value} onChange={(e) => updateMetric(i, mi, 'value', e.target.value)} placeholder="+40%" />
+                      <input type="text" className="metric-label-input" value={m.label} onChange={(e) => updateMetric(i, mi, 'label', e.target.value)} placeholder="METRIC" />
                     </div>
                   ))}
                 </div>
@@ -2757,73 +2057,80 @@ app.get('/', (c) => {
             </div>
           ))}
           
-          <button className="btn-add" onClick={addExp}>
+          <button className="btn-add" onClick={add}>
             <i className="fas fa-plus"></i> Add Experience
           </button>
         </div>
       );
     };
     
-    // ============================================
-    // LIST EDITOR (Generic)
-    // ============================================
-    const ListEditor = ({ title, icon, items, setItems, fields }) => {
-      const addItem = () => {
-        const newItem = { id: Date.now() };
-        fields.forEach(f => newItem[f.key] = '');
-        setItems([...items, newItem]);
-      };
-      
-      const updateItem = (index, field, value) => {
-        const updated = [...items];
-        updated[index] = { ...updated[index], [field]: value };
-        setItems(updated);
-      };
-      
-      const removeItem = (index) => {
-        setItems(items.filter((_, i) => i !== index));
-      };
+    // Skills Editor
+    const SkillsEditor = ({ skills, setSkills }) => {
+      const [input, setInput] = useState('');
+      const add = () => { if (input.trim()) { setSkills([...skills, input.trim()]); setInput(''); } };
+      const remove = (i) => setSkills(skills.filter((_, idx) => idx !== i));
       
       return (
-        <div className="card">
-          <div className="card-header">
-            <h2 className="card-title">
-              <i className={"fas " + icon}></i>
-              {title}
-            </h2>
-            <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
-              {items.length} entries
-            </span>
+        <div>
+          <h2 style={{ fontFamily: 'Orbitron', fontSize: '24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <i className="fas fa-code" style={{ color: 'var(--neon-violet)' }}></i>
+            Skills
+            <span style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'Rajdhani' }}>{skills.length} skills</span>
+          </h2>
+          
+          <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
+            <input type="text" className="form-input" style={{ flex: 1 }} value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && add()} placeholder="Add a skill..." />
+            <button className="btn btn-primary" onClick={add}><i className="fas fa-plus"></i> Add</button>
           </div>
           
-          {items.map((item, index) => (
-            <div key={item.id} className="experience-entry slide-in">
-              <div className="experience-header">
-                <div className="experience-number">{index + 1}</div>
-                <button className="btn-icon danger" onClick={() => removeItem(index)}>
-                  <i className="fas fa-trash"></i>
-                </button>
+          <div className="skills-container">
+            {skills.map((skill, i) => (
+              <div key={i} className="skill-tag">
+                {skill}
+                <button className="skill-remove" onClick={() => remove(i)}><i className="fas fa-times"></i></button>
               </div>
-              
+            ))}
+          </div>
+        </div>
+      );
+    };
+    
+    // List Editor (Generic)
+    const ListEditor = ({ title, icon, items, setItems, fields }) => {
+      const add = () => {
+        const item = { id: Date.now() };
+        fields.forEach(f => item[f.key] = '');
+        setItems([...items, item]);
+      };
+      const update = (i, key, val) => {
+        const u = [...items];
+        u[i] = { ...u[i], [key]: val };
+        setItems(u);
+      };
+      const remove = (i) => setItems(items.filter((_, idx) => idx !== i));
+      
+      return (
+        <div>
+          <h2 style={{ fontFamily: 'Orbitron', fontSize: '24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <i className={'fas ' + icon} style={{ color: 'var(--neon-violet)' }}></i>
+            {title}
+            <span style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'Rajdhani' }}>{items.length} entries</span>
+          </h2>
+          
+          {items.map((item, i) => (
+            <div key={item.id} className="experience-entry">
+              <div className="experience-header">
+                <div className="experience-number">{i + 1}</div>
+                <button className="btn-icon danger" onClick={() => remove(i)}><i className="fas fa-trash"></i></button>
+              </div>
               <div className="form-grid">
-                {fields.map(field => (
-                  <div key={field.key} className={"form-group" + (field.type === 'textarea' ? " full" : "")}>
-                    <label className="form-label">{field.label}</label>
-                    {field.type === 'textarea' ? (
-                      <textarea 
-                        className="form-textarea"
-                        value={item[field.key] || ''}
-                        onChange={(e) => updateItem(index, field.key, e.target.value)}
-                        placeholder={field.placeholder}
-                      />
+                {fields.map(f => (
+                  <div key={f.key} className={'form-group' + (f.type === 'textarea' ? ' full' : '')}>
+                    <label className="form-label">{f.label}</label>
+                    {f.type === 'textarea' ? (
+                      <textarea className="form-textarea" value={item[f.key] || ''} onChange={(e) => update(i, f.key, e.target.value)} placeholder={f.placeholder} />
                     ) : (
-                      <input 
-                        type="text"
-                        className="form-input"
-                        value={item[field.key] || ''}
-                        onChange={(e) => updateItem(index, field.key, e.target.value)}
-                        placeholder={field.placeholder}
-                      />
+                      <input type="text" className="form-input" value={item[f.key] || ''} onChange={(e) => update(i, f.key, e.target.value)} placeholder={f.placeholder} />
                     )}
                   </div>
                 ))}
@@ -2831,162 +2138,67 @@ app.get('/', (c) => {
             </div>
           ))}
           
-          <button className="btn-add" onClick={addItem}>
+          <button className="btn-add" onClick={add}>
             <i className="fas fa-plus"></i> Add {title.replace(/s$/, '')}
           </button>
         </div>
       );
     };
     
-    // ============================================
-    // MEDIA EDITOR
-    // ============================================
+    // Media Editor
     const MediaEditor = ({ photos, videos, setPhotos, setVideos }) => {
       const photoRef = useRef(null);
       const videoRef = useRef(null);
       
-      const handlePhotoUpload = (e) => {
+      const addPhotos = (e) => {
         const files = Array.from(e.target.files);
-        const newPhotos = files.map(file => ({
-          id: Date.now() + Math.random(),
-          name: file.name,
-          url: URL.createObjectURL(file)
-        }));
+        const newPhotos = files.map(f => ({ id: Date.now() + Math.random(), name: f.name, url: URL.createObjectURL(f) }));
         setPhotos([...photos, ...newPhotos]);
       };
       
-      const handleVideoUpload = (e) => {
+      const addVideos = (e) => {
         const files = Array.from(e.target.files);
-        const newVideos = files.map(file => ({
-          id: Date.now() + Math.random(),
-          name: file.name,
-          url: URL.createObjectURL(file)
-        }));
+        const newVideos = files.map(f => ({ id: Date.now() + Math.random(), name: f.name, url: URL.createObjectURL(f) }));
         setVideos([...videos, ...newVideos]);
       };
       
       return (
-        <div className="card">
-          <div className="card-header">
-            <h2 className="card-title">
-              <i className="fas fa-image"></i>
-              Photos & Videos
-            </h2>
-          </div>
+        <div>
+          <h2 style={{ fontFamily: 'Orbitron', fontSize: '24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <i className="fas fa-image" style={{ color: 'var(--neon-violet)' }}></i>
+            Media
+          </h2>
           
           <div style={{ marginBottom: '40px' }}>
-            <h3 style={{ fontSize: '16px', marginBottom: '20px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <i className="fas fa-camera" style={{ color: 'var(--neon-purple)' }}></i>
-              Photos
-            </h3>
-            <input type="file" ref={photoRef} onChange={handlePhotoUpload} accept="image/*" multiple style={{ display: 'none' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px' }}>
-              {photos.map(photo => (
-                <div key={photo.id} style={{ 
-                  aspectRatio: '1', 
-                  borderRadius: 'var(--radius-xl)', 
-                  overflow: 'hidden',
-                  position: 'relative',
-                  border: '1px solid var(--glass-border)'
-                }}>
-                  <img src={photo.url} alt={photo.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button 
-                    onClick={() => setPhotos(photos.filter(p => p.id !== photo.id))}
-                    style={{
-                      position: 'absolute',
-                      top: '10px',
-                      right: '10px',
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      background: 'rgba(0,0,0,0.7)',
-                      border: 'none',
-                      color: 'white',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <i className="fas fa-times"></i>
-                  </button>
+            <h3 style={{ fontSize: '18px', color: 'var(--neon-cyan)', marginBottom: '20px' }}><i className="fas fa-camera"></i> Photos</h3>
+            <input type="file" ref={photoRef} onChange={addPhotos} accept="image/*" multiple style={{ display: 'none' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '16px' }}>
+              {photos.map(p => (
+                <div key={p.id} style={{ aspectRatio: '1', borderRadius: '16px', overflow: 'hidden', position: 'relative', border: '1px solid var(--glass-border)' }}>
+                  <img src={p.url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button onClick={() => setPhotos(photos.filter(x => x.id !== p.id))} style={{ position: 'absolute', top: '8px', right: '8px', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(0,0,0,0.7)', border: 'none', color: 'white', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
                 </div>
               ))}
-              <button 
-                onClick={() => photoRef.current?.click()}
-                style={{
-                  aspectRatio: '1',
-                  borderRadius: 'var(--radius-xl)',
-                  border: '2px dashed var(--glass-border)',
-                  background: 'var(--glass-bg)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '10px',
-                  color: 'var(--text-muted)',
-                  transition: 'all 0.25s ease'
-                }}
-              >
-                <i className="fas fa-plus" style={{ fontSize: '28px' }}></i>
-                <span style={{ fontSize: '13px' }}>Add Photo</span>
+              <button onClick={() => photoRef.current?.click()} style={{ aspectRatio: '1', borderRadius: '16px', border: '2px dashed var(--glass-border)', background: 'var(--glass-light)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)' }}>
+                <i className="fas fa-plus" style={{ fontSize: '24px' }}></i>
+                <span style={{ fontSize: '12px' }}>Add Photo</span>
               </button>
             </div>
           </div>
           
           <div>
-            <h3 style={{ fontSize: '16px', marginBottom: '20px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <i className="fas fa-video" style={{ color: 'var(--neon-pink)' }}></i>
-              Videos
-            </h3>
-            <input type="file" ref={videoRef} onChange={handleVideoUpload} accept="video/*" multiple style={{ display: 'none' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
-              {videos.map(video => (
-                <div key={video.id} style={{ 
-                  aspectRatio: '16/9', 
-                  borderRadius: 'var(--radius-xl)', 
-                  overflow: 'hidden',
-                  position: 'relative',
-                  border: '1px solid var(--glass-border)',
-                  background: 'var(--bg-tertiary)'
-                }}>
-                  <video src={video.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button 
-                    onClick={() => setVideos(videos.filter(v => v.id !== video.id))}
-                    style={{
-                      position: 'absolute',
-                      top: '10px',
-                      right: '10px',
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      background: 'rgba(0,0,0,0.7)',
-                      border: 'none',
-                      color: 'white',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <i className="fas fa-times"></i>
-                  </button>
+            <h3 style={{ fontSize: '18px', color: 'var(--neon-pink)', marginBottom: '20px' }}><i className="fas fa-video"></i> Videos</h3>
+            <input type="file" ref={videoRef} onChange={addVideos} accept="video/*" multiple style={{ display: 'none' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+              {videos.map(v => (
+                <div key={v.id} style={{ aspectRatio: '16/9', borderRadius: '16px', overflow: 'hidden', position: 'relative', border: '1px solid var(--glass-border)', background: 'var(--void-mid)' }}>
+                  <video src={v.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button onClick={() => setVideos(videos.filter(x => x.id !== v.id))} style={{ position: 'absolute', top: '8px', right: '8px', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(0,0,0,0.7)', border: 'none', color: 'white', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
                 </div>
               ))}
-              <button 
-                onClick={() => videoRef.current?.click()}
-                style={{
-                  aspectRatio: '16/9',
-                  borderRadius: 'var(--radius-xl)',
-                  border: '2px dashed var(--glass-border)',
-                  background: 'var(--glass-bg)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '10px',
-                  color: 'var(--text-muted)',
-                  transition: 'all 0.25s ease'
-                }}
-              >
-                <i className="fas fa-plus" style={{ fontSize: '28px' }}></i>
-                <span style={{ fontSize: '13px' }}>Add Video</span>
+              <button onClick={() => videoRef.current?.click()} style={{ aspectRatio: '16/9', borderRadius: '16px', border: '2px dashed var(--glass-border)', background: 'var(--glass-light)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)' }}>
+                <i className="fas fa-plus" style={{ fontSize: '24px' }}></i>
+                <span style={{ fontSize: '12px' }}>Add Video</span>
               </button>
             </div>
           </div>
@@ -2994,66 +2206,36 @@ app.get('/', (c) => {
       );
     };
     
-    // ============================================
-    // PREVIEW VIEW
-    // ============================================
+    // Preview View
     const PreviewView = ({ profile, setView }) => (
-      <div className="fade-in">
-        <div className="card" style={{ marginBottom: '28px' }}>
+      <div className="fade-in-up">
+        <div className="neon-card" style={{ marginBottom: '32px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h2 style={{ fontFamily: 'Space Grotesk', marginBottom: '6px', fontSize: '24px' }}>Live Preview</h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>This is how your profile will appear to recruiters</p>
+              <h2 style={{ fontFamily: 'Orbitron', fontSize: '28px', marginBottom: '8px' }}>Live Preview</h2>
+              <p style={{ color: 'var(--text-muted)' }}>How recruiters will see your profile</p>
             </div>
             <div style={{ display: 'flex', gap: '16px' }}>
-              <button className="btn btn-secondary" onClick={() => setView(VIEWS.BUILDER)}>
-                <i className="fas fa-edit"></i> Edit
-              </button>
-              <button className="btn btn-primary">
-                <i className="fas fa-share"></i> Publish
-              </button>
+              <button className="btn btn-secondary" onClick={() => setView(VIEWS.BUILDER)}><i className="fas fa-edit"></i> Edit</button>
+              <button className="btn btn-primary"><i className="fas fa-share"></i> Publish</button>
             </div>
           </div>
         </div>
         
-        {/* Profile Header */}
-        <div className="card" style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{
-            width: '120px',
-            height: '120px',
-            margin: '0 auto 28px',
-            borderRadius: '28px',
-            background: 'var(--gradient-aurora)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '42px',
-            fontWeight: '700',
-            boxShadow: 'var(--glow-purple)'
-          }}>
+        {/* Profile Card */}
+        <div className="neon-card" style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div className="card-glow purple"></div>
+          <div style={{ width: '140px', height: '140px', margin: '0 auto 32px', background: 'linear-gradient(135deg, var(--neon-violet), var(--neon-magenta), var(--neon-cyan))', borderRadius: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px', fontWeight: '700', fontFamily: 'Orbitron', boxShadow: '0 0 60px rgba(147,51,234,0.5)' }}>
             {profile.basics.name ? profile.basics.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?'}
           </div>
-          <h2 style={{ fontFamily: 'Space Grotesk', fontSize: '32px', marginBottom: '8px' }}>
-            {profile.basics.name || 'Your Name'}
-          </h2>
-          <p style={{ color: 'var(--neon-purple)', fontSize: '20px', fontWeight: '600', marginBottom: '12px' }}>
-            {profile.basics.title || 'Your Title'}
-          </p>
-          <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto', fontSize: '16px' }}>
-            {profile.basics.tagline || 'Your professional tagline'}
-          </p>
+          <h1 style={{ fontFamily: 'Orbitron', fontSize: '36px', fontWeight: '700', marginBottom: '12px' }}>{profile.basics.name || 'Your Name'}</h1>
+          <p style={{ fontSize: '22px', color: 'var(--neon-cyan)', fontWeight: '600', marginBottom: '16px' }}>{profile.basics.title || 'Your Title'}</p>
+          <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto', fontSize: '18px' }}>{profile.basics.tagline || 'Your professional tagline'}</p>
           
-          {profile.skills?.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginTop: '24px' }}>
-              {profile.skills.slice(0, 8).map((skill, i) => (
-                <span key={i} style={{
-                  padding: '8px 18px',
-                  background: 'var(--glass-bg)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: 'var(--radius-xl)',
-                  fontSize: '13px',
-                  color: 'var(--text-secondary)'
-                }}>{skill}</span>
+          {profile.skills.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center', marginTop: '32px' }}>
+              {profile.skills.slice(0, 8).map((s, i) => (
+                <span key={i} className="skill-tag">{s}</span>
               ))}
             </div>
           )}
@@ -3061,40 +2243,27 @@ app.get('/', (c) => {
         
         {/* Timeline */}
         {profile.experience.length > 0 && (
-          <div className="card">
-            <div className="card-header">
-              <h2 className="card-title">
-                <i className="fas fa-briefcase"></i>
-                Career Timeline
-              </h2>
-            </div>
+          <div className="neon-card">
+            <div className="card-glow cyan"></div>
+            <h2 style={{ fontFamily: 'Orbitron', fontSize: '24px', marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <i className="fas fa-briefcase" style={{ color: 'var(--neon-violet)' }}></i>
+              Career Timeline
+            </h2>
             
-            <div className="timeline">
-              {profile.experience.map((exp, index) => (
-                <div key={exp.id} className="timeline-entry">
+            <div className="timeline-preview">
+              {profile.experience.map((exp, i) => (
+                <div key={exp.id} className="timeline-item">
                   <h3 className="timeline-company">{exp.company || 'Company'}</h3>
                   <p className="timeline-role">{exp.role || 'Role'}</p>
-                  <span className="timeline-dates">{exp.startDate || 'Start'} - {exp.endDate || 'End'}</span>
+                  <span className="timeline-dates">{exp.startDate || 'Start'} — {exp.endDate || 'End'}</span>
                   <p className="timeline-desc">{exp.description || 'Description...'}</p>
                   
                   {exp.metrics.some(m => m.value) && (
                     <div className="preview-metrics">
-                      {exp.metrics.filter(m => m.value).map((metric, i) => (
-                        <div key={i} className="preview-metric">
-                          <div className="preview-metric-value">{metric.value}</div>
-                          <div className="preview-metric-label">{metric.label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {exp.dayInLife.some(d => d.activity) && (
-                    <div className="day-in-life" style={{ marginTop: '24px' }}>
-                      <h4><i className="fas fa-sun"></i> A Day in the Life</h4>
-                      {exp.dayInLife.filter(d => d.activity).map((item, i) => (
-                        <div key={i} className="day-item">
-                          <span className="day-time">{item.time}</span>
-                          <span style={{ color: 'var(--text-secondary)' }}>{item.activity}</span>
+                      {exp.metrics.filter(m => m.value).map((m, mi) => (
+                        <div key={mi} className="preview-metric">
+                          <div className="preview-metric-value">{m.value}</div>
+                          <div className="preview-metric-label">{m.label}</div>
                         </div>
                       ))}
                     </div>
@@ -3107,9 +2276,7 @@ app.get('/', (c) => {
       </div>
     );
     
-    // ============================================
-    // RENDER
-    // ============================================
+    // Render
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
   </script>
