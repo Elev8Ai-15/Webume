@@ -1330,6 +1330,31 @@ app.get('/', (c) => {
       border-color: var(--purple-main);
       background: rgba(139, 92, 246, 0.1);
     }
+    
+    /* Enhanced image quality rendering */
+    img {
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      image-rendering: -webkit-optimize-contrast;
+    }
+    
+    /* Video player improvements */
+    video {
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    video::-webkit-media-controls {
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    }
+    
+    video::-webkit-media-controls-enclosure {
+      padding: 0;
+    }
+    
+    video::-webkit-media-controls-panel {
+      padding: 0 8px 8px;
+    }
   </style>
 </head>
 <body>
@@ -1369,11 +1394,132 @@ app.get('/', (c) => {
     
     const VIEW = { UPLOAD: 1, BUILDER: 2, PREVIEW: 3 };
     
+    // INDUSTRY-SPECIFIC TEMPLATES - 10 Premium Options
+    const TEMPLATE_CATEGORIES = [
+      { id: 'professional', name: 'Professional', icon: 'fa-briefcase' },
+      { id: 'service', name: 'Service Industry', icon: 'fa-hands-helping' },
+      { id: 'creative', name: 'Creative', icon: 'fa-palette' },
+      { id: 'technical', name: 'Technical', icon: 'fa-code' }
+    ];
+    
     const TEMPLATES = [
-      { id: 'executive', name: 'Executive', desc: 'Bold & authoritative for senior leaders', color: '#8B5CF6', icon: 'fa-crown' },
-      { id: 'creative', name: 'Creative', desc: 'Vibrant gradients for designers & artists', color: '#EC4899', icon: 'fa-palette' },
-      { id: 'tech', name: 'Tech Pioneer', desc: 'Data-driven design for engineers', color: '#06B6D4', icon: 'fa-microchip' },
-      { id: 'minimal', name: 'Minimal', desc: 'Clean & elegant simplicity', color: '#10B981', icon: 'fa-feather' }
+      // Professional Category
+      { 
+        id: 'executive', 
+        category: 'professional',
+        name: 'Executive', 
+        desc: 'Bold & authoritative for C-suite and senior leaders', 
+        color: '#8B5CF6', 
+        accent2: '#6D28D9',
+        icon: 'fa-crown',
+        gradient: 'linear-gradient(135deg, #8B5CF6, #6D28D9, #4C1D95)',
+        industries: ['Finance', 'Consulting', 'Legal', 'Corporate']
+      },
+      { 
+        id: 'corporate', 
+        category: 'professional',
+        name: 'Corporate', 
+        desc: 'Professional navy & gold for business roles', 
+        color: '#1E3A5F', 
+        accent2: '#D4AF37',
+        icon: 'fa-building',
+        gradient: 'linear-gradient(135deg, #1E3A5F, #2C5282, #D4AF37)',
+        industries: ['Banking', 'Insurance', 'Real Estate', 'Management']
+      },
+      { 
+        id: 'nonprofit', 
+        category: 'professional',
+        name: 'Nonprofit', 
+        desc: 'Trust-building blues & greens for mission-driven work', 
+        color: '#0891B2', 
+        accent2: '#059669',
+        icon: 'fa-heart',
+        gradient: 'linear-gradient(135deg, #0891B2, #0D9488, #059669)',
+        industries: ['Charity', 'NGO', 'Social Work', 'Education']
+      },
+      
+      // Service Industry Category
+      { 
+        id: 'healthcare', 
+        category: 'service',
+        name: 'Healthcare', 
+        desc: 'Calming blues & teals for medical professionals', 
+        color: '#0EA5E9', 
+        accent2: '#14B8A6',
+        icon: 'fa-heartbeat',
+        gradient: 'linear-gradient(135deg, #0EA5E9, #06B6D4, #14B8A6)',
+        industries: ['Medical', 'Nursing', 'Pharmacy', 'Dental']
+      },
+      { 
+        id: 'restaurant', 
+        category: 'service',
+        name: 'Restaurant & Hospitality', 
+        desc: 'Warm appetizing colors for food service', 
+        color: '#DC2626', 
+        accent2: '#EA580C',
+        icon: 'fa-utensils',
+        gradient: 'linear-gradient(135deg, #DC2626, #EA580C, #F59E0B)',
+        industries: ['Chef', 'Server', 'Hotel', 'Catering']
+      },
+      { 
+        id: 'trades', 
+        category: 'service',
+        name: 'Trades & Services', 
+        desc: 'Strong earth tones for skilled trades', 
+        color: '#D97706', 
+        accent2: '#78716C',
+        icon: 'fa-tools',
+        gradient: 'linear-gradient(135deg, #D97706, #B45309, #78716C)',
+        industries: ['Plumbing', 'Electric', 'HVAC', 'Construction']
+      },
+      { 
+        id: 'beauty', 
+        category: 'service',
+        name: 'Beauty & Wellness', 
+        desc: 'Elegant rose gold & soft tones for salons & spas', 
+        color: '#EC4899', 
+        accent2: '#BE185D',
+        icon: 'fa-spa',
+        gradient: 'linear-gradient(135deg, #EC4899, #DB2777, #BE185D)',
+        industries: ['Hair Salon', 'Spa', 'Makeup', 'Fitness']
+      },
+      
+      // Creative Category
+      { 
+        id: 'creative', 
+        category: 'creative',
+        name: 'Creative', 
+        desc: 'Vibrant gradients for designers & artists', 
+        color: '#F472B6', 
+        accent2: '#A855F7',
+        icon: 'fa-paint-brush',
+        gradient: 'linear-gradient(135deg, #F472B6, #E879F9, #A855F7)',
+        industries: ['Design', 'Art', 'Photography', 'Marketing']
+      },
+      
+      // Technical Category
+      { 
+        id: 'tech', 
+        category: 'technical',
+        name: 'Tech Pioneer', 
+        desc: 'Data-driven cyan & neon for engineers', 
+        color: '#06B6D4', 
+        accent2: '#22D3EE',
+        icon: 'fa-microchip',
+        gradient: 'linear-gradient(135deg, #06B6D4, #22D3EE, #67E8F9)',
+        industries: ['Software', 'Data Science', 'DevOps', 'IT']
+      },
+      { 
+        id: 'minimal', 
+        category: 'technical',
+        name: 'Minimal', 
+        desc: 'Clean & elegant simplicity for any industry', 
+        color: '#10B981', 
+        accent2: '#34D399',
+        icon: 'fa-feather',
+        gradient: 'linear-gradient(135deg, #10B981, #34D399, #6EE7B7)',
+        industries: ['General', 'Startup', 'Freelance', 'Academic']
+      }
     ];
     
     // Storage keys
@@ -2205,81 +2351,180 @@ app.get('/', (c) => {
       );
     };
     
-    // Basics Editor with Profile Photo Upload
+    // Basics Editor with Profile Photo Upload - ENHANCED with quality handling
     const BasicsEditor = ({ profile, updateBasics, rawText, profilePhoto, setProfilePhoto }) => {
       const photoInputRef = useRef(null);
+      const [photoLoading, setPhotoLoading] = useState(false);
       
-      const handlePhotoChange = (e) => {
+      const handlePhotoChange = async (e) => {
         const file = e.target.files[0];
-        if (file) {
-          const url = URL.createObjectURL(file);
-          setProfilePhoto(url);
+        if (!file) return;
+        
+        setPhotoLoading(true);
+        
+        try {
+          // Create high-quality image with proper handling
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+              // Create canvas for optimal quality
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              
+              // Target size for profile photos (high quality - preserve larger images)
+              const maxSize = 1600;
+              let width = img.width;
+              let height = img.height;
+              
+              // Scale down if needed while maintaining aspect ratio
+              if (width > height && width > maxSize) {
+                height = (height * maxSize) / width;
+                width = maxSize;
+              } else if (height > maxSize) {
+                width = (width * maxSize) / height;
+                height = maxSize;
+              }
+              
+              canvas.width = width;
+              canvas.height = height;
+              
+              // Use high quality rendering
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = 'high';
+              ctx.drawImage(img, 0, 0, width, height);
+              
+              // Convert to high quality (0.95 quality, use PNG for best quality)
+              const dataUrl = canvas.toDataURL('image/png', 0.95);
+              setProfilePhoto(dataUrl);
+              setPhotoLoading(false);
+            };
+            img.onerror = () => {
+              // Fallback to original if processing fails
+              setProfilePhoto(URL.createObjectURL(file));
+              setPhotoLoading(false);
+            };
+            img.src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+        } catch (err) {
+          console.error('Photo processing error:', err);
+          setProfilePhoto(URL.createObjectURL(file));
+          setPhotoLoading(false);
         }
       };
       
       return (
         <div>
-          {/* Profile Photo Section */}
+          {/* Profile Photo Section - ENHANCED */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '28px', marginBottom: '32px', padding: '24px', background: 'rgba(139,92,246,0.08)', borderRadius: '20px', border: '1px solid rgba(139,92,246,0.2)' }}>
             <input
               type="file"
               ref={photoInputRef}
               onChange={handlePhotoChange}
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp,image/heic"
               hidden
             />
             <div
-              onClick={() => photoInputRef.current?.click()}
+              onClick={() => !photoLoading && photoInputRef.current?.click()}
               style={{
-                width: '120px',
-                height: '120px',
+                width: '140px',
+                height: '140px',
                 borderRadius: '24px',
-                background: profilePhoto ? 'transparent' : 'linear-gradient(135deg, var(--purple-main), var(--pink-main))',
-                border: '3px dashed rgba(255,255,255,0.2)',
+                background: profilePhoto ? '#1a1a2e' : 'linear-gradient(135deg, var(--purple-main), var(--pink-main))',
+                border: profilePhoto ? '4px solid var(--purple-main)' : '3px dashed rgba(255,255,255,0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                cursor: 'pointer',
+                cursor: photoLoading ? 'wait' : 'pointer',
                 overflow: 'hidden',
                 flexShrink: 0,
                 transition: 'all 0.3s ease',
-                boxShadow: '0 8px 32px rgba(139,92,246,0.25)'
+                boxShadow: profilePhoto ? '0 12px 40px rgba(139,92,246,0.35)' : '0 8px 32px rgba(139,92,246,0.25)',
+                position: 'relative'
               }}
             >
-              {profilePhoto ? (
-                <img src={profilePhoto} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {photoLoading ? (
+                <div style={{ textAlign: 'center', color: '#fff' }}>
+                  <i className="fas fa-spinner fa-spin" style={{ fontSize: '32px', marginBottom: '8px', display: 'block' }}></i>
+                  <span style={{ fontSize: '11px', fontWeight: '600' }}>Processing...</span>
+                </div>
+              ) : profilePhoto ? (
+                <img 
+                  src={profilePhoto} 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover',
+                    imageRendering: '-webkit-optimize-contrast',
+                    WebkitBackfaceVisibility: 'hidden',
+                    backfaceVisibility: 'hidden',
+                    transform: 'translateZ(0)'
+                  }} 
+                  alt="Profile"
+                />
               ) : (
                 <div style={{ textAlign: 'center', color: '#fff' }}>
-                  <i className="fas fa-camera" style={{ fontSize: '28px', marginBottom: '8px', display: 'block' }}></i>
-                  <span style={{ fontSize: '11px', fontWeight: '600' }}>Add Photo</span>
+                  <i className="fas fa-camera" style={{ fontSize: '32px', marginBottom: '10px', display: 'block' }}></i>
+                  <span style={{ fontSize: '12px', fontWeight: '600' }}>Add Photo</span>
+                </div>
+              )}
+              
+              {/* Hover overlay */}
+              {profilePhoto && !photoLoading && (
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'rgba(0,0,0,0.5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: 0,
+                  transition: 'opacity 0.2s',
+                  borderRadius: '20px'
+                }} className="photo-hover-overlay">
+                  <i className="fas fa-camera" style={{ color: '#fff', fontSize: '24px' }}></i>
                 </div>
               )}
             </div>
             <div style={{ flex: 1 }}>
-              <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '8px' }}>Profile Photo</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '8px' }}>
+                Profile Photo
+                {profilePhoto && <i className="fas fa-check-circle" style={{ marginLeft: '10px', color: 'var(--green-main)', fontSize: '14px' }}></i>}
+              </h3>
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '14px' }}>
-                Upload a professional headshot to personalize your profile
+                Upload a professional headshot (JPEG, PNG, WebP supported)
               </p>
-              <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <button 
                   className="btn btn-primary" 
                   style={{ padding: '10px 20px', fontSize: '13px' }}
                   onClick={() => photoInputRef.current?.click()}
+                  disabled={photoLoading}
                 >
-                  <i className="fas fa-upload"></i> Upload Photo
+                  <i className={photoLoading ? 'fas fa-spinner fa-spin' : 'fas fa-upload'}></i> 
+                  {photoLoading ? 'Processing...' : profilePhoto ? 'Change Photo' : 'Upload Photo'}
                 </button>
                 {profilePhoto && (
                   <button 
                     className="btn btn-secondary" 
                     style={{ padding: '10px 20px', fontSize: '13px' }}
-                    onClick={() => setProfilePhoto(null)}
+                    onClick={() => { setProfilePhoto(null); localStorage.removeItem(STORAGE_KEYS.PHOTO); }}
                   >
                     <i className="fas fa-trash"></i> Remove
                   </button>
                 )}
               </div>
+              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginTop: '10px' }}>
+                <i className="fas fa-info-circle" style={{ marginRight: '6px' }}></i>
+                High-quality images are automatically optimized for best display
+              </p>
             </div>
           </div>
+          
+          <style>{\`
+            .photo-hover-overlay:hover { opacity: 1 !important; }
+          \`}</style>
           
           <div className="form-row">
             <div className="form-field">
@@ -2957,107 +3202,185 @@ app.get('/', (c) => {
       );
     };
     
-    // Template Selector Component
+    // Template Selector Component - Enhanced with Industry Categories
     const TemplateSelector = ({ selectedTemplate, setTemplate }) => {
-      const templates = TEMPLATES;
+      const [activeCategory, setActiveCategory] = useState('all');
+      
+      const filteredTemplates = activeCategory === 'all' 
+        ? TEMPLATES 
+        : TEMPLATES.filter(t => t.category === activeCategory);
       
       return (
         <div>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '28px' }}>
-            Choose a template that best represents your professional brand. Your data will be preserved when switching.
+          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '20px' }}>
+            Choose a template designed for your industry. Your data is preserved when switching.
           </p>
           
+          {/* Category Filter */}
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '28px', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setActiveCategory('all')}
+              style={{
+                padding: '10px 18px',
+                borderRadius: '100px',
+                border: activeCategory === 'all' ? '2px solid var(--purple-main)' : '2px solid rgba(255,255,255,0.1)',
+                background: activeCategory === 'all' ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.03)',
+                color: activeCategory === 'all' ? '#fff' : 'rgba(255,255,255,0.5)',
+                fontSize: '13px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              <i className="fas fa-th" style={{ marginRight: '8px' }}></i>
+              All Templates
+            </button>
+            {TEMPLATE_CATEGORIES.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                style={{
+                  padding: '10px 18px',
+                  borderRadius: '100px',
+                  border: activeCategory === cat.id ? '2px solid var(--purple-main)' : '2px solid rgba(255,255,255,0.1)',
+                  background: activeCategory === cat.id ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.03)',
+                  color: activeCategory === cat.id ? '#fff' : 'rgba(255,255,255,0.5)',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <i className={'fas ' + cat.icon} style={{ marginRight: '8px' }}></i>
+                {cat.name}
+              </button>
+            ))}
+          </div>
+          
+          {/* Templates Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
-            {templates.map(template => (
+            {filteredTemplates.map(template => (
               <div
                 key={template.id}
                 onClick={() => setTemplate(template.id)}
                 style={{
-                  padding: '28px',
+                  padding: '24px',
                   borderRadius: '20px',
                   background: selectedTemplate === template.id 
-                    ? 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.1))'
-                    : 'rgba(255,255,255,0.04)',
+                    ? 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(236,72,153,0.08))'
+                    : 'rgba(255,255,255,0.03)',
                   border: selectedTemplate === template.id 
                     ? '2px solid ' + template.color
-                    : '2px solid rgba(255,255,255,0.08)',
+                    : '2px solid rgba(255,255,255,0.06)',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   position: 'relative',
                   overflow: 'hidden'
                 }}
               >
-                {/* Preview header bar */}
+                {/* Gradient header bar */}
                 <div style={{
                   position: 'absolute',
                   top: 0,
                   left: 0,
                   right: 0,
                   height: '4px',
-                  background: template.color
+                  background: template.gradient
                 }} />
                 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+                {/* Template Header */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '14px' }}>
                   <div style={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '16px',
-                    background: template.color + '20',
+                    width: '52px',
+                    height: '52px',
+                    borderRadius: '14px',
+                    background: template.gradient,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '24px',
-                    color: template.color
+                    fontSize: '22px',
+                    color: '#fff',
+                    boxShadow: '0 8px 24px ' + template.color + '40'
                   }}>
                     <i className={'fas ' + template.icon}></i>
                   </div>
-                  <div>
-                    <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '4px' }}>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#fff', marginBottom: '4px' }}>
                       {template.name}
                     </h3>
-                    <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                    <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', lineHeight: '1.4' }}>
                       {template.desc}
                     </p>
                   </div>
                 </div>
                 
-                {/* Mini preview mockup */}
-                <div style={{
-                  padding: '16px',
-                  background: 'rgba(0,0,0,0.3)',
-                  borderRadius: '12px',
-                  marginTop: '8px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                    <div style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '8px',
-                      background: template.color
-                    }} />
-                    <div>
-                      <div style={{ width: '80px', height: '8px', background: 'rgba(255,255,255,0.3)', borderRadius: '4px', marginBottom: '4px' }} />
-                      <div style={{ width: '50px', height: '6px', background: 'rgba(255,255,255,0.15)', borderRadius: '3px' }} />
-                    </div>
-                  </div>
-                  <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', marginBottom: '8px' }} />
-                  <div style={{ width: '75%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px' }} />
+                {/* Industry Tags */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
+                  {template.industries.map((ind, i) => (
+                    <span key={i} style={{
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      background: 'rgba(255,255,255,0.06)',
+                      fontSize: '10px',
+                      fontWeight: '500',
+                      color: 'rgba(255,255,255,0.5)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.3px'
+                    }}>
+                      {ind}
+                    </span>
+                  ))}
                 </div>
                 
+                {/* Mini Preview */}
+                <div style={{
+                  padding: '14px',
+                  background: 'rgba(0,0,0,0.25)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255,255,255,0.05)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                    <div style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '8px',
+                      background: template.gradient
+                    }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ width: '60%', height: '7px', background: 'rgba(255,255,255,0.25)', borderRadius: '4px', marginBottom: '4px' }} />
+                      <div style={{ width: '40%', height: '5px', background: template.color + '50', borderRadius: '3px' }} />
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+                    {[1,2,3].map(i => (
+                      <div key={i} style={{ 
+                        flex: 1, 
+                        height: '20px', 
+                        background: i === 1 ? template.color + '30' : 'rgba(255,255,255,0.08)', 
+                        borderRadius: '4px' 
+                      }} />
+                    ))}
+                  </div>
+                  <div style={{ width: '100%', height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', marginBottom: '6px' }} />
+                  <div style={{ width: '70%', height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px' }} />
+                </div>
+                
+                {/* Selected checkmark */}
                 {selectedTemplate === template.id && (
                   <div style={{
                     position: 'absolute',
-                    top: '16px',
-                    right: '16px',
-                    width: '28px',
-                    height: '28px',
+                    top: '14px',
+                    right: '14px',
+                    width: '26px',
+                    height: '26px',
                     borderRadius: '50%',
-                    background: template.color,
+                    background: template.gradient,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: '#fff',
-                    fontSize: '12px'
+                    fontSize: '11px',
+                    boxShadow: '0 4px 12px ' + template.color + '50'
                   }}>
                     <i className="fas fa-check"></i>
                   </div>
@@ -3065,20 +3388,67 @@ app.get('/', (c) => {
               </div>
             ))}
           </div>
+          
+          {/* Template count */}
+          <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>
+            Showing {filteredTemplates.length} of {TEMPLATES.length} templates
+          </p>
         </div>
       );
     };
     
-    // Media Editor
+    // Media Editor - ENHANCED with proper video playback and image quality
     const MediaEditor = ({ photos, videos, setPhotos, setVideos }) => {
       const photoInputRef = useRef(null);
       const videoInputRef = useRef(null);
+      const [expandedVideo, setExpandedVideo] = useState(null);
+      const [expandedPhoto, setExpandedPhoto] = useState(null);
       
-      const handlePhotoUpload = (e) => {
+      const handlePhotoUpload = async (e) => {
         const files = Array.from(e.target.files);
-        const newPhotos = files.map(f => ({
-          id: Math.random(),
-          url: URL.createObjectURL(f)
+        const newPhotos = await Promise.all(files.map(async (file) => {
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              const img = new Image();
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const maxSize = 1200;
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > height && width > maxSize) {
+                  height = (height * maxSize) / width;
+                  width = maxSize;
+                } else if (height > maxSize) {
+                  width = (width * maxSize) / height;
+                  height = maxSize;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                resolve({
+                  id: Date.now() + Math.random(),
+                  url: canvas.toDataURL('image/jpeg', 0.9),
+                  name: file.name
+                });
+              };
+              img.onerror = () => {
+                resolve({
+                  id: Date.now() + Math.random(),
+                  url: URL.createObjectURL(file),
+                  name: file.name
+                });
+              };
+              img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+          });
         }));
         setPhotos([...photos, ...newPhotos]);
       };
@@ -3086,53 +3456,177 @@ app.get('/', (c) => {
       const handleVideoUpload = (e) => {
         const files = Array.from(e.target.files);
         const newVideos = files.map(f => ({
-          id: Math.random(),
-          url: URL.createObjectURL(f)
+          id: Date.now() + Math.random(),
+          url: URL.createObjectURL(f),
+          name: f.name,
+          type: f.type
         }));
         setVideos([...videos, ...newVideos]);
       };
       
       return (
         <div>
+          {/* Expanded Photo Modal */}
+          {expandedPhoto && (
+            <div 
+              onClick={() => setExpandedPhoto(null)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.9)',
+                zIndex: 10000,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '40px',
+                cursor: 'zoom-out'
+              }}
+            >
+              <img 
+                src={expandedPhoto.url} 
+                style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '12px', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }} 
+                alt="Expanded"
+              />
+              <button
+                onClick={() => setExpandedPhoto(null)}
+                style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: '20px',
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.1)',
+                  border: 'none',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  fontSize: '20px'
+                }}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+          )}
+          
+          {/* Expanded Video Modal */}
+          {expandedVideo && (
+            <div 
+              onClick={(e) => e.target === e.currentTarget && setExpandedVideo(null)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.95)',
+                zIndex: 10000,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '40px'
+              }}
+            >
+              <video 
+                src={expandedVideo.url} 
+                controls 
+                autoPlay
+                playsInline
+                style={{ 
+                  maxWidth: '90vw', 
+                  maxHeight: '85vh', 
+                  borderRadius: '12px', 
+                  boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+                  objectFit: 'contain',
+                  background: '#000'
+                }}
+              />
+              <button
+                onClick={() => setExpandedVideo(null)}
+                style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: '20px',
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.1)',
+                  border: 'none',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  fontSize: '20px'
+                }}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+          )}
+        
           <h3 style={{ fontSize: '14px', color: 'var(--cyan-main)', marginBottom: '18px', fontWeight: '600' }}>
             <i className="fas fa-camera" style={{ marginRight: '10px' }}></i>
             Photos
+            <span style={{ marginLeft: '10px', fontSize: '12px', color: 'rgba(255,255,255,0.4)', fontWeight: '400' }}>
+              ({photos.length} uploaded)
+            </span>
           </h3>
           
           <input
             type="file"
             ref={photoInputRef}
             onChange={handlePhotoUpload}
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp,image/gif"
             multiple
             hidden
           />
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '14px', marginBottom: '36px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '14px', marginBottom: '36px' }}>
             {photos.map(photo => (
-              <div key={photo.id} style={{
-                aspectRatio: '1',
-                borderRadius: '14px',
-                overflow: 'hidden',
-                position: 'relative',
-                border: '1px solid rgba(255,255,255,0.1)'
-              }}>
-                <img src={photo.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div 
+                key={photo.id} 
+                style={{
+                  aspectRatio: '1',
+                  borderRadius: '14px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  border: '2px solid rgba(255,255,255,0.1)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onClick={() => setExpandedPhoto(photo)}
+              >
+                <img 
+                  src={photo.url} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'high-quality' }} 
+                  alt={photo.name || 'Photo'}
+                />
+                {/* Hover overlay with zoom icon */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(transparent 50%, rgba(0,0,0,0.7))',
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  justifyContent: 'center',
+                  padding: '10px',
+                  opacity: 0,
+                  transition: 'opacity 0.2s'
+                }} className="media-hover">
+                  <i className="fas fa-search-plus" style={{ color: '#fff', fontSize: '18px' }}></i>
+                </div>
                 <button
-                  onClick={() => setPhotos(photos.filter(p => p.id !== photo.id))}
+                  onClick={(e) => { e.stopPropagation(); setPhotos(photos.filter(p => p.id !== photo.id)); }}
                   style={{
                     position: 'absolute',
                     top: '8px',
                     right: '8px',
-                    width: '26px',
-                    height: '26px',
+                    width: '28px',
+                    height: '28px',
                     borderRadius: '50%',
-                    background: 'rgba(0,0,0,0.6)',
+                    background: 'rgba(239,68,68,0.9)',
                     border: 'none',
                     color: '#fff',
                     cursor: 'pointer',
-                    fontSize: '11px'
+                    fontSize: '12px',
+                    opacity: 0,
+                    transition: 'opacity 0.2s'
                   }}
+                  className="delete-btn"
                 >
                   <i className="fas fa-times"></i>
                 </button>
@@ -3144,60 +3638,117 @@ app.get('/', (c) => {
               style={{
                 aspectRatio: '1',
                 borderRadius: '14px',
-                border: '2px dashed rgba(255,255,255,0.15)',
-                background: 'transparent',
+                border: '2px dashed rgba(6,182,212,0.4)',
+                background: 'rgba(6,182,212,0.05)',
                 cursor: 'pointer',
-                color: 'rgba(255,255,255,0.4)',
-                fontSize: '22px'
+                color: 'var(--cyan-main)',
+                fontSize: '18px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'all 0.2s'
               }}
             >
               <i className="fas fa-plus"></i>
+              <span style={{ fontSize: '11px', fontWeight: '600' }}>Add Photo</span>
             </button>
           </div>
           
           <h3 style={{ fontSize: '14px', color: 'var(--pink-main)', marginBottom: '18px', fontWeight: '600' }}>
             <i className="fas fa-video" style={{ marginRight: '10px' }}></i>
             Videos
+            <span style={{ marginLeft: '10px', fontSize: '12px', color: 'rgba(255,255,255,0.4)', fontWeight: '400' }}>
+              ({videos.length} uploaded)
+            </span>
           </h3>
           
           <input
             type="file"
             ref={videoInputRef}
             onChange={handleVideoUpload}
-            accept="video/*"
+            accept="video/mp4,video/webm,video/mov,video/quicktime"
             multiple
             hidden
           />
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '14px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '14px' }}>
             {videos.map(video => (
-              <div key={video.id} style={{
-                aspectRatio: '16/9',
-                borderRadius: '14px',
-                overflow: 'hidden',
-                position: 'relative',
-                border: '1px solid rgba(255,255,255,0.1)',
-                background: '#0f0818'
-              }}>
-                <video src={video.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <button
-                  onClick={() => setVideos(videos.filter(v => v.id !== video.id))}
-                  style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: '8px',
-                    width: '26px',
-                    height: '26px',
-                    borderRadius: '50%',
-                    background: 'rgba(0,0,0,0.6)',
-                    border: 'none',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    fontSize: '11px'
+              <div 
+                key={video.id} 
+                style={{
+                  borderRadius: '14px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  border: '2px solid rgba(255,255,255,0.1)',
+                  background: '#0a0a12'
+                }}
+              >
+                {/* Video with controls - Fixed playback */}
+                <video 
+                  src={video.url} 
+                  controls
+                  preload="auto"
+                  playsInline
+                  style={{ 
+                    width: '100%', 
+                    minHeight: '180px',
+                    maxHeight: '300px',
+                    objectFit: 'contain',
+                    background: '#000',
+                    display: 'block'
                   }}
-                >
-                  <i className="fas fa-times"></i>
-                </button>
+                  onClick={(e) => e.target.paused ? e.target.play() : e.target.pause()}
+                />
+                
+                {/* Video info bar */}
+                <div style={{
+                  padding: '10px 14px',
+                  background: 'rgba(0,0,0,0.5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <i className="fas fa-film"></i>
+                    {video.name || 'Video'}
+                  </span>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => setExpandedVideo(video)}
+                      style={{
+                        width: '30px',
+                        height: '30px',
+                        borderRadius: '8px',
+                        background: 'rgba(236,72,153,0.2)',
+                        border: 'none',
+                        color: 'var(--pink-main)',
+                        cursor: 'pointer',
+                        fontSize: '12px'
+                      }}
+                      title="Full screen"
+                    >
+                      <i className="fas fa-expand"></i>
+                    </button>
+                    <button
+                      onClick={() => setVideos(videos.filter(v => v.id !== video.id))}
+                      style={{
+                        width: '30px',
+                        height: '30px',
+                        borderRadius: '8px',
+                        background: 'rgba(239,68,68,0.2)',
+                        border: 'none',
+                        color: '#EF4444',
+                        cursor: 'pointer',
+                        fontSize: '12px'
+                      }}
+                      title="Delete"
+                    >
+                      <i className="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
             
@@ -3206,59 +3757,44 @@ app.get('/', (c) => {
               style={{
                 aspectRatio: '16/9',
                 borderRadius: '14px',
-                border: '2px dashed rgba(255,255,255,0.15)',
-                background: 'transparent',
+                border: '2px dashed rgba(236,72,153,0.4)',
+                background: 'rgba(236,72,153,0.05)',
                 cursor: 'pointer',
-                color: 'rgba(255,255,255,0.4)',
-                fontSize: '22px'
+                color: 'var(--pink-main)',
+                fontSize: '18px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                transition: 'all 0.2s'
               }}
             >
               <i className="fas fa-plus"></i>
+              <span style={{ fontSize: '12px', fontWeight: '600' }}>Add Video</span>
+              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>MP4, WebM, MOV</span>
             </button>
           </div>
+          
+          <style>{\`
+            .media-hover:hover, div:hover > .media-hover { opacity: 1 !important; }
+            div:hover > .delete-btn { opacity: 1 !important; }
+          \`}</style>
         </div>
       );
     };
     
-    // Preview View with Template Support
+    // Preview View with Template Support - ENHANCED for all 10 templates
     const PreviewView = ({ profile, setView, profilePhoto, selectedTemplate }) => {
       const template = TEMPLATES.find(t => t.id === selectedTemplate) || TEMPLATES[0];
       
-      // Template-specific styles
-      const getTemplateStyles = () => {
-        switch (selectedTemplate) {
-          case 'creative':
-            return {
-              accent: '#EC4899',
-              gradient: 'linear-gradient(135deg, #EC4899, #F472B6, #8B5CF6)',
-              cardBg: 'rgba(236,72,153,0.08)',
-              border: 'rgba(236,72,153,0.2)'
-            };
-          case 'tech':
-            return {
-              accent: '#06B6D4',
-              gradient: 'linear-gradient(135deg, #06B6D4, #22D3EE, #8B5CF6)',
-              cardBg: 'rgba(6,182,212,0.08)',
-              border: 'rgba(6,182,212,0.2)'
-            };
-          case 'minimal':
-            return {
-              accent: '#10B981',
-              gradient: 'linear-gradient(135deg, #10B981, #34D399, #6EE7B7)',
-              cardBg: 'rgba(16,185,129,0.08)',
-              border: 'rgba(16,185,129,0.2)'
-            };
-          default: // executive
-            return {
-              accent: '#8B5CF6',
-              gradient: 'linear-gradient(135deg, #8B5CF6, #A78BFA, #EC4899)',
-              cardBg: 'rgba(139,92,246,0.08)',
-              border: 'rgba(139,92,246,0.2)'
-            };
-        }
+      // Use template's own gradient and color
+      const styles = {
+        accent: template.color,
+        gradient: template.gradient,
+        cardBg: template.color + '12',
+        border: template.color + '30'
       };
-      
-      const styles = getTemplateStyles();
       
       return (
         <div>
