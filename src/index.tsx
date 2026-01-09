@@ -84,6 +84,14 @@ RETURN THIS EXACT JSON STRUCTURE:
   "experience": [
     {
       "company": "Company Name",
+      "companyInfo": {
+        "website": "company website URL (e.g., https://google.com)",
+        "domain": "company domain for logo lookup (e.g., google.com)",
+        "industry": "Industry sector",
+        "location": "Company HQ city, state/country",
+        "size": "Company size (e.g., 10,000+ employees, Fortune 500)",
+        "description": "1-2 sentence company description"
+      },
       "role": "Job Title",
       "startDate": "Mon YYYY",
       "endDate": "Mon YYYY or Present",
@@ -115,6 +123,15 @@ RETURN THIS EXACT JSON STRUCTURE:
   ],
   "certifications": ["Cert 1", "Cert 2"]
 }
+
+## COMPANY INFO REQUIREMENTS
+For each company, you MUST provide:
+- Website URL (research or infer based on company name)
+- Domain (clean domain for logo lookup, e.g., "google.com", "microsoft.com")
+- Industry sector
+- Location (headquarters)
+- Company size estimate
+- Brief company description
 
 ABSOLUTE REQUIREMENTS:
 - NEVER use generic descriptions - be SPECIFIC to this person's actual experience
@@ -231,35 +248,35 @@ app.get('/', (c) => {
        Semi-transparent cards with blur effect
        =========================================================== */
     .glass {
-      background: rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 20px;
     }
     
     .glass-card {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 24px;
       box-shadow: 
-        0 4px 30px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 4px 20px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
     
     .glass-sidebar {
-      background: rgba(15, 8, 24, 0.7);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(15, 8, 24, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
     }
     
     .glass-input {
-      background: rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
       padding: 14px 18px;
@@ -1354,6 +1371,14 @@ app.get('/', (c) => {
         }
       };
       
+      // Helper to get company logo URL from Clearbit
+      const getCompanyLogoUrl = (domain) => {
+        if (!domain) return null;
+        // Clean domain
+        const cleanDomain = domain.replace(/^(https?:\\/\\/)?(www\\.)?/, '').split('/')[0];
+        return \`https://logo.clearbit.com/\${cleanDomain}\`;
+      };
+      
       const buildProfile = (aiData, text) => {
         if (aiData && !aiData.error && aiData.basics) {
           return {
@@ -1361,25 +1386,42 @@ app.get('/', (c) => {
               ...aiData.basics,
               summary: aiData.basics.summary || ''
             },
-            experience: (aiData.experience || []).map((e, i) => ({
-              id: Date.now() + i,
-              ...e,
-              responsibilities: e.responsibilities || [],
-              dayInLife: e.dayInLife || [
-                { time: '9:00 AM', activity: '' },
-                { time: '10:30 AM', activity: '' },
-                { time: '12:00 PM', activity: '' },
-                { time: '2:00 PM', activity: '' },
-                { time: '4:00 PM', activity: '' },
-                { time: '5:30 PM', activity: '' }
-              ],
-              metrics: e.metrics || [
-                { value: '', label: '' },
-                { value: '', label: '' },
-                { value: '', label: '' },
-                { value: '', label: '' }
-              ]
-            })),
+            experience: (aiData.experience || []).map((e, i) => {
+              // Auto-generate logo URL from company domain
+              const companyInfo = e.companyInfo || {};
+              const domain = companyInfo.domain || '';
+              const logoUrl = getCompanyLogoUrl(domain);
+              
+              return {
+                id: Date.now() + i,
+                ...e,
+                companyInfo: {
+                  website: companyInfo.website || '',
+                  domain: domain,
+                  industry: companyInfo.industry || '',
+                  location: companyInfo.location || '',
+                  size: companyInfo.size || '',
+                  description: companyInfo.description || ''
+                },
+                logoUrl: logoUrl,
+                customLogo: null, // For manual upload
+                responsibilities: e.responsibilities || [],
+                dayInLife: e.dayInLife || [
+                  { time: '9:00 AM', activity: '' },
+                  { time: '10:30 AM', activity: '' },
+                  { time: '12:00 PM', activity: '' },
+                  { time: '2:00 PM', activity: '' },
+                  { time: '4:00 PM', activity: '' },
+                  { time: '5:30 PM', activity: '' }
+                ],
+                metrics: e.metrics || [
+                  { value: '', label: '' },
+                  { value: '', label: '' },
+                  { value: '', label: '' },
+                  { value: '', label: '' }
+                ]
+              };
+            }),
             skills: aiData.skills || [],
             achievements: (aiData.achievements || []).map((a, i) => ({
               id: Date.now() + i + 1000,
@@ -1956,16 +1998,31 @@ app.get('/', (c) => {
       );
     };
     
-    // Experience Editor
+    // Experience Editor with Company Logo Support
     const ExperienceEditor = ({ experiences, setExperiences }) => {
+      const [logoErrors, setLogoErrors] = useState({});
+      const [showCompanyInfo, setShowCompanyInfo] = useState({});
+      const logoInputRefs = useRef({});
+      
       const addExperience = () => {
         setExperiences([...experiences, {
           id: Date.now(),
           company: '',
+          companyInfo: {
+            website: '',
+            domain: '',
+            industry: '',
+            location: '',
+            size: '',
+            description: ''
+          },
+          logoUrl: null,
+          customLogo: null,
           role: '',
           startDate: '',
           endDate: '',
           description: '',
+          responsibilities: [],
           dayInLife: [
             { time: '9:00 AM', activity: '' },
             { time: '11:00 AM', activity: '' },
@@ -1988,8 +2045,25 @@ app.get('/', (c) => {
         setExperiences(updated);
       };
       
+      const updateCompanyInfo = (idx, key, value) => {
+        const updated = [...experiences];
+        updated[idx].companyInfo = { ...updated[idx].companyInfo, [key]: value };
+        
+        // Auto-update logo URL when domain changes
+        if (key === 'domain' && value) {
+          const cleanDomain = value.replace(/^(https?:\\/\\/)?(www\\.)?/, '').split('/')[0];
+          updated[idx].logoUrl = \`https://logo.clearbit.com/\${cleanDomain}\`;
+          // Clear any previous error
+          setLogoErrors(prev => ({ ...prev, [idx]: false }));
+        }
+        
+        setExperiences(updated);
+      };
+      
       const removeExperience = (idx) => {
-        setExperiences(experiences.filter((_, i) => i !== idx));
+        if (confirm('Are you sure you want to remove this experience? This action cannot be undone.')) {
+          setExperiences(experiences.filter((_, i) => i !== idx));
+        }
       };
       
       const updateMetric = (expIdx, metricIdx, key, value) => {
@@ -2004,16 +2078,227 @@ app.get('/', (c) => {
         setExperiences(updated);
       };
       
+      const handleLogoUpload = (idx, e) => {
+        const file = e.target.files[0];
+        if (file) {
+          if (confirm('Upload this logo for ' + (experiences[idx].company || 'this company') + '?')) {
+            const url = URL.createObjectURL(file);
+            const updated = [...experiences];
+            updated[idx].customLogo = url;
+            setExperiences(updated);
+          }
+        }
+      };
+      
+      const handleLogoError = (idx) => {
+        setLogoErrors(prev => ({ ...prev, [idx]: true }));
+      };
+      
+      const clearCustomLogo = (idx) => {
+        if (confirm('Remove custom logo and revert to auto-detected logo?')) {
+          const updated = [...experiences];
+          updated[idx].customLogo = null;
+          setExperiences(updated);
+        }
+      };
+      
+      const toggleCompanyInfo = (idx) => {
+        setShowCompanyInfo(prev => ({ ...prev, [idx]: !prev[idx] }));
+      };
+      
+      // Get display logo - custom takes priority over auto
+      const getDisplayLogo = (exp, idx) => {
+        if (exp.customLogo) return exp.customLogo;
+        if (exp.logoUrl && !logoErrors[idx]) return exp.logoUrl;
+        return null;
+      };
+      
       return (
         <div>
           {experiences.map((exp, idx) => (
             <div key={exp.id} className="glass exp-entry">
               <div className="exp-head">
-                <div className="exp-badge">{idx + 1}</div>
-                <button className="btn-icon" onClick={() => removeExperience(idx)}>
-                  <i className="fas fa-trash"></i>
-                </button>
+                {/* Company Logo Section */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
+                  <input
+                    type="file"
+                    ref={el => logoInputRefs.current[idx] = el}
+                    onChange={(e) => handleLogoUpload(idx, e)}
+                    accept="image/*"
+                    hidden
+                  />
+                  <div
+                    onClick={() => logoInputRefs.current[idx]?.click()}
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '14px',
+                      background: getDisplayLogo(exp, idx) ? '#fff' : 'linear-gradient(135deg, var(--purple-main), var(--pink-main))',
+                      border: '2px solid rgba(255,255,255,0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      position: 'relative'
+                    }}
+                    title={getDisplayLogo(exp, idx) ? "Click to upload custom logo" : "Auto-detect or upload company logo"}
+                  >
+                    {getDisplayLogo(exp, idx) ? (
+                      <img 
+                        src={getDisplayLogo(exp, idx)} 
+                        onError={() => handleLogoError(idx)}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} 
+                      />
+                    ) : (
+                      <div style={{ textAlign: 'center', color: '#fff' }}>
+                        <i className="fas fa-building" style={{ fontSize: '20px' }}></i>
+                      </div>
+                    )}
+                    {/* Upload overlay */}
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'rgba(0,0,0,0.6)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: 0,
+                      transition: 'opacity 0.2s',
+                      borderRadius: '12px'
+                    }} className="logo-upload-overlay">
+                      <i className="fas fa-camera" style={{ color: '#fff', fontSize: '16px' }}></i>
+                    </div>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '18px', fontWeight: '700', color: '#fff' }}>
+                      {exp.company || 'New Experience'}
+                    </div>
+                    <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>
+                      {exp.role || 'Role'} • {exp.startDate || 'Start'} - {exp.endDate || 'End'}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {exp.customLogo && (
+                    <button 
+                      className="btn-icon" 
+                      onClick={() => clearCustomLogo(idx)}
+                      title="Remove custom logo"
+                      style={{ background: 'rgba(236,72,153,0.15)', borderColor: 'rgba(236,72,153,0.3)' }}
+                    >
+                      <i className="fas fa-image" style={{ color: 'var(--pink-main)' }}></i>
+                    </button>
+                  )}
+                  <button 
+                    className="btn-icon" 
+                    onClick={() => toggleCompanyInfo(idx)}
+                    title="Company details"
+                    style={{ 
+                      background: showCompanyInfo[idx] ? 'rgba(6,182,212,0.2)' : 'rgba(255,255,255,0.05)',
+                      borderColor: showCompanyInfo[idx] ? 'var(--cyan-main)' : 'rgba(255,255,255,0.1)'
+                    }}
+                  >
+                    <i className="fas fa-info-circle" style={{ color: showCompanyInfo[idx] ? 'var(--cyan-main)' : 'rgba(255,255,255,0.5)' }}></i>
+                  </button>
+                  <button className="btn-icon" onClick={() => removeExperience(idx)}>
+                    <i className="fas fa-trash"></i>
+                  </button>
+                </div>
               </div>
+              
+              {/* Company Info Section - Expandable */}
+              {showCompanyInfo[idx] && (
+                <div style={{ 
+                  margin: '20px 0', 
+                  padding: '20px', 
+                  background: 'rgba(6,182,212,0.08)', 
+                  borderRadius: '14px',
+                  border: '1px solid rgba(6,182,212,0.2)'
+                }}>
+                  <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--cyan-main)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <i className="fas fa-building"></i>
+                    Company Information
+                    <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontWeight: '400', marginLeft: 'auto' }}>
+                      Auto-generated • Edit if needed
+                    </span>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-field">
+                      <label className="form-label">Domain (for logo)</label>
+                      <input
+                        className="glass-input"
+                        value={exp.companyInfo?.domain || ''}
+                        onChange={(e) => updateCompanyInfo(idx, 'domain', e.target.value)}
+                        placeholder="google.com"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <label className="form-label">Website</label>
+                      <input
+                        className="glass-input"
+                        value={exp.companyInfo?.website || ''}
+                        onChange={(e) => updateCompanyInfo(idx, 'website', e.target.value)}
+                        placeholder="https://company.com"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <label className="form-label">Industry</label>
+                      <input
+                        className="glass-input"
+                        value={exp.companyInfo?.industry || ''}
+                        onChange={(e) => updateCompanyInfo(idx, 'industry', e.target.value)}
+                        placeholder="Technology, Finance, etc."
+                      />
+                    </div>
+                    <div className="form-field">
+                      <label className="form-label">Location</label>
+                      <input
+                        className="glass-input"
+                        value={exp.companyInfo?.location || ''}
+                        onChange={(e) => updateCompanyInfo(idx, 'location', e.target.value)}
+                        placeholder="San Francisco, CA"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <label className="form-label">Company Size</label>
+                      <input
+                        className="glass-input"
+                        value={exp.companyInfo?.size || ''}
+                        onChange={(e) => updateCompanyInfo(idx, 'size', e.target.value)}
+                        placeholder="1000+ employees"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <label className="form-label">Description</label>
+                      <input
+                        className="glass-input"
+                        value={exp.companyInfo?.description || ''}
+                        onChange={(e) => updateCompanyInfo(idx, 'description', e.target.value)}
+                        placeholder="Brief company description"
+                      />
+                    </div>
+                  </div>
+                  {(logoErrors[idx] && !exp.customLogo) && (
+                    <div style={{ 
+                      marginTop: '12px', 
+                      padding: '10px 14px', 
+                      background: 'rgba(239,68,68,0.1)', 
+                      border: '1px solid rgba(239,68,68,0.2)',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                      color: '#EF4444',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <i className="fas fa-exclamation-triangle"></i>
+                      Logo not found for this domain. Please upload a custom logo.
+                    </div>
+                  )}
+                </div>
+              )}
               
               <div className="form-row">
                 <div className="form-field">
@@ -2059,6 +2344,7 @@ app.get('/', (c) => {
                     value={exp.description}
                     onChange={(e) => updateExperience(idx, 'description', e.target.value)}
                     placeholder="Describe your role and responsibilities..."
+                    style={{ minHeight: '120px' }}
                   />
                 </div>
               </div>
@@ -2069,7 +2355,7 @@ app.get('/', (c) => {
                   <i className="fas fa-sun"></i>
                   Day in the Life
                 </div>
-                {exp.dayInLife.map((day, dayIdx) => (
+                {(exp.dayInLife || []).map((day, dayIdx) => (
                   <div key={dayIdx} className="day-entry">
                     <span className="day-time">{day.time}</span>
                     <input
@@ -2089,7 +2375,7 @@ app.get('/', (c) => {
                   Impact Metrics
                 </div>
                 <div className="metrics-row">
-                  {exp.metrics.map((metric, metricIdx) => (
+                  {(exp.metrics || []).map((metric, metricIdx) => (
                     <div key={metricIdx} className="metric-box">
                       <input
                         value={metric.value}
@@ -2111,6 +2397,12 @@ app.get('/', (c) => {
           <button className="btn-ghost" onClick={addExperience}>
             <i className="fas fa-plus"></i> Add Experience
           </button>
+          
+          <style>{\`
+            .exp-entry:hover .logo-upload-overlay {
+              opacity: 1 !important;
+            }
+          \`}</style>
         </div>
       );
     };
@@ -2653,13 +2945,62 @@ app.get('/', (c) => {
               </h2>
               
               <div className="timeline-wrap" style={{ '--timeline-color': styles.accent }}>
-                {profile.experience.map((exp, idx) => (
+                {profile.experience.map((exp, idx) => {
+                  const displayLogo = exp.customLogo || exp.logoUrl;
+                  return (
                   <div key={exp.id} className="glass timeline-item">
-                    <h3 className="timeline-company">{exp.company || 'Company'}</h3>
-                    <p className="timeline-role" style={{ color: styles.accent }}>{exp.role || 'Role'}</p>
-                    <span className="timeline-dates" style={{ background: styles.accent + '15', borderColor: styles.accent + '30', color: styles.accent }}>
-                      {exp.startDate || 'Start'} — {exp.endDate || 'End'}
-                    </span>
+                    {/* Company Header with Logo */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', marginBottom: '16px' }}>
+                      {displayLogo && (
+                        <div style={{
+                          width: '56px',
+                          height: '56px',
+                          borderRadius: '12px',
+                          background: '#fff',
+                          border: '2px solid rgba(255,255,255,0.2)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden',
+                          flexShrink: 0
+                        }}>
+                          <img 
+                            src={displayLogo} 
+                            onError={(e) => e.target.style.display = 'none'}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} 
+                          />
+                        </div>
+                      )}
+                      <div style={{ flex: 1 }}>
+                        <h3 className="timeline-company" style={{ marginBottom: '4px' }}>{exp.company || 'Company'}</h3>
+                        <p className="timeline-role" style={{ color: styles.accent, marginBottom: '8px' }}>{exp.role || 'Role'}</p>
+                        <span className="timeline-dates" style={{ background: styles.accent + '15', borderColor: styles.accent + '30', color: styles.accent }}>
+                          {exp.startDate || 'Start'} — {exp.endDate || 'End'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Company Info Badge */}
+                    {exp.companyInfo && (exp.companyInfo.industry || exp.companyInfo.location) && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '14px' }}>
+                        {exp.companyInfo.industry && (
+                          <span style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
+                            <i className="fas fa-industry" style={{ marginRight: '6px' }}></i>{exp.companyInfo.industry}
+                          </span>
+                        )}
+                        {exp.companyInfo.location && (
+                          <span style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
+                            <i className="fas fa-map-marker-alt" style={{ marginRight: '6px' }}></i>{exp.companyInfo.location}
+                          </span>
+                        )}
+                        {exp.companyInfo.size && (
+                          <span style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
+                            <i className="fas fa-users" style={{ marginRight: '6px' }}></i>{exp.companyInfo.size}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    
                     <p className="timeline-desc">{exp.description || 'Description of your role and achievements'}</p>
                     
                     {/* Responsibilities */}
@@ -2706,7 +3047,8 @@ app.get('/', (c) => {
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
