@@ -8,47 +8,121 @@ app.post('/api/parse-resume', async (c) => {
   try {
     const { text } = await c.req.json();
     
-    const prompt = `You are an expert resume parser. Analyze this resume and extract ALL information into JSON.
+    const prompt = `You are an elite career analyst, executive resume writer, and talent acquisition expert with 20+ years experience. Analyze this resume DEEPLY and extract MAXIMUM value to create a comprehensive, impressive professional profile.
 
-RESUME:
+RESUME TEXT TO ANALYZE:
 ${text}
 
-Return EXACT JSON:
+YOUR MISSION - Create the most detailed, impactful profile possible:
+
+## BASICS EXTRACTION
+- Extract the person's full name, most recent/impressive job title
+- Create a POWERFUL tagline (like "Visionary Tech Leader Who Scaled Teams 10x and Drove $50M Revenue")
+- Write a compelling 3-4 sentence executive summary highlighting their unique value proposition
+- Extract all contact info (email, phone, location, LinkedIn, website)
+
+## EXPERIENCE ANALYSIS (This is CRITICAL - be extremely thorough)
+For EACH position, provide:
+
+1. **DESCRIPTION** (5-8 sentences minimum):
+   - Opening sentence: Core role and scope of responsibility
+   - Key projects led or contributed to (name specific initiatives if mentioned)
+   - Technologies, methodologies, tools used daily
+   - Cross-functional collaboration and stakeholder management
+   - Leadership scope (direct reports, team size, budget if applicable)
+   - Major wins and accomplishments in this role
+   - How they advanced the company's mission or bottom line
+   - Closing sentence: Career growth or recognition received
+
+2. **RESPONSIBILITIES** (8-12 bullet points):
+   - Be SPECIFIC to this role and industry
+   - Start each with strong action verbs (Led, Architected, Spearheaded, Optimized, etc.)
+   - Include scope/scale where possible (e.g., "Managed portfolio of 15+ enterprise clients")
+   - Mix strategic and tactical duties
+   
+3. **DAY IN THE LIFE** (Create a realistic, detailed schedule):
+   - 8:30 AM: Morning routine specific to this role
+   - 9:30 AM: Core morning work activity
+   - 11:00 AM: Meetings or collaboration time
+   - 12:30 PM: Midday activity
+   - 2:00 PM: Afternoon deep work
+   - 4:00 PM: Late afternoon tasks
+   - 5:30 PM: End of day wrap-up
+
+4. **METRICS** (Generate 4 impressive metrics, estimate if not explicit):
+   - Revenue/cost impact (e.g., "+$2.5M revenue", "-40% costs")
+   - Scale/efficiency (e.g., "10x throughput", "200% growth")
+   - Team/scope (e.g., "25 direct reports", "50+ stakeholders")
+   - Quality/speed (e.g., "99.9% uptime", "3x faster delivery")
+
+## SKILLS EXTRACTION
+- Extract EVERY skill mentioned in the resume
+- Add 10-15 related/inferred skills based on the roles
+- Group logically: Technical, Leadership, Domain, Soft skills
+
+## ACHIEVEMENTS
+- Extract explicit achievements AND infer major wins from job descriptions
+- Write each as a compelling mini-story with context and impact
+
+## EDUCATION & CERTIFICATIONS
+- Extract all degrees, schools, graduation years, honors
+- List all professional certifications
+
+RETURN THIS EXACT JSON STRUCTURE:
 {
   "basics": {
-    "name": "full name",
-    "title": "job title",
-    "tagline": "1-line summary",
-    "email": "email",
-    "phone": "phone",
-    "location": "city, state",
-    "linkedin": "url",
-    "website": "url"
+    "name": "Full Name",
+    "title": "Most Impressive Job Title",
+    "tagline": "Powerful 1-line value proposition with specific achievements",
+    "email": "email@domain.com",
+    "phone": "phone number",
+    "location": "City, State/Country",
+    "linkedin": "linkedin URL",
+    "website": "website URL",
+    "summary": "3-4 sentence executive summary showcasing unique expertise and career trajectory"
   },
   "experience": [
     {
-      "company": "company",
-      "role": "title",
-      "startDate": "date",
-      "endDate": "date",
-      "description": "description",
+      "company": "Company Name",
+      "role": "Job Title",
+      "startDate": "Mon YYYY",
+      "endDate": "Mon YYYY or Present",
+      "description": "COMPREHENSIVE 5-8 sentence description covering responsibilities, projects, technologies, leadership, and achievements. Make it read like a polished executive resume.",
+      "responsibilities": ["Action-verb duty 1 with scope", "Action-verb duty 2", "...", "8-12 total"],
       "dayInLife": [
-        {"time": "9:00 AM", "activity": "activity"},
-        {"time": "11:00 AM", "activity": "activity"},
-        {"time": "1:00 PM", "activity": "activity"},
-        {"time": "3:00 PM", "activity": "activity"},
-        {"time": "5:00 PM", "activity": "activity"}
+        {"time": "8:30 AM", "activity": "Role-specific morning activity"},
+        {"time": "9:30 AM", "activity": "Core work activity"},
+        {"time": "11:00 AM", "activity": "Collaborative work"},
+        {"time": "12:30 PM", "activity": "Midday task"},
+        {"time": "2:00 PM", "activity": "Afternoon focus work"},
+        {"time": "4:00 PM", "activity": "Late afternoon activity"},
+        {"time": "5:30 PM", "activity": "Wrap-up activity"}
       ],
       "metrics": [
-        {"value": "value", "label": "label"}
+        {"value": "+XX%", "label": "Specific metric"},
+        {"value": "$X.XM", "label": "Financial impact"},
+        {"value": "XX", "label": "Scale metric"},
+        {"value": "XX%", "label": "Improvement metric"}
       ]
     }
   ],
-  "skills": ["skill1", "skill2"],
-  "achievements": [{"title": "title", "description": "desc"}]
+  "skills": ["Skill 1", "Skill 2", "... 15-25 total skills"],
+  "achievements": [
+    {"title": "Achievement Title", "description": "Compelling 2-3 sentence description with context and impact"}
+  ],
+  "education": [
+    {"degree": "Degree", "school": "Institution", "year": "Year", "details": "Honors, GPA, relevant details"}
+  ],
+  "certifications": ["Cert 1", "Cert 2"]
 }
 
-Rules: Extract ALL experiences. Find ALL metrics. Generate realistic day-in-life. Return ONLY JSON.`;
+ABSOLUTE REQUIREMENTS:
+- NEVER use generic descriptions - be SPECIFIC to this person's actual experience
+- ALWAYS include concrete numbers, percentages, dollar amounts in metrics
+- Write descriptions that would impress a Fortune 500 recruiter
+- Generate realistic estimates for any metrics not explicitly stated
+- Return ONLY valid JSON with no markdown formatting or code blocks
+- Use empty string "" for missing fields, NEVER null`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -127,28 +201,27 @@ app.get('/', (c) => {
       overflow: hidden;
     }
     
-    /* Background image with blur effect */
+    /* Background image - minimal blur to show glass cards clearly */
     .bg-image {
       position: absolute;
-      inset: -50px;
+      inset: -10px;
       background-image: url('/static/background.png');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      filter: blur(30px) brightness(0.6) saturate(1.3);
-      transform: scale(1.1);
-      opacity: 0.85;
+      filter: blur(2px) brightness(0.85) saturate(1.1);
+      transform: scale(1.02);
+      opacity: 1;
     }
     
-    /* Gradient overlay for depth */
+    /* Very subtle gradient overlay - maximize background visibility */
     .bg-gradient {
       position: absolute;
       inset: 0;
       background: 
-        radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 100%, rgba(6, 182, 212, 0.1) 0%, transparent 40%),
-        linear-gradient(180deg, rgba(10, 10, 18, 0.3) 0%, rgba(10, 10, 18, 0.7) 100%);
+        radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
+        linear-gradient(180deg, rgba(10, 10, 18, 0.05) 0%, rgba(10, 10, 18, 0.2) 100%);
     }
     
     /* Subtle noise texture overlay */
@@ -1183,6 +1256,13 @@ app.get('/', (c) => {
     
     const VIEW = { UPLOAD: 1, BUILDER: 2, PREVIEW: 3 };
     
+    const TEMPLATES = [
+      { id: 'executive', name: 'Executive', desc: 'Bold & authoritative for senior leaders', color: '#8B5CF6', icon: 'fa-crown' },
+      { id: 'creative', name: 'Creative', desc: 'Vibrant gradients for designers & artists', color: '#EC4899', icon: 'fa-palette' },
+      { id: 'tech', name: 'Tech Pioneer', desc: 'Data-driven design for engineers', color: '#06B6D4', icon: 'fa-microchip' },
+      { id: 'minimal', name: 'Minimal', desc: 'Clean & elegant simplicity', color: '#10B981', icon: 'fa-feather' }
+    ];
+    
     const App = () => {
       const [view, setView] = useState(VIEW.UPLOAD);
       const [profile, setProfile] = useState(null);
@@ -1190,13 +1270,15 @@ app.get('/', (c) => {
       const [progress, setProgress] = useState(0);
       const [activeTab, setTab] = useState('basics');
       const [rawText, setRawText] = useState('');
+      const [selectedTemplate, setTemplate] = useState('executive');
+      const [profilePhoto, setProfilePhoto] = useState(null);
       const [steps, setSteps] = useState([
         { text: 'Reading file', state: 'pending' },
         { text: 'Extracting text', state: 'pending' },
-        { text: 'AI analyzing', state: 'pending' },
-        { text: 'Finding experiences', state: 'pending' },
-        { text: 'Generating insights', state: 'pending' },
-        { text: 'Building profile', state: 'pending' }
+        { text: 'AI deep analysis', state: 'pending' },
+        { text: 'Extracting experiences', state: 'pending' },
+        { text: 'Generating descriptions', state: 'pending' },
+        { text: 'Building rich profile', state: 'pending' }
       ]);
       
       const processFile = async (file) => {
@@ -1282,16 +1364,21 @@ app.get('/', (c) => {
       const buildProfile = (aiData, text) => {
         if (aiData && !aiData.error && aiData.basics) {
           return {
-            basics: { ...aiData.basics },
+            basics: { 
+              ...aiData.basics,
+              summary: aiData.basics.summary || ''
+            },
             experience: (aiData.experience || []).map((e, i) => ({
               id: Date.now() + i,
               ...e,
+              responsibilities: e.responsibilities || [],
               dayInLife: e.dayInLife || [
                 { time: '9:00 AM', activity: '' },
-                { time: '11:00 AM', activity: '' },
-                { time: '1:00 PM', activity: '' },
-                { time: '3:00 PM', activity: '' },
-                { time: '5:00 PM', activity: '' }
+                { time: '10:30 AM', activity: '' },
+                { time: '12:00 PM', activity: '' },
+                { time: '2:00 PM', activity: '' },
+                { time: '4:00 PM', activity: '' },
+                { time: '5:30 PM', activity: '' }
               ],
               metrics: e.metrics || [
                 { value: '', label: '' },
@@ -1305,6 +1392,11 @@ app.get('/', (c) => {
               id: Date.now() + i + 1000,
               ...a
             })),
+            education: (aiData.education || []).map((e, i) => ({
+              id: Date.now() + i + 2000,
+              ...e
+            })),
+            certifications: aiData.certifications || [],
             awards: [],
             reviews: [],
             payHistory: [],
@@ -1322,11 +1414,13 @@ app.get('/', (c) => {
         return {
           basics: {
             name, title: '', tagline: '', email, phone,
-            location: '', linkedin: '', website: ''
+            location: '', linkedin: '', website: '', summary: ''
           },
           experience: [],
           skills: [],
           achievements: [],
+          education: [],
+          certifications: [],
           awards: [],
           reviews: [],
           payHistory: [],
@@ -1341,11 +1435,13 @@ app.get('/', (c) => {
         { id: 'experience', icon: 'fa-briefcase', label: 'Experience' },
         { id: 'skills', icon: 'fa-code', label: 'Skills' },
         { id: 'achievements', icon: 'fa-trophy', label: 'Achievements' },
+        { id: 'education', icon: 'fa-graduation-cap', label: 'Education' },
         { id: 'awards', icon: 'fa-award', label: 'Awards' },
         { id: 'reviews', icon: 'fa-star', label: 'Reviews' },
         { id: 'pay', icon: 'fa-dollar-sign', label: 'Pay History' },
         { id: 'projects', icon: 'fa-folder', label: 'Projects' },
-        { id: 'media', icon: 'fa-image', label: 'Media' }
+        { id: 'media', icon: 'fa-image', label: 'Media' },
+        { id: 'templates', icon: 'fa-palette', label: 'Templates' }
       ];
       
       return (
@@ -1417,12 +1513,18 @@ app.get('/', (c) => {
                 setProfile={setProfile}
                 activeTab={activeTab}
                 rawText={rawText}
+                profilePhoto={profilePhoto}
+                setProfilePhoto={setProfilePhoto}
+                selectedTemplate={selectedTemplate}
+                setTemplate={setTemplate}
               />
             )}
             {view === VIEW.PREVIEW && profile && (
               <PreviewView
                 profile={profile}
                 setView={setView}
+                profilePhoto={profilePhoto}
+                selectedTemplate={selectedTemplate}
               />
             )}
           </main>
@@ -1529,7 +1631,7 @@ app.get('/', (c) => {
     };
     
     // Builder View Component
-    const BuilderView = ({ profile, setProfile, activeTab, rawText }) => {
+    const BuilderView = ({ profile, setProfile, activeTab, rawText, profilePhoto, setProfilePhoto, selectedTemplate, setTemplate }) => {
       const updateField = (key, value) => setProfile(p => ({ ...p, [key]: value }));
       const updateBasics = (key, value) => setProfile(p => ({ ...p, basics: { ...p.basics, [key]: value } }));
       
@@ -1537,8 +1639,8 @@ app.get('/', (c) => {
         <div>
           <div className="page-header">
             <div>
-              <h1 className="page-title">{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h1>
-              <p className="page-desc">Edit and customize your profile information</p>
+              <h1 className="page-title">{activeTab === 'templates' ? 'Templates' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h1>
+              <p className="page-desc">{activeTab === 'templates' ? 'Choose your profile style' : 'Edit and customize your profile information'}</p>
             </div>
           </div>
           
@@ -1564,7 +1666,13 @@ app.get('/', (c) => {
           {/* Content Card */}
           <div className="glass-card" style={{ padding: '28px' }}>
             {activeTab === 'basics' && (
-              <BasicsEditor profile={profile} updateBasics={updateBasics} rawText={rawText} />
+              <BasicsEditor 
+                profile={profile} 
+                updateBasics={updateBasics} 
+                rawText={rawText}
+                profilePhoto={profilePhoto}
+                setProfilePhoto={setProfilePhoto}
+              />
             )}
             {activeTab === 'experience' && (
               <ExperienceEditor
@@ -1586,6 +1694,19 @@ app.get('/', (c) => {
                 fields={[
                   { key: 'title', label: 'Title', placeholder: 'Achievement title' },
                   { key: 'description', label: 'Description', placeholder: 'Details', textarea: true }
+                ]}
+              />
+            )}
+            {activeTab === 'education' && (
+              <ListEditor
+                title="Education"
+                items={profile.education || []}
+                setItems={(i) => updateField('education', i)}
+                fields={[
+                  { key: 'degree', label: 'Degree', placeholder: 'Bachelor of Science in Computer Science' },
+                  { key: 'school', label: 'School', placeholder: 'Stanford University' },
+                  { key: 'year', label: 'Year', placeholder: '2020' },
+                  { key: 'details', label: 'Details', placeholder: 'GPA, honors, relevant coursework' }
                 ]}
               />
             )}
@@ -1647,102 +1768,200 @@ app.get('/', (c) => {
                 setVideos={(v) => updateField('videos', v)}
               />
             )}
+            {activeTab === 'templates' && (
+              <TemplateSelector
+                selectedTemplate={selectedTemplate}
+                setTemplate={setTemplate}
+              />
+            )}
           </div>
         </div>
       );
     };
     
-    // Basics Editor
-    const BasicsEditor = ({ profile, updateBasics, rawText }) => (
-      <div>
-        <div className="form-row">
-          <div className="form-field">
-            <label className="form-label">Full Name</label>
+    // Basics Editor with Profile Photo Upload
+    const BasicsEditor = ({ profile, updateBasics, rawText, profilePhoto, setProfilePhoto }) => {
+      const photoInputRef = useRef(null);
+      
+      const handlePhotoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const url = URL.createObjectURL(file);
+          setProfilePhoto(url);
+        }
+      };
+      
+      return (
+        <div>
+          {/* Profile Photo Section */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '28px', marginBottom: '32px', padding: '24px', background: 'rgba(139,92,246,0.08)', borderRadius: '20px', border: '1px solid rgba(139,92,246,0.2)' }}>
             <input
-              className="glass-input"
-              value={profile.basics.name}
-              onChange={(e) => updateBasics('name', e.target.value)}
-              placeholder="John Smith"
+              type="file"
+              ref={photoInputRef}
+              onChange={handlePhotoChange}
+              accept="image/*"
+              hidden
             />
+            <div
+              onClick={() => photoInputRef.current?.click()}
+              style={{
+                width: '120px',
+                height: '120px',
+                borderRadius: '24px',
+                background: profilePhoto ? 'transparent' : 'linear-gradient(135deg, var(--purple-main), var(--pink-main))',
+                border: '3px dashed rgba(255,255,255,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                overflow: 'hidden',
+                flexShrink: 0,
+                transition: 'all 0.3s ease',
+                boxShadow: '0 8px 32px rgba(139,92,246,0.25)'
+              }}
+            >
+              {profilePhoto ? (
+                <img src={profilePhoto} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ textAlign: 'center', color: '#fff' }}>
+                  <i className="fas fa-camera" style={{ fontSize: '28px', marginBottom: '8px', display: 'block' }}></i>
+                  <span style={{ fontSize: '11px', fontWeight: '600' }}>Add Photo</span>
+                </div>
+              )}
+            </div>
+            <div style={{ flex: 1 }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '8px' }}>Profile Photo</h3>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '14px' }}>
+                Upload a professional headshot to personalize your profile
+              </p>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button 
+                  className="btn btn-primary" 
+                  style={{ padding: '10px 20px', fontSize: '13px' }}
+                  onClick={() => photoInputRef.current?.click()}
+                >
+                  <i className="fas fa-upload"></i> Upload Photo
+                </button>
+                {profilePhoto && (
+                  <button 
+                    className="btn btn-secondary" 
+                    style={{ padding: '10px 20px', fontSize: '13px' }}
+                    onClick={() => setProfilePhoto(null)}
+                  >
+                    <i className="fas fa-trash"></i> Remove
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-          <div className="form-field">
-            <label className="form-label">Job Title</label>
-            <input
-              className="glass-input"
-              value={profile.basics.title}
-              onChange={(e) => updateBasics('title', e.target.value)}
-              placeholder="Senior Software Engineer"
-            />
+          
+          <div className="form-row">
+            <div className="form-field">
+              <label className="form-label">Full Name</label>
+              <input
+                className="glass-input"
+                value={profile.basics.name}
+                onChange={(e) => updateBasics('name', e.target.value)}
+                placeholder="John Smith"
+              />
+            </div>
+            <div className="form-field">
+              <label className="form-label">Job Title</label>
+              <input
+                className="glass-input"
+                value={profile.basics.title}
+                onChange={(e) => updateBasics('title', e.target.value)}
+                placeholder="Senior Software Engineer"
+              />
+            </div>
+            <div className="form-field full-width">
+              <label className="form-label">Professional Tagline</label>
+              <input
+                className="glass-input"
+                value={profile.basics.tagline}
+                onChange={(e) => updateBasics('tagline', e.target.value)}
+                placeholder="Building scalable systems that drive business growth"
+              />
+            </div>
+            <div className="form-field full-width">
+              <label className="form-label">Professional Summary</label>
+              <textarea
+                className="glass-input form-textarea"
+                value={profile.basics.summary || ''}
+                onChange={(e) => updateBasics('summary', e.target.value)}
+                placeholder="A compelling 2-3 sentence summary of your professional background and expertise..."
+              />
+            </div>
+            <div className="form-field">
+              <label className="form-label">Email</label>
+              <input
+                className="glass-input"
+                value={profile.basics.email}
+                onChange={(e) => updateBasics('email', e.target.value)}
+                placeholder="john@example.com"
+              />
+            </div>
+            <div className="form-field">
+              <label className="form-label">Phone</label>
+              <input
+                className="glass-input"
+                value={profile.basics.phone}
+                onChange={(e) => updateBasics('phone', e.target.value)}
+                placeholder="+1 555 123 4567"
+              />
+            </div>
+            <div className="form-field">
+              <label className="form-label">Location</label>
+              <input
+                className="glass-input"
+                value={profile.basics.location}
+                onChange={(e) => updateBasics('location', e.target.value)}
+                placeholder="San Francisco, CA"
+              />
+            </div>
+            <div className="form-field">
+              <label className="form-label">LinkedIn</label>
+              <input
+                className="glass-input"
+                value={profile.basics.linkedin}
+                onChange={(e) => updateBasics('linkedin', e.target.value)}
+                placeholder="linkedin.com/in/johnsmith"
+              />
+            </div>
+            <div className="form-field">
+              <label className="form-label">Website</label>
+              <input
+                className="glass-input"
+                value={profile.basics.website || ''}
+                onChange={(e) => updateBasics('website', e.target.value)}
+                placeholder="yourwebsite.com"
+              />
+            </div>
           </div>
-          <div className="form-field full-width">
-            <label className="form-label">Professional Tagline</label>
-            <input
-              className="glass-input"
-              value={profile.basics.tagline}
-              onChange={(e) => updateBasics('tagline', e.target.value)}
-              placeholder="Building scalable systems that drive business growth"
-            />
-          </div>
-          <div className="form-field">
-            <label className="form-label">Email</label>
-            <input
-              className="glass-input"
-              value={profile.basics.email}
-              onChange={(e) => updateBasics('email', e.target.value)}
-              placeholder="john@example.com"
-            />
-          </div>
-          <div className="form-field">
-            <label className="form-label">Phone</label>
-            <input
-              className="glass-input"
-              value={profile.basics.phone}
-              onChange={(e) => updateBasics('phone', e.target.value)}
-              placeholder="+1 555 123 4567"
-            />
-          </div>
-          <div className="form-field">
-            <label className="form-label">Location</label>
-            <input
-              className="glass-input"
-              value={profile.basics.location}
-              onChange={(e) => updateBasics('location', e.target.value)}
-              placeholder="San Francisco, CA"
-            />
-          </div>
-          <div className="form-field">
-            <label className="form-label">LinkedIn</label>
-            <input
-              className="glass-input"
-              value={profile.basics.linkedin}
-              onChange={(e) => updateBasics('linkedin', e.target.value)}
-              placeholder="linkedin.com/in/johnsmith"
-            />
-          </div>
+          
+          {rawText && (
+            <details style={{ marginTop: '28px' }}>
+              <summary style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.45)', fontSize: '13px', fontWeight: '500' }}>
+                <i className="fas fa-file-alt" style={{ marginRight: '8px' }}></i>
+                View Extracted Text
+              </summary>
+              <pre style={{
+                marginTop: '14px',
+                padding: '18px',
+                background: 'rgba(0,0,0,0.3)',
+                borderRadius: '12px',
+                fontSize: '11px',
+                color: 'rgba(255,255,255,0.4)',
+                maxHeight: '180px',
+                overflow: 'auto',
+                whiteSpace: 'pre-wrap',
+                border: '1px solid rgba(255,255,255,0.08)'
+              }}>{rawText}</pre>
+            </details>
+          )}
         </div>
-        
-        {rawText && (
-          <details style={{ marginTop: '28px' }}>
-            <summary style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.45)', fontSize: '13px', fontWeight: '500' }}>
-              <i className="fas fa-file-alt" style={{ marginRight: '8px' }}></i>
-              View Extracted Text
-            </summary>
-            <pre style={{
-              marginTop: '14px',
-              padding: '18px',
-              background: 'rgba(0,0,0,0.3)',
-              borderRadius: '12px',
-              fontSize: '11px',
-              color: 'rgba(255,255,255,0.4)',
-              maxHeight: '180px',
-              overflow: 'auto',
-              whiteSpace: 'pre-wrap',
-              border: '1px solid rgba(255,255,255,0.08)'
-            }}>{rawText}</pre>
-          </details>
-        )}
-      </div>
-    );
+      );
+    };
     
     // Experience Editor
     const ExperienceEditor = ({ experiences, setExperiences }) => {
@@ -2005,6 +2224,118 @@ app.get('/', (c) => {
       );
     };
     
+    // Template Selector Component
+    const TemplateSelector = ({ selectedTemplate, setTemplate }) => {
+      const templates = TEMPLATES;
+      
+      return (
+        <div>
+          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '28px' }}>
+            Choose a template that best represents your professional brand. Your data will be preserved when switching.
+          </p>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+            {templates.map(template => (
+              <div
+                key={template.id}
+                onClick={() => setTemplate(template.id)}
+                style={{
+                  padding: '28px',
+                  borderRadius: '20px',
+                  background: selectedTemplate === template.id 
+                    ? 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.1))'
+                    : 'rgba(255,255,255,0.04)',
+                  border: selectedTemplate === template.id 
+                    ? '2px solid ' + template.color
+                    : '2px solid rgba(255,255,255,0.08)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+              >
+                {/* Preview header bar */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: template.color
+                }} />
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+                  <div style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '16px',
+                    background: template.color + '20',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '24px',
+                    color: template.color
+                  }}>
+                    <i className={'fas ' + template.icon}></i>
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '4px' }}>
+                      {template.name}
+                    </h3>
+                    <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                      {template.desc}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Mini preview mockup */}
+                <div style={{
+                  padding: '16px',
+                  background: 'rgba(0,0,0,0.3)',
+                  borderRadius: '12px',
+                  marginTop: '8px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      background: template.color
+                    }} />
+                    <div>
+                      <div style={{ width: '80px', height: '8px', background: 'rgba(255,255,255,0.3)', borderRadius: '4px', marginBottom: '4px' }} />
+                      <div style={{ width: '50px', height: '6px', background: 'rgba(255,255,255,0.15)', borderRadius: '3px' }} />
+                    </div>
+                  </div>
+                  <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', marginBottom: '8px' }} />
+                  <div style={{ width: '75%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px' }} />
+                </div>
+                
+                {selectedTemplate === template.id && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    background: template.color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    fontSize: '12px'
+                  }}>
+                    <i className="fas fa-check"></i>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+    
     // Media Editor
     const MediaEditor = ({ photos, videos, setPhotos, setVideos }) => {
       const photoInputRef = useRef(null);
@@ -2156,77 +2487,279 @@ app.get('/', (c) => {
       );
     };
     
-    // Preview View
-    const PreviewView = ({ profile, setView }) => (
-      <div>
-        <div className="glass preview-header">
-          <div>
-            <h1 className="page-title">Live Preview</h1>
-            <p className="page-desc">How recruiters will see your profile</p>
+    // Preview View with Template Support
+    const PreviewView = ({ profile, setView, profilePhoto, selectedTemplate }) => {
+      const template = TEMPLATES.find(t => t.id === selectedTemplate) || TEMPLATES[0];
+      
+      // Template-specific styles
+      const getTemplateStyles = () => {
+        switch (selectedTemplate) {
+          case 'creative':
+            return {
+              accent: '#EC4899',
+              gradient: 'linear-gradient(135deg, #EC4899, #F472B6, #8B5CF6)',
+              cardBg: 'rgba(236,72,153,0.08)',
+              border: 'rgba(236,72,153,0.2)'
+            };
+          case 'tech':
+            return {
+              accent: '#06B6D4',
+              gradient: 'linear-gradient(135deg, #06B6D4, #22D3EE, #8B5CF6)',
+              cardBg: 'rgba(6,182,212,0.08)',
+              border: 'rgba(6,182,212,0.2)'
+            };
+          case 'minimal':
+            return {
+              accent: '#10B981',
+              gradient: 'linear-gradient(135deg, #10B981, #34D399, #6EE7B7)',
+              cardBg: 'rgba(16,185,129,0.08)',
+              border: 'rgba(16,185,129,0.2)'
+            };
+          default: // executive
+            return {
+              accent: '#8B5CF6',
+              gradient: 'linear-gradient(135deg, #8B5CF6, #A78BFA, #EC4899)',
+              cardBg: 'rgba(139,92,246,0.08)',
+              border: 'rgba(139,92,246,0.2)'
+            };
+        }
+      };
+      
+      const styles = getTemplateStyles();
+      
+      return (
+        <div>
+          <div className="glass preview-header">
+            <div>
+              <h1 className="page-title">Live Preview</h1>
+              <p className="page-desc">
+                <span style={{ 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  gap: '8px',
+                  padding: '4px 12px',
+                  background: styles.accent + '20',
+                  borderRadius: '100px',
+                  fontSize: '12px',
+                  color: styles.accent,
+                  fontWeight: '600'
+                }}>
+                  <i className={'fas ' + template.icon}></i>
+                  {template.name} Template
+                </span>
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '14px' }}>
+              <button className="btn btn-secondary" onClick={() => setView(VIEW.BUILDER)}>
+                <i className="fas fa-edit"></i> Edit
+              </button>
+              <button className="btn btn-primary" style={{ background: styles.gradient }}>
+                <i className="fas fa-share"></i> Publish
+              </button>
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: '14px' }}>
-            <button className="btn btn-secondary" onClick={() => setView(VIEW.BUILDER)}>
-              <i className="fas fa-edit"></i> Edit
-            </button>
-            <button className="btn btn-primary">
-              <i className="fas fa-share"></i> Publish
-            </button>
-          </div>
-        </div>
-        
-        {/* Profile Hero */}
-        <div className="glass-card profile-hero">
-          <div className="profile-avatar">
-            {profile.basics.name
-              ? profile.basics.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-              : '?'}
-          </div>
-          <h1 className="profile-name">{profile.basics.name || 'Your Name'}</h1>
-          <p className="profile-title">{profile.basics.title || 'Your Title'}</p>
-          <p className="profile-tagline">{profile.basics.tagline || 'Your professional tagline'}</p>
           
-          {profile.skills.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginTop: '28px' }}>
-              {profile.skills.slice(0, 8).map((skill, idx) => (
-                <span key={idx} className="skill-chip">{skill}</span>
-              ))}
+          {/* Profile Hero with Photo Support */}
+          <div className="glass-card profile-hero" style={{ borderTop: '4px solid ' + styles.accent }}>
+            {profilePhoto ? (
+              <div style={{
+                width: '130px',
+                height: '130px',
+                margin: '0 auto 24px',
+                borderRadius: '32px',
+                overflow: 'hidden',
+                border: '4px solid ' + styles.accent,
+                boxShadow: '0 20px 50px ' + styles.accent + '40'
+              }}>
+                <img src={profilePhoto} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            ) : (
+              <div className="profile-avatar" style={{ background: styles.gradient }}>
+                {profile.basics.name
+                  ? profile.basics.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+                  : '?'}
+              </div>
+            )}
+            <h1 className="profile-name">{profile.basics.name || 'Your Name'}</h1>
+            <p className="profile-title" style={{ color: styles.accent }}>{profile.basics.title || 'Your Title'}</p>
+            <p className="profile-tagline">{profile.basics.tagline || 'Your professional tagline'}</p>
+            
+            {profile.basics.summary && (
+              <p style={{ 
+                color: 'rgba(255,255,255,0.6)', 
+                maxWidth: '600px', 
+                margin: '18px auto 0', 
+                fontSize: '14px',
+                lineHeight: '1.8',
+                fontStyle: 'italic'
+              }}>
+                "{profile.basics.summary}"
+              </p>
+            )}
+            
+            {/* Contact Info */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '18px', justifyContent: 'center', marginTop: '28px' }}>
+              {profile.basics.email && (
+                <a href={'mailto:' + profile.basics.email} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255,255,255,0.6)', fontSize: '13px', textDecoration: 'none' }}>
+                  <i className="fas fa-envelope" style={{ color: styles.accent }}></i>
+                  {profile.basics.email}
+                </a>
+              )}
+              {profile.basics.phone && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>
+                  <i className="fas fa-phone" style={{ color: styles.accent }}></i>
+                  {profile.basics.phone}
+                </span>
+              )}
+              {profile.basics.location && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>
+                  <i className="fas fa-map-marker-alt" style={{ color: styles.accent }}></i>
+                  {profile.basics.location}
+                </span>
+              )}
+              {profile.basics.linkedin && (
+                <a href={'https://' + profile.basics.linkedin.replace(/^https?:\\/\\//, '')} target="_blank" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255,255,255,0.6)', fontSize: '13px', textDecoration: 'none' }}>
+                  <i className="fab fa-linkedin" style={{ color: styles.accent }}></i>
+                  LinkedIn
+                </a>
+              )}
+            </div>
+            
+            {profile.skills.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginTop: '28px' }}>
+                {profile.skills.slice(0, 10).map((skill, idx) => (
+                  <span key={idx} style={{
+                    padding: '8px 16px',
+                    background: styles.accent + '15',
+                    border: '1px solid ' + styles.accent + '30',
+                    borderRadius: '100px',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    color: styles.accent
+                  }}>{skill}</span>
+                ))}
+                {profile.skills.length > 10 && (
+                  <span style={{
+                    padding: '8px 16px',
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '100px',
+                    fontSize: '12px',
+                    color: 'rgba(255,255,255,0.4)'
+                  }}>+{profile.skills.length - 10} more</span>
+                )}
+              </div>
+            )}
+          </div>
+          
+          {/* Career Timeline */}
+          {profile.experience.length > 0 && (
+            <div className="glass-card" style={{ padding: '28px', marginTop: '24px' }}>
+              <h2 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '28px', color: '#fff', fontFamily: 'Space Grotesk, sans-serif' }}>
+                <i className="fas fa-briefcase" style={{ marginRight: '14px', color: styles.accent }}></i>
+                Career Timeline
+              </h2>
+              
+              <div className="timeline-wrap" style={{ '--timeline-color': styles.accent }}>
+                {profile.experience.map((exp, idx) => (
+                  <div key={exp.id} className="glass timeline-item">
+                    <h3 className="timeline-company">{exp.company || 'Company'}</h3>
+                    <p className="timeline-role" style={{ color: styles.accent }}>{exp.role || 'Role'}</p>
+                    <span className="timeline-dates" style={{ background: styles.accent + '15', borderColor: styles.accent + '30', color: styles.accent }}>
+                      {exp.startDate || 'Start'} — {exp.endDate || 'End'}
+                    </span>
+                    <p className="timeline-desc">{exp.description || 'Description of your role and achievements'}</p>
+                    
+                    {/* Responsibilities */}
+                    {exp.responsibilities && exp.responsibilities.length > 0 && (
+                      <div style={{ marginTop: '18px' }}>
+                        <h4 style={{ fontSize: '13px', fontWeight: '600', color: styles.accent, marginBottom: '12px' }}>
+                          <i className="fas fa-tasks" style={{ marginRight: '8px' }}></i>
+                          Key Responsibilities
+                        </h4>
+                        <ul style={{ paddingLeft: '20px', color: 'rgba(255,255,255,0.55)', fontSize: '13px', lineHeight: '1.8' }}>
+                          {exp.responsibilities.slice(0, 6).map((resp, ridx) => (
+                            <li key={ridx} style={{ marginBottom: '6px' }}>{resp}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {/* Day in Life */}
+                    {exp.dayInLife && exp.dayInLife.some(d => d.activity) && (
+                      <div style={{ marginTop: '18px', padding: '16px', background: styles.accent + '08', borderRadius: '12px', border: '1px solid ' + styles.accent + '15' }}>
+                        <h4 style={{ fontSize: '13px', fontWeight: '600', color: styles.accent, marginBottom: '14px' }}>
+                          <i className="fas fa-sun" style={{ marginRight: '8px' }}></i>
+                          A Day in This Role
+                        </h4>
+                        <div style={{ display: 'grid', gap: '8px' }}>
+                          {exp.dayInLife.filter(d => d.activity).map((day, didx) => (
+                            <div key={didx} style={{ display: 'flex', gap: '14px', fontSize: '12px' }}>
+                              <span style={{ color: styles.accent, fontWeight: '600', width: '70px', flexShrink: 0 }}>{day.time}</span>
+                              <span style={{ color: 'rgba(255,255,255,0.55)' }}>{day.activity}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {exp.metrics?.some(m => m.value) && (
+                      <div className="timeline-metrics">
+                        {exp.metrics.filter(m => m.value).map((metric, midx) => (
+                          <div key={midx} className="timeline-metric" style={{ background: styles.accent + '10', borderColor: styles.accent + '20' }}>
+                            <div className="timeline-metric-val" style={{ color: styles.accent }}>{metric.value}</div>
+                            <div className="timeline-metric-label">{metric.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Education Section */}
+          {profile.education && profile.education.length > 0 && (
+            <div className="glass-card" style={{ padding: '28px', marginTop: '24px' }}>
+              <h2 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '28px', color: '#fff', fontFamily: 'Space Grotesk, sans-serif' }}>
+                <i className="fas fa-graduation-cap" style={{ marginRight: '14px', color: styles.accent }}></i>
+                Education
+              </h2>
+              <div style={{ display: 'grid', gap: '18px' }}>
+                {profile.education.map((edu, idx) => (
+                  <div key={edu.id || idx} style={{ padding: '20px', background: 'rgba(0,0,0,0.2)', borderRadius: '14px', borderLeft: '4px solid ' + styles.accent }}>
+                    <h3 style={{ fontSize: '17px', fontWeight: '700', color: '#fff', marginBottom: '6px' }}>{edu.degree || 'Degree'}</h3>
+                    <p style={{ fontSize: '14px', color: styles.accent, marginBottom: '8px' }}>{edu.school || 'School'} • {edu.year || 'Year'}</p>
+                    {edu.details && <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{edu.details}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Achievements Section */}
+          {profile.achievements && profile.achievements.length > 0 && (
+            <div className="glass-card" style={{ padding: '28px', marginTop: '24px' }}>
+              <h2 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '28px', color: '#fff', fontFamily: 'Space Grotesk, sans-serif' }}>
+                <i className="fas fa-trophy" style={{ marginRight: '14px', color: styles.accent }}></i>
+                Achievements
+              </h2>
+              <div style={{ display: 'grid', gap: '18px' }}>
+                {profile.achievements.map((ach, idx) => (
+                  <div key={ach.id || idx} style={{ padding: '20px', background: 'rgba(0,0,0,0.2)', borderRadius: '14px' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#fff', marginBottom: '8px' }}>
+                      <i className="fas fa-star" style={{ marginRight: '10px', color: styles.accent, fontSize: '14px' }}></i>
+                      {ach.title || 'Achievement'}
+                    </h3>
+                    <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)', lineHeight: '1.7' }}>{ach.description || 'Description'}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
-        
-        {/* Career Timeline */}
-        {profile.experience.length > 0 && (
-          <div className="glass-card" style={{ padding: '28px' }}>
-            <h2 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '28px', color: '#fff', fontFamily: 'Space Grotesk, sans-serif' }}>
-              <i className="fas fa-briefcase" style={{ marginRight: '14px', color: 'var(--purple-main)' }}></i>
-              Career Timeline
-            </h2>
-            
-            <div className="timeline-wrap">
-              {profile.experience.map((exp, idx) => (
-                <div key={exp.id} className="glass timeline-item">
-                  <h3 className="timeline-company">{exp.company || 'Company'}</h3>
-                  <p className="timeline-role">{exp.role || 'Role'}</p>
-                  <span className="timeline-dates">{exp.startDate || 'Start'} — {exp.endDate || 'End'}</span>
-                  <p className="timeline-desc">{exp.description || 'Description of your role and achievements'}</p>
-                  
-                  {exp.metrics?.some(m => m.value) && (
-                    <div className="timeline-metrics">
-                      {exp.metrics.filter(m => m.value).map((metric, midx) => (
-                        <div key={midx} className="timeline-metric">
-                          <div className="timeline-metric-val">{metric.value}</div>
-                          <div className="timeline-metric-label">{metric.label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    );
+      );
+    };
     
     ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
