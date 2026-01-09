@@ -1227,6 +1227,109 @@ app.get('/', (c) => {
       .sidebar { display: none; }
       .stats-grid, .form-row { grid-template-columns: 1fr; }
     }
+    
+    /* Animation for floating save indicator */
+    @keyframes slideIn {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    /* Responsibilities editor styles */
+    .resp-section {
+      margin-top: 24px;
+      padding: 20px;
+      background: rgba(139, 92, 246, 0.06);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 14px;
+    }
+    
+    .resp-header {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--purple-light);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .resp-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .resp-bullet {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      background: rgba(139, 92, 246, 0.2);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--purple-light);
+      margin-top: 8px;
+    }
+    
+    .resp-input {
+      flex: 1;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    
+    .resp-input:focus {
+      outline: none;
+      border-color: var(--purple-main);
+    }
+    
+    .resp-delete {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 6px;
+      color: rgba(239, 68, 68, 0.6);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      margin-top: 8px;
+      transition: all 0.2s;
+    }
+    
+    .resp-delete:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #EF4444;
+    }
+    
+    .add-resp-btn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      background: transparent;
+      border: 2px dashed rgba(139, 92, 246, 0.3);
+      border-radius: 8px;
+      color: var(--purple-light);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .add-resp-btn:hover {
+      border-color: var(--purple-main);
+      background: rgba(139, 92, 246, 0.1);
+    }
   </style>
 </head>
 <body>
@@ -1326,23 +1429,27 @@ app.get('/', (c) => {
         }
       }, []);
       
-      // Auto-save profile when it changes
+      // Auto-save profile when it changes - ENHANCED with better feedback
       React.useEffect(() => {
         if (profile) {
+          // Immediate visual feedback
+          setSaveStatus('saving');
+          
           const saveTimeout = setTimeout(() => {
             try {
-              setSaveStatus('saving');
               localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
               const now = new Date();
               localStorage.setItem(STORAGE_KEYS.LAST_SAVED, now.toISOString());
               setLastSaved(now);
               setSaveStatus('saved');
-              setTimeout(() => setSaveStatus(''), 2000);
+              console.log('✅ Auto-saved at', now.toLocaleTimeString());
+              setTimeout(() => setSaveStatus(''), 3000);
             } catch (e) {
               console.error('Error saving profile:', e);
               setSaveStatus('error');
+              setTimeout(() => setSaveStatus(''), 5000);
             }
-          }, 1000); // Debounce saves by 1 second
+          }, 500); // Reduced debounce to 500ms for faster saves
           return () => clearTimeout(saveTimeout);
         }
       }, [profile]);
@@ -1608,6 +1715,51 @@ app.get('/', (c) => {
       
       return (
         <div className="app-container">
+          {/* FLOATING AUTO-SAVE INDICATOR - Always visible */}
+          {saveStatus && (
+            <div style={{
+              position: 'fixed',
+              top: '20px',
+              right: '20px',
+              zIndex: 9999,
+              padding: '12px 20px',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              fontSize: '13px',
+              fontWeight: '600',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+              animation: 'slideIn 0.3s ease',
+              background: saveStatus === 'saving' 
+                ? 'linear-gradient(135deg, rgba(6,182,212,0.9), rgba(139,92,246,0.9))' 
+                : saveStatus === 'saved'
+                ? 'linear-gradient(135deg, rgba(16,185,129,0.9), rgba(6,182,212,0.9))'
+                : 'linear-gradient(135deg, rgba(239,68,68,0.9), rgba(236,72,153,0.9))',
+              color: '#fff',
+              backdropFilter: 'blur(10px)'
+            }}>
+              {saveStatus === 'saving' && (
+                <>
+                  <i className="fas fa-circle-notch fa-spin"></i>
+                  Auto-saving...
+                </>
+              )}
+              {saveStatus === 'saved' && (
+                <>
+                  <i className="fas fa-check-circle"></i>
+                  All changes saved!
+                </>
+              )}
+              {saveStatus === 'error' && (
+                <>
+                  <i className="fas fa-exclamation-triangle"></i>
+                  Save failed - click Save Now
+                </>
+              )}
+            </div>
+          )}
+          
           {/* Sidebar */}
           <aside className="sidebar glass-sidebar">
             <div className="logo">
@@ -2317,6 +2469,28 @@ app.get('/', (c) => {
         setExperiences(updated);
       };
       
+      // Responsibility management functions
+      const addResponsibility = (expIdx) => {
+        const updated = [...experiences];
+        if (!updated[expIdx].responsibilities) {
+          updated[expIdx].responsibilities = [];
+        }
+        updated[expIdx].responsibilities.push('');
+        setExperiences(updated);
+      };
+      
+      const updateResponsibility = (expIdx, respIdx, value) => {
+        const updated = [...experiences];
+        updated[expIdx].responsibilities[respIdx] = value;
+        setExperiences(updated);
+      };
+      
+      const removeResponsibility = (expIdx, respIdx) => {
+        const updated = [...experiences];
+        updated[expIdx].responsibilities = updated[expIdx].responsibilities.filter((_, i) => i !== respIdx);
+        setExperiences(updated);
+      };
+      
       const handleLogoUpload = (idx, e) => {
         const file = e.target.files[0];
         if (file) {
@@ -2586,6 +2760,41 @@ app.get('/', (c) => {
                     style={{ minHeight: '120px' }}
                   />
                 </div>
+              </div>
+              
+              {/* KEY RESPONSIBILITIES - Editable List */}
+              <div className="resp-section">
+                <div className="resp-header">
+                  <i className="fas fa-tasks"></i>
+                  Key Responsibilities
+                  <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontWeight: '400' }}>
+                    {(exp.responsibilities || []).length} items
+                  </span>
+                </div>
+                
+                {(exp.responsibilities || []).map((resp, respIdx) => (
+                  <div key={respIdx} className="resp-item">
+                    <div className="resp-bullet">{respIdx + 1}</div>
+                    <input
+                      className="resp-input"
+                      value={resp}
+                      onChange={(e) => updateResponsibility(idx, respIdx, e.target.value)}
+                      placeholder="Led a team of 5 engineers to deliver..."
+                    />
+                    <button 
+                      className="resp-delete"
+                      onClick={() => removeResponsibility(idx, respIdx)}
+                      title="Remove this responsibility"
+                    >
+                      <i className="fas fa-times"></i>
+                    </button>
+                  </div>
+                ))}
+                
+                <button className="add-resp-btn" onClick={() => addResponsibility(idx)}>
+                  <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
+                  Add Responsibility
+                </button>
               </div>
               
               {/* Day in Life */}
