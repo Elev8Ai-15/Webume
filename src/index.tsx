@@ -115,8 +115,8 @@ IMPORTANT RULES:
 });
 
 // ============================================
-// WEBUME: THE FUTURE OF PROFESSIONAL PROFILES
-// Ultra Premium Futuristic Design
+// WEBUME - PREMIUM GLASSMORPHISM UI
+// Inspired by Modern Glass Design Trends 2025
 // ============================================
 
 app.get('/', (c) => {
@@ -125,8 +125,8 @@ app.get('/', (c) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WEBUME | The Future of Professional Profiles</title>
-  <meta name="description" content="Not a resume. An empire. Transform your career into undeniable proof of impact.">
+  <title>WEBUME | Premium AI Resume Builder</title>
+  <meta name="description" content="Transform your career into an immersive digital experience. AI-powered resume parsing meets stunning glassmorphism design.">
   
   <!-- React 18 -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -143,239 +143,320 @@ app.get('/', (c) => {
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
     /* ============================================
-       WEBUME ULTRA - FUTURISTIC DESIGN SYSTEM
-       The Future of Professional Profiles
+       WEBUME - PREMIUM GLASSMORPHISM DESIGN SYSTEM
+       Research-backed implementation:
+       - backdrop-filter: blur(10-20px)
+       - Semi-transparent backgrounds rgba() with low alpha
+       - Subtle borders rgba(255,255,255,0.1-0.2)
+       - Box shadows for depth
        ============================================ */
     
     :root {
-      /* Void Black Background */
-      --void: #000000;
-      --void-deep: #030308;
-      --void-mid: #08081a;
+      /* Base Colors - Deep, rich background */
+      --bg-primary: #0a0a1a;
+      --bg-secondary: #0d0d24;
+      --bg-tertiary: #12122d;
       
-      /* Electric Neon Colors */
-      --neon-violet: #bf5fff;
-      --neon-purple: #9333ea;
-      --neon-magenta: #e11d9b;
-      --neon-pink: #ff2d92;
-      --neon-cyan: #00f0ff;
-      --neon-blue: #0066ff;
-      --neon-green: #00ff88;
-      --neon-yellow: #ffe600;
-      --neon-orange: #ff6600;
-      --neon-red: #ff0055;
+      /* Accent Colors - Vivid but not harsh */
+      --accent-primary: #7c3aed;
+      --accent-secondary: #a855f7;
+      --accent-tertiary: #c084fc;
+      --accent-cyan: #06b6d4;
+      --accent-pink: #ec4899;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
       
-      /* Glass */
-      --glass-light: rgba(255,255,255,0.03);
-      --glass-medium: rgba(255,255,255,0.06);
-      --glass-border: rgba(255,255,255,0.08);
-      --glass-glow: rgba(255,255,255,0.12);
+      /* Glass Effects - The core of glassmorphism */
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-bg-hover: rgba(255, 255, 255, 0.06);
+      --glass-bg-card: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-border-hover: rgba(255, 255, 255, 0.15);
+      --glass-highlight: rgba(255, 255, 255, 0.1);
       
-      /* Text */
-      --text-white: #ffffff;
-      --text-silver: #e8e8ff;
-      --text-muted: #8888aa;
-      --text-dim: #555577;
+      /* Text Colors */
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.85);
+      --text-muted: rgba(255, 255, 255, 0.5);
+      --text-dim: rgba(255, 255, 255, 0.35);
+      
+      /* Shadows */
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.25);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
+      --shadow-glow-purple: 0 0 60px rgba(124, 58, 237, 0.3);
+      --shadow-glow-cyan: 0 0 60px rgba(6, 182, 212, 0.3);
+      
+      /* Blur values */
+      --blur-sm: blur(8px);
+      --blur-md: blur(16px);
+      --blur-lg: blur(24px);
+      
+      /* Border radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-2xl: 32px;
+      
+      /* Transitions */
+      --transition-fast: 0.15s ease;
+      --transition-base: 0.25s ease;
+      --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { height: 100%; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      height: 100%;
+      font-size: 16px;
+    }
     
     body {
       min-height: 100%;
-      font-family: 'Rajdhani', sans-serif;
-      background: var(--void);
-      color: var(--text-white);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
       overflow-x: hidden;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
     
-    #root { min-height: 100vh; }
+    #root {
+      min-height: 100vh;
+      position: relative;
+    }
     
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { 
-      background: linear-gradient(180deg, var(--neon-violet), var(--neon-cyan));
-      border-radius: 3px;
+    /* Premium Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--accent-primary), var(--accent-cyan));
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, var(--accent-secondary), var(--accent-cyan));
     }
     
     /* ============================================
-       ANIMATED CYBER BACKGROUND
+       ANIMATED BACKGROUND - Subtle & Elegant
+       Multiple gradient layers with smooth animation
        ============================================ */
-    .cyber-bg {
+    .animated-bg {
       position: fixed;
       inset: 0;
       z-index: 0;
       overflow: hidden;
-      background: var(--void);
+      background: var(--bg-primary);
     }
     
-    /* Massive gradient orbs */
-    .cyber-bg::before {
-      content: '';
+    /* Primary gradient orbs */
+    .gradient-orb {
       position: absolute;
-      width: 150vw;
-      height: 150vh;
-      top: -50%;
-      left: -25%;
-      background: 
-        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(147,51,234,0.4) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 50% at 80% 20%, rgba(225,29,155,0.3) 0%, transparent 45%),
-        radial-gradient(ellipse 40% 60% at 70% 80%, rgba(0,240,255,0.25) 0%, transparent 45%),
-        radial-gradient(ellipse 50% 40% at 10% 90%, rgba(0,255,136,0.2) 0%, transparent 40%);
-      animation: cosmicDrift 30s ease-in-out infinite;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.5;
+      animation: orbFloat 20s ease-in-out infinite;
     }
     
-    @keyframes cosmicDrift {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      25% { transform: translate(5%, -3%) rotate(2deg); }
-      50% { transform: translate(-3%, 5%) rotate(-1deg); }
-      75% { transform: translate(-5%, -2%) rotate(1deg); }
+    .gradient-orb.orb-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent-primary) 0%, transparent 70%);
+      top: -200px;
+      left: -100px;
+      animation-delay: 0s;
     }
     
-    /* Cyber grid */
-    .cyber-grid {
+    .gradient-orb.orb-2 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--accent-cyan) 0%, transparent 70%);
+      top: 50%;
+      right: -150px;
+      animation-delay: -5s;
+    }
+    
+    .gradient-orb.orb-3 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, var(--accent-pink) 0%, transparent 70%);
+      bottom: -100px;
+      left: 30%;
+      animation-delay: -10s;
+    }
+    
+    .gradient-orb.orb-4 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, var(--accent-emerald) 0%, transparent 70%);
+      top: 30%;
+      left: 20%;
+      opacity: 0.3;
+      animation-delay: -15s;
+    }
+    
+    @keyframes orbFloat {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      25% {
+        transform: translate(30px, -50px) scale(1.05);
+      }
+      50% {
+        transform: translate(-20px, 30px) scale(0.95);
+      }
+      75% {
+        transform: translate(50px, 20px) scale(1.02);
+      }
+    }
+    
+    /* Subtle grid pattern */
+    .grid-pattern {
       position: absolute;
       inset: 0;
       background-image: 
-        linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
-      background-size: 80px 80px;
-      transform: perspective(500px) rotateX(60deg);
-      transform-origin: center top;
-      animation: gridPulse 4s ease-in-out infinite;
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.5;
     }
     
-    @keyframes gridPulse {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 0.8; }
-    }
-    
-    /* Floating particles */
-    .particle {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: var(--neon-cyan);
-      border-radius: 50%;
-      box-shadow: 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-cyan);
-      animation: particleFloat 15s linear infinite;
-    }
-    
-    @keyframes particleFloat {
-      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
-    }
-    
-    /* Scan lines */
-    .scanlines {
+    /* Subtle noise texture */
+    .noise-overlay {
       position: absolute;
       inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.1) 2px,
-        rgba(0,0,0,0.1) 4px
-      );
-      pointer-events: none;
-      opacity: 0.3;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     }
     
     /* ============================================
-       MAIN CONTAINER
+       MAIN LAYOUT
        ============================================ */
     .main-container {
       position: relative;
       z-index: 1;
       min-height: 100vh;
-      padding: 40px;
+      padding: 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 16px;
+      }
     }
     
     /* ============================================
-       ULTRA HEADER
+       GLASSMORPHIC HEADER
        ============================================ */
-    .ultra-header {
+    .glass-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 60px;
-      padding: 30px 40px;
-      background: linear-gradient(135deg, rgba(147,51,234,0.15) 0%, rgba(0,240,255,0.08) 100%);
+      padding: 24px 32px;
+      margin-bottom: 32px;
+      background: var(--glass-bg-card);
+      backdrop-filter: var(--blur-md);
+      -webkit-backdrop-filter: var(--blur-md);
       border: 1px solid var(--glass-border);
-      border-radius: 24px;
+      border-radius: var(--radius-2xl);
       position: relative;
       overflow: hidden;
+      transition: var(--transition-base);
     }
     
-    .ultra-header::before {
+    .glass-header::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--neon-violet), var(--neon-cyan), var(--neon-pink));
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent
+      );
     }
     
-    .logo-section {
+    .glass-header:hover {
+      border-color: var(--glass-border-hover);
+    }
+    
+    .logo-wrapper {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 16px;
     }
     
     .logo-icon {
-      width: 70px;
-      height: 70px;
-      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta));
-      border-radius: 20px;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
+      font-size: 24px;
       position: relative;
-      box-shadow: 
-        0 0 40px rgba(147,51,234,0.5),
-        inset 0 0 30px rgba(255,255,255,0.1);
-      animation: logoPulse 3s ease-in-out infinite;
+      box-shadow: var(--shadow-glow-purple);
     }
     
-    @keyframes logoPulse {
-      0%, 100% { box-shadow: 0 0 40px rgba(147,51,234,0.5), inset 0 0 30px rgba(255,255,255,0.1); }
-      50% { box-shadow: 0 0 60px rgba(147,51,234,0.7), inset 0 0 30px rgba(255,255,255,0.2); }
+    .logo-icon::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
+      border-radius: var(--radius-lg);
+      z-index: -1;
+      opacity: 0.5;
+      filter: blur(8px);
     }
     
     .logo-text {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 36px;
-      font-weight: 900;
-      letter-spacing: 4px;
-      background: linear-gradient(135deg, #fff 0%, var(--neon-cyan) 50%, var(--neon-violet) 100%);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-tertiary) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 40px rgba(0,240,255,0.5);
+      background-clip: text;
     }
     
-    .tagline {
-      font-size: 14px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
+    .logo-tagline {
+      font-size: 12px;
+      font-weight: 500;
       color: var(--text-muted);
-      margin-top: 4px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
     
     .header-stats {
       display: flex;
-      gap: 40px;
+      gap: 32px;
     }
     
     .header-stat {
@@ -383,229 +464,231 @@ app.get('/', (c) => {
     }
     
     .header-stat-value {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 32px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
       font-weight: 700;
-      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-emerald));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
     .header-stat-label {
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    @media (max-width: 768px) {
+      .glass-header {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+      }
+      
+      .header-stats {
+        gap: 24px;
+      }
     }
     
     /* ============================================
-       NEON CARDS
+       GLASS CARDS - Core Component
        ============================================ */
-    .neon-card {
-      background: linear-gradient(135deg, rgba(20,20,40,0.8) 0%, rgba(10,10,25,0.9) 100%);
+    .glass-card {
+      background: var(--glass-bg-card);
+      backdrop-filter: var(--blur-md);
+      -webkit-backdrop-filter: var(--blur-md);
       border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 40px;
+      border-radius: var(--radius-xl);
+      padding: 32px;
       position: relative;
       overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: var(--transition-slow);
     }
     
-    .neon-card::before {
+    /* Top highlight line */
+    .glass-card::before {
       content: '';
       position: absolute;
       top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--neon-violet), var(--neon-cyan), transparent);
-      opacity: 0.7;
+      left: 24px;
+      right: 24px;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent, 
+        var(--glass-highlight), 
+        transparent
+      );
     }
     
-    .neon-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(147,51,234,0.1) 0%, transparent 50%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
+    /* Hover effect */
+    .glass-card:hover {
+      background: var(--glass-bg-hover);
+      border-color: var(--glass-border-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
     }
     
-    .neon-card:hover::after {
-      opacity: 1;
+    /* Accent variants */
+    .glass-card.accent-purple {
+      border-left: 3px solid var(--accent-primary);
     }
     
-    .neon-card:hover {
-      border-color: rgba(147,51,234,0.3);
-      box-shadow: 
-        0 0 60px rgba(147,51,234,0.2),
-        0 20px 60px rgba(0,0,0,0.4);
-      transform: translateY(-4px);
+    .glass-card.accent-cyan {
+      border-left: 3px solid var(--accent-cyan);
     }
     
-    .card-glow {
-      position: absolute;
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.3;
-      pointer-events: none;
+    .glass-card.accent-pink {
+      border-left: 3px solid var(--accent-pink);
     }
     
-    .card-glow.purple { background: var(--neon-violet); top: -100px; right: -100px; }
-    .card-glow.cyan { background: var(--neon-cyan); bottom: -100px; left: -100px; }
-    .card-glow.pink { background: var(--neon-pink); top: 50%; right: -100px; }
+    .glass-card.accent-emerald {
+      border-left: 3px solid var(--accent-emerald);
+    }
     
     /* ============================================
-       UPLOAD ZONE - DRAMATIC
+       UPLOAD ZONE - Premium Drag & Drop
        ============================================ */
     .upload-zone {
-      min-height: 500px;
-      border: 3px dashed rgba(147,51,234,0.4);
-      border-radius: 32px;
+      min-height: 450px;
+      border: 2px dashed var(--glass-border);
+      border-radius: var(--radius-2xl);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.4s ease;
+      transition: var(--transition-slow);
       position: relative;
-      overflow: hidden;
-      background: linear-gradient(135deg, rgba(147,51,234,0.05) 0%, rgba(0,240,255,0.03) 100%);
+      background: linear-gradient(135deg, 
+        rgba(124, 58, 237, 0.03) 0%, 
+        rgba(6, 182, 212, 0.02) 100%
+      );
     }
     
-    .upload-zone::before {
-      content: '';
-      position: absolute;
-      inset: 20px;
-      border: 1px solid rgba(147,51,234,0.2);
-      border-radius: 24px;
-      pointer-events: none;
-    }
-    
-    .upload-zone:hover, .upload-zone.drag-over {
-      border-color: var(--neon-violet);
-      background: linear-gradient(135deg, rgba(147,51,234,0.12) 0%, rgba(0,240,255,0.08) 100%);
-      box-shadow: 
-        0 0 100px rgba(147,51,234,0.3),
-        inset 0 0 100px rgba(147,51,234,0.05);
+    .upload-zone:hover {
+      border-color: var(--accent-primary);
+      background: linear-gradient(135deg, 
+        rgba(124, 58, 237, 0.08) 0%, 
+        rgba(6, 182, 212, 0.05) 100%
+      );
     }
     
     .upload-zone.drag-over {
-      transform: scale(1.02);
+      border-color: var(--accent-cyan);
       border-style: solid;
+      background: linear-gradient(135deg, 
+        rgba(6, 182, 212, 0.12) 0%, 
+        rgba(124, 58, 237, 0.08) 100%
+      );
+      transform: scale(1.01);
     }
     
-    .upload-icon-container {
-      width: 160px;
-      height: 160px;
-      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta), var(--neon-cyan));
-      border-radius: 40px;
+    .upload-icon-wrapper {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: var(--radius-2xl);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 40px;
+      margin-bottom: 32px;
       position: relative;
-      box-shadow: 
-        0 0 80px rgba(147,51,234,0.5),
-        0 0 120px rgba(0,240,255,0.3);
-      animation: uploadIconFloat 4s ease-in-out infinite;
+      box-shadow: var(--shadow-glow-purple);
+      animation: floatIcon 4s ease-in-out infinite;
     }
     
-    @keyframes uploadIconFloat {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-15px) rotate(2deg); }
+    @keyframes floatIcon {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
     }
     
-    .upload-icon-container::before {
+    .upload-icon-wrapper i {
+      font-size: 48px;
+      color: white;
+    }
+    
+    .upload-icon-wrapper::before {
       content: '';
       position: absolute;
-      inset: -3px;
-      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet), var(--neon-pink), var(--neon-cyan));
-      border-radius: 43px;
+      inset: -4px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
+      border-radius: calc(var(--radius-2xl) + 4px);
       z-index: -1;
-      animation: borderRotate 3s linear infinite;
+      opacity: 0.5;
+      filter: blur(16px);
+      animation: pulseGlow 3s ease-in-out infinite;
     }
     
-    @keyframes borderRotate {
-      0% { filter: hue-rotate(0deg); }
-      100% { filter: hue-rotate(360deg); }
-    }
-    
-    .upload-icon-container i {
-      font-size: 70px;
-      color: white;
-      filter: drop-shadow(0 0 20px rgba(255,255,255,0.5));
-      animation: iconPulse 2s ease-in-out infinite;
-    }
-    
-    @keyframes iconPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.05); }
     }
     
     .upload-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 36px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
       font-weight: 700;
-      letter-spacing: 2px;
-      margin-bottom: 16px;
-      background: linear-gradient(135deg, #fff 0%, var(--neon-cyan) 100%);
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-tertiary) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
     .upload-subtitle {
-      font-size: 18px;
+      font-size: 16px;
       color: var(--text-muted);
-      margin-bottom: 40px;
-      letter-spacing: 1px;
+      margin-bottom: 32px;
     }
     
     .upload-formats {
       display: flex;
-      gap: 20px;
+      gap: 16px;
     }
     
-    .format-chip {
+    .format-badge {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 16px 28px;
-      background: rgba(147,51,234,0.15);
-      border: 1px solid rgba(147,51,234,0.3);
+      gap: 8px;
+      padding: 12px 20px;
+      background: var(--glass-bg);
+      backdrop-filter: var(--blur-sm);
+      -webkit-backdrop-filter: var(--blur-sm);
+      border: 1px solid var(--glass-border);
       border-radius: 50px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--neon-violet);
-      transition: all 0.3s ease;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: var(--transition-base);
     }
     
-    .format-chip:hover {
-      background: rgba(147,51,234,0.25);
-      border-color: var(--neon-violet);
-      box-shadow: 0 0 30px rgba(147,51,234,0.3);
+    .format-badge:hover {
+      background: var(--glass-bg-hover);
+      border-color: var(--accent-primary);
+      color: var(--accent-tertiary);
     }
     
-    .format-chip i {
-      font-size: 18px;
+    .format-badge i {
+      font-size: 16px;
+      color: var(--accent-primary);
     }
     
     /* ============================================
        AI PROCESSING ANIMATION
        ============================================ */
-    .ai-processing {
+    .processing-container {
       text-align: center;
-      padding: 80px 40px;
+      padding: 60px 40px;
     }
     
-    .ai-brain {
-      width: 200px;
-      height: 200px;
-      margin: 0 auto 50px;
+    .ai-brain-container {
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 40px;
       position: relative;
     }
     
@@ -614,106 +697,119 @@ app.get('/', (c) => {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 100px;
-      height: 100px;
-      background: linear-gradient(135deg, var(--neon-violet), var(--neon-cyan));
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
       border-radius: 50%;
-      box-shadow: 
-        0 0 60px var(--neon-violet),
-        0 0 100px var(--neon-cyan);
-      animation: brainPulse 1.5s ease-in-out infinite;
+      box-shadow: var(--shadow-glow-purple), var(--shadow-glow-cyan);
+      animation: brainPulse 2s ease-in-out infinite;
     }
     
     @keyframes brainPulse {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 60px var(--neon-violet), 0 0 100px var(--neon-cyan); }
-      50% { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 0 80px var(--neon-violet), 0 0 140px var(--neon-cyan); }
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.1); }
     }
     
-    .ai-ring {
+    .ai-brain-ring {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      border: 2px solid var(--neon-violet);
+      border: 2px solid var(--accent-primary);
       border-radius: 50%;
-      animation: ringExpand 2s ease-out infinite;
+      opacity: 0;
+      animation: ringExpand 2.5s ease-out infinite;
     }
     
-    .ai-ring:nth-child(1) { animation-delay: 0s; }
-    .ai-ring:nth-child(2) { animation-delay: 0.5s; }
-    .ai-ring:nth-child(3) { animation-delay: 1s; }
+    .ai-brain-ring:nth-child(1) { animation-delay: 0s; }
+    .ai-brain-ring:nth-child(2) { animation-delay: 0.5s; }
+    .ai-brain-ring:nth-child(3) { animation-delay: 1s; }
     
     @keyframes ringExpand {
-      0% { width: 100px; height: 100px; opacity: 1; }
-      100% { width: 200px; height: 200px; opacity: 0; }
-    }
-    
-    .ai-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-violet) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      0% { width: 80px; height: 80px; opacity: 0.8; }
+      100% { width: 180px; height: 180px; opacity: 0; }
     }
     
     .ai-badge {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 12px 24px;
-      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta));
+      gap: 8px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
       border-radius: 50px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
-      letter-spacing: 2px;
-      margin-bottom: 40px;
-      box-shadow: 0 0 40px rgba(147,51,234,0.5);
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-glow-purple);
     }
     
-    .ai-dot {
-      width: 10px;
-      height: 10px;
+    .ai-badge-dot {
+      width: 8px;
+      height: 8px;
       background: white;
       border-radius: 50%;
-      animation: aiDotPulse 0.8s ease-in-out infinite;
+      animation: dotPulse 1s ease-in-out infinite;
     }
     
-    @keyframes aiDotPulse {
+    @keyframes dotPulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.7); }
+      50% { opacity: 0.5; transform: scale(0.8); }
     }
     
-    .progress-bar-container {
-      max-width: 600px;
-      margin: 0 auto 40px;
+    .processing-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--text-primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
-    .progress-bar-bg {
-      height: 16px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 8px;
+    .processing-subtitle {
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+    
+    .progress-percentage {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 56px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-bottom: 24px;
+      text-shadow: 0 0 40px var(--accent-cyan);
+    }
+    
+    .progress-bar-wrapper {
+      max-width: 500px;
+      margin: 0 auto 32px;
+    }
+    
+    .progress-bar-track {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
       overflow: hidden;
-      position: relative;
     }
     
     .progress-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--neon-violet), var(--neon-cyan), var(--neon-green));
-      border-radius: 8px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-cyan), var(--accent-emerald));
+      border-radius: 4px;
       transition: width 0.3s ease;
       position: relative;
-      box-shadow: 0 0 30px var(--neon-cyan);
+      box-shadow: 0 0 20px var(--accent-cyan);
     }
     
     .progress-bar-fill::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-      animation: shimmer 1.5s infinite;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
     }
     
     @keyframes shimmer {
@@ -721,72 +817,66 @@ app.get('/', (c) => {
       100% { transform: translateX(100%); }
     }
     
-    .progress-percent {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 48px;
-      font-weight: 700;
-      color: var(--neon-cyan);
-      text-shadow: 0 0 40px var(--neon-cyan);
-      margin-bottom: 30px;
-    }
-    
     .progress-steps {
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      max-width: 500px;
+      gap: 12px;
+      max-width: 400px;
       margin: 0 auto;
     }
     
     .progress-step {
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 16px 24px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      font-size: 16px;
+      gap: 12px;
+      padding: 14px 20px;
+      background: var(--glass-bg);
+      backdrop-filter: var(--blur-sm);
+      -webkit-backdrop-filter: var(--blur-sm);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      font-size: 14px;
       color: var(--text-dim);
-      transition: all 0.3s ease;
+      transition: var(--transition-base);
     }
     
     .progress-step.active {
-      background: rgba(147,51,234,0.1);
-      border-color: rgba(147,51,234,0.3);
-      color: var(--neon-violet);
-      box-shadow: 0 0 30px rgba(147,51,234,0.2);
+      background: rgba(124, 58, 237, 0.1);
+      border-color: rgba(124, 58, 237, 0.3);
+      color: var(--accent-tertiary);
     }
     
     .progress-step.complete {
-      background: rgba(0,255,136,0.08);
-      border-color: rgba(0,255,136,0.3);
-      color: var(--neon-green);
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: var(--accent-emerald);
     }
     
     .progress-step i {
-      width: 24px;
-      font-size: 18px;
+      width: 20px;
+      font-size: 14px;
     }
     
     /* ============================================
-       STAT CARDS - CYBERPUNK STYLE
+       STATS GRID
        ============================================ */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      margin-bottom: 40px;
+      gap: 20px;
+      margin-bottom: 32px;
     }
     
     .stat-card {
-      background: linear-gradient(135deg, rgba(20,20,40,0.9) 0%, rgba(10,10,25,0.95) 100%);
+      background: var(--glass-bg-card);
+      backdrop-filter: var(--blur-md);
+      -webkit-backdrop-filter: var(--blur-md);
       border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 30px;
+      border-radius: var(--radius-xl);
+      padding: 24px;
       position: relative;
       overflow: hidden;
-      transition: all 0.4s ease;
+      transition: var(--transition-slow);
     }
     
     .stat-card::before {
@@ -798,82 +888,91 @@ app.get('/', (c) => {
       height: 3px;
     }
     
-    .stat-card.violet::before { background: linear-gradient(90deg, transparent, var(--neon-violet), transparent); }
-    .stat-card.cyan::before { background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); }
-    .stat-card.pink::before { background: linear-gradient(90deg, transparent, var(--neon-pink), transparent); }
-    .stat-card.green::before { background: linear-gradient(90deg, transparent, var(--neon-green), transparent); }
+    .stat-card.purple::before { background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); }
+    .stat-card.cyan::before { background: linear-gradient(90deg, var(--accent-cyan), #22d3ee); }
+    .stat-card.pink::before { background: linear-gradient(90deg, var(--accent-pink), #f472b6); }
+    .stat-card.emerald::before { background: linear-gradient(90deg, var(--accent-emerald), #34d399); }
     
     .stat-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      transform: translateY(-4px);
+      border-color: var(--glass-border-hover);
+      box-shadow: var(--shadow-lg);
     }
     
-    .stat-card.violet:hover { border-color: var(--neon-violet); box-shadow: 0 0 60px rgba(147,51,234,0.3); }
-    .stat-card.cyan:hover { border-color: var(--neon-cyan); box-shadow: 0 0 60px rgba(0,240,255,0.3); }
-    .stat-card.pink:hover { border-color: var(--neon-pink); box-shadow: 0 0 60px rgba(255,45,146,0.3); }
-    .stat-card.green:hover { border-color: var(--neon-green); box-shadow: 0 0 60px rgba(0,255,136,0.3); }
+    .stat-card.purple:hover { box-shadow: var(--shadow-glow-purple); }
+    .stat-card.cyan:hover { box-shadow: var(--shadow-glow-cyan); }
     
     .stat-icon {
-      width: 60px;
-      height: 60px;
-      border-radius: 16px;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-      margin-bottom: 20px;
+      font-size: 20px;
+      margin-bottom: 16px;
     }
     
-    .stat-card.violet .stat-icon { background: rgba(147,51,234,0.2); color: var(--neon-violet); }
-    .stat-card.cyan .stat-icon { background: rgba(0,240,255,0.2); color: var(--neon-cyan); }
-    .stat-card.pink .stat-icon { background: rgba(255,45,146,0.2); color: var(--neon-pink); }
-    .stat-card.green .stat-icon { background: rgba(0,255,136,0.2); color: var(--neon-green); }
+    .stat-card.purple .stat-icon { background: rgba(124, 58, 237, 0.15); color: var(--accent-primary); }
+    .stat-card.cyan .stat-icon { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+    .stat-card.pink .stat-icon { background: rgba(236, 72, 153, 0.15); color: var(--accent-pink); }
+    .stat-card.emerald .stat-icon { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
     
     .stat-value {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 42px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 36px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
     
-    .stat-card.violet .stat-value { color: var(--neon-violet); text-shadow: 0 0 30px var(--neon-violet); }
-    .stat-card.cyan .stat-value { color: var(--neon-cyan); text-shadow: 0 0 30px var(--neon-cyan); }
-    .stat-card.pink .stat-value { color: var(--neon-pink); text-shadow: 0 0 30px var(--neon-pink); }
-    .stat-card.green .stat-value { color: var(--neon-green); text-shadow: 0 0 30px var(--neon-green); }
+    .stat-card.purple .stat-value { color: var(--accent-tertiary); }
+    .stat-card.cyan .stat-value { color: var(--accent-cyan); }
+    .stat-card.pink .stat-value { color: var(--accent-pink); }
+    .stat-card.emerald .stat-value { color: var(--accent-emerald); }
     
     .stat-label {
-      font-size: 14px;
+      font-size: 12px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
       color: var(--text-muted);
     }
     
+    @media (max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+    
     /* ============================================
-       NAV TABS
+       NAVIGATION TABS
        ============================================ */
-    .nav-tabs {
+    .nav-tabs-wrapper {
       display: flex;
       gap: 8px;
       padding: 8px;
-      background: rgba(255,255,255,0.02);
+      background: var(--glass-bg);
+      backdrop-filter: var(--blur-md);
+      -webkit-backdrop-filter: var(--blur-md);
       border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      margin-bottom: 40px;
+      border-radius: var(--radius-xl);
+      margin-bottom: 24px;
       overflow-x: auto;
     }
     
     .nav-tab {
-      padding: 16px 28px;
+      padding: 14px 24px;
       background: transparent;
       border: none;
-      border-radius: 14px;
+      border-radius: var(--radius-md);
       color: var(--text-muted);
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 15px;
+      font-family: inherit;
+      font-size: 14px;
       font-weight: 600;
-      letter-spacing: 1px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: var(--transition-base);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -881,42 +980,44 @@ app.get('/', (c) => {
     }
     
     .nav-tab:hover {
-      color: var(--text-white);
-      background: rgba(255,255,255,0.05);
+      color: var(--text-primary);
+      background: var(--glass-bg-hover);
     }
     
     .nav-tab.active {
-      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta));
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
       color: white;
-      box-shadow: 0 0 40px rgba(147,51,234,0.4);
+      box-shadow: var(--shadow-glow-purple);
     }
     
     .nav-tab i {
-      font-size: 16px;
+      font-size: 14px;
     }
     
     /* ============================================
-       FORM ELEMENTS - CYBER STYLE
+       FORM ELEMENTS
        ============================================ */
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
+      gap: 20px;
     }
     
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
     
-    .form-group.full { grid-column: 1 / -1; }
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
     
     .form-label {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
       color: var(--text-muted);
       display: flex;
       align-items: center;
@@ -924,53 +1025,63 @@ app.get('/', (c) => {
     }
     
     .form-label i {
-      color: var(--neon-violet);
+      color: var(--accent-primary);
+      font-size: 12px;
     }
     
-    .form-input, .form-textarea {
-      padding: 18px 22px;
-      background: rgba(10,10,25,0.8);
-      border: 2px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
-      color: var(--text-white);
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 16px;
-      transition: all 0.3s ease;
+    .form-input,
+    .form-textarea {
+      padding: 16px 18px;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: var(--blur-sm);
+      -webkit-backdrop-filter: var(--blur-sm);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 15px;
+      transition: var(--transition-base);
     }
     
-    .form-input:focus, .form-textarea:focus {
+    .form-input:focus,
+    .form-textarea:focus {
       outline: none;
-      border-color: var(--neon-violet);
-      box-shadow: 0 0 30px rgba(147,51,234,0.2);
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
     }
     
-    .form-input::placeholder, .form-textarea::placeholder {
+    .form-input::placeholder,
+    .form-textarea::placeholder {
       color: var(--text-dim);
     }
     
     .form-textarea {
-      min-height: 140px;
+      min-height: 120px;
       resize: vertical;
-      line-height: 1.7;
+      line-height: 1.6;
+    }
+    
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
     }
     
     /* ============================================
-       BUTTONS - NEON STYLE
+       BUTTONS
        ============================================ */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      padding: 18px 36px;
-      border-radius: 14px;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: var(--transition-base);
       border: none;
       position: relative;
       overflow: hidden;
@@ -980,196 +1091,134 @@ app.get('/', (c) => {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
       opacity: 0;
       transition: opacity 0.3s ease;
     }
     
-    .btn:hover::before { opacity: 1; }
+    .btn:hover::before {
+      opacity: 1;
+    }
     
     .btn-primary {
-      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta));
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
       color: white;
-      box-shadow: 0 0 40px rgba(147,51,234,0.4);
+      box-shadow: var(--shadow-glow-purple);
     }
     
     .btn-primary:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 10px 60px rgba(147,51,234,0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.4);
     }
     
     .btn-secondary {
-      background: rgba(255,255,255,0.05);
-      border: 2px solid rgba(255,255,255,0.1);
-      color: var(--text-white);
+      background: var(--glass-bg);
+      backdrop-filter: var(--blur-sm);
+      -webkit-backdrop-filter: var(--blur-sm);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
     }
     
     .btn-secondary:hover {
-      border-color: var(--neon-violet);
-      box-shadow: 0 0 40px rgba(147,51,234,0.2);
+      background: var(--glass-bg-hover);
+      border-color: var(--glass-border-hover);
     }
     
-    .btn-cyan {
-      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
-      color: white;
-      box-shadow: 0 0 40px rgba(0,240,255,0.4);
-    }
-    
-    .btn-add {
-      width: 100%;
-      padding: 24px;
+    .btn-ghost {
       background: transparent;
-      border: 2px dashed rgba(147,51,234,0.3);
-      border-radius: 16px;
+      border: 2px dashed var(--glass-border);
       color: var(--text-muted);
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      width: 100%;
+      padding: 20px;
     }
     
-    .btn-add:hover {
-      border-color: var(--neon-violet);
-      color: var(--neon-violet);
-      background: rgba(147,51,234,0.05);
+    .btn-ghost:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-tertiary);
+      background: rgba(124, 58, 237, 0.05);
+    }
+    
+    .btn-icon {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border-radius: var(--radius-md);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition-base);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .btn-icon:hover {
+      background: var(--glass-bg-hover);
+      color: var(--text-primary);
+    }
+    
+    .btn-icon.danger:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
     }
     
     /* ============================================
        EXPERIENCE ENTRIES
        ============================================ */
     .experience-entry {
-      background: rgba(20,20,40,0.6);
+      background: var(--glass-bg);
+      backdrop-filter: var(--blur-sm);
+      -webkit-backdrop-filter: var(--blur-sm);
       border: 1px solid var(--glass-border);
-      border-left: 4px solid var(--neon-violet);
-      border-radius: 20px;
-      padding: 32px;
-      margin-bottom: 24px;
-      position: relative;
-      transition: all 0.3s ease;
+      border-left: 3px solid var(--accent-primary);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      margin-bottom: 20px;
+      transition: var(--transition-base);
     }
     
     .experience-entry:hover {
-      border-color: rgba(147,51,234,0.3);
-      box-shadow: 0 0 40px rgba(147,51,234,0.1);
+      border-color: var(--glass-border-hover);
+      box-shadow: var(--shadow-md);
     }
     
     .experience-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
     
     .experience-number {
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta));
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 18px;
-      font-weight: 700;
-      box-shadow: 0 0 30px rgba(147,51,234,0.4);
-    }
-    
-    .btn-icon {
       width: 44px;
       height: 44px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--text-muted);
-      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s ease;
-    }
-    
-    .btn-icon:hover {
-      background: rgba(255,255,255,0.1);
-      color: var(--text-white);
-    }
-    
-    .btn-icon.danger:hover {
-      background: rgba(255,0,85,0.15);
-      border-color: var(--neon-red);
-      color: var(--neon-red);
-    }
-    
-    /* ============================================
-       METRICS
-       ============================================ */
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-top: 28px;
-    }
-    
-    .metric-box {
-      background: rgba(10,10,25,0.8);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      padding: 20px;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-    
-    .metric-box:hover {
-      border-color: var(--neon-violet);
-      box-shadow: 0 0 30px rgba(147,51,234,0.15);
-    }
-    
-    .metric-box input {
-      width: 100%;
-      background: transparent;
-      border: none;
-      outline: none;
-      text-align: center;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 28px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
       font-weight: 700;
-      color: var(--neon-cyan);
-      margin-bottom: 8px;
+      box-shadow: var(--shadow-glow-purple);
     }
     
-    .metric-box input::placeholder {
-      color: var(--text-dim);
-      font-size: 20px;
+    /* Day in Life Section */
+    .day-in-life-wrapper {
+      margin-top: 24px;
+      padding: 20px;
+      background: rgba(6, 182, 212, 0.05);
+      border: 1px solid rgba(6, 182, 212, 0.15);
+      border-radius: var(--radius-lg);
     }
     
-    .metric-label-input {
-      width: 100%;
-      background: transparent;
-      border: none;
-      outline: none;
-      text-align: center;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-muted);
-    }
-    
-    /* ============================================
-       DAY IN LIFE
-       ============================================ */
-    .day-in-life-section {
-      margin-top: 28px;
-      padding: 24px;
-      background: rgba(0,240,255,0.03);
-      border: 1px solid rgba(0,240,255,0.1);
-      border-radius: 16px;
-    }
-    
-    .day-in-life-title {
-      font-size: 15px;
+    .day-in-life-header {
+      font-size: 14px;
       font-weight: 600;
-      color: var(--neon-cyan);
-      margin-bottom: 20px;
+      color: var(--accent-cyan);
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -1184,56 +1233,120 @@ app.get('/', (c) => {
     
     .day-time {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
-      color: var(--neon-violet);
-      width: 100px;
+      font-size: 13px;
+      color: var(--accent-primary);
+      width: 90px;
       flex-shrink: 0;
     }
     
     .day-input {
       flex: 1;
       padding: 12px 16px;
-      background: rgba(10,10,25,0.8);
+      background: rgba(0, 0, 0, 0.2);
       border: 1px solid var(--glass-border);
-      border-radius: 10px;
-      color: var(--text-white);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
       font-size: 14px;
-      transition: all 0.3s ease;
+      transition: var(--transition-base);
     }
     
     .day-input:focus {
       outline: none;
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 20px rgba(0,240,255,0.1);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.15);
+    }
+    
+    /* Metrics Grid */
+    .metrics-wrapper {
+      margin-top: 24px;
+    }
+    
+    .metrics-header {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-cyan);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    
+    .metric-box {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: center;
+      transition: var(--transition-base);
+    }
+    
+    .metric-box:hover {
+      border-color: var(--accent-cyan);
+    }
+    
+    .metric-box input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      text-align: center;
+      color: var(--text-primary);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    
+    .metric-box input:first-child {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-bottom: 4px;
+    }
+    
+    .metric-box input:last-child {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+    }
+    
+    @media (max-width: 768px) {
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
     
     /* ============================================
-       SKILL TAGS
+       SKILLS TAGS
        ============================================ */
     .skills-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 24px;
+      gap: 10px;
+      margin-bottom: 20px;
     }
     
     .skill-tag {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 12px 20px;
-      background: linear-gradient(135deg, rgba(147,51,234,0.15), rgba(0,240,255,0.1));
-      border: 1px solid rgba(147,51,234,0.3);
+      gap: 8px;
+      padding: 10px 18px;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(6, 182, 212, 0.1));
+      border: 1px solid rgba(124, 58, 237, 0.25);
       border-radius: 50px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-silver);
-      transition: all 0.3s ease;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: var(--transition-base);
     }
     
     .skill-tag:hover {
-      border-color: var(--neon-violet);
-      box-shadow: 0 0 20px rgba(147,51,234,0.2);
+      border-color: var(--accent-primary);
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
     }
     
     .skill-remove {
@@ -1243,224 +1356,231 @@ app.get('/', (c) => {
       cursor: pointer;
       padding: 0;
       display: flex;
-      align-items: center;
-      transition: color 0.3s ease;
+      transition: color 0.2s ease;
     }
     
     .skill-remove:hover {
-      color: var(--neon-red);
+      color: #ef4444;
     }
     
     /* ============================================
-       TIMELINE PREVIEW
+       PREVIEW / TIMELINE
        ============================================ */
-    .timeline-preview {
+    .timeline-wrapper {
       position: relative;
-      padding-left: 60px;
+      padding-left: 48px;
     }
     
-    .timeline-preview::before {
+    .timeline-wrapper::before {
       content: '';
       position: absolute;
-      left: 20px;
+      left: 16px;
       top: 0;
       bottom: 0;
-      width: 4px;
-      background: linear-gradient(180deg, var(--neon-violet), var(--neon-cyan), var(--neon-pink));
-      border-radius: 2px;
-      box-shadow: 0 0 20px rgba(147,51,234,0.5);
+      width: 2px;
+      background: linear-gradient(180deg, var(--accent-primary), var(--accent-cyan), var(--accent-pink));
+      border-radius: 1px;
     }
     
     .timeline-item {
       position: relative;
-      margin-bottom: 40px;
-      padding: 28px;
-      background: rgba(20,20,40,0.7);
+      margin-bottom: 32px;
+      padding: 24px;
+      background: var(--glass-bg-card);
+      backdrop-filter: var(--blur-sm);
+      -webkit-backdrop-filter: var(--blur-sm);
       border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      transition: all 0.3s ease;
+      border-radius: var(--radius-xl);
+      transition: var(--transition-base);
     }
     
     .timeline-item:hover {
-      border-color: rgba(147,51,234,0.3);
-      transform: translateX(8px);
+      border-color: var(--glass-border-hover);
+      transform: translateX(4px);
     }
     
     .timeline-item::before {
       content: '';
       position: absolute;
-      left: -52px;
-      top: 32px;
-      width: 24px;
-      height: 24px;
-      background: var(--neon-violet);
+      left: -40px;
+      top: 28px;
+      width: 16px;
+      height: 16px;
+      background: var(--accent-primary);
       border-radius: 50%;
-      border: 4px solid var(--void);
-      box-shadow: 0 0 30px var(--neon-violet);
+      border: 3px solid var(--bg-primary);
+      box-shadow: 0 0 20px var(--accent-primary);
     }
     
     .timeline-company {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 24px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     
     .timeline-role {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
-      color: var(--neon-cyan);
+      color: var(--accent-cyan);
       margin-bottom: 12px;
     }
     
     .timeline-dates {
       display: inline-block;
-      padding: 8px 18px;
-      background: rgba(147,51,234,0.15);
-      border: 1px solid rgba(147,51,234,0.3);
+      padding: 6px 14px;
+      background: rgba(124, 58, 237, 0.15);
+      border: 1px solid rgba(124, 58, 237, 0.25);
       border-radius: 50px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--neon-violet);
+      font-size: 12px;
+      color: var(--accent-tertiary);
       margin-bottom: 16px;
     }
     
-    .timeline-desc {
+    .timeline-description {
       color: var(--text-muted);
-      line-height: 1.8;
+      line-height: 1.7;
     }
     
-    /* ============================================
-       PREVIEW METRICS
-       ============================================ */
     .preview-metrics {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-top: 24px;
+      gap: 12px;
+      margin-top: 20px;
     }
     
     .preview-metric {
-      background: rgba(0,240,255,0.05);
-      border: 1px solid rgba(0,240,255,0.2);
-      border-radius: 14px;
-      padding: 20px;
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: var(--radius-md);
+      padding: 16px;
       text-align: center;
-      transition: all 0.3s ease;
+      transition: var(--transition-base);
     }
     
     .preview-metric:hover {
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 30px rgba(0,240,255,0.15);
+      border-color: var(--accent-cyan);
     }
     
     .preview-metric-value {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 28px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 24px;
       font-weight: 700;
-      color: var(--neon-cyan);
-      text-shadow: 0 0 20px var(--neon-cyan);
+      color: var(--accent-cyan);
     }
     
     .preview-metric-label {
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 1px;
       color: var(--text-muted);
-      margin-top: 8px;
-    }
-    
-    /* ============================================
-       EMPTY STATE
-       ============================================ */
-    .empty-state {
-      text-align: center;
-      padding: 100px 40px;
-    }
-    
-    .empty-icon {
-      width: 140px;
-      height: 140px;
-      margin: 0 auto 40px;
-      background: linear-gradient(135deg, var(--neon-violet), var(--neon-magenta), var(--neon-cyan));
-      border-radius: 35px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 60px;
-      box-shadow: 0 0 80px rgba(147,51,234,0.4);
-      animation: emptyFloat 4s ease-in-out infinite;
-    }
-    
-    @keyframes emptyFloat {
-      0%, 100% { transform: translateY(0) rotate(-2deg); }
-      50% { transform: translateY(-20px) rotate(2deg); }
-    }
-    
-    .empty-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      background: linear-gradient(135deg, #fff 0%, var(--neon-cyan) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    .empty-subtitle {
-      color: var(--text-muted);
-      font-size: 18px;
-      margin-bottom: 40px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    /* ============================================
-       RESPONSIVE
-       ============================================ */
-    @media (max-width: 1200px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .metrics-grid, .preview-metrics { grid-template-columns: repeat(2, 1fr); }
+      margin-top: 4px;
     }
     
     @media (max-width: 768px) {
-      .main-container { padding: 20px; }
-      .ultra-header { flex-direction: column; gap: 24px; padding: 24px; }
-      .header-stats { gap: 24px; }
-      .stats-grid { grid-template-columns: 1fr; }
-      .form-grid { grid-template-columns: 1fr; }
-      .nav-tabs { flex-wrap: wrap; }
+      .preview-metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    /* ============================================
+       SECTION HEADERS
+       ============================================ */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    
+    .section-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    
+    .section-header i {
+      color: var(--accent-primary);
+      font-size: 20px;
+    }
+    
+    .section-header .count {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
     }
     
     /* ============================================
        ANIMATIONS
        ============================================ */
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(40px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     
     .fade-in-up {
-      animation: fadeInUp 0.6s ease forwards;
+      animation: fadeInUp 0.5s ease forwards;
     }
     
-    @keyframes glowPulse {
-      0%, 100% { filter: drop-shadow(0 0 20px currentColor); }
-      50% { filter: drop-shadow(0 0 40px currentColor); }
+    /* Staggered animation for cards */
+    .stagger-1 { animation-delay: 0.05s; }
+    .stagger-2 { animation-delay: 0.1s; }
+    .stagger-3 { animation-delay: 0.15s; }
+    .stagger-4 { animation-delay: 0.2s; }
+    
+    /* ============================================
+       EMPTY STATE
+       ============================================ */
+    .empty-state {
+      text-align: center;
+      padding: 80px 40px;
     }
     
-    .glow-pulse {
-      animation: glowPulse 2s ease-in-out infinite;
+    .empty-icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 32px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), var(--accent-cyan));
+      border-radius: var(--radius-2xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      box-shadow: var(--shadow-glow-purple);
+      animation: floatIcon 4s ease-in-out infinite;
+    }
+    
+    .empty-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    
+    .empty-subtitle {
+      color: var(--text-muted);
+      font-size: 16px;
+      max-width: 400px;
+      margin: 0 auto 32px;
     }
   </style>
 </head>
 <body>
-  <!-- Cyber Background -->
-  <div class="cyber-bg">
-    <div class="cyber-grid"></div>
-    <div class="scanlines"></div>
-    ${[...Array(15)].map((_, i) => `<div class="particle" style="left: ${Math.random() * 100}%; animation-delay: ${Math.random() * 15}s;"></div>`).join('')}
+  <!-- Animated Background -->
+  <div class="animated-bg">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+    <div class="gradient-orb orb-4"></div>
+    <div class="grid-pattern"></div>
+    <div class="noise-overlay"></div>
   </div>
   
   <div id="root"></div>
@@ -1705,14 +1825,14 @@ app.get('/', (c) => {
       );
     };
     
-    // Header
+    // Header Component
     const Header = ({ profile, view }) => (
-      <header className="ultra-header fade-in-up">
-        <div className="logo-section">
+      <header className="glass-header fade-in-up">
+        <div className="logo-wrapper">
           <div className="logo-icon">⚡</div>
           <div>
             <div className="logo-text">WEBUME</div>
-            <div className="tagline">The Future of Professional Profiles</div>
+            <div className="logo-tagline">Premium AI Resume Builder</div>
           </div>
         </div>
         
@@ -1733,7 +1853,7 @@ app.get('/', (c) => {
       </header>
     );
     
-    // Upload View
+    // Upload View Component
     const UploadView = ({ onUpload, processing, progress, steps }) => {
       const [dragOver, setDragOver] = useState(false);
       const inputRef = useRef(null);
@@ -1746,29 +1866,27 @@ app.get('/', (c) => {
       
       if (processing) {
         return (
-          <div className="neon-card fade-in-up">
-            <div className="card-glow purple"></div>
-            <div className="card-glow cyan"></div>
-            
-            <div className="ai-processing">
-              <div className="ai-brain">
+          <div className="glass-card fade-in-up">
+            <div className="processing-container">
+              <div className="ai-brain-container">
                 <div className="ai-brain-core"></div>
-                <div className="ai-ring"></div>
-                <div className="ai-ring"></div>
-                <div className="ai-ring"></div>
+                <div className="ai-brain-ring"></div>
+                <div className="ai-brain-ring"></div>
+                <div className="ai-brain-ring"></div>
               </div>
               
               <div className="ai-badge">
-                <div className="ai-dot"></div>
+                <div className="ai-badge-dot"></div>
                 GEMINI AI PROCESSING
               </div>
               
-              <div className="ai-title">Analyzing Your Resume</div>
+              <div className="processing-title">Analyzing Your Resume</div>
+              <div className="processing-subtitle">Our AI is extracting every detail from your career history</div>
               
-              <div className="progress-percent">{Math.round(progress)}%</div>
+              <div className="progress-percentage">{Math.round(progress)}%</div>
               
-              <div className="progress-bar-container">
-                <div className="progress-bar-bg">
+              <div className="progress-bar-wrapper">
+                <div className="progress-bar-track">
                   <div className="progress-bar-fill" style={{ width: progress + '%' }}></div>
                 </div>
               </div>
@@ -1791,10 +1909,7 @@ app.get('/', (c) => {
       }
       
       return (
-        <div className="neon-card fade-in-up">
-          <div className="card-glow purple"></div>
-          <div className="card-glow cyan"></div>
-          
+        <div className="glass-card fade-in-up">
           <div
             className={'upload-zone' + (dragOver ? ' drag-over' : '')}
             onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -1810,24 +1925,24 @@ app.get('/', (c) => {
               style={{ display: 'none' }}
             />
             
-            <div className="upload-icon-container">
+            <div className="upload-icon-wrapper">
               <i className="fas fa-cloud-upload-alt"></i>
             </div>
             
-            <h2 className="upload-title">DROP YOUR RESUME</h2>
-            <p className="upload-subtitle">Powered by Gemini AI • Instant extraction</p>
+            <h2 className="upload-title">Drop Your Resume</h2>
+            <p className="upload-subtitle">Powered by Gemini AI • Instant Extraction</p>
             
             <div className="upload-formats">
-              <span className="format-chip"><i className="fas fa-file-pdf"></i> PDF</span>
-              <span className="format-chip"><i className="fas fa-file-word"></i> DOCX</span>
-              <span className="format-chip"><i className="fas fa-file-alt"></i> TXT</span>
+              <span className="format-badge"><i className="fas fa-file-pdf"></i> PDF</span>
+              <span className="format-badge"><i className="fas fa-file-word"></i> DOCX</span>
+              <span className="format-badge"><i className="fas fa-file-alt"></i> TXT</span>
             </div>
           </div>
         </div>
       );
     };
     
-    // Builder View
+    // Builder View Component
     const BuilderView = ({ profile, setProfile, activeTab, setActiveTab, rawText, setView }) => {
       const tabs = [
         { id: 'basics', icon: 'fa-user', label: 'Basic Info' },
@@ -1848,22 +1963,22 @@ app.get('/', (c) => {
         <div className="fade-in-up">
           {/* Stats */}
           <div className="stats-grid">
-            <div className="stat-card violet">
+            <div className="stat-card purple stagger-1 fade-in-up">
               <div className="stat-icon"><i className="fas fa-briefcase"></i></div>
               <div className="stat-value">{profile.experience.length}</div>
               <div className="stat-label">Experiences</div>
             </div>
-            <div className="stat-card cyan">
+            <div className="stat-card cyan stagger-2 fade-in-up">
               <div className="stat-icon"><i className="fas fa-code"></i></div>
               <div className="stat-value">{profile.skills.length}</div>
               <div className="stat-label">Skills</div>
             </div>
-            <div className="stat-card pink">
+            <div className="stat-card pink stagger-3 fade-in-up">
               <div className="stat-icon"><i className="fas fa-trophy"></i></div>
               <div className="stat-value">{profile.achievements.length}</div>
               <div className="stat-label">Achievements</div>
             </div>
-            <div className="stat-card green">
+            <div className="stat-card emerald stagger-4 fade-in-up">
               <div className="stat-icon"><i className="fas fa-check-double"></i></div>
               <div className="stat-value">94%</div>
               <div className="stat-label">Complete</div>
@@ -1871,7 +1986,7 @@ app.get('/', (c) => {
           </div>
           
           {/* Nav Tabs */}
-          <div className="nav-tabs">
+          <div className="nav-tabs-wrapper">
             {tabs.map(tab => (
               <button
                 key={tab.id}
@@ -1889,9 +2004,7 @@ app.get('/', (c) => {
           </div>
           
           {/* Content */}
-          <div className="neon-card">
-            <div className="card-glow purple"></div>
-            
+          <div className="glass-card">
             {activeTab === 'basics' && <BasicsEditor profile={profile} updateBasics={updateBasics} rawText={rawText} />}
             {activeTab === 'experience' && <ExperienceEditor experience={profile.experience} setExperience={(e) => update('experience', e)} />}
             {activeTab === 'skills' && <SkillsEditor skills={profile.skills} setSkills={(s) => update('skills', s)} />}
@@ -1909,10 +2022,10 @@ app.get('/', (c) => {
     // Basics Editor
     const BasicsEditor = ({ profile, updateBasics, rawText }) => (
       <div>
-        <h2 style={{ fontFamily: 'Orbitron', fontSize: '24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <i className="fas fa-user" style={{ color: 'var(--neon-violet)' }}></i>
-          Basic Information
-        </h2>
+        <div className="section-header">
+          <i className="fas fa-user"></i>
+          <h2>Basic Information</h2>
+        </div>
         
         <div className="form-grid">
           <div className="form-group">
@@ -1925,7 +2038,7 @@ app.get('/', (c) => {
           </div>
           <div className="form-group full">
             <label className="form-label"><i className="fas fa-quote-left"></i> Professional Tagline</label>
-            <input type="text" className="form-input" value={profile.basics.tagline} onChange={(e) => updateBasics('tagline', e.target.value)} placeholder="10+ years driving innovation..." />
+            <input type="text" className="form-input" value={profile.basics.tagline} onChange={(e) => updateBasics('tagline', e.target.value)} placeholder="10+ years driving innovation at top tech companies..." />
           </div>
           <div className="form-group">
             <label className="form-label"><i className="fas fa-envelope"></i> Email</label>
@@ -1947,10 +2060,11 @@ app.get('/', (c) => {
         
         {rawText && (
           <details style={{ marginTop: '32px' }}>
-            <summary style={{ cursor: 'pointer', color: 'var(--text-muted)', fontWeight: '600' }}>
-              View extracted raw text
+            <summary style={{ cursor: 'pointer', color: 'var(--text-muted)', fontWeight: '600', padding: '12px 0' }}>
+              <i className="fas fa-file-alt" style={{ marginRight: '8px' }}></i>
+              View Extracted Raw Text
             </summary>
-            <pre style={{ marginTop: '16px', padding: '20px', background: 'rgba(10,10,25,0.8)', borderRadius: '12px', fontSize: '12px', color: 'var(--text-muted)', maxHeight: '200px', overflow: 'auto', whiteSpace: 'pre-wrap', fontFamily: 'JetBrains Mono' }}>
+            <pre style={{ marginTop: '12px', padding: '20px', background: 'rgba(0,0,0,0.3)', borderRadius: 'var(--radius-md)', fontSize: '12px', color: 'var(--text-muted)', maxHeight: '200px', overflow: 'auto', whiteSpace: 'pre-wrap', fontFamily: 'JetBrains Mono, monospace', border: '1px solid var(--glass-border)' }}>
               {rawText}
             </pre>
           </details>
@@ -1989,11 +2103,11 @@ app.get('/', (c) => {
       
       return (
         <div>
-          <h2 style={{ fontFamily: 'Orbitron', fontSize: '24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <i className="fas fa-briefcase" style={{ color: 'var(--neon-violet)' }}></i>
-            Work Experience
-            <span style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'Rajdhani' }}>{experience.length} entries</span>
-          </h2>
+          <div className="section-header">
+            <i className="fas fa-briefcase"></i>
+            <h2>Work Experience</h2>
+            <span className="count">{experience.length} entries</span>
+          </div>
           
           {experience.map((exp, i) => (
             <div key={exp.id} className="experience-entry">
@@ -2021,27 +2135,27 @@ app.get('/', (c) => {
                 </div>
                 <div className="form-group full">
                   <label className="form-label">Description</label>
-                  <textarea className="form-textarea" value={exp.description} onChange={(e) => update(i, 'description', e.target.value)} placeholder="Describe your role and accomplishments..." />
+                  <textarea className="form-textarea" value={exp.description} onChange={(e) => update(i, 'description', e.target.value)} placeholder="Describe your role, responsibilities, and key accomplishments..." />
                 </div>
               </div>
               
               {/* Day in Life */}
-              <div className="day-in-life-section">
-                <div className="day-in-life-title">
+              <div className="day-in-life-wrapper">
+                <div className="day-in-life-header">
                   <i className="fas fa-sun"></i>
                   A Day in the Life
                 </div>
                 {exp.dayInLife.map((d, di) => (
                   <div key={di} className="day-item">
                     <span className="day-time">{d.time}</span>
-                    <input type="text" className="day-input" value={d.activity} onChange={(e) => updateDay(i, di, e.target.value)} placeholder="What did you typically do?" />
+                    <input type="text" className="day-input" value={d.activity} onChange={(e) => updateDay(i, di, e.target.value)} placeholder="What did you typically do at this time?" />
                   </div>
                 ))}
               </div>
               
               {/* Metrics */}
-              <div style={{ marginTop: '28px' }}>
-                <div style={{ fontSize: '15px', fontWeight: '600', color: 'var(--neon-cyan)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div className="metrics-wrapper">
+                <div className="metrics-header">
                   <i className="fas fa-chart-line"></i>
                   Impact Metrics
                 </div>
@@ -2049,7 +2163,7 @@ app.get('/', (c) => {
                   {exp.metrics.map((m, mi) => (
                     <div key={mi} className="metric-box">
                       <input type="text" value={m.value} onChange={(e) => updateMetric(i, mi, 'value', e.target.value)} placeholder="+40%" />
-                      <input type="text" className="metric-label-input" value={m.label} onChange={(e) => updateMetric(i, mi, 'label', e.target.value)} placeholder="METRIC" />
+                      <input type="text" value={m.label} onChange={(e) => updateMetric(i, mi, 'label', e.target.value)} placeholder="METRIC" />
                     </div>
                   ))}
                 </div>
@@ -2057,7 +2171,7 @@ app.get('/', (c) => {
             </div>
           ))}
           
-          <button className="btn-add" onClick={add}>
+          <button className="btn-ghost" onClick={add}>
             <i className="fas fa-plus"></i> Add Experience
           </button>
         </div>
@@ -2072,22 +2186,34 @@ app.get('/', (c) => {
       
       return (
         <div>
-          <h2 style={{ fontFamily: 'Orbitron', fontSize: '24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <i className="fas fa-code" style={{ color: 'var(--neon-violet)' }}></i>
-            Skills
-            <span style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'Rajdhani' }}>{skills.length} skills</span>
-          </h2>
+          <div className="section-header">
+            <i className="fas fa-code"></i>
+            <h2>Skills</h2>
+            <span className="count">{skills.length} skills</span>
+          </div>
           
-          <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
-            <input type="text" className="form-input" style={{ flex: 1 }} value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && add()} placeholder="Add a skill..." />
-            <button className="btn btn-primary" onClick={add}><i className="fas fa-plus"></i> Add</button>
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+            <input 
+              type="text" 
+              className="form-input" 
+              style={{ flex: 1 }} 
+              value={input} 
+              onChange={(e) => setInput(e.target.value)} 
+              onKeyPress={(e) => e.key === 'Enter' && add()} 
+              placeholder="Add a skill..." 
+            />
+            <button className="btn btn-primary" onClick={add}>
+              <i className="fas fa-plus"></i> Add
+            </button>
           </div>
           
           <div className="skills-container">
             {skills.map((skill, i) => (
               <div key={i} className="skill-tag">
                 {skill}
-                <button className="skill-remove" onClick={() => remove(i)}><i className="fas fa-times"></i></button>
+                <button className="skill-remove" onClick={() => remove(i)}>
+                  <i className="fas fa-times"></i>
+                </button>
               </div>
             ))}
           </div>
@@ -2111,17 +2237,19 @@ app.get('/', (c) => {
       
       return (
         <div>
-          <h2 style={{ fontFamily: 'Orbitron', fontSize: '24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <i className={'fas ' + icon} style={{ color: 'var(--neon-violet)' }}></i>
-            {title}
-            <span style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'Rajdhani' }}>{items.length} entries</span>
-          </h2>
+          <div className="section-header">
+            <i className={'fas ' + icon}></i>
+            <h2>{title}</h2>
+            <span className="count">{items.length} entries</span>
+          </div>
           
           {items.map((item, i) => (
             <div key={item.id} className="experience-entry">
               <div className="experience-header">
                 <div className="experience-number">{i + 1}</div>
-                <button className="btn-icon danger" onClick={() => remove(i)}><i className="fas fa-trash"></i></button>
+                <button className="btn-icon danger" onClick={() => remove(i)}>
+                  <i className="fas fa-trash"></i>
+                </button>
               </div>
               <div className="form-grid">
                 {fields.map(f => (
@@ -2138,7 +2266,7 @@ app.get('/', (c) => {
             </div>
           ))}
           
-          <button className="btn-add" onClick={add}>
+          <button className="btn-ghost" onClick={add}>
             <i className="fas fa-plus"></i> Add {title.replace(/s$/, '')}
           </button>
         </div>
@@ -2164,22 +2292,26 @@ app.get('/', (c) => {
       
       return (
         <div>
-          <h2 style={{ fontFamily: 'Orbitron', fontSize: '24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <i className="fas fa-image" style={{ color: 'var(--neon-violet)' }}></i>
-            Media
-          </h2>
+          <div className="section-header">
+            <i className="fas fa-image"></i>
+            <h2>Media</h2>
+          </div>
           
           <div style={{ marginBottom: '40px' }}>
-            <h3 style={{ fontSize: '18px', color: 'var(--neon-cyan)', marginBottom: '20px' }}><i className="fas fa-camera"></i> Photos</h3>
+            <h3 style={{ fontSize: '16px', color: 'var(--accent-cyan)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <i className="fas fa-camera"></i> Photos
+            </h3>
             <input type="file" ref={photoRef} onChange={addPhotos} accept="image/*" multiple style={{ display: 'none' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px' }}>
               {photos.map(p => (
-                <div key={p.id} style={{ aspectRatio: '1', borderRadius: '16px', overflow: 'hidden', position: 'relative', border: '1px solid var(--glass-border)' }}>
+                <div key={p.id} style={{ aspectRatio: '1', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', border: '1px solid var(--glass-border)' }}>
                   <img src={p.url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button onClick={() => setPhotos(photos.filter(x => x.id !== p.id))} style={{ position: 'absolute', top: '8px', right: '8px', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(0,0,0,0.7)', border: 'none', color: 'white', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
+                  <button onClick={() => setPhotos(photos.filter(x => x.id !== p.id))} style={{ position: 'absolute', top: '8px', right: '8px', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(0,0,0,0.7)', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className="fas fa-times"></i>
+                  </button>
                 </div>
               ))}
-              <button onClick={() => photoRef.current?.click()} style={{ aspectRatio: '1', borderRadius: '16px', border: '2px dashed var(--glass-border)', background: 'var(--glass-light)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)' }}>
+              <button onClick={() => photoRef.current?.click()} style={{ aspectRatio: '1', borderRadius: 'var(--radius-md)', border: '2px dashed var(--glass-border)', background: 'transparent', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)', transition: 'var(--transition-base)' }}>
                 <i className="fas fa-plus" style={{ fontSize: '24px' }}></i>
                 <span style={{ fontSize: '12px' }}>Add Photo</span>
               </button>
@@ -2187,16 +2319,20 @@ app.get('/', (c) => {
           </div>
           
           <div>
-            <h3 style={{ fontSize: '18px', color: 'var(--neon-pink)', marginBottom: '20px' }}><i className="fas fa-video"></i> Videos</h3>
+            <h3 style={{ fontSize: '16px', color: 'var(--accent-pink)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <i className="fas fa-video"></i> Videos
+            </h3>
             <input type="file" ref={videoRef} onChange={addVideos} accept="video/*" multiple style={{ display: 'none' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
               {videos.map(v => (
-                <div key={v.id} style={{ aspectRatio: '16/9', borderRadius: '16px', overflow: 'hidden', position: 'relative', border: '1px solid var(--glass-border)', background: 'var(--void-mid)' }}>
+                <div key={v.id} style={{ aspectRatio: '16/9', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', border: '1px solid var(--glass-border)', background: 'var(--bg-secondary)' }}>
                   <video src={v.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button onClick={() => setVideos(videos.filter(x => x.id !== v.id))} style={{ position: 'absolute', top: '8px', right: '8px', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(0,0,0,0.7)', border: 'none', color: 'white', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
+                  <button onClick={() => setVideos(videos.filter(x => x.id !== v.id))} style={{ position: 'absolute', top: '8px', right: '8px', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(0,0,0,0.7)', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className="fas fa-times"></i>
+                  </button>
                 </div>
               ))}
-              <button onClick={() => videoRef.current?.click()} style={{ aspectRatio: '16/9', borderRadius: '16px', border: '2px dashed var(--glass-border)', background: 'var(--glass-light)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)' }}>
+              <button onClick={() => videoRef.current?.click()} style={{ aspectRatio: '16/9', borderRadius: 'var(--radius-md)', border: '2px dashed var(--glass-border)', background: 'transparent', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)', transition: 'var(--transition-base)' }}>
                 <i className="fas fa-plus" style={{ fontSize: '24px' }}></i>
                 <span style={{ fontSize: '12px' }}>Add Video</span>
               </button>
@@ -2209,31 +2345,53 @@ app.get('/', (c) => {
     // Preview View
     const PreviewView = ({ profile, setView }) => (
       <div className="fade-in-up">
-        <div className="neon-card" style={{ marginBottom: '32px' }}>
+        <div className="glass-card" style={{ marginBottom: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h2 style={{ fontFamily: 'Orbitron', fontSize: '28px', marginBottom: '8px' }}>Live Preview</h2>
-              <p style={{ color: 'var(--text-muted)' }}>How recruiters will see your profile</p>
+              <h2 style={{ fontFamily: 'Space Grotesk', fontSize: '24px', marginBottom: '4px' }}>Live Preview</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>How recruiters will see your profile</p>
             </div>
-            <div style={{ display: 'flex', gap: '16px' }}>
-              <button className="btn btn-secondary" onClick={() => setView(VIEWS.BUILDER)}><i className="fas fa-edit"></i> Edit</button>
-              <button className="btn btn-primary"><i className="fas fa-share"></i> Publish</button>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button className="btn btn-secondary" onClick={() => setView(VIEWS.BUILDER)}>
+                <i className="fas fa-edit"></i> Edit
+              </button>
+              <button className="btn btn-primary">
+                <i className="fas fa-share"></i> Publish
+              </button>
             </div>
           </div>
         </div>
         
         {/* Profile Card */}
-        <div className="neon-card" style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div className="card-glow purple"></div>
-          <div style={{ width: '140px', height: '140px', margin: '0 auto 32px', background: 'linear-gradient(135deg, var(--neon-violet), var(--neon-magenta), var(--neon-cyan))', borderRadius: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px', fontWeight: '700', fontFamily: 'Orbitron', boxShadow: '0 0 60px rgba(147,51,234,0.5)' }}>
+        <div className="glass-card" style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <div style={{ 
+            width: '120px', 
+            height: '120px', 
+            margin: '0 auto 24px', 
+            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), var(--accent-cyan))', 
+            borderRadius: 'var(--radius-2xl)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            fontSize: '40px', 
+            fontWeight: '700', 
+            fontFamily: 'Space Grotesk',
+            boxShadow: 'var(--shadow-glow-purple)'
+          }}>
             {profile.basics.name ? profile.basics.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?'}
           </div>
-          <h1 style={{ fontFamily: 'Orbitron', fontSize: '36px', fontWeight: '700', marginBottom: '12px' }}>{profile.basics.name || 'Your Name'}</h1>
-          <p style={{ fontSize: '22px', color: 'var(--neon-cyan)', fontWeight: '600', marginBottom: '16px' }}>{profile.basics.title || 'Your Title'}</p>
-          <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto', fontSize: '18px' }}>{profile.basics.tagline || 'Your professional tagline'}</p>
+          <h1 style={{ fontFamily: 'Space Grotesk', fontSize: '32px', fontWeight: '700', marginBottom: '8px' }}>
+            {profile.basics.name || 'Your Name'}
+          </h1>
+          <p style={{ fontSize: '20px', color: 'var(--accent-cyan)', fontWeight: '600', marginBottom: '12px' }}>
+            {profile.basics.title || 'Your Title'}
+          </p>
+          <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto', fontSize: '16px', lineHeight: '1.6' }}>
+            {profile.basics.tagline || 'Your professional tagline will appear here'}
+          </p>
           
           {profile.skills.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center', marginTop: '32px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginTop: '28px' }}>
               {profile.skills.slice(0, 8).map((s, i) => (
                 <span key={i} className="skill-tag">{s}</span>
               ))}
@@ -2243,20 +2401,19 @@ app.get('/', (c) => {
         
         {/* Timeline */}
         {profile.experience.length > 0 && (
-          <div className="neon-card">
-            <div className="card-glow cyan"></div>
-            <h2 style={{ fontFamily: 'Orbitron', fontSize: '24px', marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <i className="fas fa-briefcase" style={{ color: 'var(--neon-violet)' }}></i>
-              Career Timeline
-            </h2>
+          <div className="glass-card">
+            <div className="section-header" style={{ marginBottom: '32px' }}>
+              <i className="fas fa-briefcase"></i>
+              <h2>Career Timeline</h2>
+            </div>
             
-            <div className="timeline-preview">
+            <div className="timeline-wrapper">
               {profile.experience.map((exp, i) => (
                 <div key={exp.id} className="timeline-item">
                   <h3 className="timeline-company">{exp.company || 'Company'}</h3>
                   <p className="timeline-role">{exp.role || 'Role'}</p>
                   <span className="timeline-dates">{exp.startDate || 'Start'} — {exp.endDate || 'End'}</span>
-                  <p className="timeline-desc">{exp.description || 'Description...'}</p>
+                  <p className="timeline-description">{exp.description || 'Description...'}</p>
                   
                   {exp.metrics.some(m => m.value) && (
                     <div className="preview-metrics">
