@@ -106,9 +106,6 @@ app.get('/', (c) => {
       --pink-main: #EC4899;
       --cyan-main: #06B6D4;
       --green-main: #10B981;
-      --glass-bg: rgba(255, 255, 255, 0.08);
-      --glass-border: rgba(255, 255, 255, 0.12);
-      --glass-blur: 24px;
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
