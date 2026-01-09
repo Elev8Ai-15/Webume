@@ -6,7 +6,7 @@ const app = new Hono()
 const GEMINI_API_KEY = 'AIzaSyB9jQaRGkfj4Tyq5y5j45RiYAeb_H2e-2g';
 
 // ============================================
-// AI RESUME PARSING ENDPOINT - FIXED MODEL
+// AI RESUME PARSING ENDPOINT
 // ============================================
 app.post('/api/parse-resume', async (c) => {
   try {
@@ -97,7 +97,6 @@ IMPORTANT RULES:
       return c.json({ error: 'No response from AI', raw: data }, 500);
     }
     
-    // Clean and parse JSON
     let parsed;
     try {
       const jsonStr = aiText.replace(/```json\n?|\n?```/g, '').trim();
@@ -115,8 +114,8 @@ IMPORTANT RULES:
 });
 
 // ============================================
-// WEBUME - PREMIUM GLASSMORPHISM UI
-// Inspired by Modern Glass Design Trends 2025
+// WEBUME - TRULY PREMIUM GLASSMORPHISM UI
+// Based on Dribbble/Behance Top Designs
 // ============================================
 
 app.get('/', (c) => {
@@ -125,332 +124,226 @@ app.get('/', (c) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WEBUME | Premium AI Resume Builder</title>
-  <meta name="description" content="Transform your career into an immersive digital experience. AI-powered resume parsing meets stunning glassmorphism design.">
+  <title>WEBUME | AI Resume Builder</title>
   
-  <!-- React 18 -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
-  <!-- PDF.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
-  
-  <!-- Mammoth.js for DOCX -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  
-  <!-- Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
-    /* ============================================
-       WEBUME - PREMIUM GLASSMORPHISM DESIGN SYSTEM
-       Research-backed implementation:
-       - backdrop-filter: blur(10-20px)
-       - Semi-transparent backgrounds rgba() with low alpha
-       - Subtle borders rgba(255,255,255,0.1-0.2)
-       - Box shadows for depth
-       ============================================ */
-    
-    :root {
-      /* Base Colors - Deep, rich background */
-      --bg-primary: #0a0a1a;
-      --bg-secondary: #0d0d24;
-      --bg-tertiary: #12122d;
-      
-      /* Accent Colors - Vivid but not harsh */
-      --accent-primary: #7c3aed;
-      --accent-secondary: #a855f7;
-      --accent-tertiary: #c084fc;
-      --accent-cyan: #06b6d4;
-      --accent-pink: #ec4899;
-      --accent-emerald: #10b981;
-      --accent-amber: #f59e0b;
-      
-      /* Glass Effects - The core of glassmorphism */
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-bg-hover: rgba(255, 255, 255, 0.06);
-      --glass-bg-card: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --glass-border-hover: rgba(255, 255, 255, 0.15);
-      --glass-highlight: rgba(255, 255, 255, 0.1);
-      
-      /* Text Colors */
-      --text-primary: #ffffff;
-      --text-secondary: rgba(255, 255, 255, 0.85);
-      --text-muted: rgba(255, 255, 255, 0.5);
-      --text-dim: rgba(255, 255, 255, 0.35);
-      
-      /* Shadows */
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.25);
-      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
-      --shadow-glow-purple: 0 0 60px rgba(124, 58, 237, 0.3);
-      --shadow-glow-cyan: 0 0 60px rgba(6, 182, 212, 0.3);
-      
-      /* Blur values */
-      --blur-sm: blur(8px);
-      --blur-md: blur(16px);
-      --blur-lg: blur(24px);
-      
-      /* Border radius */
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --radius-xl: 24px;
-      --radius-2xl: 32px;
-      
-      /* Transitions */
-      --transition-fast: 0.15s ease;
-      --transition-base: 0.25s ease;
-      --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    * {
+    *, *::before, *::after {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
     
-    html {
-      height: 100%;
-      font-size: 16px;
+    :root {
+      --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    html, body, #root {
+      min-height: 100vh;
+      font-family: var(--font);
+      overflow-x: hidden;
     }
     
     body {
-      min-height: 100%;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      overflow-x: hidden;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+      color: #fff;
     }
     
-    #root {
-      min-height: 100vh;
-      position: relative;
-    }
-    
-    /* Premium Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: var(--bg-secondary);
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--accent-primary), var(--accent-cyan));
-      border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(180deg, var(--accent-secondary), var(--accent-cyan));
-    }
-    
-    /* ============================================
-       ANIMATED BACKGROUND - Subtle & Elegant
-       Multiple gradient layers with smooth animation
-       ============================================ */
-    .animated-bg {
+    /* =============================================
+       STUNNING ANIMATED BACKGROUND
+       Vibrant gradient orbs that make it feel alive
+       ============================================= */
+    .bg-wrapper {
       position: fixed;
       inset: 0;
       z-index: 0;
       overflow: hidden;
-      background: var(--bg-primary);
     }
     
-    /* Primary gradient orbs */
-    .gradient-orb {
+    /* Large vibrant gradient orbs */
+    .orb {
       position: absolute;
       border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.5;
-      animation: orbFloat 20s ease-in-out infinite;
+      filter: blur(80px);
+      opacity: 0.7;
+      animation: float 20s ease-in-out infinite;
     }
     
-    .gradient-orb.orb-1 {
+    .orb-1 {
       width: 600px;
       height: 600px;
-      background: radial-gradient(circle, var(--accent-primary) 0%, transparent 70%);
-      top: -200px;
-      left: -100px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      top: -10%;
+      left: -5%;
       animation-delay: 0s;
     }
     
-    .gradient-orb.orb-2 {
+    .orb-2 {
       width: 500px;
       height: 500px;
-      background: radial-gradient(circle, var(--accent-cyan) 0%, transparent 70%);
-      top: 50%;
-      right: -150px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      top: 60%;
+      right: -10%;
       animation-delay: -5s;
     }
     
-    .gradient-orb.orb-3 {
+    .orb-3 {
       width: 450px;
       height: 450px;
-      background: radial-gradient(circle, var(--accent-pink) 0%, transparent 70%);
-      bottom: -100px;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      bottom: -15%;
       left: 30%;
       animation-delay: -10s;
     }
     
-    .gradient-orb.orb-4 {
+    .orb-4 {
       width: 350px;
       height: 350px;
-      background: radial-gradient(circle, var(--accent-emerald) 0%, transparent 70%);
-      top: 30%;
-      left: 20%;
-      opacity: 0.3;
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      top: 40%;
+      left: 10%;
+      opacity: 0.5;
       animation-delay: -15s;
     }
     
-    @keyframes orbFloat {
-      0%, 100% {
-        transform: translate(0, 0) scale(1);
-      }
-      25% {
-        transform: translate(30px, -50px) scale(1.05);
-      }
-      50% {
-        transform: translate(-20px, 30px) scale(0.95);
-      }
-      75% {
-        transform: translate(50px, 20px) scale(1.02);
-      }
+    .orb-5 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+      top: 20%;
+      right: 20%;
+      opacity: 0.4;
+      animation-delay: -7s;
     }
     
-    /* Subtle grid pattern */
-    .grid-pattern {
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(50px, -50px) scale(1.1); }
+      50% { transform: translate(-30px, 50px) scale(0.95); }
+      75% { transform: translate(40px, 30px) scale(1.05); }
+    }
+    
+    /* Mesh gradient overlay */
+    .mesh-overlay {
       position: absolute;
       inset: 0;
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      background-size: 60px 60px;
-      opacity: 0.5;
+      background: 
+        radial-gradient(at 40% 20%, rgba(102, 126, 234, 0.15) 0px, transparent 50%),
+        radial-gradient(at 80% 0%, rgba(240, 147, 251, 0.1) 0px, transparent 50%),
+        radial-gradient(at 0% 50%, rgba(79, 172, 254, 0.1) 0px, transparent 50%),
+        radial-gradient(at 80% 50%, rgba(67, 233, 123, 0.08) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(250, 112, 154, 0.1) 0px, transparent 50%),
+        radial-gradient(at 80% 100%, rgba(118, 75, 162, 0.12) 0px, transparent 50%);
     }
     
     /* Subtle noise texture */
-    .noise-overlay {
+    .noise {
       position: absolute;
       inset: 0;
       opacity: 0.03;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
     
-    /* ============================================
-       MAIN LAYOUT
-       ============================================ */
-    .main-container {
+    /* =============================================
+       GLASS CARD SYSTEM
+       Real frosted glass effect
+       ============================================= */
+    .glass {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 24px;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+    
+    .glass-strong {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 24px;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.25),
+        inset 0 1px 2px rgba(255, 255, 255, 0.15);
+    }
+    
+    .glass-subtle {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+    }
+    
+    /* =============================================
+       MAIN CONTAINER
+       ============================================= */
+    .container {
       position: relative;
       z-index: 1;
-      min-height: 100vh;
-      padding: 32px;
-      max-width: 1400px;
+      max-width: 1300px;
       margin: 0 auto;
+      padding: 32px;
+      min-height: 100vh;
     }
     
-    @media (max-width: 768px) {
-      .main-container {
-        padding: 16px;
-      }
-    }
-    
-    /* ============================================
-       GLASSMORPHIC HEADER
-       ============================================ */
-    .glass-header {
+    /* =============================================
+       HEADER
+       ============================================= */
+    .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 32px;
+      padding: 20px 32px;
       margin-bottom: 32px;
-      background: var(--glass-bg-card);
-      backdrop-filter: var(--blur-md);
-      -webkit-backdrop-filter: var(--blur-md);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-2xl);
-      position: relative;
-      overflow: hidden;
-      transition: var(--transition-base);
     }
     
-    .glass-header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.2), 
-        transparent
-      );
-    }
-    
-    .glass-header:hover {
-      border-color: var(--glass-border-hover);
-    }
-    
-    .logo-wrapper {
+    .logo-group {
       display: flex;
       align-items: center;
       gap: 16px;
     }
     
     .logo-icon {
-      width: 56px;
-      height: 56px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      border-radius: var(--radius-lg);
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 24px;
-      position: relative;
-      box-shadow: var(--shadow-glow-purple);
-    }
-    
-    .logo-icon::after {
-      content: '';
-      position: absolute;
-      inset: -2px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
-      border-radius: var(--radius-lg);
-      z-index: -1;
-      opacity: 0.5;
-      filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
     }
     
     .logo-text {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 28px;
-      font-weight: 700;
+      font-size: 26px;
+      font-weight: 800;
       letter-spacing: -0.5px;
-      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-tertiary) 100%);
+      background: linear-gradient(135deg, #fff 0%, #e0e0ff 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
     
-    .logo-tagline {
-      font-size: 12px;
+    .logo-sub {
+      font-size: 11px;
       font-weight: 500;
-      color: var(--text-muted);
-      letter-spacing: 1px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 2px;
       text-transform: uppercase;
     }
     
@@ -459,357 +352,277 @@ app.get('/', (c) => {
       gap: 32px;
     }
     
-    .header-stat {
+    .stat-item {
       text-align: center;
     }
     
-    .header-stat-value {
-      font-family: 'Space Grotesk', sans-serif;
+    .stat-value {
       font-size: 28px;
       font-weight: 700;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-emerald));
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
     
-    .header-stat-label {
+    .stat-label {
       font-size: 11px;
       font-weight: 600;
-      color: var(--text-muted);
+      color: rgba(255,255,255,0.5);
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     
-    @media (max-width: 768px) {
-      .glass-header {
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px;
-      }
-      
-      .header-stats {
-        gap: 24px;
-      }
-    }
-    
-    /* ============================================
-       GLASS CARDS - Core Component
-       ============================================ */
-    .glass-card {
-      background: var(--glass-bg-card);
-      backdrop-filter: var(--blur-md);
-      -webkit-backdrop-filter: var(--blur-md);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      padding: 32px;
+    /* =============================================
+       UPLOAD ZONE - The Hero Section
+       ============================================= */
+    .upload-card {
+      padding: 48px;
+      text-align: center;
       position: relative;
       overflow: hidden;
-      transition: var(--transition-slow);
     }
     
-    /* Top highlight line */
-    .glass-card::before {
+    /* Glow effect behind card */
+    .upload-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 24px;
-      right: 24px;
-      height: 1px;
-      background: linear-gradient(90deg, 
-        transparent, 
-        var(--glass-highlight), 
-        transparent
-      );
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(102, 126, 234, 0.15) 0%, transparent 50%);
+      animation: pulse-glow 4s ease-in-out infinite;
     }
     
-    /* Hover effect */
-    .glass-card:hover {
-      background: var(--glass-bg-hover);
-      border-color: var(--glass-border-hover);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.1); }
     }
     
-    /* Accent variants */
-    .glass-card.accent-purple {
-      border-left: 3px solid var(--accent-primary);
-    }
-    
-    .glass-card.accent-cyan {
-      border-left: 3px solid var(--accent-cyan);
-    }
-    
-    .glass-card.accent-pink {
-      border-left: 3px solid var(--accent-pink);
-    }
-    
-    .glass-card.accent-emerald {
-      border-left: 3px solid var(--accent-emerald);
-    }
-    
-    /* ============================================
-       UPLOAD ZONE - Premium Drag & Drop
-       ============================================ */
     .upload-zone {
-      min-height: 450px;
-      border: 2px dashed var(--glass-border);
-      border-radius: var(--radius-2xl);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: var(--transition-slow);
       position: relative;
-      background: linear-gradient(135deg, 
-        rgba(124, 58, 237, 0.03) 0%, 
-        rgba(6, 182, 212, 0.02) 100%
-      );
+      padding: 60px 40px;
+      border: 2px dashed rgba(255, 255, 255, 0.25);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(240, 147, 251, 0.05) 100%);
     }
     
     .upload-zone:hover {
-      border-color: var(--accent-primary);
-      background: linear-gradient(135deg, 
-        rgba(124, 58, 237, 0.08) 0%, 
-        rgba(6, 182, 212, 0.05) 100%
-      );
+      border-color: rgba(102, 126, 234, 0.6);
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(240, 147, 251, 0.1) 100%);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
     }
     
     .upload-zone.drag-over {
-      border-color: var(--accent-cyan);
+      border-color: #4facfe;
       border-style: solid;
-      background: linear-gradient(135deg, 
-        rgba(6, 182, 212, 0.12) 0%, 
-        rgba(124, 58, 237, 0.08) 100%
-      );
-      transform: scale(1.01);
+      background: linear-gradient(135deg, rgba(79, 172, 254, 0.2) 0%, rgba(0, 242, 254, 0.1) 100%);
+      transform: scale(1.02);
     }
     
-    .upload-icon-wrapper {
-      width: 120px;
-      height: 120px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      border-radius: var(--radius-2xl);
+    .upload-icon-wrap {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 28px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      border-radius: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 32px;
       position: relative;
-      box-shadow: var(--shadow-glow-purple);
-      animation: floatIcon 4s ease-in-out infinite;
+      box-shadow: 
+        0 16px 40px rgba(102, 126, 234, 0.4),
+        0 0 0 8px rgba(102, 126, 234, 0.1);
+      animation: icon-float 3s ease-in-out infinite;
     }
     
-    @keyframes floatIcon {
+    @keyframes icon-float {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
+      50% { transform: translateY(-10px); }
     }
     
-    .upload-icon-wrapper i {
-      font-size: 48px;
+    .upload-icon-wrap i {
+      font-size: 40px;
       color: white;
     }
     
-    .upload-icon-wrapper::before {
-      content: '';
-      position: absolute;
-      inset: -4px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
-      border-radius: calc(var(--radius-2xl) + 4px);
-      z-index: -1;
-      opacity: 0.5;
-      filter: blur(16px);
-      animation: pulseGlow 3s ease-in-out infinite;
-    }
-    
-    @keyframes pulseGlow {
-      0%, 100% { opacity: 0.3; transform: scale(1); }
-      50% { opacity: 0.6; transform: scale(1.05); }
-    }
-    
     .upload-title {
-      font-family: 'Space Grotesk', sans-serif;
       font-size: 32px;
       font-weight: 700;
       margin-bottom: 12px;
-      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-tertiary) 100%);
+      background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
     
     .upload-subtitle {
       font-size: 16px;
-      color: var(--text-muted);
+      color: rgba(255,255,255,0.6);
       margin-bottom: 32px;
     }
     
     .upload-formats {
       display: flex;
+      justify-content: center;
       gap: 16px;
     }
     
-    .format-badge {
+    .format-tag {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 12px 20px;
-      background: var(--glass-bg);
-      backdrop-filter: var(--blur-sm);
-      -webkit-backdrop-filter: var(--blur-sm);
-      border: 1px solid var(--glass-border);
-      border-radius: 50px;
-      font-family: 'JetBrains Mono', monospace;
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 100px;
       font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      transition: var(--transition-base);
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+      transition: all 0.3s ease;
     }
     
-    .format-badge:hover {
-      background: var(--glass-bg-hover);
-      border-color: var(--accent-primary);
-      color: var(--accent-tertiary);
+    .format-tag:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(102, 126, 234, 0.5);
+      color: #fff;
     }
     
-    .format-badge i {
-      font-size: 16px;
-      color: var(--accent-primary);
+    .format-tag i {
+      color: #667eea;
     }
     
-    /* ============================================
-       AI PROCESSING ANIMATION
-       ============================================ */
-    .processing-container {
-      text-align: center;
+    /* =============================================
+       PROCESSING STATE
+       ============================================= */
+    .processing-wrap {
       padding: 60px 40px;
+      text-align: center;
     }
     
-    .ai-brain-container {
-      width: 180px;
-      height: 180px;
+    .brain-container {
+      width: 140px;
+      height: 140px;
       margin: 0 auto 40px;
       position: relative;
     }
     
-    .ai-brain-core {
+    .brain-core {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border-radius: 50%;
-      box-shadow: var(--shadow-glow-purple), var(--shadow-glow-cyan);
-      animation: brainPulse 2s ease-in-out infinite;
+      box-shadow: 
+        0 0 40px rgba(102, 126, 234, 0.6),
+        0 0 80px rgba(118, 75, 162, 0.4);
+      animation: brain-pulse 2s ease-in-out infinite;
     }
     
-    @keyframes brainPulse {
+    @keyframes brain-pulse {
       0%, 100% { transform: translate(-50%, -50%) scale(1); }
-      50% { transform: translate(-50%, -50%) scale(1.1); }
+      50% { transform: translate(-50%, -50%) scale(1.15); }
     }
     
-    .ai-brain-ring {
+    .brain-ring {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      border: 2px solid var(--accent-primary);
+      border: 2px solid #667eea;
       border-radius: 50%;
       opacity: 0;
-      animation: ringExpand 2.5s ease-out infinite;
+      animation: ring-expand 2s ease-out infinite;
     }
     
-    .ai-brain-ring:nth-child(1) { animation-delay: 0s; }
-    .ai-brain-ring:nth-child(2) { animation-delay: 0.5s; }
-    .ai-brain-ring:nth-child(3) { animation-delay: 1s; }
+    .brain-ring:nth-child(1) { animation-delay: 0s; }
+    .brain-ring:nth-child(2) { animation-delay: 0.5s; }
+    .brain-ring:nth-child(3) { animation-delay: 1s; }
     
-    @keyframes ringExpand {
-      0% { width: 80px; height: 80px; opacity: 0.8; }
-      100% { width: 180px; height: 180px; opacity: 0; }
+    @keyframes ring-expand {
+      0% { width: 70px; height: 70px; opacity: 0.8; }
+      100% { width: 140px; height: 140px; opacity: 0; }
     }
     
     .ai-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 20px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      border-radius: 50px;
-      font-family: 'JetBrains Mono', monospace;
+      padding: 10px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 100px;
       font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      margin-bottom: 24px;
-      box-shadow: var(--shadow-glow-purple);
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
     }
     
-    .ai-badge-dot {
+    .ai-dot {
       width: 8px;
       height: 8px;
-      background: white;
+      background: #fff;
       border-radius: 50%;
-      animation: dotPulse 1s ease-in-out infinite;
+      animation: dot-pulse 1s ease-in-out infinite;
     }
     
-    @keyframes dotPulse {
+    @keyframes dot-pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
+      50% { opacity: 0.5; transform: scale(0.7); }
     }
     
-    .processing-title {
-      font-family: 'Space Grotesk', sans-serif;
+    .process-title {
       font-size: 28px;
       font-weight: 700;
       margin-bottom: 8px;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--text-primary));
+      color: #fff;
+    }
+    
+    .process-subtitle {
+      font-size: 15px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 40px;
+    }
+    
+    .progress-percent {
+      font-size: 56px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
+      margin-bottom: 20px;
     }
     
-    .processing-subtitle {
-      color: var(--text-muted);
-      margin-bottom: 32px;
-    }
-    
-    .progress-percentage {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 56px;
-      font-weight: 700;
-      color: var(--accent-cyan);
-      margin-bottom: 24px;
-      text-shadow: 0 0 40px var(--accent-cyan);
-    }
-    
-    .progress-bar-wrapper {
+    .progress-track {
       max-width: 500px;
-      margin: 0 auto 32px;
-    }
-    
-    .progress-bar-track {
       height: 8px;
-      background: rgba(255, 255, 255, 0.1);
+      margin: 0 auto 32px;
+      background: rgba(255,255,255,0.1);
       border-radius: 4px;
       overflow: hidden;
     }
     
-    .progress-bar-fill {
+    .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--accent-primary), var(--accent-cyan), var(--accent-emerald));
+      background: linear-gradient(90deg, #667eea 0%, #4facfe 50%, #43e97b 100%);
       border-radius: 4px;
       transition: width 0.3s ease;
+      box-shadow: 0 0 20px rgba(79, 172, 254, 0.5);
       position: relative;
-      box-shadow: 0 0 20px var(--accent-cyan);
     }
     
-    .progress-bar-fill::after {
+    .progress-fill::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      animation: shimmer 2s infinite;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: shimmer 1.5s infinite;
     }
     
     @keyframes shimmer {
@@ -817,66 +630,58 @@ app.get('/', (c) => {
       100% { transform: translateX(100%); }
     }
     
-    .progress-steps {
+    .steps-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       max-width: 400px;
       margin: 0 auto;
     }
     
-    .progress-step {
+    .step-item {
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 14px 20px;
-      background: var(--glass-bg);
-      backdrop-filter: var(--blur-sm);
-      -webkit-backdrop-filter: var(--blur-sm);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
       font-size: 14px;
-      color: var(--text-dim);
-      transition: var(--transition-base);
+      font-weight: 500;
+      color: rgba(255,255,255,0.4);
+      transition: all 0.3s ease;
     }
     
-    .progress-step.active {
-      background: rgba(124, 58, 237, 0.1);
-      border-color: rgba(124, 58, 237, 0.3);
-      color: var(--accent-tertiary);
+    .step-item.active {
+      background: rgba(102, 126, 234, 0.15);
+      border-color: rgba(102, 126, 234, 0.3);
+      color: #a5b4fc;
     }
     
-    .progress-step.complete {
-      background: rgba(16, 185, 129, 0.1);
-      border-color: rgba(16, 185, 129, 0.3);
-      color: var(--accent-emerald);
+    .step-item.complete {
+      background: rgba(67, 233, 123, 0.1);
+      border-color: rgba(67, 233, 123, 0.3);
+      color: #43e97b;
     }
     
-    .progress-step i {
-      width: 20px;
-      font-size: 14px;
+    .step-item i {
+      width: 18px;
     }
     
-    /* ============================================
+    /* =============================================
        STATS GRID
-       ============================================ */
+       ============================================= */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 20px;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
     
     .stat-card {
-      background: var(--glass-bg-card);
-      backdrop-filter: var(--blur-md);
-      -webkit-backdrop-filter: var(--blur-md);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
       padding: 24px;
       position: relative;
       overflow: hidden;
-      transition: var(--transition-slow);
     }
     
     .stat-card::before {
@@ -888,24 +693,15 @@ app.get('/', (c) => {
       height: 3px;
     }
     
-    .stat-card.purple::before { background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); }
-    .stat-card.cyan::before { background: linear-gradient(90deg, var(--accent-cyan), #22d3ee); }
-    .stat-card.pink::before { background: linear-gradient(90deg, var(--accent-pink), #f472b6); }
-    .stat-card.emerald::before { background: linear-gradient(90deg, var(--accent-emerald), #34d399); }
-    
-    .stat-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--glass-border-hover);
-      box-shadow: var(--shadow-lg);
-    }
-    
-    .stat-card.purple:hover { box-shadow: var(--shadow-glow-purple); }
-    .stat-card.cyan:hover { box-shadow: var(--shadow-glow-cyan); }
+    .stat-card.purple::before { background: linear-gradient(90deg, #667eea, #764ba2); }
+    .stat-card.blue::before { background: linear-gradient(90deg, #4facfe, #00f2fe); }
+    .stat-card.pink::before { background: linear-gradient(90deg, #f093fb, #f5576c); }
+    .stat-card.green::before { background: linear-gradient(90deg, #43e97b, #38f9d7); }
     
     .stat-icon {
       width: 48px;
       height: 48px;
-      border-radius: var(--radius-md);
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -913,90 +709,101 @@ app.get('/', (c) => {
       margin-bottom: 16px;
     }
     
-    .stat-card.purple .stat-icon { background: rgba(124, 58, 237, 0.15); color: var(--accent-primary); }
-    .stat-card.cyan .stat-icon { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
-    .stat-card.pink .stat-icon { background: rgba(236, 72, 153, 0.15); color: var(--accent-pink); }
-    .stat-card.emerald .stat-icon { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
+    .stat-card.purple .stat-icon { background: rgba(102, 126, 234, 0.2); color: #667eea; }
+    .stat-card.blue .stat-icon { background: rgba(79, 172, 254, 0.2); color: #4facfe; }
+    .stat-card.pink .stat-icon { background: rgba(240, 147, 251, 0.2); color: #f093fb; }
+    .stat-card.green .stat-icon { background: rgba(67, 233, 123, 0.2); color: #43e97b; }
     
-    .stat-value {
-      font-family: 'Space Grotesk', sans-serif;
+    .stat-card .stat-value {
       font-size: 36px;
       font-weight: 700;
       margin-bottom: 4px;
     }
     
-    .stat-card.purple .stat-value { color: var(--accent-tertiary); }
-    .stat-card.cyan .stat-value { color: var(--accent-cyan); }
-    .stat-card.pink .stat-value { color: var(--accent-pink); }
-    .stat-card.emerald .stat-value { color: var(--accent-emerald); }
+    .stat-card.purple .stat-value { color: #a5b4fc; }
+    .stat-card.blue .stat-value { color: #4facfe; }
+    .stat-card.pink .stat-value { color: #f5a5c7; }
+    .stat-card.green .stat-value { color: #43e97b; }
     
-    .stat-label {
+    .stat-card .stat-label {
       font-size: 12px;
       font-weight: 600;
+      color: rgba(255,255,255,0.5);
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: var(--text-muted);
     }
     
-    @media (max-width: 1024px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    
-    @media (max-width: 640px) {
-      .stats-grid { grid-template-columns: 1fr; }
-    }
-    
-    /* ============================================
+    /* =============================================
        NAVIGATION TABS
-       ============================================ */
-    .nav-tabs-wrapper {
+       ============================================= */
+    .tabs-wrap {
       display: flex;
-      gap: 8px;
-      padding: 8px;
-      background: var(--glass-bg);
-      backdrop-filter: var(--blur-md);
-      -webkit-backdrop-filter: var(--blur-md);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
+      gap: 6px;
+      padding: 6px;
       margin-bottom: 24px;
       overflow-x: auto;
     }
     
-    .nav-tab {
-      padding: 14px 24px;
-      background: transparent;
-      border: none;
-      border-radius: var(--radius-md);
-      color: var(--text-muted);
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition-base);
+    .tab-btn {
       display: flex;
       align-items: center;
-      gap: 10px;
-      white-space: nowrap;
-    }
-    
-    .nav-tab:hover {
-      color: var(--text-primary);
-      background: var(--glass-bg-hover);
-    }
-    
-    .nav-tab.active {
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      color: white;
-      box-shadow: var(--shadow-glow-purple);
-    }
-    
-    .nav-tab i {
+      gap: 8px;
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font);
       font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.3s ease;
     }
     
-    /* ============================================
+    .tab-btn:hover {
+      color: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .tab-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    }
+    
+    /* =============================================
+       CONTENT CARD
+       ============================================= */
+    .content-card {
+      padding: 32px;
+    }
+    
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    
+    .section-header h2 {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    
+    .section-header i {
+      color: #667eea;
+      font-size: 20px;
+    }
+    
+    .section-header .count {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+    }
+    
+    /* =============================================
        FORM ELEMENTS
-       ============================================ */
+       ============================================= */
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -1009,50 +816,46 @@ app.get('/', (c) => {
       gap: 8px;
     }
     
-    .form-group.full {
-      grid-column: 1 / -1;
-    }
+    .form-group.full { grid-column: 1 / -1; }
     
     .form-label {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-muted);
       display: flex;
       align-items: center;
       gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     
     .form-label i {
-      color: var(--accent-primary);
+      color: #667eea;
       font-size: 12px;
     }
     
     .form-input,
     .form-textarea {
-      padding: 16px 18px;
-      background: rgba(0, 0, 0, 0.2);
-      backdrop-filter: var(--blur-sm);
-      -webkit-backdrop-filter: var(--blur-sm);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
-      color: var(--text-primary);
-      font-family: inherit;
+      padding: 14px 18px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: #fff;
+      font-family: var(--font);
       font-size: 15px;
-      transition: var(--transition-base);
+      transition: all 0.3s ease;
     }
     
     .form-input:focus,
     .form-textarea:focus {
       outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
     }
     
     .form-input::placeholder,
     .form-textarea::placeholder {
-      color: var(--text-dim);
+      color: rgba(255,255,255,0.3);
     }
     
     .form-textarea {
@@ -1061,167 +864,126 @@ app.get('/', (c) => {
       line-height: 1.6;
     }
     
-    @media (max-width: 640px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    /* ============================================
+    /* =============================================
        BUTTONS
-       ============================================ */
+       ============================================= */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
       padding: 14px 28px;
-      border-radius: var(--radius-md);
-      font-family: inherit;
+      border-radius: 12px;
+      font-family: var(--font);
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: var(--transition-base);
+      transition: all 0.3s ease;
       border: none;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    
-    .btn:hover::before {
-      opacity: 1;
     }
     
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      color: white;
-      box-shadow: var(--shadow-glow-purple);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
     }
     
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.4);
+      box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
     }
     
     .btn-secondary {
-      background: var(--glass-bg);
-      backdrop-filter: var(--blur-sm);
-      -webkit-backdrop-filter: var(--blur-sm);
-      border: 1px solid var(--glass-border);
-      color: var(--text-primary);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
     }
     
     .btn-secondary:hover {
-      background: var(--glass-bg-hover);
-      border-color: var(--glass-border-hover);
+      background: rgba(255,255,255,0.15);
     }
     
     .btn-ghost {
-      background: transparent;
-      border: 2px dashed var(--glass-border);
-      color: var(--text-muted);
       width: 100%;
       padding: 20px;
+      background: transparent;
+      border: 2px dashed rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.5);
+      border-radius: 16px;
     }
     
     .btn-ghost:hover {
-      border-color: var(--accent-primary);
-      color: var(--accent-tertiary);
-      background: rgba(124, 58, 237, 0.05);
+      border-color: #667eea;
+      color: #a5b4fc;
+      background: rgba(102, 126, 234, 0.05);
+    }
+    
+    /* =============================================
+       EXPERIENCE ENTRIES
+       ============================================= */
+    .exp-entry {
+      padding: 28px;
+      margin-bottom: 20px;
+      border-left: 3px solid #667eea;
+    }
+    
+    .exp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    
+    .exp-num {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
     }
     
     .btn-icon {
       width: 40px;
       height: 40px;
-      padding: 0;
-      border-radius: var(--radius-md);
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      color: var(--text-muted);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: rgba(255,255,255,0.5);
       cursor: pointer;
-      transition: var(--transition-base);
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    
-    .btn-icon:hover {
-      background: var(--glass-bg-hover);
-      color: var(--text-primary);
+      transition: all 0.3s ease;
     }
     
     .btn-icon.danger:hover {
-      background: rgba(239, 68, 68, 0.15);
-      border-color: rgba(239, 68, 68, 0.3);
-      color: #ef4444;
+      background: rgba(245, 87, 108, 0.15);
+      border-color: rgba(245, 87, 108, 0.3);
+      color: #f5576c;
     }
     
-    /* ============================================
-       EXPERIENCE ENTRIES
-       ============================================ */
-    .experience-entry {
-      background: var(--glass-bg);
-      backdrop-filter: var(--blur-sm);
-      -webkit-backdrop-filter: var(--blur-sm);
-      border: 1px solid var(--glass-border);
-      border-left: 3px solid var(--accent-primary);
-      border-radius: var(--radius-xl);
-      padding: 28px;
-      margin-bottom: 20px;
-      transition: var(--transition-base);
-    }
-    
-    .experience-entry:hover {
-      border-color: var(--glass-border-hover);
-      box-shadow: var(--shadow-md);
-    }
-    
-    .experience-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 24px;
-    }
-    
-    .experience-number {
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      box-shadow: var(--shadow-glow-purple);
-    }
-    
-    /* Day in Life Section */
-    .day-in-life-wrapper {
+    /* Day in Life */
+    .day-section {
       margin-top: 24px;
       padding: 20px;
-      background: rgba(6, 182, 212, 0.05);
-      border: 1px solid rgba(6, 182, 212, 0.15);
-      border-radius: var(--radius-lg);
+      background: rgba(79, 172, 254, 0.05);
+      border: 1px solid rgba(79, 172, 254, 0.15);
+      border-radius: 16px;
     }
     
-    .day-in-life-header {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--accent-cyan);
-      margin-bottom: 16px;
+    .day-title {
       display: flex;
       align-items: center;
       gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #4facfe;
+      margin-bottom: 16px;
     }
     
     .day-item {
@@ -1232,43 +994,43 @@ app.get('/', (c) => {
     }
     
     .day-time {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--accent-primary);
       width: 90px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #667eea;
       flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
     }
     
     .day-input {
       flex: 1;
-      padding: 12px 16px;
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      color: var(--text-primary);
+      padding: 10px 14px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: #fff;
       font-size: 14px;
-      transition: var(--transition-base);
+      transition: all 0.3s ease;
     }
     
     .day-input:focus {
       outline: none;
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.15);
+      border-color: #4facfe;
     }
     
-    /* Metrics Grid */
-    .metrics-wrapper {
+    /* Metrics */
+    .metrics-section {
       margin-top: 24px;
     }
     
-    .metrics-header {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--accent-cyan);
-      margin-bottom: 16px;
+    .metrics-title {
       display: flex;
       align-items: center;
       gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #43e97b;
+      margin-bottom: 16px;
     }
     
     .metrics-grid {
@@ -1278,16 +1040,16 @@ app.get('/', (c) => {
     }
     
     .metric-box {
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
       padding: 16px;
       text-align: center;
-      transition: var(--transition-base);
+      transition: all 0.3s ease;
     }
     
     .metric-box:hover {
-      border-color: var(--accent-cyan);
+      border-color: #43e97b;
     }
     
     .metric-box input {
@@ -1296,34 +1058,29 @@ app.get('/', (c) => {
       border: none;
       outline: none;
       text-align: center;
-      color: var(--text-primary);
-      font-family: 'Space Grotesk', sans-serif;
+      color: #fff;
+      font-family: var(--font);
     }
     
     .metric-box input:first-child {
       font-size: 24px;
       font-weight: 700;
-      color: var(--accent-cyan);
+      color: #43e97b;
       margin-bottom: 4px;
     }
     
     .metric-box input:last-child {
       font-size: 10px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      color: rgba(255,255,255,0.5);
     }
     
-    @media (max-width: 768px) {
-      .metrics-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    
-    /* ============================================
-       SKILLS TAGS
-       ============================================ */
-    .skills-container {
+    /* =============================================
+       SKILLS
+       ============================================= */
+    .skills-wrap {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
@@ -1335,68 +1092,55 @@ app.get('/', (c) => {
       align-items: center;
       gap: 8px;
       padding: 10px 18px;
-      background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(6, 182, 212, 0.1));
-      border: 1px solid rgba(124, 58, 237, 0.25);
-      border-radius: 50px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.1));
+      border: 1px solid rgba(102, 126, 234, 0.25);
+      border-radius: 100px;
       font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      transition: var(--transition-base);
+      font-weight: 600;
+      color: #e0e0ff;
+      transition: all 0.3s ease;
     }
     
     .skill-tag:hover {
-      border-color: var(--accent-primary);
-      background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+      border-color: #667eea;
     }
     
     .skill-remove {
       background: none;
       border: none;
-      color: var(--text-dim);
+      color: rgba(255,255,255,0.4);
       cursor: pointer;
       padding: 0;
-      display: flex;
-      transition: color 0.2s ease;
+      font-size: 12px;
+      transition: color 0.3s ease;
     }
     
     .skill-remove:hover {
-      color: #ef4444;
+      color: #f5576c;
     }
     
-    /* ============================================
-       PREVIEW / TIMELINE
-       ============================================ */
-    .timeline-wrapper {
+    /* =============================================
+       TIMELINE PREVIEW
+       ============================================= */
+    .timeline {
       position: relative;
       padding-left: 48px;
     }
     
-    .timeline-wrapper::before {
+    .timeline::before {
       content: '';
       position: absolute;
       left: 16px;
       top: 0;
       bottom: 0;
       width: 2px;
-      background: linear-gradient(180deg, var(--accent-primary), var(--accent-cyan), var(--accent-pink));
-      border-radius: 1px;
+      background: linear-gradient(180deg, #667eea 0%, #4facfe 50%, #f093fb 100%);
     }
     
     .timeline-item {
       position: relative;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
       padding: 24px;
-      background: var(--glass-bg-card);
-      backdrop-filter: var(--blur-sm);
-      -webkit-backdrop-filter: var(--blur-sm);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      transition: var(--transition-base);
-    }
-    
-    .timeline-item:hover {
-      border-color: var(--glass-border-hover);
-      transform: translateX(4px);
     }
     
     .timeline-item::before {
@@ -1404,16 +1148,15 @@ app.get('/', (c) => {
       position: absolute;
       left: -40px;
       top: 28px;
-      width: 16px;
-      height: 16px;
-      background: var(--accent-primary);
+      width: 14px;
+      height: 14px;
+      background: #667eea;
       border-radius: 50%;
-      border: 3px solid var(--bg-primary);
-      box-shadow: 0 0 20px var(--accent-primary);
+      border: 3px solid #1a1a2e;
+      box-shadow: 0 0 20px #667eea;
     }
     
     .timeline-company {
-      font-family: 'Space Grotesk', sans-serif;
       font-size: 22px;
       font-weight: 700;
       margin-bottom: 6px;
@@ -1422,24 +1165,24 @@ app.get('/', (c) => {
     .timeline-role {
       font-size: 16px;
       font-weight: 600;
-      color: var(--accent-cyan);
+      color: #4facfe;
       margin-bottom: 12px;
     }
     
     .timeline-dates {
       display: inline-block;
       padding: 6px 14px;
-      background: rgba(124, 58, 237, 0.15);
-      border: 1px solid rgba(124, 58, 237, 0.25);
-      border-radius: 50px;
-      font-family: 'JetBrains Mono', monospace;
+      background: rgba(102, 126, 234, 0.15);
+      border: 1px solid rgba(102, 126, 234, 0.25);
+      border-radius: 100px;
       font-size: 12px;
-      color: var(--accent-tertiary);
+      font-weight: 600;
+      color: #a5b4fc;
       margin-bottom: 16px;
     }
     
-    .timeline-description {
-      color: var(--text-muted);
+    .timeline-desc {
+      color: rgba(255,255,255,0.6);
       line-height: 1.7;
     }
     
@@ -1451,148 +1194,77 @@ app.get('/', (c) => {
     }
     
     .preview-metric {
-      background: rgba(6, 182, 212, 0.08);
-      border: 1px solid rgba(6, 182, 212, 0.2);
-      border-radius: var(--radius-md);
+      background: rgba(67, 233, 123, 0.08);
+      border: 1px solid rgba(67, 233, 123, 0.2);
+      border-radius: 12px;
       padding: 16px;
       text-align: center;
-      transition: var(--transition-base);
     }
     
-    .preview-metric:hover {
-      border-color: var(--accent-cyan);
-    }
-    
-    .preview-metric-value {
-      font-family: 'Space Grotesk', sans-serif;
+    .preview-metric-val {
       font-size: 24px;
       font-weight: 700;
-      color: var(--accent-cyan);
+      color: #43e97b;
     }
     
     .preview-metric-label {
       font-size: 10px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      color: rgba(255,255,255,0.5);
       margin-top: 4px;
     }
     
+    /* =============================================
+       RESPONSIVE
+       ============================================= */
+    @media (max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .metrics-grid, .preview-metrics { grid-template-columns: repeat(2, 1fr); }
+    }
+    
     @media (max-width: 768px) {
-      .preview-metrics {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .container { padding: 16px; }
+      .header { flex-direction: column; gap: 20px; padding: 16px; }
+      .stats-grid, .form-grid { grid-template-columns: 1fr; }
+      .upload-card, .content-card { padding: 24px; }
     }
     
-    /* ============================================
-       SECTION HEADERS
-       ============================================ */
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 28px;
-    }
-    
-    .section-header h2 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-    }
-    
-    .section-header i {
-      color: var(--accent-primary);
-      font-size: 20px;
-    }
-    
-    .section-header .count {
-      font-size: 13px;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-    
-    /* ============================================
+    /* =============================================
        ANIMATIONS
-       ============================================ */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+       ============================================= */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
-    .fade-in-up {
-      animation: fadeInUp 0.5s ease forwards;
-    }
-    
-    /* Staggered animation for cards */
-    .stagger-1 { animation-delay: 0.05s; }
-    .stagger-2 { animation-delay: 0.1s; }
-    .stagger-3 { animation-delay: 0.15s; }
-    .stagger-4 { animation-delay: 0.2s; }
-    
-    /* ============================================
-       EMPTY STATE
-       ============================================ */
-    .empty-state {
-      text-align: center;
-      padding: 80px 40px;
-    }
-    
-    .empty-icon {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 32px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), var(--accent-cyan));
-      border-radius: var(--radius-2xl);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-      box-shadow: var(--shadow-glow-purple);
-      animation: floatIcon 4s ease-in-out infinite;
-    }
-    
-    .empty-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-    
-    .empty-subtitle {
-      color: var(--text-muted);
-      font-size: 16px;
-      max-width: 400px;
-      margin: 0 auto 32px;
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
     }
   </style>
 </head>
 <body>
-  <!-- Animated Background -->
-  <div class="animated-bg">
-    <div class="gradient-orb orb-1"></div>
-    <div class="gradient-orb orb-2"></div>
-    <div class="gradient-orb orb-3"></div>
-    <div class="gradient-orb orb-4"></div>
-    <div class="grid-pattern"></div>
-    <div class="noise-overlay"></div>
+  <!-- STUNNING ANIMATED BACKGROUND -->
+  <div class="bg-wrapper">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+    <div class="orb orb-5"></div>
+    <div class="mesh-overlay"></div>
+    <div class="noise"></div>
   </div>
   
   <div id="root"></div>
   
   <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
+    const { useState, useRef } = React;
     
-    // Resume Parser
     const ResumeParser = {
       async parsePDF(file) {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const ab = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
         let text = '';
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
@@ -1602,8 +1274,8 @@ app.get('/', (c) => {
         return text;
       },
       async parseDOCX(file) {
-        const arrayBuffer = await file.arrayBuffer();
-        const result = await mammoth.extractRawText({ arrayBuffer });
+        const ab = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer: ab });
         return result.value;
       },
       async parseTXT(file) {
@@ -1611,10 +1283,8 @@ app.get('/', (c) => {
       }
     };
     
-    // Views
     const VIEWS = { UPLOAD: 'upload', BUILDER: 'builder', PREVIEW: 'preview' };
     
-    // Main App
     const App = () => {
       const [view, setView] = useState(VIEWS.UPLOAD);
       const [profile, setProfile] = useState(null);
@@ -1624,8 +1294,8 @@ app.get('/', (c) => {
       const [rawText, setRawText] = useState('');
       const [steps, setSteps] = useState([
         { label: 'Reading document', status: 'pending' },
-        { label: 'Extracting text content', status: 'pending' },
-        { label: 'AI analyzing structure', status: 'pending' },
+        { label: 'Extracting text', status: 'pending' },
+        { label: 'AI analyzing', status: 'pending' },
         { label: 'Identifying experiences', status: 'pending' },
         { label: 'Generating insights', status: 'pending' },
         { label: 'Building profile', status: 'pending' }
@@ -1637,7 +1307,6 @@ app.get('/', (c) => {
         const s = [...steps];
         
         try {
-          // Step 1: Read file
           s[0].status = 'active';
           setSteps([...s]);
           await new Promise(r => setTimeout(r, 400));
@@ -1645,7 +1314,6 @@ app.get('/', (c) => {
           const ext = file.name.split('.').pop().toLowerCase();
           let text = '';
           
-          // Step 2: Extract text
           s[0].status = 'complete';
           s[1].status = 'active';
           setSteps([...s]);
@@ -1656,9 +1324,7 @@ app.get('/', (c) => {
           else text = await ResumeParser.parseTXT(file);
           
           setRawText(text);
-          console.log('Extracted text:', text);
           
-          // Step 3: AI Analysis
           s[1].status = 'complete';
           s[2].status = 'active';
           setSteps([...s]);
@@ -1671,19 +1337,11 @@ app.get('/', (c) => {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ text })
             });
-            
-            if (res.ok) {
-              aiData = await res.json();
-              console.log('AI parsed:', aiData);
-            } else {
-              const err = await res.json();
-              console.error('AI error:', err);
-            }
+            if (res.ok) aiData = await res.json();
           } catch (e) {
-            console.error('AI request failed:', e);
+            console.error('AI error:', e);
           }
           
-          // Step 4-6: Process
           s[2].status = 'complete';
           s[3].status = 'active';
           setSteps([...s]);
@@ -1701,7 +1359,6 @@ app.get('/', (c) => {
           setSteps([...s]);
           setProgress(90);
           
-          // Build profile
           const finalProfile = buildProfile(aiData, text);
           
           s[5].status = 'complete';
@@ -1724,24 +1381,10 @@ app.get('/', (c) => {
       const buildProfile = (ai, text) => {
         if (ai && !ai.error && ai.basics) {
           return {
-            basics: {
-              name: ai.basics?.name || '',
-              title: ai.basics?.title || '',
-              tagline: ai.basics?.tagline || '',
-              email: ai.basics?.email || '',
-              phone: ai.basics?.phone || '',
-              location: ai.basics?.location || '',
-              linkedin: ai.basics?.linkedin || '',
-              website: ai.basics?.website || ''
-            },
+            basics: { ...ai.basics },
             experience: (ai.experience || []).map((e, i) => ({
               id: Date.now() + i,
-              company: e.company || '',
-              role: e.role || '',
-              startDate: e.startDate || '',
-              endDate: e.endDate || '',
-              description: e.description || '',
-              tasks: e.tasks || '',
+              ...e,
               dayInLife: e.dayInLife || [
                 { time: '9:00 AM', activity: '' },
                 { time: '11:00 AM', activity: '' },
@@ -1754,16 +1397,11 @@ app.get('/', (c) => {
                 { value: '', label: '' },
                 { value: '', label: '' },
                 { value: '', label: '' }
-              ],
-              toxicity: 5
+              ]
             })),
             skills: ai.skills || [],
             education: ai.education || [],
-            achievements: (ai.achievements || []).map((a, i) => ({
-              id: Date.now() + i + 1000,
-              title: a.title || '',
-              description: a.description || ''
-            })),
+            achievements: (ai.achievements || []).map((a, i) => ({ id: Date.now() + i + 1000, ...a })),
             awards: [],
             reviews: [],
             payHistory: [],
@@ -1773,14 +1411,12 @@ app.get('/', (c) => {
           };
         }
         
-        // Fallback parsing
         const emailMatch = text.match(/[\\w.-]+@[\\w.-]+\\.\\w+/);
         const phoneMatch = text.match(/[\\+]?[(]?[0-9]{3}[)]?[-\\s.]?[0-9]{3}[-\\s.]?[0-9]{4}/);
         const lines = text.split('\\n').filter(l => l.trim());
-        const name = lines[0]?.trim() || '';
         
         return {
-          basics: { name, title: '', tagline: '', email: emailMatch?.[0] || '', phone: phoneMatch?.[0] || '', location: '', linkedin: '', website: '' },
+          basics: { name: lines[0]?.trim() || '', title: '', tagline: '', email: emailMatch?.[0] || '', phone: phoneMatch?.[0] || '', location: '', linkedin: '', website: '' },
           experience: [],
           skills: [],
           education: [],
@@ -1795,27 +1431,15 @@ app.get('/', (c) => {
       };
       
       return (
-        <div className="main-container">
-          <Header profile={profile} view={view} />
+        <div className="container">
+          <Header profile={profile} />
           
           {view === VIEWS.UPLOAD && (
-            <UploadView 
-              onUpload={handleUpload}
-              processing={processing}
-              progress={progress}
-              steps={steps}
-            />
+            <UploadView onUpload={handleUpload} processing={processing} progress={progress} steps={steps} />
           )}
           
           {view === VIEWS.BUILDER && profile && (
-            <BuilderView
-              profile={profile}
-              setProfile={setProfile}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              rawText={rawText}
-              setView={setView}
-            />
+            <BuilderView profile={profile} setProfile={setProfile} activeTab={activeTab} setActiveTab={setActiveTab} rawText={rawText} setView={setView} />
           )}
           
           {view === VIEWS.PREVIEW && profile && (
@@ -1825,35 +1449,32 @@ app.get('/', (c) => {
       );
     };
     
-    // Header Component
-    const Header = ({ profile, view }) => (
-      <header className="glass-header fade-in-up">
-        <div className="logo-wrapper">
+    const Header = ({ profile }) => (
+      <header className="header glass fade-in">
+        <div className="logo-group">
           <div className="logo-icon">⚡</div>
           <div>
             <div className="logo-text">WEBUME</div>
-            <div className="logo-tagline">Premium AI Resume Builder</div>
+            <div className="logo-sub">AI Resume Builder</div>
           </div>
         </div>
-        
         <div className="header-stats">
-          <div className="header-stat">
-            <div className="header-stat-value">{profile?.experience?.length || 0}</div>
-            <div className="header-stat-label">Experiences</div>
+          <div className="stat-item">
+            <div className="stat-value">{profile?.experience?.length || 0}</div>
+            <div className="stat-label">Experiences</div>
           </div>
-          <div className="header-stat">
-            <div className="header-stat-value">{profile?.skills?.length || 0}</div>
-            <div className="header-stat-label">Skills</div>
+          <div className="stat-item">
+            <div className="stat-value">{profile?.skills?.length || 0}</div>
+            <div className="stat-label">Skills</div>
           </div>
-          <div className="header-stat">
-            <div className="header-stat-value">{profile?.achievements?.length || 0}</div>
-            <div className="header-stat-label">Achievements</div>
+          <div className="stat-item">
+            <div className="stat-value">{profile?.achievements?.length || 0}</div>
+            <div className="stat-label">Achievements</div>
           </div>
         </div>
       </header>
     );
     
-    // Upload View Component
     const UploadView = ({ onUpload, processing, progress, steps }) => {
       const [dragOver, setDragOver] = useState(false);
       const inputRef = useRef(null);
@@ -1866,34 +1487,32 @@ app.get('/', (c) => {
       
       if (processing) {
         return (
-          <div className="glass-card fade-in-up">
-            <div className="processing-container">
-              <div className="ai-brain-container">
-                <div className="ai-brain-core"></div>
-                <div className="ai-brain-ring"></div>
-                <div className="ai-brain-ring"></div>
-                <div className="ai-brain-ring"></div>
+          <div className="glass-strong upload-card fade-in">
+            <div className="processing-wrap">
+              <div className="brain-container">
+                <div className="brain-core"></div>
+                <div className="brain-ring"></div>
+                <div className="brain-ring"></div>
+                <div className="brain-ring"></div>
               </div>
               
               <div className="ai-badge">
-                <div className="ai-badge-dot"></div>
+                <div className="ai-dot"></div>
                 GEMINI AI PROCESSING
               </div>
               
-              <div className="processing-title">Analyzing Your Resume</div>
-              <div className="processing-subtitle">Our AI is extracting every detail from your career history</div>
+              <div className="process-title">Analyzing Your Resume</div>
+              <div className="process-subtitle">Extracting every detail from your career history</div>
               
-              <div className="progress-percentage">{Math.round(progress)}%</div>
+              <div className="progress-percent">{Math.round(progress)}%</div>
               
-              <div className="progress-bar-wrapper">
-                <div className="progress-bar-track">
-                  <div className="progress-bar-fill" style={{ width: progress + '%' }}></div>
-                </div>
+              <div className="progress-track">
+                <div className="progress-fill" style={{ width: progress + '%' }}></div>
               </div>
               
-              <div className="progress-steps">
+              <div className="steps-list">
                 {steps.map((step, i) => (
-                  <div key={i} className={'progress-step ' + step.status}>
+                  <div key={i} className={'step-item ' + step.status}>
                     <i className={
                       step.status === 'complete' ? 'fas fa-check-circle' :
                       step.status === 'active' ? 'fas fa-circle-notch fa-spin' :
@@ -1909,7 +1528,7 @@ app.get('/', (c) => {
       }
       
       return (
-        <div className="glass-card fade-in-up">
+        <div className="glass-strong upload-card fade-in">
           <div
             className={'upload-zone' + (dragOver ? ' drag-over' : '')}
             onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -1925,7 +1544,7 @@ app.get('/', (c) => {
               style={{ display: 'none' }}
             />
             
-            <div className="upload-icon-wrapper">
+            <div className="upload-icon-wrap">
               <i className="fas fa-cloud-upload-alt"></i>
             </div>
             
@@ -1933,16 +1552,15 @@ app.get('/', (c) => {
             <p className="upload-subtitle">Powered by Gemini AI • Instant Extraction</p>
             
             <div className="upload-formats">
-              <span className="format-badge"><i className="fas fa-file-pdf"></i> PDF</span>
-              <span className="format-badge"><i className="fas fa-file-word"></i> DOCX</span>
-              <span className="format-badge"><i className="fas fa-file-alt"></i> TXT</span>
+              <span className="format-tag"><i className="fas fa-file-pdf"></i> PDF</span>
+              <span className="format-tag"><i className="fas fa-file-word"></i> DOCX</span>
+              <span className="format-tag"><i className="fas fa-file-alt"></i> TXT</span>
             </div>
           </div>
         </div>
       );
     };
     
-    // Builder View Component
     const BuilderView = ({ profile, setProfile, activeTab, setActiveTab, rawText, setView }) => {
       const tabs = [
         { id: 'basics', icon: 'fa-user', label: 'Basic Info' },
@@ -1960,51 +1578,44 @@ app.get('/', (c) => {
       const updateBasics = (field, value) => setProfile(p => ({ ...p, basics: { ...p.basics, [field]: value } }));
       
       return (
-        <div className="fade-in-up">
-          {/* Stats */}
+        <div className="fade-in">
           <div className="stats-grid">
-            <div className="stat-card purple stagger-1 fade-in-up">
+            <div className="glass stat-card purple">
               <div className="stat-icon"><i className="fas fa-briefcase"></i></div>
               <div className="stat-value">{profile.experience.length}</div>
               <div className="stat-label">Experiences</div>
             </div>
-            <div className="stat-card cyan stagger-2 fade-in-up">
+            <div className="glass stat-card blue">
               <div className="stat-icon"><i className="fas fa-code"></i></div>
               <div className="stat-value">{profile.skills.length}</div>
               <div className="stat-label">Skills</div>
             </div>
-            <div className="stat-card pink stagger-3 fade-in-up">
+            <div className="glass stat-card pink">
               <div className="stat-icon"><i className="fas fa-trophy"></i></div>
               <div className="stat-value">{profile.achievements.length}</div>
               <div className="stat-label">Achievements</div>
             </div>
-            <div className="stat-card emerald stagger-4 fade-in-up">
+            <div className="glass stat-card green">
               <div className="stat-icon"><i className="fas fa-check-double"></i></div>
               <div className="stat-value">94%</div>
               <div className="stat-label">Complete</div>
             </div>
           </div>
           
-          {/* Nav Tabs */}
-          <div className="nav-tabs-wrapper">
+          <div className="glass tabs-wrap">
             {tabs.map(tab => (
-              <button
-                key={tab.id}
-                className={'nav-tab' + (activeTab === tab.id ? ' active' : '')}
-                onClick={() => setActiveTab(tab.id)}
-              >
+              <button key={tab.id} className={'tab-btn' + (activeTab === tab.id ? ' active' : '')} onClick={() => setActiveTab(tab.id)}>
                 <i className={'fas ' + tab.icon}></i>
                 {tab.label}
               </button>
             ))}
-            <button className="nav-tab" onClick={() => setView(VIEWS.PREVIEW)}>
+            <button className="tab-btn" onClick={() => setView(VIEWS.PREVIEW)}>
               <i className="fas fa-eye"></i>
               Preview
             </button>
           </div>
           
-          {/* Content */}
-          <div className="glass-card">
+          <div className="glass-strong content-card">
             {activeTab === 'basics' && <BasicsEditor profile={profile} updateBasics={updateBasics} rawText={rawText} />}
             {activeTab === 'experience' && <ExperienceEditor experience={profile.experience} setExperience={(e) => update('experience', e)} />}
             {activeTab === 'skills' && <SkillsEditor skills={profile.skills} setSkills={(s) => update('skills', s)} />}
@@ -2019,7 +1630,6 @@ app.get('/', (c) => {
       );
     };
     
-    // Basics Editor
     const BasicsEditor = ({ profile, updateBasics, rawText }) => (
       <div>
         <div className="section-header">
@@ -2038,7 +1648,7 @@ app.get('/', (c) => {
           </div>
           <div className="form-group full">
             <label className="form-label"><i className="fas fa-quote-left"></i> Professional Tagline</label>
-            <input type="text" className="form-input" value={profile.basics.tagline} onChange={(e) => updateBasics('tagline', e.target.value)} placeholder="10+ years driving innovation at top tech companies..." />
+            <input type="text" className="form-input" value={profile.basics.tagline} onChange={(e) => updateBasics('tagline', e.target.value)} placeholder="10+ years driving innovation..." />
           </div>
           <div className="form-group">
             <label className="form-label"><i className="fas fa-envelope"></i> Email</label>
@@ -2060,11 +1670,11 @@ app.get('/', (c) => {
         
         {rawText && (
           <details style={{ marginTop: '32px' }}>
-            <summary style={{ cursor: 'pointer', color: 'var(--text-muted)', fontWeight: '600', padding: '12px 0' }}>
+            <summary style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontWeight: '600', padding: '12px 0' }}>
               <i className="fas fa-file-alt" style={{ marginRight: '8px' }}></i>
-              View Extracted Raw Text
+              View Extracted Text
             </summary>
-            <pre style={{ marginTop: '12px', padding: '20px', background: 'rgba(0,0,0,0.3)', borderRadius: 'var(--radius-md)', fontSize: '12px', color: 'var(--text-muted)', maxHeight: '200px', overflow: 'auto', whiteSpace: 'pre-wrap', fontFamily: 'JetBrains Mono, monospace', border: '1px solid var(--glass-border)' }}>
+            <pre style={{ marginTop: '12px', padding: '20px', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', fontSize: '12px', color: 'rgba(255,255,255,0.5)', maxHeight: '200px', overflow: 'auto', whiteSpace: 'pre-wrap' }}>
               {rawText}
             </pre>
           </details>
@@ -2072,13 +1682,11 @@ app.get('/', (c) => {
       </div>
     );
     
-    // Experience Editor
     const ExperienceEditor = ({ experience, setExperience }) => {
       const add = () => setExperience([...experience, {
         id: Date.now(), company: '', role: '', startDate: '', endDate: '', description: '', tasks: '',
         dayInLife: [{time:'9:00 AM',activity:''},{time:'11:00 AM',activity:''},{time:'1:00 PM',activity:''},{time:'3:00 PM',activity:''},{time:'5:00 PM',activity:''}],
-        metrics: [{value:'',label:''},{value:'',label:''},{value:'',label:''},{value:'',label:''}],
-        toxicity: 5
+        metrics: [{value:'',label:''},{value:'',label:''},{value:'',label:''},{value:'',label:''}]
       }]);
       
       const update = (i, field, val) => {
@@ -2110,9 +1718,9 @@ app.get('/', (c) => {
           </div>
           
           {experience.map((exp, i) => (
-            <div key={exp.id} className="experience-entry">
-              <div className="experience-header">
-                <div className="experience-number">{i + 1}</div>
+            <div key={exp.id} className="glass-subtle exp-entry">
+              <div className="exp-header">
+                <div className="exp-num">{i + 1}</div>
                 <button className="btn-icon danger" onClick={() => remove(i)}><i className="fas fa-trash"></i></button>
               </div>
               
@@ -2135,30 +1743,22 @@ app.get('/', (c) => {
                 </div>
                 <div className="form-group full">
                   <label className="form-label">Description</label>
-                  <textarea className="form-textarea" value={exp.description} onChange={(e) => update(i, 'description', e.target.value)} placeholder="Describe your role, responsibilities, and key accomplishments..." />
+                  <textarea className="form-textarea" value={exp.description} onChange={(e) => update(i, 'description', e.target.value)} placeholder="Describe your role..." />
                 </div>
               </div>
               
-              {/* Day in Life */}
-              <div className="day-in-life-wrapper">
-                <div className="day-in-life-header">
-                  <i className="fas fa-sun"></i>
-                  A Day in the Life
-                </div>
+              <div className="day-section">
+                <div className="day-title"><i className="fas fa-sun"></i> A Day in the Life</div>
                 {exp.dayInLife.map((d, di) => (
                   <div key={di} className="day-item">
                     <span className="day-time">{d.time}</span>
-                    <input type="text" className="day-input" value={d.activity} onChange={(e) => updateDay(i, di, e.target.value)} placeholder="What did you typically do at this time?" />
+                    <input type="text" className="day-input" value={d.activity} onChange={(e) => updateDay(i, di, e.target.value)} placeholder="What did you do?" />
                   </div>
                 ))}
               </div>
               
-              {/* Metrics */}
-              <div className="metrics-wrapper">
-                <div className="metrics-header">
-                  <i className="fas fa-chart-line"></i>
-                  Impact Metrics
-                </div>
+              <div className="metrics-section">
+                <div className="metrics-title"><i className="fas fa-chart-line"></i> Impact Metrics</div>
                 <div className="metrics-grid">
                   {exp.metrics.map((m, mi) => (
                     <div key={mi} className="metric-box">
@@ -2178,7 +1778,6 @@ app.get('/', (c) => {
       );
     };
     
-    // Skills Editor
     const SkillsEditor = ({ skills, setSkills }) => {
       const [input, setInput] = useState('');
       const add = () => { if (input.trim()) { setSkills([...skills, input.trim()]); setInput(''); } };
@@ -2193,27 +1792,15 @@ app.get('/', (c) => {
           </div>
           
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-            <input 
-              type="text" 
-              className="form-input" 
-              style={{ flex: 1 }} 
-              value={input} 
-              onChange={(e) => setInput(e.target.value)} 
-              onKeyPress={(e) => e.key === 'Enter' && add()} 
-              placeholder="Add a skill..." 
-            />
-            <button className="btn btn-primary" onClick={add}>
-              <i className="fas fa-plus"></i> Add
-            </button>
+            <input type="text" className="form-input" style={{ flex: 1 }} value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && add()} placeholder="Add a skill..." />
+            <button className="btn btn-primary" onClick={add}><i className="fas fa-plus"></i> Add</button>
           </div>
           
-          <div className="skills-container">
+          <div className="skills-wrap">
             {skills.map((skill, i) => (
               <div key={i} className="skill-tag">
                 {skill}
-                <button className="skill-remove" onClick={() => remove(i)}>
-                  <i className="fas fa-times"></i>
-                </button>
+                <button className="skill-remove" onClick={() => remove(i)}><i className="fas fa-times"></i></button>
               </div>
             ))}
           </div>
@@ -2221,7 +1808,6 @@ app.get('/', (c) => {
       );
     };
     
-    // List Editor (Generic)
     const ListEditor = ({ title, icon, items, setItems, fields }) => {
       const add = () => {
         const item = { id: Date.now() };
@@ -2244,12 +1830,10 @@ app.get('/', (c) => {
           </div>
           
           {items.map((item, i) => (
-            <div key={item.id} className="experience-entry">
-              <div className="experience-header">
-                <div className="experience-number">{i + 1}</div>
-                <button className="btn-icon danger" onClick={() => remove(i)}>
-                  <i className="fas fa-trash"></i>
-                </button>
+            <div key={item.id} className="glass-subtle exp-entry">
+              <div className="exp-header">
+                <div className="exp-num">{i + 1}</div>
+                <button className="btn-icon danger" onClick={() => remove(i)}><i className="fas fa-trash"></i></button>
               </div>
               <div className="form-grid">
                 {fields.map(f => (
@@ -2266,14 +1850,11 @@ app.get('/', (c) => {
             </div>
           ))}
           
-          <button className="btn-ghost" onClick={add}>
-            <i className="fas fa-plus"></i> Add {title.replace(/s$/, '')}
-          </button>
+          <button className="btn-ghost" onClick={add}><i className="fas fa-plus"></i> Add {title.replace(/s$/, '')}</button>
         </div>
       );
     };
     
-    // Media Editor
     const MediaEditor = ({ photos, videos, setPhotos, setVideos }) => {
       const photoRef = useRef(null);
       const videoRef = useRef(null);
@@ -2298,20 +1879,20 @@ app.get('/', (c) => {
           </div>
           
           <div style={{ marginBottom: '40px' }}>
-            <h3 style={{ fontSize: '16px', color: 'var(--accent-cyan)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <h3 style={{ fontSize: '16px', color: '#4facfe', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <i className="fas fa-camera"></i> Photos
             </h3>
             <input type="file" ref={photoRef} onChange={addPhotos} accept="image/*" multiple style={{ display: 'none' }} />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px' }}>
               {photos.map(p => (
-                <div key={p.id} style={{ aspectRatio: '1', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', border: '1px solid var(--glass-border)' }}>
+                <div key={p.id} style={{ aspectRatio: '1', borderRadius: '12px', overflow: 'hidden', position: 'relative', border: '1px solid rgba(255,255,255,0.1)' }}>
                   <img src={p.url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <button onClick={() => setPhotos(photos.filter(x => x.id !== p.id))} style={{ position: 'absolute', top: '8px', right: '8px', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(0,0,0,0.7)', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <i className="fas fa-times"></i>
                   </button>
                 </div>
               ))}
-              <button onClick={() => photoRef.current?.click()} style={{ aspectRatio: '1', borderRadius: 'var(--radius-md)', border: '2px dashed var(--glass-border)', background: 'transparent', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)', transition: 'var(--transition-base)' }}>
+              <button onClick={() => photoRef.current?.click()} style={{ aspectRatio: '1', borderRadius: '12px', border: '2px dashed rgba(255,255,255,0.15)', background: 'transparent', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'rgba(255,255,255,0.5)' }}>
                 <i className="fas fa-plus" style={{ fontSize: '24px' }}></i>
                 <span style={{ fontSize: '12px' }}>Add Photo</span>
               </button>
@@ -2319,20 +1900,20 @@ app.get('/', (c) => {
           </div>
           
           <div>
-            <h3 style={{ fontSize: '16px', color: 'var(--accent-pink)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <h3 style={{ fontSize: '16px', color: '#f093fb', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <i className="fas fa-video"></i> Videos
             </h3>
             <input type="file" ref={videoRef} onChange={addVideos} accept="video/*" multiple style={{ display: 'none' }} />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
               {videos.map(v => (
-                <div key={v.id} style={{ aspectRatio: '16/9', borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', border: '1px solid var(--glass-border)', background: 'var(--bg-secondary)' }}>
+                <div key={v.id} style={{ aspectRatio: '16/9', borderRadius: '12px', overflow: 'hidden', position: 'relative', border: '1px solid rgba(255,255,255,0.1)', background: '#0f0f23' }}>
                   <video src={v.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <button onClick={() => setVideos(videos.filter(x => x.id !== v.id))} style={{ position: 'absolute', top: '8px', right: '8px', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(0,0,0,0.7)', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <i className="fas fa-times"></i>
                   </button>
                 </div>
               ))}
-              <button onClick={() => videoRef.current?.click()} style={{ aspectRatio: '16/9', borderRadius: 'var(--radius-md)', border: '2px dashed var(--glass-border)', background: 'transparent', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)', transition: 'var(--transition-base)' }}>
+              <button onClick={() => videoRef.current?.click()} style={{ aspectRatio: '16/9', borderRadius: '12px', border: '2px dashed rgba(255,255,255,0.15)', background: 'transparent', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'rgba(255,255,255,0.5)' }}>
                 <i className="fas fa-plus" style={{ fontSize: '24px' }}></i>
                 <span style={{ fontSize: '12px' }}>Add Video</span>
               </button>
@@ -2342,53 +1923,28 @@ app.get('/', (c) => {
       );
     };
     
-    // Preview View
     const PreviewView = ({ profile, setView }) => (
-      <div className="fade-in-up">
-        <div className="glass-card" style={{ marginBottom: '24px' }}>
+      <div className="fade-in">
+        <div className="glass" style={{ padding: '24px', marginBottom: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h2 style={{ fontFamily: 'Space Grotesk', fontSize: '24px', marginBottom: '4px' }}>Live Preview</h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>How recruiters will see your profile</p>
+              <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '4px' }}>Live Preview</h2>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>How recruiters will see your profile</p>
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
-              <button className="btn btn-secondary" onClick={() => setView(VIEWS.BUILDER)}>
-                <i className="fas fa-edit"></i> Edit
-              </button>
-              <button className="btn btn-primary">
-                <i className="fas fa-share"></i> Publish
-              </button>
+              <button className="btn btn-secondary" onClick={() => setView(VIEWS.BUILDER)}><i className="fas fa-edit"></i> Edit</button>
+              <button className="btn btn-primary"><i className="fas fa-share"></i> Publish</button>
             </div>
           </div>
         </div>
         
-        {/* Profile Card */}
-        <div className="glass-card" style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <div style={{ 
-            width: '120px', 
-            height: '120px', 
-            margin: '0 auto 24px', 
-            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), var(--accent-cyan))', 
-            borderRadius: 'var(--radius-2xl)', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            fontSize: '40px', 
-            fontWeight: '700', 
-            fontFamily: 'Space Grotesk',
-            boxShadow: 'var(--shadow-glow-purple)'
-          }}>
+        <div className="glass-strong" style={{ padding: '48px', textAlign: 'center', marginBottom: '24px' }}>
+          <div style={{ width: '120px', height: '120px', margin: '0 auto 24px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)', borderRadius: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px', fontWeight: '700', boxShadow: '0 16px 40px rgba(102, 126, 234, 0.4)' }}>
             {profile.basics.name ? profile.basics.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?'}
           </div>
-          <h1 style={{ fontFamily: 'Space Grotesk', fontSize: '32px', fontWeight: '700', marginBottom: '8px' }}>
-            {profile.basics.name || 'Your Name'}
-          </h1>
-          <p style={{ fontSize: '20px', color: 'var(--accent-cyan)', fontWeight: '600', marginBottom: '12px' }}>
-            {profile.basics.title || 'Your Title'}
-          </p>
-          <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto', fontSize: '16px', lineHeight: '1.6' }}>
-            {profile.basics.tagline || 'Your professional tagline will appear here'}
-          </p>
+          <h1 style={{ fontSize: '32px', fontWeight: '700', marginBottom: '8px' }}>{profile.basics.name || 'Your Name'}</h1>
+          <p style={{ fontSize: '20px', color: '#4facfe', fontWeight: '600', marginBottom: '12px' }}>{profile.basics.title || 'Your Title'}</p>
+          <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: '600px', margin: '0 auto', fontSize: '16px', lineHeight: '1.6' }}>{profile.basics.tagline || 'Your professional tagline'}</p>
           
           {profile.skills.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginTop: '28px' }}>
@@ -2399,27 +1955,26 @@ app.get('/', (c) => {
           )}
         </div>
         
-        {/* Timeline */}
         {profile.experience.length > 0 && (
-          <div className="glass-card">
-            <div className="section-header" style={{ marginBottom: '32px' }}>
+          <div className="glass-strong" style={{ padding: '32px' }}>
+            <div className="section-header">
               <i className="fas fa-briefcase"></i>
               <h2>Career Timeline</h2>
             </div>
             
-            <div className="timeline-wrapper">
+            <div className="timeline">
               {profile.experience.map((exp, i) => (
-                <div key={exp.id} className="timeline-item">
+                <div key={exp.id} className="glass-subtle timeline-item">
                   <h3 className="timeline-company">{exp.company || 'Company'}</h3>
                   <p className="timeline-role">{exp.role || 'Role'}</p>
                   <span className="timeline-dates">{exp.startDate || 'Start'} — {exp.endDate || 'End'}</span>
-                  <p className="timeline-description">{exp.description || 'Description...'}</p>
+                  <p className="timeline-desc">{exp.description || 'Description...'}</p>
                   
                   {exp.metrics.some(m => m.value) && (
                     <div className="preview-metrics">
                       {exp.metrics.filter(m => m.value).map((m, mi) => (
                         <div key={mi} className="preview-metric">
-                          <div className="preview-metric-value">{m.value}</div>
+                          <div className="preview-metric-val">{m.value}</div>
                           <div className="preview-metric-label">{m.label}</div>
                         </div>
                       ))}
@@ -2433,7 +1988,6 @@ app.get('/', (c) => {
       </div>
     );
     
-    // Render
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
   </script>
