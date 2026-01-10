@@ -41,6 +41,15 @@ async function getCurrentUser(c: any): Promise<any> {
   }
 }
 
+// Generate unique profile slug
+function generateSlug(name: string): string {
+  const base = name.toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  const random = Math.random().toString(36).substring(2, 6);
+  return `${base}-${random}`;
+}
+
 // API: Register new user
 app.post('/api/auth/register', async (c) => {
   try {
@@ -56,20 +65,27 @@ app.post('/api/auth/register', async (c) => {
       return c.json({ error: 'An account with this email already exists' }, 400);
     }
     
-    // Create user
+    // Create user with unique public profile slug
     const hashedPassword = await hashPassword(password);
+    const slug = generateSlug(name);
     const user = {
       email: email.toLowerCase(),
       name,
+      slug,
       password: hashedPassword,
       createdAt: new Date().toISOString(),
       profile: null,
       profilePhoto: null,
       selectedTemplate: 'executive',
-      rawText: ''
+      rawText: '',
+      isPublic: false,
+      profileViews: 0,
+      lastViewedAt: null
     };
     
     await c.env.USERS_KV.put(`user:${email.toLowerCase()}`, JSON.stringify(user));
+    // Also store slug mapping for public profiles
+    await c.env.USERS_KV.put(`slug:${slug}`, email.toLowerCase());
     
     // Create session
     const token = generateToken();
@@ -195,8 +211,157 @@ app.get('/api/profile/load', async (c) => {
     profile: user.profile,
     profilePhoto: user.profilePhoto,
     selectedTemplate: user.selectedTemplate,
-    rawText: user.rawText
+    rawText: user.rawText,
+    slug: user.slug,
+    isPublic: user.isPublic || false,
+    profileViews: user.profileViews || 0
   });
+});
+
+// API: Toggle profile public/private
+app.post('/api/profile/publish', async (c) => {
+  const user = await getCurrentUser(c);
+  if (!user) {
+    return c.json({ error: 'Not authenticated' }, 401);
+  }
+  
+  const { isPublic } = await c.req.json();
+  user.isPublic = isPublic;
+  await c.env.USERS_KV.put(`user:${user.email}`, JSON.stringify(user));
+  
+  return c.json({ 
+    success: true, 
+    isPublic, 
+    publicUrl: isPublic ? `/p/${user.slug}` : null 
+  });
+});
+
+// API: Update profile slug (custom URL)
+app.post('/api/profile/slug', async (c) => {
+  const user = await getCurrentUser(c);
+  if (!user) {
+    return c.json({ error: 'Not authenticated' }, 401);
+  }
+  
+  const { slug } = await c.req.json();
+  const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, '').substring(0, 30);
+  
+  if (cleanSlug.length < 3) {
+    return c.json({ error: 'Slug must be at least 3 characters' }, 400);
+  }
+  
+  // Check if slug is taken
+  const existing = await c.env.USERS_KV.get(`slug:${cleanSlug}`);
+  if (existing && existing !== user.email) {
+    return c.json({ error: 'This URL is already taken' }, 400);
+  }
+  
+  // Remove old slug mapping
+  if (user.slug) {
+    await c.env.USERS_KV.delete(`slug:${user.slug}`);
+  }
+  
+  // Set new slug
+  user.slug = cleanSlug;
+  await c.env.USERS_KV.put(`user:${user.email}`, JSON.stringify(user));
+  await c.env.USERS_KV.put(`slug:${cleanSlug}`, user.email);
+  
+  return c.json({ success: true, slug: cleanSlug });
+});
+
+// API: Get public profile by slug (for viewing)
+app.get('/api/public/:slug', async (c) => {
+  const slug = c.req.param('slug');
+  
+  const email = await c.env.USERS_KV.get(`slug:${slug}`);
+  if (!email) {
+    return c.json({ error: 'Profile not found' }, 404);
+  }
+  
+  const user = await c.env.USERS_KV.get(`user:${email}`, 'json') as any;
+  if (!user || !user.isPublic) {
+    return c.json({ error: 'Profile not found or private' }, 404);
+  }
+  
+  // Increment view count
+  user.profileViews = (user.profileViews || 0) + 1;
+  user.lastViewedAt = new Date().toISOString();
+  await c.env.USERS_KV.put(`user:${email}`, JSON.stringify(user));
+  
+  // Return public profile data (no sensitive info)
+  return c.json({
+    name: user.name,
+    profile: user.profile,
+    profilePhoto: user.profilePhoto,
+    selectedTemplate: user.selectedTemplate,
+    views: user.profileViews
+  });
+});
+
+// API: ATS Score Analysis
+app.post('/api/ats-score', async (c) => {
+  try {
+    const { profile, jobDescription } = await c.req.json();
+    
+    if (!profile) {
+      return c.json({ error: 'Profile is required' }, 400);
+    }
+    
+    // Extract keywords from job description or use common ATS keywords
+    const commonKeywords = [
+      'leadership', 'management', 'strategy', 'analytics', 'communication',
+      'project management', 'team', 'budget', 'revenue', 'growth',
+      'development', 'implementation', 'optimization', 'collaboration',
+      'stakeholder', 'presentation', 'reporting', 'analysis', 'planning'
+    ];
+    
+    const profileText = JSON.stringify(profile).toLowerCase();
+    const skills = profile.skills || [];
+    
+    let score = 0;
+    const matches = [];
+    const missing = [];
+    
+    // Check for keyword matches
+    commonKeywords.forEach(keyword => {
+      if (profileText.includes(keyword.toLowerCase())) {
+        score += 5;
+        matches.push(keyword);
+      } else {
+        missing.push(keyword);
+      }
+    });
+    
+    // Bonus for completeness
+    if (profile.basics?.name) score += 5;
+    if (profile.basics?.email) score += 5;
+    if (profile.basics?.phone) score += 3;
+    if (profile.basics?.summary && profile.basics.summary.length > 100) score += 10;
+    if (profile.experience?.length > 0) score += 15;
+    if (profile.experience?.length > 2) score += 5;
+    if (skills.length >= 5) score += 10;
+    if (skills.length >= 10) score += 5;
+    if (profile.education?.length > 0) score += 5;
+    if (profile.achievements?.length > 0) score += 5;
+    
+    // Cap at 100
+    score = Math.min(100, score);
+    
+    return c.json({
+      score,
+      grade: score >= 90 ? 'A+' : score >= 80 ? 'A' : score >= 70 ? 'B' : score >= 60 ? 'C' : 'D',
+      matches: matches.slice(0, 10),
+      suggestions: missing.slice(0, 5).map(k => `Consider adding "${k}" to your profile`),
+      tips: [
+        score < 70 ? 'Add more quantifiable achievements with numbers' : null,
+        skills.length < 10 ? 'Add more relevant skills to improve matching' : null,
+        !profile.basics?.summary ? 'Add a professional summary' : null,
+        profile.experience?.length < 2 ? 'Add more work experience details' : null
+      ].filter(Boolean)
+    });
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
 });
 
 app.post('/api/parse-resume', async (c) => {
@@ -385,6 +550,336 @@ ABSOLUTE REQUIREMENTS:
   }
 });
 
+// Public Profile View Page
+app.get('/p/:slug', async (c) => {
+  const slug = c.req.param('slug');
+  return c.html(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading Profile... | Webumé</title>
+  <link rel="icon" type="image/png" href="/static/logo.png">
+  <meta name="description" content="View professional profile on Webumé">
+  <meta property="og:title" content="Professional Profile | Webumé">
+  <meta property="og:description" content="View this professional profile created with Webumé">
+  <meta property="og:type" content="profile">
+  
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #0f0f1a 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(139,92,246,0.2);
+      border-top-color: #8B5CF6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .error h1 { font-size: 72px; margin-bottom: 20px; }
+    .error p { color: rgba(255,255,255,0.6); margin-bottom: 30px; }
+    .error a {
+      display: inline-block;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #8B5CF6, #EC4899);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading profile...</p>
+    </div>
+  </div>
+  
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const SLUG = '${slug}';
+    
+    const PublicProfile = () => {
+      const [profile, setProfile] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState(null);
+      const [qrCode, setQrCode] = useState(null);
+      
+      useEffect(() => {
+        fetch('/api/public/' + SLUG)
+          .then(r => r.json())
+          .then(data => {
+            if (data.error) {
+              setError(data.error);
+            } else {
+              setProfile(data);
+              document.title = (data.profile?.basics?.name || data.name) + ' | Webumé';
+              // Generate QR code
+              if (window.QRCode) {
+                QRCode.toDataURL(window.location.href, { width: 200, margin: 2 })
+                  .then(url => setQrCode(url));
+              }
+            }
+            setLoading(false);
+          })
+          .catch(e => {
+            setError('Failed to load profile');
+            setLoading(false);
+          });
+      }, []);
+      
+      if (loading) {
+        return (
+          <div className="loading">
+            <div className="spinner"></div>
+            <p>Loading profile...</p>
+          </div>
+        );
+      }
+      
+      if (error) {
+        return (
+          <div className="error">
+            <h1>404</h1>
+            <p>{error}</p>
+            <a href="/">Create Your Own Webumé</a>
+          </div>
+        );
+      }
+      
+      const p = profile.profile;
+      const basics = p?.basics || {};
+      const template = profile.selectedTemplate || 'executive';
+      
+      const colors = {
+        executive: { accent: '#8B5CF6', gradient: 'linear-gradient(135deg, #8B5CF6, #6D28D9)' },
+        corporate: { accent: '#1E3A5F', gradient: 'linear-gradient(135deg, #1E3A5F, #D4AF37)' },
+        healthcare: { accent: '#0EA5E9', gradient: 'linear-gradient(135deg, #0EA5E9, #14B8A6)' },
+        restaurant: { accent: '#DC2626', gradient: 'linear-gradient(135deg, #DC2626, #F59E0B)' },
+        trades: { accent: '#D97706', gradient: 'linear-gradient(135deg, #D97706, #78716C)' },
+        beauty: { accent: '#EC4899', gradient: 'linear-gradient(135deg, #EC4899, #BE185D)' },
+        creative: { accent: '#F472B6', gradient: 'linear-gradient(135deg, #F472B6, #A855F7)' },
+        tech: { accent: '#06B6D4', gradient: 'linear-gradient(135deg, #06B6D4, #22D3EE)' },
+        nonprofit: { accent: '#0891B2', gradient: 'linear-gradient(135deg, #0891B2, #059669)' },
+        minimal: { accent: '#10B981', gradient: 'linear-gradient(135deg, #10B981, #34D399)' }
+      };
+      
+      const style = colors[template] || colors.executive;
+      
+      return (
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}>
+          {/* Header */}
+          <header style={{ 
+            background: 'rgba(255,255,255,0.03)', 
+            borderRadius: '24px', 
+            padding: '40px',
+            marginBottom: '30px',
+            border: '1px solid rgba(255,255,255,0.08)',
+            display: 'flex',
+            gap: '30px',
+            alignItems: 'center',
+            flexWrap: 'wrap'
+          }}>
+            {profile.profilePhoto && (
+              <img 
+                src={profile.profilePhoto} 
+                style={{ 
+                  width: '140px', 
+                  height: '140px', 
+                  borderRadius: '20px',
+                  objectFit: 'cover',
+                  border: '4px solid ' + style.accent
+                }}
+                alt={basics.name}
+              />
+            )}
+            <div style={{ flex: 1, minWidth: '250px' }}>
+              <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>{basics.name}</h1>
+              <p style={{ fontSize: '18px', color: style.accent, fontWeight: '600', marginBottom: '8px' }}>{basics.title}</p>
+              {basics.tagline && <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', marginBottom: '16px' }}>{basics.tagline}</p>}
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>
+                {basics.email && <span><i className="fas fa-envelope" style={{ marginRight: '6px' }}></i>{basics.email}</span>}
+                {basics.location && <span><i className="fas fa-map-marker-alt" style={{ marginRight: '6px' }}></i>{basics.location}</span>}
+                {basics.linkedin && <a href={basics.linkedin.startsWith('http') ? basics.linkedin : 'https://' + basics.linkedin} target="_blank" style={{ color: '#0A66C2' }}><i className="fab fa-linkedin"></i> LinkedIn</a>}
+              </div>
+            </div>
+            {qrCode && (
+              <div style={{ textAlign: 'center' }}>
+                <img src={qrCode} style={{ width: '100px', borderRadius: '8px' }} alt="QR Code" />
+                <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginTop: '6px' }}>Scan to share</p>
+              </div>
+            )}
+          </header>
+          
+          {/* Summary */}
+          {basics.summary && (
+            <section style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '20px', padding: '28px', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <h2 style={{ fontSize: '14px', color: style.accent, marginBottom: '14px', fontWeight: '700' }}>
+                <i className="fas fa-user" style={{ marginRight: '10px' }}></i>About
+              </h2>
+              <p style={{ fontSize: '15px', lineHeight: '1.7', color: 'rgba(255,255,255,0.8)' }}>{basics.summary}</p>
+            </section>
+          )}
+          
+          {/* Experience */}
+          {p?.experience?.length > 0 && (
+            <section style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '20px', padding: '28px', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <h2 style={{ fontSize: '14px', color: style.accent, marginBottom: '20px', fontWeight: '700' }}>
+                <i className="fas fa-briefcase" style={{ marginRight: '10px' }}></i>Experience
+              </h2>
+              {p.experience.map((exp, i) => (
+                <div key={i} style={{ marginBottom: i < p.experience.length - 1 ? '28px' : 0, paddingBottom: i < p.experience.length - 1 ? '28px' : 0, borderBottom: i < p.experience.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '10px' }}>
+                    {exp.companyInfo?.domain && (
+                      <img 
+                        src={'https://logo.clearbit.com/' + exp.companyInfo.domain} 
+                        style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#fff' }}
+                        onError={(e) => e.target.style.display = 'none'}
+                        alt=""
+                      />
+                    )}
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: '700' }}>{exp.role}</h3>
+                      <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>{exp.company} • {exp.startDate} - {exp.endDate}</p>
+                    </div>
+                  </div>
+                  {exp.description && <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.6', marginTop: '12px' }}>{exp.description}</p>}
+                  {exp.metrics?.length > 0 && (
+                    <div style={{ display: 'flex', gap: '16px', marginTop: '16px', flexWrap: 'wrap' }}>
+                      {exp.metrics.map((m, j) => (
+                        <div key={j} style={{ background: style.accent + '15', padding: '10px 16px', borderRadius: '10px', textAlign: 'center' }}>
+                          <div style={{ fontSize: '18px', fontWeight: '800', color: style.accent }}>{m.value}</div>
+                          <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)' }}>{m.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </section>
+          )}
+          
+          {/* Skills */}
+          {p?.skills?.length > 0 && (
+            <section style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '20px', padding: '28px', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <h2 style={{ fontSize: '14px', color: style.accent, marginBottom: '16px', fontWeight: '700' }}>
+                <i className="fas fa-cogs" style={{ marginRight: '10px' }}></i>Skills
+              </h2>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                {p.skills.map((skill, i) => (
+                  <span key={i} style={{ 
+                    padding: '8px 16px', 
+                    background: style.accent + '20',
+                    border: '1px solid ' + style.accent + '40',
+                    borderRadius: '100px',
+                    fontSize: '13px',
+                    fontWeight: '500'
+                  }}>{skill}</span>
+                ))}
+              </div>
+            </section>
+          )}
+          
+          {/* Education */}
+          {p?.education?.length > 0 && (
+            <section style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '20px', padding: '28px', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <h2 style={{ fontSize: '14px', color: style.accent, marginBottom: '16px', fontWeight: '700' }}>
+                <i className="fas fa-graduation-cap" style={{ marginRight: '10px' }}></i>Education
+              </h2>
+              {p.education.map((edu, i) => (
+                <div key={i} style={{ marginBottom: i < p.education.length - 1 ? '16px' : 0 }}>
+                  <h3 style={{ fontSize: '15px', fontWeight: '600' }}>{edu.degree}</h3>
+                  <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>{edu.school} {edu.year && '• ' + edu.year}</p>
+                </div>
+              ))}
+            </section>
+          )}
+          
+          {/* Footer */}
+          <footer style={{ textAlign: 'center', marginTop: '40px', paddingTop: '30px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '16px' }}>
+              <i className="fas fa-eye" style={{ marginRight: '6px' }}></i>{profile.views || 0} profile views
+            </p>
+            <a href="/" style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '14px 28px',
+              background: style.gradient,
+              color: '#fff',
+              textDecoration: 'none',
+              borderRadius: '12px',
+              fontWeight: '600',
+              fontSize: '14px'
+            }}>
+              <i className="fas fa-rocket"></i>
+              Create Your Own Webumé
+            </a>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '20px' }}>
+              Powered by Webumé • The Digital Resume Revolution
+            </p>
+          </footer>
+        </div>
+      );
+    };
+    
+    ReactDOM.render(<PublicProfile />, document.getElementById('root'));
+  </script>
+</body>
+</html>`);
+});
+
+// PWA Manifest
+app.get('/manifest.json', (c) => {
+  return c.json({
+    name: 'Webumé - Digital Resume',
+    short_name: 'Webumé',
+    description: 'Transform your resume into an immersive digital experience',
+    start_url: '/',
+    display: 'standalone',
+    background_color: '#0a0a12',
+    theme_color: '#8B5CF6',
+    orientation: 'portrait-primary',
+    icons: [
+      { src: '/static/logo.png', sizes: '192x192', type: 'image/png' },
+      { src: '/static/logo.png', sizes: '512x512', type: 'image/png' }
+    ],
+    categories: ['business', 'productivity'],
+    screenshots: [],
+    shortcuts: [
+      { name: 'Upload Resume', url: '/', icons: [{ src: '/static/logo.png', sizes: '96x96' }] }
+    ]
+  });
+});
+
 app.get('/', (c) => {
   return c.html(`<!DOCTYPE html>
 <html lang="en">
@@ -393,7 +888,15 @@ app.get('/', (c) => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Webumé | Your WebApp Resume</title>
   <link rel="icon" type="image/png" href="/static/logo.png">
+  <link rel="apple-touch-icon" href="/static/logo.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#8B5CF6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="Transform your resume into an immersive digital experience">
+  <meta property="og:title" content="Webumé - Digital Resume Revolution">
+  <meta property="og:description" content="AI-powered digital profiles that get you hired">
+  <meta property="og:type" content="website">
   
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -401,6 +904,7 @@ app.get('/', (c) => {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -1941,6 +2445,9 @@ app.get('/', (c) => {
       const [profilePhoto, setProfilePhoto] = useState(null);
       const [lastSaved, setLastSaved] = useState(null);
       const [saveStatus, setSaveStatus] = useState(''); // 'saving', 'saved', 'error'
+      const [slug, setSlug] = useState('');
+      const [isPublic, setIsPublic] = useState(false);
+      const [profileViews, setProfileViews] = useState(0);
       const [steps, setSteps] = useState([
         { text: 'Reading file', state: 'pending' },
         { text: 'Extracting text', state: 'pending' },
@@ -1986,6 +2493,9 @@ app.get('/', (c) => {
           if (data.profilePhoto) setProfilePhoto(data.profilePhoto);
           if (data.selectedTemplate) setTemplate(data.selectedTemplate);
           if (data.rawText) setRawText(data.rawText);
+          if (data.slug) setSlug(data.slug);
+          if (data.isPublic !== undefined) setIsPublic(data.isPublic);
+          if (data.profileViews) setProfileViews(data.profileViews);
         } catch (e) {
           console.error('Error loading profile:', e);
         }
@@ -2620,6 +3130,10 @@ app.get('/', (c) => {
                 setView={setView}
                 profilePhoto={profilePhoto}
                 selectedTemplate={selectedTemplate}
+                slug={slug}
+                isPublic={isPublic}
+                setIsPublic={setIsPublic}
+                profileViews={profileViews}
               />
             )}
           </main>
@@ -4350,8 +4864,73 @@ app.get('/', (c) => {
     };
     
     // Preview View with Template Support - ENHANCED for all 10 templates
-    const PreviewView = ({ profile, setView, profilePhoto, selectedTemplate }) => {
+    const PreviewView = ({ profile, setView, profilePhoto, selectedTemplate, slug, isPublic, setIsPublic, profileViews }) => {
       const template = TEMPLATES.find(t => t.id === selectedTemplate) || TEMPLATES[0];
+      const [showPublishModal, setShowPublishModal] = useState(false);
+      const [publishing, setPublishing] = useState(false);
+      const [qrCode, setQrCode] = useState(null);
+      const [atsScore, setAtsScore] = useState(null);
+      const [showAtsModal, setShowAtsModal] = useState(false);
+      
+      const publicUrl = window.location.origin + '/p/' + slug;
+      
+      // Generate QR code when modal opens
+      useEffect(() => {
+        if (showPublishModal && window.QRCode && slug) {
+          QRCode.toDataURL(publicUrl, { width: 200, margin: 2 })
+            .then(url => setQrCode(url))
+            .catch(() => {});
+        }
+      }, [showPublishModal, slug]);
+      
+      const handlePublish = async () => {
+        setPublishing(true);
+        try {
+          const res = await fetch('/api/profile/publish', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isPublic: !isPublic })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setIsPublic(!isPublic);
+          }
+        } catch (e) {
+          alert('Failed to update publish status');
+        }
+        setPublishing(false);
+      };
+      
+      const copyLink = () => {
+        navigator.clipboard.writeText(publicUrl);
+        alert('Link copied to clipboard!');
+      };
+      
+      const shareProfile = (platform) => {
+        const text = encodeURIComponent(profile.basics?.name + ' - Professional Profile');
+        const url = encodeURIComponent(publicUrl);
+        const links = {
+          linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url=' + url,
+          twitter: 'https://twitter.com/intent/tweet?text=' + text + '&url=' + url,
+          email: 'mailto:?subject=' + text + '&body=Check out my professional profile: ' + publicUrl
+        };
+        window.open(links[platform], '_blank');
+      };
+      
+      const checkAtsScore = async () => {
+        setShowAtsModal(true);
+        try {
+          const res = await fetch('/api/ats-score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ profile })
+          });
+          const data = await res.json();
+          setAtsScore(data);
+        } catch (e) {
+          setAtsScore({ error: 'Failed to analyze profile' });
+        }
+      };
       
       // Use template's own gradient and color
       const styles = {
@@ -4363,6 +4942,273 @@ app.get('/', (c) => {
       
       return (
         <div>
+          {/* Publish Modal */}
+          {showPublishModal && (
+            <div style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.85)',
+              zIndex: 10000,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px'
+            }} onClick={() => setShowPublishModal(false)}>
+              <div onClick={e => e.stopPropagation()} style={{
+                background: 'linear-gradient(135deg, #1a1a2e, #0f0f1a)',
+                borderRadius: '24px',
+                padding: '36px',
+                maxWidth: '500px',
+                width: '100%',
+                border: '1px solid rgba(139,92,246,0.3)'
+              }}>
+                <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '8px', color: '#fff' }}>
+                  <i className="fas fa-share-alt" style={{ marginRight: '12px', color: 'var(--purple-main)' }}></i>
+                  Share Your Profile
+                </h2>
+                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '28px' }}>
+                  Make your profile public and share it with recruiters
+                </p>
+                
+                {/* Public Toggle */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '20px',
+                  background: isPublic ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.03)',
+                  borderRadius: '14px',
+                  marginBottom: '24px',
+                  border: '1px solid ' + (isPublic ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.08)')
+                }}>
+                  <div>
+                    <h4 style={{ fontSize: '15px', fontWeight: '600', color: '#fff', marginBottom: '4px' }}>
+                      {isPublic ? '🌐 Profile is Public' : '🔒 Profile is Private'}
+                    </h4>
+                    <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                      {isPublic ? 'Anyone with the link can view' : 'Only you can see your profile'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handlePublish}
+                    disabled={publishing}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '10px',
+                      border: 'none',
+                      background: isPublic ? 'rgba(239,68,68,0.2)' : 'var(--green-main)',
+                      color: isPublic ? '#EF4444' : '#fff',
+                      fontWeight: '600',
+                      fontSize: '13px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {publishing ? '...' : isPublic ? 'Make Private' : 'Publish'}
+                  </button>
+                </div>
+                
+                {/* URL and QR */}
+                {isPublic && (
+                  <>
+                    <div style={{ marginBottom: '24px' }}>
+                      <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px', display: 'block' }}>
+                        Your Public URL
+                      </label>
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <input
+                          value={publicUrl}
+                          readOnly
+                          style={{
+                            flex: 1,
+                            padding: '14px',
+                            background: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '10px',
+                            color: '#fff',
+                            fontSize: '13px'
+                          }}
+                        />
+                        <button onClick={copyLink} style={{
+                          padding: '14px 20px',
+                          background: 'var(--purple-main)',
+                          border: 'none',
+                          borderRadius: '10px',
+                          color: '#fff',
+                          cursor: 'pointer'
+                        }}>
+                          <i className="fas fa-copy"></i>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {/* QR Code */}
+                    {qrCode && (
+                      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                        <img src={qrCode} style={{ borderRadius: '12px', background: '#fff', padding: '10px' }} alt="QR Code" />
+                        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '8px' }}>Scan to view profile</p>
+                      </div>
+                    )}
+                    
+                    {/* Social Share */}
+                    <div>
+                      <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '12px', display: 'block' }}>
+                        Share on
+                      </label>
+                      <div style={{ display: 'flex', gap: '12px' }}>
+                        <button onClick={() => shareProfile('linkedin')} style={{
+                          flex: 1,
+                          padding: '14px',
+                          background: '#0A66C2',
+                          border: 'none',
+                          borderRadius: '10px',
+                          color: '#fff',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          fontSize: '13px'
+                        }}>
+                          <i className="fab fa-linkedin" style={{ marginRight: '8px' }}></i>LinkedIn
+                        </button>
+                        <button onClick={() => shareProfile('twitter')} style={{
+                          flex: 1,
+                          padding: '14px',
+                          background: '#1DA1F2',
+                          border: 'none',
+                          borderRadius: '10px',
+                          color: '#fff',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          fontSize: '13px'
+                        }}>
+                          <i className="fab fa-twitter" style={{ marginRight: '8px' }}></i>Twitter
+                        </button>
+                        <button onClick={() => shareProfile('email')} style={{
+                          flex: 1,
+                          padding: '14px',
+                          background: 'rgba(255,255,255,0.1)',
+                          border: 'none',
+                          borderRadius: '10px',
+                          color: '#fff',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          fontSize: '13px'
+                        }}>
+                          <i className="fas fa-envelope" style={{ marginRight: '8px' }}></i>Email
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+                
+                {/* View Stats */}
+                {isPublic && profileViews > 0 && (
+                  <div style={{ marginTop: '20px', textAlign: 'center', padding: '14px', background: 'rgba(139,92,246,0.1)', borderRadius: '10px' }}>
+                    <span style={{ fontSize: '24px', fontWeight: '800', color: 'var(--purple-main)' }}>{profileViews}</span>
+                    <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginLeft: '8px' }}>profile views</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {/* ATS Score Modal */}
+          {showAtsModal && (
+            <div style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.85)',
+              zIndex: 10000,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px'
+            }} onClick={() => setShowAtsModal(false)}>
+              <div onClick={e => e.stopPropagation()} style={{
+                background: 'linear-gradient(135deg, #1a1a2e, #0f0f1a)',
+                borderRadius: '24px',
+                padding: '36px',
+                maxWidth: '500px',
+                width: '100%',
+                border: '1px solid rgba(6,182,212,0.3)'
+              }}>
+                <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '8px', color: '#fff' }}>
+                  <i className="fas fa-chart-line" style={{ marginRight: '12px', color: 'var(--cyan-main)' }}></i>
+                  ATS Compatibility Score
+                </h2>
+                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginBottom: '28px' }}>
+                  See how well your profile matches ATS requirements
+                </p>
+                
+                {!atsScore ? (
+                  <div style={{ textAlign: 'center', padding: '40px' }}>
+                    <i className="fas fa-spinner fa-spin" style={{ fontSize: '32px', color: 'var(--cyan-main)' }}></i>
+                    <p style={{ marginTop: '16px', color: 'rgba(255,255,255,0.5)' }}>Analyzing your profile...</p>
+                  </div>
+                ) : atsScore.error ? (
+                  <p style={{ color: '#EF4444' }}>{atsScore.error}</p>
+                ) : (
+                  <>
+                    {/* Score Circle */}
+                    <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                      <div style={{
+                        width: '120px',
+                        height: '120px',
+                        borderRadius: '50%',
+                        background: 'conic-gradient(var(--cyan-main) ' + (atsScore.score * 3.6) + 'deg, rgba(255,255,255,0.1) 0deg)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto'
+                      }}>
+                        <div style={{
+                          width: '100px',
+                          height: '100px',
+                          borderRadius: '50%',
+                          background: '#1a1a2e',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexDirection: 'column'
+                        }}>
+                          <span style={{ fontSize: '32px', fontWeight: '800', color: 'var(--cyan-main)' }}>{atsScore.score}</span>
+                          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>/ 100</span>
+                        </div>
+                      </div>
+                      <p style={{ marginTop: '12px', fontSize: '18px', fontWeight: '700', color: atsScore.score >= 80 ? 'var(--green-main)' : atsScore.score >= 60 ? '#F59E0B' : '#EF4444' }}>
+                        Grade: {atsScore.grade}
+                      </p>
+                    </div>
+                    
+                    {/* Keywords Found */}
+                    {atsScore.matches?.length > 0 && (
+                      <div style={{ marginBottom: '20px' }}>
+                        <h4 style={{ fontSize: '13px', color: 'var(--green-main)', marginBottom: '10px' }}>
+                          <i className="fas fa-check-circle" style={{ marginRight: '8px' }}></i>Keywords Found
+                        </h4>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                          {atsScore.matches.map((k, i) => (
+                            <span key={i} style={{ padding: '6px 12px', background: 'rgba(16,185,129,0.15)', borderRadius: '6px', fontSize: '12px', color: 'var(--green-main)' }}>{k}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Suggestions */}
+                    {atsScore.tips?.length > 0 && (
+                      <div>
+                        <h4 style={{ fontSize: '13px', color: '#F59E0B', marginBottom: '10px' }}>
+                          <i className="fas fa-lightbulb" style={{ marginRight: '8px' }}></i>Suggestions
+                        </h4>
+                        <ul style={{ paddingLeft: '20px', color: 'rgba(255,255,255,0.7)', fontSize: '13px', lineHeight: '1.8' }}>
+                          {atsScore.tips.map((tip, i) => <li key={i}>{tip}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+          
           <div className="glass preview-header">
             <div>
               <h1 className="page-title">Live Preview</h1>
@@ -4381,14 +5227,30 @@ app.get('/', (c) => {
                   <i className={'fas ' + template.icon}></i>
                   {template.name} Template
                 </span>
+                {isPublic && (
+                  <span style={{ 
+                    marginLeft: '10px',
+                    padding: '4px 12px',
+                    background: 'rgba(16,185,129,0.2)',
+                    borderRadius: '100px',
+                    fontSize: '12px',
+                    color: 'var(--green-main)',
+                    fontWeight: '600'
+                  }}>
+                    <i className="fas fa-globe" style={{ marginRight: '6px' }}></i>Public
+                  </span>
+                )}
               </p>
             </div>
-            <div style={{ display: 'flex', gap: '14px' }}>
+            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+              <button className="btn btn-secondary" onClick={checkAtsScore}>
+                <i className="fas fa-chart-line"></i> ATS Score
+              </button>
               <button className="btn btn-secondary" onClick={() => setView(VIEW.BUILDER)}>
                 <i className="fas fa-edit"></i> Edit
               </button>
-              <button className="btn btn-primary" style={{ background: styles.gradient }}>
-                <i className="fas fa-share"></i> Publish
+              <button className="btn btn-primary" style={{ background: styles.gradient }} onClick={() => setShowPublishModal(true)}>
+                <i className="fas fa-share"></i> {isPublic ? 'Share' : 'Publish'}
               </button>
             </div>
           </div>
