@@ -3127,6 +3127,7 @@ app.get('/', (c) => {
             {view === VIEW.PREVIEW && profile && (
               <PreviewView
                 profile={profile}
+                setProfile={setProfile}
                 setView={setView}
                 profilePhoto={profilePhoto}
                 selectedTemplate={selectedTemplate}
@@ -3750,7 +3751,17 @@ app.get('/', (c) => {
             { value: '', label: '' },
             { value: '', label: '' },
             { value: '', label: '' }
-          ]
+          ],
+          // NEW: Employer-specific rich content
+          challenges: [],      // Challenges faced at this employer
+          victories: [],       // Key wins and successes
+          impactStories: [],   // Detailed impact narratives
+          projects: [],        // Projects at this employer
+          awards: [],          // Awards received at this employer
+          reviews: [],         // Performance reviews/testimonials
+          photos: [],          // Photos from this employer
+          videos: [],          // Videos from this employer
+          skills: []           // Skills learned/used at this employer
         }]);
       };
       
@@ -4476,6 +4487,877 @@ app.get('/', (c) => {
       );
     };
     
+    // EMPLOYER DETAIL PAGE - Full immersive view for each employer experience
+    const EmployerDetailPage = ({ experience, onClose, template, isEditing, onUpdate }) => {
+      const [activeSection, setActiveSection] = useState('overview');
+      const [expandedPhoto, setExpandedPhoto] = useState(null);
+      const [expandedVideo, setExpandedVideo] = useState(null);
+      const photoInputRef = useRef(null);
+      const videoInputRef = useRef(null);
+      
+      const styles = {
+        accent: template?.color || '#8B5CF6',
+        gradient: template?.gradient || 'linear-gradient(135deg, #8B5CF6, #6D28D9)',
+      };
+      
+      const exp = experience || {};
+      const displayLogo = exp.customLogo || exp.logoUrl;
+      
+      // Calculate tenure
+      const calculateTenure = () => {
+        if (!exp.startDate) return '';
+        const start = new Date(exp.startDate);
+        const end = exp.endDate && exp.endDate !== 'Present' ? new Date(exp.endDate) : new Date();
+        const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+        const years = Math.floor(months / 12);
+        const remainingMonths = months % 12;
+        if (years > 0 && remainingMonths > 0) return \`\${years} yr\${years > 1 ? 's' : ''} \${remainingMonths} mo\`;
+        if (years > 0) return \`\${years} year\${years > 1 ? 's' : ''}\`;
+        return \`\${remainingMonths} month\${remainingMonths > 1 ? 's' : ''}\`;
+      };
+      
+      const sections = [
+        { id: 'overview', icon: 'fa-eye', label: 'Overview' },
+        { id: 'responsibilities', icon: 'fa-tasks', label: 'Responsibilities' },
+        { id: 'projects', icon: 'fa-folder', label: 'Projects' },
+        { id: 'achievements', icon: 'fa-trophy', label: 'Achievements' },
+        { id: 'challenges', icon: 'fa-mountain', label: 'Challenges' },
+        { id: 'media', icon: 'fa-photo-video', label: 'Media' },
+        { id: 'reviews', icon: 'fa-star', label: 'Reviews' },
+        { id: 'dayinlife', icon: 'fa-sun', label: 'Day in Life' },
+      ];
+      
+      // Handle photo upload for this employer
+      const handlePhotoUpload = async (e) => {
+        const files = Array.from(e.target.files || []);
+        const newPhotos = await Promise.all(files.map(file => {
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+              const img = new Image();
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const maxSize = 1600;
+                let { width, height } = img;
+                if (width > maxSize || height > maxSize) {
+                  if (width > height) { height = (height / width) * maxSize; width = maxSize; }
+                  else { width = (width / height) * maxSize; height = maxSize; }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve({ id: Date.now() + Math.random(), url: canvas.toDataURL('image/png', 0.95), name: file.name });
+              };
+              img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+          });
+        }));
+        const updatedPhotos = [...(exp.photos || []), ...newPhotos];
+        onUpdate('photos', updatedPhotos);
+      };
+      
+      // Handle video upload for this employer
+      const handleVideoUpload = (e) => {
+        const files = Array.from(e.target.files || []);
+        const newVideos = files.map(file => ({
+          id: Date.now() + Math.random(),
+          url: URL.createObjectURL(file),
+          name: file.name,
+          type: file.type
+        }));
+        const updatedVideos = [...(exp.videos || []), ...newVideos];
+        onUpdate('videos', updatedVideos);
+      };
+      
+      // Add item helpers
+      const addProject = () => {
+        const projects = [...(exp.projects || []), { id: Date.now(), name: '', description: '', url: '', techStack: [], outcome: '' }];
+        onUpdate('projects', projects);
+      };
+      
+      const addChallenge = () => {
+        const challenges = [...(exp.challenges || []), { id: Date.now(), title: '', situation: '', approach: '', outcome: '' }];
+        onUpdate('challenges', challenges);
+      };
+      
+      const addVictory = () => {
+        const victories = [...(exp.victories || []), { id: Date.now(), title: '', description: '', impact: '' }];
+        onUpdate('victories', victories);
+      };
+      
+      const addReview = () => {
+        const reviews = [...(exp.reviews || []), { id: Date.now(), quote: '', author: '', role: '', date: '' }];
+        onUpdate('reviews', reviews);
+      };
+      
+      return (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.95)',
+          zIndex: 20000,
+          overflow: 'auto'
+        }}>
+          {/* Photo Modal */}
+          {expandedPhoto && (
+            <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', zIndex: 30000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setExpandedPhoto(null)}>
+              <img src={expandedPhoto} style={{ maxWidth: '95%', maxHeight: '95%', borderRadius: '12px' }} />
+              <button onClick={() => setExpandedPhoto(null)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%', width: '50px', height: '50px', color: '#fff', fontSize: '20px', cursor: 'pointer' }}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+          )}
+          
+          {/* Video Modal */}
+          {expandedVideo && (
+            <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', zIndex: 30000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setExpandedVideo(null)}>
+              <video src={expandedVideo} controls autoPlay style={{ maxWidth: '95%', maxHeight: '95%', borderRadius: '12px' }} onClick={e => e.stopPropagation()} />
+              <button onClick={() => setExpandedVideo(null)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%', width: '50px', height: '50px', color: '#fff', fontSize: '20px', cursor: 'pointer' }}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+          )}
+          
+          {/* Header */}
+          <div style={{
+            position: 'sticky',
+            top: 0,
+            background: 'linear-gradient(135deg, #0a0a12 0%, #1a1a2e 100%)',
+            borderBottom: '1px solid rgba(255,255,255,0.1)',
+            padding: '20px 40px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '24px',
+            zIndex: 100
+          }}>
+            <button onClick={onClose} style={{
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '12px',
+              padding: '12px 20px',
+              color: '#fff',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '14px'
+            }}>
+              <i className="fas fa-arrow-left"></i>
+              Back to Timeline
+            </button>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
+              {displayLogo && (
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '14px',
+                  background: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden'
+                }}>
+                  <img src={displayLogo} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} onError={(e) => e.target.style.display = 'none'} />
+                </div>
+              )}
+              <div>
+                <h1 style={{ fontSize: '26px', fontWeight: '800', color: '#fff', marginBottom: '4px', fontFamily: 'Space Grotesk, sans-serif' }}>
+                  {exp.company || 'Company Name'}
+                </h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                  <span style={{ color: styles.accent, fontSize: '16px', fontWeight: '600' }}>{exp.role || 'Your Role'}</span>
+                  <span style={{ padding: '4px 12px', background: styles.accent + '20', borderRadius: '100px', fontSize: '12px', color: styles.accent }}>
+                    {exp.startDate || 'Start'} — {exp.endDate || 'Present'}
+                  </span>
+                  {calculateTenure() && (
+                    <span style={{ padding: '4px 12px', background: 'rgba(255,255,255,0.05)', borderRadius: '100px', fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>
+                      <i className="fas fa-clock" style={{ marginRight: '6px' }}></i>{calculateTenure()}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Quick Stats */}
+            <div style={{ display: 'flex', gap: '20px' }}>
+              {exp.metrics?.filter(m => m.value).slice(0, 3).map((m, i) => (
+                <div key={i} style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '22px', fontWeight: '800', color: styles.accent }}>{m.value}</div>
+                  <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>{m.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Navigation Tabs */}
+          <div style={{
+            position: 'sticky',
+            top: '100px',
+            background: 'rgba(10,10,18,0.95)',
+            backdropFilter: 'blur(10px)',
+            borderBottom: '1px solid rgba(255,255,255,0.05)',
+            padding: '0 40px',
+            zIndex: 99,
+            display: 'flex',
+            gap: '8px',
+            overflowX: 'auto'
+          }}>
+            {sections.map(sec => (
+              <button
+                key={sec.id}
+                onClick={() => setActiveSection(sec.id)}
+                style={{
+                  padding: '16px 24px',
+                  background: activeSection === sec.id ? styles.accent + '15' : 'transparent',
+                  border: 'none',
+                  borderBottom: activeSection === sec.id ? \`3px solid \${styles.accent}\` : '3px solid transparent',
+                  color: activeSection === sec.id ? styles.accent : 'rgba(255,255,255,0.5)',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                <i className={\`fas \${sec.icon}\`}></i>
+                {sec.label}
+              </button>
+            ))}
+          </div>
+          
+          {/* Content */}
+          <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
+            
+            {/* OVERVIEW SECTION */}
+            {activeSection === 'overview' && (
+              <div>
+                {/* Company Info Card */}
+                {exp.companyInfo && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+                    {exp.companyInfo.industry && (
+                      <div style={{ padding: '20px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <i className="fas fa-industry" style={{ color: styles.accent, marginBottom: '8px', display: 'block' }}></i>
+                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>Industry</div>
+                        <div style={{ fontSize: '15px', color: '#fff', fontWeight: '600' }}>{exp.companyInfo.industry}</div>
+                      </div>
+                    )}
+                    {exp.companyInfo.location && (
+                      <div style={{ padding: '20px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <i className="fas fa-map-marker-alt" style={{ color: styles.accent, marginBottom: '8px', display: 'block' }}></i>
+                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>Location</div>
+                        <div style={{ fontSize: '15px', color: '#fff', fontWeight: '600' }}>{exp.companyInfo.location}</div>
+                      </div>
+                    )}
+                    {exp.companyInfo.size && (
+                      <div style={{ padding: '20px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <i className="fas fa-users" style={{ color: styles.accent, marginBottom: '8px', display: 'block' }}></i>
+                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>Company Size</div>
+                        <div style={{ fontSize: '15px', color: '#fff', fontWeight: '600' }}>{exp.companyInfo.size}</div>
+                      </div>
+                    )}
+                    {exp.companyInfo.website && (
+                      <div style={{ padding: '20px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <i className="fas fa-globe" style={{ color: styles.accent, marginBottom: '8px', display: 'block' }}></i>
+                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>Website</div>
+                        <a href={exp.companyInfo.website} target="_blank" style={{ fontSize: '15px', color: styles.accent, fontWeight: '600', textDecoration: 'none' }}>{exp.companyInfo.domain || 'Visit Site'}</a>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Description */}
+                <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '20px', padding: '32px', border: '1px solid rgba(255,255,255,0.06)', marginBottom: '32px' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '16px' }}>
+                    <i className="fas fa-user-tie" style={{ marginRight: '12px', color: styles.accent }}></i>
+                    Role Overview
+                  </h3>
+                  <p style={{ fontSize: '16px', lineHeight: '1.9', color: 'rgba(255,255,255,0.75)' }}>
+                    {exp.description || 'Add a description of your role, responsibilities, and impact at this company.'}
+                  </p>
+                </div>
+                
+                {/* Impact Metrics */}
+                {exp.metrics?.some(m => m.value) && (
+                  <div style={{ marginBottom: '32px' }}>
+                    <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '20px' }}>
+                      <i className="fas fa-chart-line" style={{ marginRight: '12px', color: styles.accent }}></i>
+                      Key Impact Metrics
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+                      {exp.metrics.filter(m => m.value).map((metric, idx) => (
+                        <div key={idx} style={{
+                          background: \`linear-gradient(135deg, \${styles.accent}15, \${styles.accent}05)\`,
+                          borderRadius: '16px',
+                          padding: '24px',
+                          border: \`1px solid \${styles.accent}25\`,
+                          textAlign: 'center'
+                        }}>
+                          <div style={{ fontSize: '32px', fontWeight: '800', color: styles.accent, marginBottom: '8px' }}>{metric.value}</div>
+                          <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>{metric.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Skills Used */}
+                {exp.skills?.length > 0 && (
+                  <div>
+                    <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '16px' }}>
+                      <i className="fas fa-tools" style={{ marginRight: '12px', color: styles.accent }}></i>
+                      Skills Applied
+                    </h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                      {exp.skills.map((skill, idx) => (
+                        <span key={idx} style={{
+                          padding: '10px 18px',
+                          background: styles.accent + '15',
+                          border: \`1px solid \${styles.accent}30\`,
+                          borderRadius: '100px',
+                          fontSize: '13px',
+                          fontWeight: '500',
+                          color: styles.accent
+                        }}>{skill}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {/* RESPONSIBILITIES SECTION */}
+            {activeSection === 'responsibilities' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                  <h3 style={{ fontSize: '22px', fontWeight: '700', color: '#fff' }}>
+                    <i className="fas fa-tasks" style={{ marginRight: '12px', color: styles.accent }}></i>
+                    Key Responsibilities
+                  </h3>
+                  {isEditing && (
+                    <button onClick={() => {
+                      const resp = [...(exp.responsibilities || []), ''];
+                      onUpdate('responsibilities', resp);
+                    }} style={{
+                      padding: '10px 20px',
+                      background: styles.gradient,
+                      border: 'none',
+                      borderRadius: '10px',
+                      color: '#fff',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}>
+                      <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>Add Responsibility
+                    </button>
+                  )}
+                </div>
+                
+                <div style={{ display: 'grid', gap: '12px' }}>
+                  {(exp.responsibilities || []).map((resp, idx) => (
+                    <div key={idx} style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '16px',
+                      padding: '20px',
+                      background: 'rgba(255,255,255,0.03)',
+                      borderRadius: '14px',
+                      border: '1px solid rgba(255,255,255,0.06)'
+                    }}>
+                      <div style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '10px',
+                        background: styles.accent + '20',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: styles.accent,
+                        fontWeight: '700',
+                        fontSize: '14px',
+                        flexShrink: 0
+                      }}>{idx + 1}</div>
+                      <p style={{ flex: 1, fontSize: '15px', lineHeight: '1.7', color: 'rgba(255,255,255,0.75)', margin: 0 }}>{resp}</p>
+                    </div>
+                  ))}
+                  {(!exp.responsibilities || exp.responsibilities.length === 0) && (
+                    <p style={{ color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', padding: '40px', textAlign: 'center' }}>
+                      No responsibilities added yet. {isEditing ? 'Click "Add Responsibility" to start.' : ''}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* PROJECTS SECTION */}
+            {activeSection === 'projects' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                  <h3 style={{ fontSize: '22px', fontWeight: '700', color: '#fff' }}>
+                    <i className="fas fa-folder" style={{ marginRight: '12px', color: styles.accent }}></i>
+                    Projects at {exp.company || 'This Company'}
+                  </h3>
+                  {isEditing && (
+                    <button onClick={addProject} style={{
+                      padding: '10px 20px',
+                      background: styles.gradient,
+                      border: 'none',
+                      borderRadius: '10px',
+                      color: '#fff',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}>
+                      <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>Add Project
+                    </button>
+                  )}
+                </div>
+                
+                <div style={{ display: 'grid', gap: '20px' }}>
+                  {(exp.projects || []).map((project, idx) => (
+                    <div key={project.id || idx} style={{
+                      background: 'rgba(255,255,255,0.03)',
+                      borderRadius: '18px',
+                      padding: '28px',
+                      border: '1px solid rgba(255,255,255,0.06)'
+                    }}>
+                      <h4 style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '12px' }}>
+                        <i className="fas fa-project-diagram" style={{ marginRight: '10px', color: styles.accent }}></i>
+                        {project.name || 'Project Name'}
+                      </h4>
+                      <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'rgba(255,255,255,0.7)', marginBottom: '16px' }}>
+                        {project.description || 'Project description...'}
+                      </p>
+                      {project.techStack?.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
+                          {project.techStack.map((tech, tidx) => (
+                            <span key={tidx} style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>{tech}</span>
+                          ))}
+                        </div>
+                      )}
+                      {project.outcome && (
+                        <div style={{ padding: '16px', background: styles.accent + '10', borderRadius: '12px', borderLeft: \`4px solid \${styles.accent}\` }}>
+                          <div style={{ fontSize: '12px', color: styles.accent, fontWeight: '600', marginBottom: '4px' }}>OUTCOME</div>
+                          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', margin: 0 }}>{project.outcome}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {(!exp.projects || exp.projects.length === 0) && (
+                    <p style={{ color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', padding: '40px', textAlign: 'center' }}>
+                      No projects added yet.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* ACHIEVEMENTS/VICTORIES SECTION */}
+            {activeSection === 'achievements' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                  <h3 style={{ fontSize: '22px', fontWeight: '700', color: '#fff' }}>
+                    <i className="fas fa-trophy" style={{ marginRight: '12px', color: '#F59E0B' }}></i>
+                    Achievements & Victories
+                  </h3>
+                  {isEditing && (
+                    <button onClick={addVictory} style={{
+                      padding: '10px 20px',
+                      background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+                      border: 'none',
+                      borderRadius: '10px',
+                      color: '#fff',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}>
+                      <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>Add Victory
+                    </button>
+                  )}
+                </div>
+                
+                <div style={{ display: 'grid', gap: '20px' }}>
+                  {(exp.victories || []).map((victory, idx) => (
+                    <div key={victory.id || idx} style={{
+                      background: 'linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.02))',
+                      borderRadius: '18px',
+                      padding: '28px',
+                      border: '1px solid rgba(245,158,11,0.2)',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}>
+                      <i className="fas fa-trophy" style={{ position: 'absolute', right: '20px', top: '20px', fontSize: '48px', color: 'rgba(245,158,11,0.1)' }}></i>
+                      <h4 style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '12px' }}>{victory.title || 'Victory Title'}</h4>
+                      <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'rgba(255,255,255,0.7)', marginBottom: '12px' }}>{victory.description}</p>
+                      {victory.impact && (
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'rgba(245,158,11,0.2)', borderRadius: '8px' }}>
+                          <i className="fas fa-bolt" style={{ color: '#F59E0B' }}></i>
+                          <span style={{ fontSize: '14px', color: '#F59E0B', fontWeight: '600' }}>{victory.impact}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {/* Awards at this company */}
+                  {(exp.awards || []).map((award, idx) => (
+                    <div key={award.id || idx} style={{
+                      background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.02))',
+                      borderRadius: '18px',
+                      padding: '28px',
+                      border: '1px solid rgba(139,92,246,0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '20px'
+                    }}>
+                      <div style={{ width: '60px', height: '60px', borderRadius: '16px', background: 'linear-gradient(135deg, #8B5CF6, #6D28D9)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className="fas fa-award" style={{ fontSize: '28px', color: '#fff' }}></i>
+                      </div>
+                      <div>
+                        <h4 style={{ fontSize: '17px', fontWeight: '700', color: '#fff', marginBottom: '4px' }}>{award.title || 'Award Name'}</h4>
+                        <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>{award.organization} • {award.year}</p>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {(!exp.victories || exp.victories.length === 0) && (!exp.awards || exp.awards.length === 0) && (
+                    <p style={{ color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', padding: '40px', textAlign: 'center' }}>
+                      No achievements or victories added yet.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* CHALLENGES SECTION */}
+            {activeSection === 'challenges' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                  <h3 style={{ fontSize: '22px', fontWeight: '700', color: '#fff' }}>
+                    <i className="fas fa-mountain" style={{ marginRight: '12px', color: '#EF4444' }}></i>
+                    Challenges Overcome
+                  </h3>
+                  {isEditing && (
+                    <button onClick={addChallenge} style={{
+                      padding: '10px 20px',
+                      background: 'linear-gradient(135deg, #EF4444, #DC2626)',
+                      border: 'none',
+                      borderRadius: '10px',
+                      color: '#fff',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}>
+                      <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>Add Challenge
+                    </button>
+                  )}
+                </div>
+                
+                <div style={{ display: 'grid', gap: '24px' }}>
+                  {(exp.challenges || []).map((challenge, idx) => (
+                    <div key={challenge.id || idx} style={{
+                      background: 'rgba(255,255,255,0.03)',
+                      borderRadius: '20px',
+                      overflow: 'hidden',
+                      border: '1px solid rgba(255,255,255,0.06)'
+                    }}>
+                      <div style={{ padding: '24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                        <h4 style={{ fontSize: '18px', fontWeight: '700', color: '#fff' }}>
+                          <i className="fas fa-flag" style={{ marginRight: '10px', color: '#EF4444' }}></i>
+                          {challenge.title || 'Challenge Title'}
+                        </h4>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                        <div style={{ padding: '20px', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
+                          <div style={{ fontSize: '11px', color: '#EF4444', fontWeight: '700', marginBottom: '10px', letterSpacing: '1px' }}>SITUATION</div>
+                          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.7' }}>{challenge.situation || 'What was the situation?'}</p>
+                        </div>
+                        <div style={{ padding: '20px', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
+                          <div style={{ fontSize: '11px', color: '#F59E0B', fontWeight: '700', marginBottom: '10px', letterSpacing: '1px' }}>APPROACH</div>
+                          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.7' }}>{challenge.approach || 'How did you tackle it?'}</p>
+                        </div>
+                        <div style={{ padding: '20px' }}>
+                          <div style={{ fontSize: '11px', color: '#10B981', fontWeight: '700', marginBottom: '10px', letterSpacing: '1px' }}>OUTCOME</div>
+                          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.7' }}>{challenge.outcome || 'What was the result?'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {(!exp.challenges || exp.challenges.length === 0) && (
+                    <p style={{ color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', padding: '40px', textAlign: 'center' }}>
+                      No challenges documented yet. Add challenges you overcame to showcase problem-solving skills.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* MEDIA SECTION */}
+            {activeSection === 'media' && (
+              <div>
+                <h3 style={{ fontSize: '22px', fontWeight: '700', color: '#fff', marginBottom: '24px' }}>
+                  <i className="fas fa-photo-video" style={{ marginRight: '12px', color: styles.accent }}></i>
+                  Media Gallery from {exp.company || 'This Company'}
+                </h3>
+                
+                {/* Photos */}
+                <div style={{ marginBottom: '40px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h4 style={{ fontSize: '16px', fontWeight: '600', color: 'rgba(255,255,255,0.8)' }}>
+                      <i className="fas fa-images" style={{ marginRight: '10px' }}></i>
+                      Photos ({(exp.photos || []).length})
+                    </h4>
+                    {isEditing && (
+                      <>
+                        <input type="file" ref={photoInputRef} onChange={handlePhotoUpload} multiple accept="image/*" hidden />
+                        <button onClick={() => photoInputRef.current?.click()} style={{
+                          padding: '8px 16px',
+                          background: 'rgba(255,255,255,0.1)',
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          borderRadius: '8px',
+                          color: '#fff',
+                          cursor: 'pointer',
+                          fontSize: '13px'
+                        }}>
+                          <i className="fas fa-plus" style={{ marginRight: '6px' }}></i>Add Photos
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+                    {(exp.photos || []).map((photo, idx) => (
+                      <div key={photo.id || idx} onClick={() => setExpandedPhoto(photo.url)} style={{
+                        aspectRatio: '4/3',
+                        borderRadius: '14px',
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        position: 'relative'
+                      }}>
+                        <img src={photo.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.5), transparent)', opacity: 0, transition: 'opacity 0.2s' }} className="photo-overlay">
+                          <i className="fas fa-expand" style={{ position: 'absolute', bottom: '12px', right: '12px', color: '#fff' }}></i>
+                        </div>
+                      </div>
+                    ))}
+                    {(exp.photos || []).length === 0 && (
+                      <p style={{ color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', padding: '40px', textAlign: 'center', gridColumn: '1 / -1' }}>
+                        No photos added yet.
+                      </p>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Videos */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h4 style={{ fontSize: '16px', fontWeight: '600', color: 'rgba(255,255,255,0.8)' }}>
+                      <i className="fas fa-video" style={{ marginRight: '10px' }}></i>
+                      Videos ({(exp.videos || []).length})
+                    </h4>
+                    {isEditing && (
+                      <>
+                        <input type="file" ref={videoInputRef} onChange={handleVideoUpload} multiple accept="video/*" hidden />
+                        <button onClick={() => videoInputRef.current?.click()} style={{
+                          padding: '8px 16px',
+                          background: 'rgba(255,255,255,0.1)',
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          borderRadius: '8px',
+                          color: '#fff',
+                          cursor: 'pointer',
+                          fontSize: '13px'
+                        }}>
+                          <i className="fas fa-plus" style={{ marginRight: '6px' }}></i>Add Videos
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+                    {(exp.videos || []).map((video, idx) => (
+                      <div key={video.id || idx} style={{
+                        aspectRatio: '16/9',
+                        borderRadius: '14px',
+                        overflow: 'hidden',
+                        background: 'rgba(0,0,0,0.3)',
+                        position: 'relative',
+                        cursor: 'pointer'
+                      }} onClick={() => setExpandedVideo(video.url)}>
+                        <video src={video.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <div style={{
+                          position: 'absolute',
+                          inset: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: 'rgba(0,0,0,0.4)'
+                        }}>
+                          <div style={{
+                            width: '60px',
+                            height: '60px',
+                            borderRadius: '50%',
+                            background: styles.gradient,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <i className="fas fa-play" style={{ color: '#fff', fontSize: '20px', marginLeft: '4px' }}></i>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {(exp.videos || []).length === 0 && (
+                      <p style={{ color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', padding: '40px', textAlign: 'center', gridColumn: '1 / -1' }}>
+                        No videos added yet.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* REVIEWS SECTION */}
+            {activeSection === 'reviews' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                  <h3 style={{ fontSize: '22px', fontWeight: '700', color: '#fff' }}>
+                    <i className="fas fa-star" style={{ marginRight: '12px', color: '#F59E0B' }}></i>
+                    Reviews & Testimonials
+                  </h3>
+                  {isEditing && (
+                    <button onClick={addReview} style={{
+                      padding: '10px 20px',
+                      background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+                      border: 'none',
+                      borderRadius: '10px',
+                      color: '#fff',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}>
+                      <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>Add Review
+                    </button>
+                  )}
+                </div>
+                
+                <div style={{ display: 'grid', gap: '20px' }}>
+                  {(exp.reviews || []).map((review, idx) => (
+                    <div key={review.id || idx} style={{
+                      background: 'rgba(255,255,255,0.03)',
+                      borderRadius: '20px',
+                      padding: '28px',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      position: 'relative'
+                    }}>
+                      <i className="fas fa-quote-left" style={{ position: 'absolute', top: '20px', left: '20px', fontSize: '24px', color: 'rgba(245,158,11,0.2)' }}></i>
+                      <p style={{ fontSize: '17px', lineHeight: '1.9', color: 'rgba(255,255,255,0.8)', fontStyle: 'italic', marginBottom: '20px', paddingLeft: '40px' }}>
+                        "{review.quote || 'Add a quote from your reviewer...'}"
+                      </p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '40px' }}>
+                        <div style={{
+                          width: '44px',
+                          height: '44px',
+                          borderRadius: '12px',
+                          background: styles.gradient,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#fff',
+                          fontWeight: '700',
+                          fontSize: '16px'
+                        }}>
+                          {(review.author || 'A')[0].toUpperCase()}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '15px', fontWeight: '600', color: '#fff' }}>{review.author || 'Reviewer Name'}</div>
+                          <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{review.role || 'Role'}{review.date ? \` • \${review.date}\` : ''}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {(!exp.reviews || exp.reviews.length === 0) && (
+                    <p style={{ color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', padding: '40px', textAlign: 'center' }}>
+                      No reviews or testimonials added yet. Add feedback from managers, colleagues, or clients.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* DAY IN LIFE SECTION */}
+            {activeSection === 'dayinlife' && (
+              <div>
+                <h3 style={{ fontSize: '22px', fontWeight: '700', color: '#fff', marginBottom: '24px' }}>
+                  <i className="fas fa-sun" style={{ marginRight: '12px', color: styles.accent }}></i>
+                  A Day in This Role
+                </h3>
+                
+                <div style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  borderRadius: '20px',
+                  padding: '32px',
+                  border: '1px solid rgba(255,255,255,0.06)'
+                }}>
+                  <div style={{ position: 'relative' }}>
+                    {/* Timeline line */}
+                    <div style={{
+                      position: 'absolute',
+                      left: '50px',
+                      top: '20px',
+                      bottom: '20px',
+                      width: '2px',
+                      background: \`linear-gradient(to bottom, \${styles.accent}, \${styles.accent}30)\`
+                    }}></div>
+                    
+                    {(exp.dayInLife || []).filter(d => d.activity).map((day, idx) => (
+                      <div key={idx} style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '24px',
+                        marginBottom: idx < (exp.dayInLife || []).length - 1 ? '28px' : 0,
+                        position: 'relative'
+                      }}>
+                        <div style={{
+                          width: '100px',
+                          textAlign: 'right',
+                          fontSize: '15px',
+                          fontWeight: '700',
+                          color: styles.accent,
+                          paddingTop: '4px'
+                        }}>{day.time}</div>
+                        <div style={{
+                          width: '16px',
+                          height: '16px',
+                          borderRadius: '50%',
+                          background: styles.accent,
+                          border: '4px solid #0a0a12',
+                          flexShrink: 0,
+                          marginTop: '6px'
+                        }}></div>
+                        <div style={{
+                          flex: 1,
+                          padding: '16px 20px',
+                          background: styles.accent + '10',
+                          borderRadius: '12px',
+                          borderLeft: \`3px solid \${styles.accent}\`
+                        }}>
+                          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.8)', margin: 0 }}>{day.activity}</p>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {(!exp.dayInLife || !exp.dayInLife.some(d => d.activity)) && (
+                      <p style={{ color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', padding: '40px', textAlign: 'center' }}>
+                        No daily activities documented yet.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+    
     // Media Editor - ENHANCED with proper video playback and image quality
     const MediaEditor = ({ photos, videos, setPhotos, setVideos }) => {
       const photoInputRef = useRef(null);
@@ -4864,13 +5746,23 @@ app.get('/', (c) => {
     };
     
     // Preview View with Template Support - ENHANCED for all 10 templates
-    const PreviewView = ({ profile, setView, profilePhoto, selectedTemplate, slug, isPublic, setIsPublic, profileViews }) => {
+    const PreviewView = ({ profile, setView, profilePhoto, selectedTemplate, slug, isPublic, setIsPublic, profileViews, setProfile }) => {
       const template = TEMPLATES.find(t => t.id === selectedTemplate) || TEMPLATES[0];
       const [showPublishModal, setShowPublishModal] = useState(false);
       const [publishing, setPublishing] = useState(false);
       const [qrCode, setQrCode] = useState(null);
       const [atsScore, setAtsScore] = useState(null);
       const [showAtsModal, setShowAtsModal] = useState(false);
+      const [selectedEmployer, setSelectedEmployer] = useState(null); // For employer detail page
+      const [hoveredExp, setHoveredExp] = useState(null); // For hover effect
+      
+      // Update experience data when editing in employer detail page
+      const updateExperienceField = (expId, field, value) => {
+        const updatedExperience = profile.experience.map(exp => 
+          exp.id === expId ? { ...exp, [field]: value } : exp
+        );
+        setProfile({ ...profile, experience: updatedExperience });
+      };
       
       const publicUrl = window.location.origin + '/p/' + slug;
       
@@ -5347,19 +6239,71 @@ app.get('/', (c) => {
             )}
           </div>
           
-          {/* Career Timeline */}
+          {/* Employer Detail Page Modal */}
+          {selectedEmployer && (
+            <EmployerDetailPage
+              experience={selectedEmployer}
+              onClose={() => setSelectedEmployer(null)}
+              template={template}
+              isEditing={true}
+              onUpdate={(field, value) => updateExperienceField(selectedEmployer.id, field, value)}
+            />
+          )}
+          
+          {/* Career Timeline - INTERACTIVE */}
           {profile.experience.length > 0 && (
             <div className="glass-card" style={{ padding: '28px', marginTop: '24px' }}>
-              <h2 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '28px', color: '#fff', fontFamily: 'Space Grotesk, sans-serif' }}>
+              <h2 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '8px', color: '#fff', fontFamily: 'Space Grotesk, sans-serif' }}>
                 <i className="fas fa-briefcase" style={{ marginRight: '14px', color: styles.accent }}></i>
                 Career Timeline
               </h2>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginBottom: '28px' }}>
+                <i className="fas fa-hand-pointer" style={{ marginRight: '8px' }}></i>
+                Click on any experience to explore the full story
+              </p>
               
               <div className="timeline-wrap" style={{ '--timeline-color': styles.accent }}>
                 {profile.experience.map((exp, idx) => {
                   const displayLogo = exp.customLogo || exp.logoUrl;
+                  const isHovered = hoveredExp === exp.id;
+                  const hasRichContent = (exp.projects?.length > 0) || (exp.victories?.length > 0) || 
+                                         (exp.challenges?.length > 0) || (exp.photos?.length > 0) || 
+                                         (exp.videos?.length > 0) || (exp.reviews?.length > 0);
                   return (
-                  <div key={exp.id} className="glass timeline-item">
+                  <div 
+                    key={exp.id} 
+                    className="glass timeline-item"
+                    onClick={() => setSelectedEmployer(exp)}
+                    onMouseEnter={() => setHoveredExp(exp.id)}
+                    onMouseLeave={() => setHoveredExp(null)}
+                    style={{
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      transform: isHovered ? 'translateX(8px) scale(1.01)' : 'none',
+                      boxShadow: isHovered ? \`0 10px 40px \${styles.accent}30\` : 'none',
+                      borderLeft: isHovered ? \`4px solid \${styles.accent}\` : '4px solid transparent'
+                    }}
+                  >
+                    {/* Click Indicator */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '16px',
+                      right: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '6px 12px',
+                      background: isHovered ? styles.accent : 'rgba(255,255,255,0.05)',
+                      borderRadius: '100px',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      color: isHovered ? '#fff' : 'rgba(255,255,255,0.4)',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      <i className="fas fa-expand-alt"></i>
+                      {isHovered ? 'View Details' : 'Expand'}
+                    </div>
+                    
                     {/* Company Header with Logo */}
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', marginBottom: '16px' }}>
                       {displayLogo && (
@@ -5368,12 +6312,13 @@ app.get('/', (c) => {
                           height: '56px',
                           borderRadius: '12px',
                           background: '#fff',
-                          border: '2px solid rgba(255,255,255,0.2)',
+                          border: isHovered ? \`3px solid \${styles.accent}\` : '2px solid rgba(255,255,255,0.2)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           overflow: 'hidden',
-                          flexShrink: 0
+                          flexShrink: 0,
+                          transition: 'all 0.2s ease'
                         }}>
                           <img 
                             src={displayLogo} 
@@ -5404,59 +6349,71 @@ app.get('/', (c) => {
                             <i className="fas fa-map-marker-alt" style={{ marginRight: '6px' }}></i>{exp.companyInfo.location}
                           </span>
                         )}
-                        {exp.companyInfo.size && (
-                          <span style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
-                            <i className="fas fa-users" style={{ marginRight: '6px' }}></i>{exp.companyInfo.size}
-                          </span>
-                        )}
                       </div>
                     )}
                     
-                    <p className="timeline-desc">{exp.description || 'Description of your role and achievements'}</p>
+                    {/* Brief Description */}
+                    <p className="timeline-desc" style={{ 
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
+                      marginBottom: '16px'
+                    }}>
+                      {exp.description || 'Click to add details about your role and achievements'}
+                    </p>
                     
-                    {/* Responsibilities */}
-                    {exp.responsibilities && exp.responsibilities.length > 0 && (
-                      <div style={{ marginTop: '18px' }}>
-                        <h4 style={{ fontSize: '13px', fontWeight: '600', color: styles.accent, marginBottom: '12px' }}>
-                          <i className="fas fa-tasks" style={{ marginRight: '8px' }}></i>
-                          Key Responsibilities
-                        </h4>
-                        <ul style={{ paddingLeft: '20px', color: 'rgba(255,255,255,0.55)', fontSize: '13px', lineHeight: '1.8' }}>
-                          {exp.responsibilities.slice(0, 6).map((resp, ridx) => (
-                            <li key={ridx} style={{ marginBottom: '6px' }}>{resp}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    
-                    {/* Day in Life */}
-                    {exp.dayInLife && exp.dayInLife.some(d => d.activity) && (
-                      <div style={{ marginTop: '18px', padding: '16px', background: styles.accent + '08', borderRadius: '12px', border: '1px solid ' + styles.accent + '15' }}>
-                        <h4 style={{ fontSize: '13px', fontWeight: '600', color: styles.accent, marginBottom: '14px' }}>
-                          <i className="fas fa-sun" style={{ marginRight: '8px' }}></i>
-                          A Day in This Role
-                        </h4>
-                        <div style={{ display: 'grid', gap: '8px' }}>
-                          {exp.dayInLife.filter(d => d.activity).map((day, didx) => (
-                            <div key={didx} style={{ display: 'flex', gap: '14px', fontSize: '12px' }}>
-                              <span style={{ color: styles.accent, fontWeight: '600', width: '70px', flexShrink: 0 }}>{day.time}</span>
-                              <span style={{ color: 'rgba(255,255,255,0.55)' }}>{day.activity}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
+                    {/* Quick Metrics Preview */}
                     {exp.metrics?.some(m => m.value) && (
-                      <div className="timeline-metrics">
-                        {exp.metrics.filter(m => m.value).map((metric, midx) => (
-                          <div key={midx} className="timeline-metric" style={{ background: styles.accent + '10', borderColor: styles.accent + '20' }}>
-                            <div className="timeline-metric-val" style={{ color: styles.accent }}>{metric.value}</div>
-                            <div className="timeline-metric-label">{metric.label}</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+                        {exp.metrics.filter(m => m.value).slice(0, 3).map((metric, midx) => (
+                          <div key={midx} style={{ 
+                            padding: '8px 14px', 
+                            background: styles.accent + '10', 
+                            borderRadius: '8px',
+                            border: \`1px solid \${styles.accent}20\`
+                          }}>
+                            <span style={{ fontSize: '16px', fontWeight: '700', color: styles.accent }}>{metric.value}</span>
+                            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginLeft: '6px' }}>{metric.label}</span>
                           </div>
                         ))}
                       </div>
                     )}
+                    
+                    {/* Content Indicators */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {exp.responsibilities?.length > 0 && (
+                        <span style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>
+                          <i className="fas fa-tasks" style={{ marginRight: '4px' }}></i>{exp.responsibilities.length} Responsibilities
+                        </span>
+                      )}
+                      {exp.projects?.length > 0 && (
+                        <span style={{ padding: '4px 10px', background: 'rgba(139,92,246,0.1)', borderRadius: '6px', fontSize: '10px', color: '#A78BFA' }}>
+                          <i className="fas fa-folder" style={{ marginRight: '4px' }}></i>{exp.projects.length} Projects
+                        </span>
+                      )}
+                      {exp.victories?.length > 0 && (
+                        <span style={{ padding: '4px 10px', background: 'rgba(245,158,11,0.1)', borderRadius: '6px', fontSize: '10px', color: '#F59E0B' }}>
+                          <i className="fas fa-trophy" style={{ marginRight: '4px' }}></i>{exp.victories.length} Victories
+                        </span>
+                      )}
+                      {exp.photos?.length > 0 && (
+                        <span style={{ padding: '4px 10px', background: 'rgba(6,182,212,0.1)', borderRadius: '6px', fontSize: '10px', color: '#06B6D4' }}>
+                          <i className="fas fa-images" style={{ marginRight: '4px' }}></i>{exp.photos.length} Photos
+                        </span>
+                      )}
+                      {exp.videos?.length > 0 && (
+                        <span style={{ padding: '4px 10px', background: 'rgba(236,72,153,0.1)', borderRadius: '6px', fontSize: '10px', color: '#EC4899' }}>
+                          <i className="fas fa-video" style={{ marginRight: '4px' }}></i>{exp.videos.length} Videos
+                        </span>
+                      )}
+                      {exp.reviews?.length > 0 && (
+                        <span style={{ padding: '4px 10px', background: 'rgba(16,185,129,0.1)', borderRadius: '6px', fontSize: '10px', color: '#10B981' }}>
+                          <i className="fas fa-star" style={{ marginRight: '4px' }}></i>{exp.reviews.length} Reviews
+                        </span>
+                      )}
+                    </div>
                   </div>
                   );
                 })}
