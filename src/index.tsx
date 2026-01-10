@@ -1,8 +1,203 @@
 import { Hono } from 'hono'
+import { getCookie, setCookie, deleteCookie } from 'hono/cookie'
 
-const app = new Hono()
+type Bindings = {
+  USERS_KV: KVNamespace;
+}
+
+const app = new Hono<{ Bindings: Bindings }>()
 
 const GEMINI_API_KEY = 'AIzaSyB9jQaRGkfj4Tyq5y5j45RiYAeb_H2e-2g';
+
+// Simple hash function for passwords (use proper bcrypt in production)
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password + 'webume_salt_2024');
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Generate session token
+function generateToken(): string {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Auth middleware to get current user
+async function getCurrentUser(c: any): Promise<any> {
+  const sessionToken = getCookie(c, 'webume_session');
+  if (!sessionToken) return null;
+  
+  try {
+    const session = await c.env.USERS_KV.get(`session:${sessionToken}`, 'json');
+    if (!session) return null;
+    
+    const user = await c.env.USERS_KV.get(`user:${session.email}`, 'json');
+    return user;
+  } catch {
+    return null;
+  }
+}
+
+// API: Register new user
+app.post('/api/auth/register', async (c) => {
+  try {
+    const { email, password, name } = await c.req.json();
+    
+    if (!email || !password || !name) {
+      return c.json({ error: 'Email, password, and name are required' }, 400);
+    }
+    
+    // Check if user exists
+    const existing = await c.env.USERS_KV.get(`user:${email.toLowerCase()}`);
+    if (existing) {
+      return c.json({ error: 'An account with this email already exists' }, 400);
+    }
+    
+    // Create user
+    const hashedPassword = await hashPassword(password);
+    const user = {
+      email: email.toLowerCase(),
+      name,
+      password: hashedPassword,
+      createdAt: new Date().toISOString(),
+      profile: null,
+      profilePhoto: null,
+      selectedTemplate: 'executive',
+      rawText: ''
+    };
+    
+    await c.env.USERS_KV.put(`user:${email.toLowerCase()}`, JSON.stringify(user));
+    
+    // Create session
+    const token = generateToken();
+    const session = { email: email.toLowerCase(), createdAt: new Date().toISOString() };
+    await c.env.USERS_KV.put(`session:${token}`, JSON.stringify(session), { expirationTtl: 60 * 60 * 24 * 30 }); // 30 days
+    
+    setCookie(c, 'webume_session', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Lax',
+      maxAge: 60 * 60 * 24 * 30,
+      path: '/'
+    });
+    
+    return c.json({ success: true, user: { email: user.email, name: user.name } });
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+// API: Login
+app.post('/api/auth/login', async (c) => {
+  try {
+    const { email, password } = await c.req.json();
+    
+    if (!email || !password) {
+      return c.json({ error: 'Email and password are required' }, 400);
+    }
+    
+    const user = await c.env.USERS_KV.get(`user:${email.toLowerCase()}`, 'json') as any;
+    if (!user) {
+      return c.json({ error: 'Invalid email or password' }, 401);
+    }
+    
+    const hashedPassword = await hashPassword(password);
+    if (user.password !== hashedPassword) {
+      return c.json({ error: 'Invalid email or password' }, 401);
+    }
+    
+    // Create session
+    const token = generateToken();
+    const session = { email: email.toLowerCase(), createdAt: new Date().toISOString() };
+    await c.env.USERS_KV.put(`session:${token}`, JSON.stringify(session), { expirationTtl: 60 * 60 * 24 * 30 });
+    
+    setCookie(c, 'webume_session', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Lax',
+      maxAge: 60 * 60 * 24 * 30,
+      path: '/'
+    });
+    
+    return c.json({ 
+      success: true, 
+      user: { 
+        email: user.email, 
+        name: user.name,
+        hasProfile: !!user.profile 
+      } 
+    });
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+// API: Logout
+app.post('/api/auth/logout', async (c) => {
+  const sessionToken = getCookie(c, 'webume_session');
+  if (sessionToken) {
+    await c.env.USERS_KV.delete(`session:${sessionToken}`);
+  }
+  deleteCookie(c, 'webume_session', { path: '/' });
+  return c.json({ success: true });
+});
+
+// API: Get current user
+app.get('/api/auth/me', async (c) => {
+  const user = await getCurrentUser(c);
+  if (!user) {
+    return c.json({ user: null });
+  }
+  return c.json({ 
+    user: { 
+      email: user.email, 
+      name: user.name,
+      hasProfile: !!user.profile
+    } 
+  });
+});
+
+// API: Save profile (requires auth)
+app.post('/api/profile/save', async (c) => {
+  const user = await getCurrentUser(c);
+  if (!user) {
+    return c.json({ error: 'Not authenticated' }, 401);
+  }
+  
+  try {
+    const { profile, profilePhoto, selectedTemplate, rawText } = await c.req.json();
+    
+    user.profile = profile;
+    user.profilePhoto = profilePhoto;
+    user.selectedTemplate = selectedTemplate || user.selectedTemplate;
+    user.rawText = rawText || user.rawText;
+    user.updatedAt = new Date().toISOString();
+    
+    await c.env.USERS_KV.put(`user:${user.email}`, JSON.stringify(user));
+    
+    return c.json({ success: true, savedAt: user.updatedAt });
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+// API: Load profile (requires auth)
+app.get('/api/profile/load', async (c) => {
+  const user = await getCurrentUser(c);
+  if (!user) {
+    return c.json({ error: 'Not authenticated' }, 401);
+  }
+  
+  return c.json({
+    profile: user.profile,
+    profilePhoto: user.profilePhoto,
+    selectedTemplate: user.selectedTemplate,
+    rawText: user.rawText
+  });
+});
 
 app.post('/api/parse-resume', async (c) => {
   try {
@@ -1392,7 +1587,7 @@ app.get('/', (c) => {
       }
     };
     
-    const VIEW = { UPLOAD: 1, BUILDER: 2, PREVIEW: 3 };
+    const VIEW = { AUTH: 0, UPLOAD: 1, BUILDER: 2, PREVIEW: 3 };
     
     // INDUSTRY-SPECIFIC TEMPLATES - 10 Premium Options
     const TEMPLATE_CATEGORIES = [
@@ -1531,8 +1726,192 @@ app.get('/', (c) => {
       LAST_SAVED: 'webume_last_saved'
     };
     
+    // Auth View Component
+    const AuthView = ({ onLogin, authLoading, authError }) => {
+      const [isLogin, setIsLogin] = useState(true);
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [name, setName] = useState('');
+      const [error, setError] = useState('');
+      
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        
+        if (!email || !password || (!isLogin && !name)) {
+          setError('Please fill in all fields');
+          return;
+        }
+        
+        onLogin(isLogin, email, password, name);
+      };
+      
+      return (
+        <div style={{ 
+          minHeight: '100vh', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div className="glass" style={{ 
+            width: '100%', 
+            maxWidth: '440px', 
+            padding: '48px 40px',
+            borderRadius: '28px'
+          }}>
+            <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '24px',
+                background: 'linear-gradient(135deg, var(--purple-main), var(--pink-main))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 20px',
+                boxShadow: '0 12px 40px rgba(139,92,246,0.4)'
+              }}>
+                <i className="fas fa-rocket" style={{ fontSize: '32px', color: '#fff' }}></i>
+              </div>
+              <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#fff', marginBottom: '8px' }}>
+                {isLogin ? 'Welcome Back!' : 'Create Account'}
+              </h1>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>
+                {isLogin ? 'Sign in to access your saved profiles' : 'Start building your digital profile'}
+              </p>
+            </div>
+            
+            {(error || authError) && (
+              <div style={{
+                padding: '14px 18px',
+                background: 'rgba(239,68,68,0.15)',
+                border: '1px solid rgba(239,68,68,0.3)',
+                borderRadius: '12px',
+                marginBottom: '20px',
+                color: '#EF4444',
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <i className="fas fa-exclamation-circle"></i>
+                {error || authError}
+              </div>
+            )}
+            
+            <form onSubmit={handleSubmit}>
+              {!isLogin && (
+                <div style={{ marginBottom: '18px' }}>
+                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
+                    <i className="fas fa-user" style={{ marginRight: '8px', color: 'var(--purple-main)' }}></i>
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    className="glass-input"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="John Smith"
+                    style={{ width: '100%', padding: '14px 16px', fontSize: '15px' }}
+                  />
+                </div>
+              )}
+              
+              <div style={{ marginBottom: '18px' }}>
+                <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
+                  <i className="fas fa-envelope" style={{ marginRight: '8px', color: 'var(--purple-main)' }}></i>
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  className="glass-input"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  style={{ width: '100%', padding: '14px 16px', fontSize: '15px' }}
+                />
+              </div>
+              
+              <div style={{ marginBottom: '28px' }}>
+                <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
+                  <i className="fas fa-lock" style={{ marginRight: '8px', color: 'var(--purple-main)' }}></i>
+                  Password
+                </label>
+                <input
+                  type="password"
+                  className="glass-input"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  style={{ width: '100%', padding: '14px 16px', fontSize: '15px' }}
+                />
+              </div>
+              
+              <button 
+                type="submit" 
+                className="btn btn-primary"
+                disabled={authLoading}
+                style={{ 
+                  width: '100%', 
+                  padding: '16px', 
+                  fontSize: '15px',
+                  fontWeight: '700',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px'
+                }}
+              >
+                {authLoading ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin"></i>
+                    {isLogin ? 'Signing in...' : 'Creating account...'}
+                  </>
+                ) : (
+                  <>
+                    <i className={isLogin ? 'fas fa-sign-in-alt' : 'fas fa-user-plus'}></i>
+                    {isLogin ? 'Sign In' : 'Create Account'}
+                  </>
+                )}
+              </button>
+            </form>
+            
+            <div style={{ marginTop: '28px', textAlign: 'center' }}>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px' }}>
+                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                <button
+                  onClick={() => { setIsLogin(!isLogin); setError(''); }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--purple-light)',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    marginLeft: '6px'
+                  }}
+                >
+                  {isLogin ? 'Sign Up' : 'Sign In'}
+                </button>
+              </p>
+            </div>
+            
+            <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '11px' }}>
+                <i className="fas fa-shield-alt" style={{ marginRight: '6px' }}></i>
+                Your data is securely stored and never shared
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    };
+    
     const App = () => {
-      const [view, setView] = useState(VIEW.UPLOAD);
+      const [view, setView] = useState(VIEW.AUTH);
+      const [user, setUser] = useState(null);
+      const [authLoading, setAuthLoading] = useState(true);
+      const [authError, setAuthError] = useState('');
       const [profile, setProfile] = useState(null);
       const [loading, setLoading] = useState(false);
       const [progress, setProgress] = useState(0);
@@ -1551,112 +1930,188 @@ app.get('/', (c) => {
         { text: 'Building rich profile', state: 'pending' }
       ]);
       
-      // Load saved data on mount
+      // Check auth status on mount
       React.useEffect(() => {
-        try {
-          const savedProfile = localStorage.getItem(STORAGE_KEYS.PROFILE);
-          const savedPhoto = localStorage.getItem(STORAGE_KEYS.PHOTO);
-          const savedTemplate = localStorage.getItem(STORAGE_KEYS.TEMPLATE);
-          const savedRawText = localStorage.getItem(STORAGE_KEYS.RAW_TEXT);
-          const savedTimestamp = localStorage.getItem(STORAGE_KEYS.LAST_SAVED);
-          
-          if (savedProfile) {
-            const parsed = JSON.parse(savedProfile);
-            setProfile(parsed);
-            setView(VIEW.BUILDER);
-            console.log('✅ Loaded saved profile');
-          }
-          if (savedPhoto) setProfilePhoto(savedPhoto);
-          if (savedTemplate) setTemplate(savedTemplate);
-          if (savedRawText) setRawText(savedRawText);
-          if (savedTimestamp) setLastSaved(new Date(savedTimestamp));
-        } catch (e) {
-          console.error('Error loading saved data:', e);
-        }
+        checkAuth();
       }, []);
       
-      // Auto-save profile when it changes - ENHANCED with better feedback
+      const checkAuth = async () => {
+        try {
+          const res = await fetch('/api/auth/me');
+          const data = await res.json();
+          if (data.user) {
+            setUser(data.user);
+            // Load profile from server
+            await loadProfile();
+            setView(VIEW.UPLOAD);
+          } else {
+            setView(VIEW.AUTH);
+          }
+        } catch (e) {
+          console.error('Auth check failed:', e);
+          setView(VIEW.AUTH);
+        }
+        setAuthLoading(false);
+      };
+      
+      const loadProfile = async () => {
+        try {
+          const res = await fetch('/api/profile/load');
+          const data = await res.json();
+          if (data.profile) {
+            setProfile(data.profile);
+            setView(VIEW.BUILDER);
+            console.log('✅ Loaded profile from server');
+          }
+          if (data.profilePhoto) setProfilePhoto(data.profilePhoto);
+          if (data.selectedTemplate) setTemplate(data.selectedTemplate);
+          if (data.rawText) setRawText(data.rawText);
+        } catch (e) {
+          console.error('Error loading profile:', e);
+        }
+      };
+      
+      const handleAuth = async (isLogin, email, password, name) => {
+        setAuthLoading(true);
+        setAuthError('');
+        
+        try {
+          const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+          const body = isLogin ? { email, password } : { email, password, name };
+          
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          
+          const data = await res.json();
+          
+          if (data.error) {
+            setAuthError(data.error);
+            setAuthLoading(false);
+            return;
+          }
+          
+          setUser(data.user);
+          if (data.user.hasProfile) {
+            await loadProfile();
+          } else {
+            setView(VIEW.UPLOAD);
+          }
+        } catch (e) {
+          setAuthError('Connection error. Please try again.');
+        }
+        setAuthLoading(false);
+      };
+      
+      const handleLogout = async () => {
+        if (confirm('Are you sure you want to sign out?')) {
+          await fetch('/api/auth/logout', { method: 'POST' });
+          setUser(null);
+          setProfile(null);
+          setProfilePhoto(null);
+          setRawText('');
+          setTemplate('executive');
+          setView(VIEW.AUTH);
+        }
+      };
+      
+      // Auto-save profile to SERVER when it changes
       React.useEffect(() => {
-        if (profile) {
-          // Immediate visual feedback
+        if (profile && user) {
           setSaveStatus('saving');
           
-          const saveTimeout = setTimeout(() => {
+          const saveTimeout = setTimeout(async () => {
             try {
-              localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
-              const now = new Date();
-              localStorage.setItem(STORAGE_KEYS.LAST_SAVED, now.toISOString());
-              setLastSaved(now);
-              setSaveStatus('saved');
-              console.log('✅ Auto-saved at', now.toLocaleTimeString());
+              const res = await fetch('/api/profile/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  profile,
+                  profilePhoto,
+                  selectedTemplate,
+                  rawText
+                })
+              });
+              
+              const data = await res.json();
+              if (data.success) {
+                setLastSaved(new Date(data.savedAt));
+                setSaveStatus('saved');
+                console.log('✅ Auto-saved to server at', data.savedAt);
+              } else {
+                throw new Error(data.error);
+              }
               setTimeout(() => setSaveStatus(''), 3000);
             } catch (e) {
               console.error('Error saving profile:', e);
               setSaveStatus('error');
               setTimeout(() => setSaveStatus(''), 5000);
             }
-          }, 500); // Reduced debounce to 500ms for faster saves
+          }, 1000);
           return () => clearTimeout(saveTimeout);
         }
-      }, [profile]);
-      
-      // Save photo when it changes
-      React.useEffect(() => {
-        if (profilePhoto) {
-          try {
-            localStorage.setItem(STORAGE_KEYS.PHOTO, profilePhoto);
-          } catch (e) {
-            console.error('Error saving photo:', e);
-          }
-        }
-      }, [profilePhoto]);
-      
-      // Save template when it changes
-      React.useEffect(() => {
-        localStorage.setItem(STORAGE_KEYS.TEMPLATE, selectedTemplate);
-      }, [selectedTemplate]);
-      
-      // Save raw text when it changes
-      React.useEffect(() => {
-        if (rawText) {
-          localStorage.setItem(STORAGE_KEYS.RAW_TEXT, rawText);
-        }
-      }, [rawText]);
+      }, [profile, profilePhoto, selectedTemplate]);
       
       // Manual save function
-      const saveProgress = () => {
+      const saveProgress = async () => {
         if (!profile) {
           alert('No profile to save yet. Upload a resume first.');
           return;
         }
+        if (!user) {
+          alert('Please sign in to save your profile.');
+          return;
+        }
         try {
           setSaveStatus('saving');
-          localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
-          if (profilePhoto) localStorage.setItem(STORAGE_KEYS.PHOTO, profilePhoto);
-          localStorage.setItem(STORAGE_KEYS.TEMPLATE, selectedTemplate);
-          if (rawText) localStorage.setItem(STORAGE_KEYS.RAW_TEXT, rawText);
-          const now = new Date();
-          localStorage.setItem(STORAGE_KEYS.LAST_SAVED, now.toISOString());
-          setLastSaved(now);
-          setSaveStatus('saved');
-          alert('✅ Progress saved successfully! You can close the browser and return later.');
+          const res = await fetch('/api/profile/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              profile,
+              profilePhoto,
+              selectedTemplate,
+              rawText
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setLastSaved(new Date(data.savedAt));
+            setSaveStatus('saved');
+            alert('✅ Profile saved to your account! You can access it from any device.');
+          } else {
+            throw new Error(data.error);
+          }
         } catch (e) {
           setSaveStatus('error');
-          alert('❌ Error saving progress: ' + e.message);
+          alert('❌ Error saving profile: ' + e.message);
         }
       };
       
-      // Clear saved data
-      const clearSavedData = () => {
-        if (confirm('Are you sure you want to clear ALL saved data? This cannot be undone.')) {
-          Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+      // Clear saved data (server + local)
+      const clearSavedData = async () => {
+        if (confirm('Are you sure you want to clear ALL profile data? This cannot be undone.')) {
+          try {
+            await fetch('/api/profile/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                profile: null,
+                profilePhoto: null,
+                selectedTemplate: 'executive',
+                rawText: ''
+              })
+            });
+          } catch (e) {}
           setProfile(null);
           setProfilePhoto(null);
           setRawText('');
           setTemplate('executive');
           setLastSaved(null);
           setView(VIEW.UPLOAD);
-          alert('All saved data has been cleared.');
+          alert('All profile data has been cleared.');
         }
       };
       
@@ -1859,6 +2314,39 @@ app.get('/', (c) => {
         { id: 'templates', icon: 'fa-palette', label: 'Templates' }
       ];
       
+      // Show loading state while checking auth
+      if (authLoading && view === VIEW.AUTH) {
+        return (
+          <div style={{ 
+            minHeight: '100vh', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            flexDirection: 'column',
+            gap: '20px'
+          }}>
+            <div style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '24px',
+              background: 'linear-gradient(135deg, var(--purple-main), var(--pink-main))',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 12px 40px rgba(139,92,246,0.4)'
+            }}>
+              <i className="fas fa-spinner fa-spin" style={{ fontSize: '32px', color: '#fff' }}></i>
+            </div>
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px' }}>Loading...</p>
+          </div>
+        );
+      }
+      
+      // Show Auth view if not logged in
+      if (view === VIEW.AUTH) {
+        return <AuthView onLogin={handleAuth} authLoading={authLoading} authError={authError} />;
+      }
+      
       return (
         <div className="app-container">
           {/* FLOATING AUTO-SAVE INDICATOR - Always visible */}
@@ -1911,6 +2399,63 @@ app.get('/', (c) => {
             <div className="logo">
               <img src="/static/logo.png" alt="Webumé" className="logo-img" />
             </div>
+            
+            {/* User Info */}
+            {user && (
+              <div style={{
+                padding: '16px',
+                margin: '0 16px 16px',
+                background: 'rgba(139,92,246,0.1)',
+                borderRadius: '12px',
+                border: '1px solid rgba(139,92,246,0.2)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, var(--purple-main), var(--pink-main))',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    fontWeight: '700',
+                    fontSize: '14px'
+                  }}>
+                    {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ color: '#fff', fontWeight: '600', fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {user.name}
+                    </div>
+                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {user.email}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    color: 'rgba(255,255,255,0.6)',
+                    fontSize: '11px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <i className="fas fa-sign-out-alt"></i>
+                  Sign Out
+                </button>
+              </div>
+            )}
             
             <div className="nav-group">
               <div className="nav-label">Profile Sections</div>

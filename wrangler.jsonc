@@ -3,5 +3,11 @@
   "name": "webume",
   "compatibility_date": "2024-01-01",
   "pages_build_output_dir": "./dist",
-  "compatibility_flags": ["nodejs_compat"]
+  "compatibility_flags": ["nodejs_compat"],
+  "kv_namespaces": [
+    {
+      "binding": "USERS_KV",
+      "id": "ab526344d6d64c95a120a561a34f4909"
+    }
+  ]
 }
