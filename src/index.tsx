@@ -355,9 +355,29 @@ ABSOLUTE REQUIREMENTS:
     if (!aiText) return c.json({ error: 'No response from AI' }, 500);
     
     try {
-      const jsonStr = aiText.replace(/```json\n?|\n?```/g, '').trim();
-      return c.json(JSON.parse(jsonStr));
+      // Remove markdown code blocks - handle various formats
+      let jsonStr = aiText
+        .replace(/```json\n?/gi, '')
+        .replace(/```\n?/gi, '')
+        .replace(/\n?```/gi, '')
+        .trim();
+      
+      // If still not starting with {, extract JSON object
+      if (!jsonStr.startsWith('{')) {
+        const match = jsonStr.match(/\{[\s\S]*\}/);
+        if (match) jsonStr = match[0];
+      }
+      
+      const parsed = JSON.parse(jsonStr);
+      return c.json(parsed);
     } catch (e) {
+      // Try one more extraction method
+      try {
+        const match = aiText.match(/\{[\s\S]*\}/);
+        if (match) {
+          return c.json(JSON.parse(match[0]));
+        }
+      } catch {}
       return c.json({ error: 'Parse failed', raw: aiText }, 500);
     }
   } catch (error: any) {
