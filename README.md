@@ -1,6 +1,6 @@
 # Webumé - Digital Resume Revolution 🚀
 
-**Transform your resume into an immersive digital experience that gets you hired.**
+**Transform your resume into an immersive, interactive career experience that showcases 10 years of work in ways a paragraph never could.**
 
 ## 🌐 Live URLs
 
@@ -11,67 +11,131 @@
 
 ---
 
-## 🎯 What Is Webumé?
+## 🎯 The Vision: Career Tree Architecture
 
-Webumé is an **industry-disrupting** AI-powered resume platform that transforms static PDFs into interactive, shareable digital profiles. Built for the modern job market with features aligned to recruiter expectations and ATS optimization.
+**The Problem**: Traditional resumes force 10 years of experience into tiny paragraphs. How do you explain your value, tasks, projects, challenges, victories, reviews, and impact from a decade at one company in a single paragraph? **It's ludicrous.**
 
-### Key Value Propositions
+**The Solution**: Webumé introduces the **Organic Chronological Career Tree** - each employer on your resume becomes its own **interactive experience page** that expands to reveal the full story:
 
-- **AI-Powered Parsing**: Upload any resume (PDF/DOCX/TXT) and our Gemini AI extracts rich career data
-- **Public Shareable Profiles**: Get your own URL (`/p/your-name`) to share with recruiters
-- **ATS Optimization**: Real-time compatibility scoring with keyword analysis
-- **PWA Ready**: Install as an app on any device (Google Play Store ready)
-- **Cross-Device Sync**: Sign in from anywhere, your profile follows you
+### How It Works
+
+1. **Career Timeline View**: Your resume displays as an elegant timeline with employer cards
+2. **Hover to Preview**: Mouse over any employer card to see content indicators (projects, media, reviews)
+3. **Click to Expand**: Click any employer to open a **full-screen Employer Detail Page**
+4. **Employer Page Sections**:
+   - **Overview**: Company info, role description, tenure, key metrics
+   - **Responsibilities**: Detailed list of duties and scope
+   - **Projects**: Individual projects with tech stacks and outcomes
+   - **Achievements & Victories**: Key wins, awards received at this employer
+   - **Challenges Overcome**: Situation-Approach-Outcome stories
+   - **Media Gallery**: Photos and videos from your time there
+   - **Reviews & Testimonials**: Manager/colleague feedback
+   - **Day in Life**: What a typical day looked like
 
 ---
 
-## ✅ MVP Features (All Complete)
+## ✅ Complete Feature Set
+
+### 🌳 Interactive Career Tree
+- Clickable employer cards in Career Timeline
+- Hover effects showing content depth
+- Content indicators (projects count, media count, reviews count)
+- Full-screen Employer Detail Page per experience
+- 8 dedicated sections per employer
 
 ### 🔐 User Authentication
 - Email/password signup & login
-- Secure sessions (30-day cookies)
-- Server-side profile storage via Cloudflare KV
+- Secure sessions (30-day cookies via Cloudflare KV)
 - Cross-device profile sync
 
 ### 📄 10 Industry-Specific Templates
 | Category | Templates |
 |----------|-----------|
 | **Professional** | Executive, Corporate, Nonprofit |
-| **Service Industry** | Healthcare, Restaurant & Hospitality, Trades & Services, Beauty & Wellness |
+| **Service Industry** | Healthcare, Restaurant, Trades, Beauty |
 | **Creative** | Creative |
 | **Technical** | Tech Pioneer, Minimal |
 
-Each template includes unique colors, gradients, icons, and industry tags.
-
 ### 🌐 Public Profile Sharing
-- **Custom URLs**: `/p/your-slug`
-- **QR Code Generation**: Scan-to-view for business cards
-- **Social Sharing**: LinkedIn, Twitter, Email
-- **Profile Analytics**: Track view counts
-- **SEO Optimized**: Open Graph meta tags for link previews
+- Custom URLs: `/p/your-slug`
+- QR Code generation
+- Social sharing (LinkedIn, Twitter, Email)
+- Profile view analytics
+- SEO meta tags
 
 ### 📊 ATS Compatibility Scoring
-- Real-time score (0-100) with grade
-- Keyword matching analysis
-- Actionable improvement suggestions
-- Top industry keywords detection
+- Real-time score (0-100)
+- Keyword analysis
+- Improvement suggestions
 
-### 📱 PWA (Progressive Web App)
+### 📱 PWA Ready
 - Installable on any device
-- App manifest with icons
-- Standalone display mode
 - Google Play Store ready via PWABuilder
 
-### 🖼️ Media Handling
-- **Photos**: 1600px PNG, high-quality compression
-- **Videos**: Full playback with click-to-play controls
-- **Profile Photo**: Circular crop with template-themed borders
+---
 
-### 🤖 AI Resume Parsing
-- PDF, DOCX, TXT support
-- Gemini 2.0 Flash integration
-- Extracts: basics, experience, skills, achievements, education
-- Generates: Day-in-Life activities, impact metrics, company info
+## 📊 Data Architecture
+
+### Experience Schema (Per Employer)
+```typescript
+interface Experience {
+  id: number
+  company: string
+  companyInfo: {
+    website: string
+    domain: string
+    industry: string
+    location: string
+    size: string
+    description: string
+  }
+  logoUrl: string | null
+  customLogo: string | null
+  role: string
+  startDate: string
+  endDate: string
+  description: string
+  
+  // Core Content
+  responsibilities: string[]
+  dayInLife: { time: string, activity: string }[]
+  metrics: { value: string, label: string }[]
+  skills: string[]
+  
+  // NEW: Employer-Specific Rich Content
+  projects: Project[]         // Projects at this employer
+  victories: Victory[]        // Key wins and successes
+  challenges: Challenge[]     // Challenges overcome (SAO format)
+  awards: Award[]            // Awards received here
+  reviews: Review[]          // Performance reviews/testimonials
+  photos: Photo[]            // Photos from this employer
+  videos: Video[]            // Videos from this employer
+}
+
+interface Project {
+  id: number
+  name: string
+  description: string
+  url: string
+  techStack: string[]
+  outcome: string
+}
+
+interface Challenge {
+  id: number
+  title: string
+  situation: string    // What was the challenge?
+  approach: string     // How did you tackle it?
+  outcome: string      // What was the result?
+}
+
+interface Victory {
+  id: number
+  title: string
+  description: string
+  impact: string
+}
+```
 
 ---
 
@@ -96,9 +160,8 @@ Each template includes unique colors, gradients, icons, and industry tags.
 
 ---
 
-## 🏗️ Technical Architecture
+## 🏗️ Technical Stack
 
-### Stack
 | Layer | Technology |
 |-------|------------|
 | **Runtime** | Cloudflare Workers (Edge) |
@@ -112,165 +175,99 @@ Each template includes unique colors, gradients, icons, and industry tags.
 | **Build Tool** | Vite |
 | **Deployment** | Cloudflare Pages |
 
-### Data Models
-
-```typescript
-// User Schema (stored in KV as user:email)
-interface User {
-  email: string
-  name: string
-  passwordHash: string
-  createdAt: string
-  slug: string              // Custom URL slug
-  isPublic: boolean         // Profile visibility
-  profileViews: number      // Analytics counter
-  profile: ProfileData | null
-  profilePhoto: string | null
-  selectedTemplate: string
-  rawText: string
-}
-
-// Profile Schema
-interface ProfileData {
-  basics: {
-    name: string
-    title: string
-    tagline: string
-    email: string
-    phone: string
-    location: string
-    linkedin: string
-    website: string
-    summary: string
-  }
-  experience: Experience[]
-  skills: string[]
-  achievements: Achievement[]
-  education: Education[]
-  awards: Award[]
-  reviews: Review[]
-  payHistory: PayRecord[]
-  projects: Project[]
-}
-```
-
----
-
-## 📱 App Store Publishing
-
-### Google Play Store (via PWABuilder)
-1. Go to https://www.pwabuilder.com/
-2. Enter: `https://webume.pages.dev`
-3. Download Android package
-4. Submit to Google Play Console
-
-### Requirements Met
-- ✅ PWA manifest with all icons
-- ✅ Service worker capable
-- ✅ Standalone display mode
-- ✅ Portrait orientation
-- ✅ App categories: business, productivity
-- ✅ Shortcuts for quick actions
-
 ---
 
 ## 🚀 Quick Start
 
 ### For Users
 1. Visit https://webume.pages.dev
-2. Create an account (email + password)
-3. Upload your resume (PDF, DOCX, or TXT)
-4. AI extracts your career data automatically
-5. Edit and customize all sections
-6. Preview with your chosen template
-7. Publish and share your public URL
-8. Track who views your profile
+2. Create an account
+3. Upload your resume (PDF, DOCX, TXT)
+4. AI extracts your career data
+5. **Click on any experience in Career Timeline** to open the Employer Detail Page
+6. Add rich content: projects, challenges, photos, videos, reviews
+7. Preview with your chosen template
+8. Publish and share your public URL
 
 ### For Developers
 ```bash
-# Clone and setup
 cd /home/user/webapp
 npm install
-
-# Build and run locally
 npm run build
 pm2 start ecosystem.config.cjs
 
-# Deploy to production
-npm run build
+# Deploy
 npx wrangler pages deploy dist --project-name webume
 ```
 
 ---
 
-## 📊 Viral Growth Features
+## 📁 Project Structure
 
-Based on research into successful professional networking apps:
-
-- **Shareable URLs**: Every profile has a unique, memorable link
-- **QR Codes**: Perfect for business cards and networking events
-- **Social Sharing**: One-click share to LinkedIn, Twitter, Email
-- **ATS Score Gamification**: Users are motivated to improve their score
-- **Template Variety**: Choose based on industry to stand out
-- **Cross-Device**: Access from any device, anytime
-
----
-
-## 🎨 Design System
-
-### Glassmorphism Theme
-```css
-:root {
-  --purple-main: #8B5CF6;
-  --purple-light: #A78BFA;
-  --pink-main: #EC4899;
-  --cyan-main: #06B6D4;
-  --green-main: #10B981;
-}
+```
+webapp/
+├── src/
+│   └── index.tsx           # Main app (7000+ lines)
+│       ├── API Routes      # Auth, Profile, Resume parsing
+│       ├── Components
+│       │   ├── App         # Main state management
+│       │   ├── AuthView    # Login/Signup
+│       │   ├── UploadView  # Resume upload
+│       │   ├── BuilderView # Profile editing
+│       │   ├── PreviewView # Live preview + Career Timeline
+│       │   ├── EmployerDetailPage  # NEW: Full employer experience
+│       │   └── Editors     # Basics, Experience, Skills, etc.
+├── public/static/
+│   ├── logo.png
+│   └── background.png
+├── dist/                   # Build output (~281 KB)
+├── wrangler.jsonc         # Cloudflare config
+└── package.json
 ```
 
-### UI Components
-- Blurred glass cards with subtle borders
-- Premium gradients for CTAs
-- Font Awesome icons throughout
-- Inter & Space Grotesk typography
-- Mobile-responsive design
+---
+
+## 🎨 UI Components
+
+### Career Timeline (PreviewView)
+- Interactive employer cards
+- Hover: Shows "View Details" button + content indicators
+- Click: Opens EmployerDetailPage modal
+- Content badges: Projects, Victories, Photos, Videos, Reviews
+
+### EmployerDetailPage
+Full-screen modal with 8 sections:
+1. **Overview** - Company info, metrics, skills used
+2. **Responsibilities** - Numbered list with edit capability
+3. **Projects** - Project cards with tech stacks
+4. **Achievements** - Trophy-styled victory cards
+5. **Challenges** - SAO (Situation-Approach-Outcome) format
+6. **Media** - Photo/video gallery with lightbox
+7. **Reviews** - Testimonial cards with avatars
+8. **Day in Life** - Timeline visualization
 
 ---
 
-## 📈 Analytics & Insights
+## 📈 Version History
 
-- Profile view counter (visible to profile owner)
-- ATS score tracking
-- Keyword match analytics
-- Last saved timestamp
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.0.0 | 2026-01-10 | **Career Tree Architecture**: Interactive employer pages, rich content per experience |
+| 1.0.0 | 2026-01-10 | MVP: Auth, templates, public profiles, ATS scoring, PWA |
 
 ---
 
 ## 🔮 Future Roadmap
 
-- [ ] PDF Export / Download
+- [ ] PDF Export with full rich content
 - [ ] Video Introduction Recording
-- [ ] Employer/Recruiter View Mode
-- [ ] Premium Templates (paid tier)
-- [ ] AI-Powered Job Matching
-- [ ] Interview Preparation Tools
-- [ ] Salary Insights Integration
-- [ ] Multi-language Support
+- [ ] AI-suggested content for each employer
+- [ ] Recruiter/Employer view mode
+- [ ] Analytics dashboard
+- [ ] Premium templates
 
 ---
 
-## 📝 Version History
+**Built to revolutionize the job market. Every experience deserves its full story.** ✨
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | 2026-01-10 | MVP Complete: Auth, 10 templates, public profiles, ATS scoring, QR codes, PWA |
-| 0.9.0 | 2026-01-09 | Photo quality fix, video playback, auto-save |
-| 0.8.0 | 2026-01-09 | Template system, company logos, glassmorphism UI |
-| 0.5.0 | 2026-01-08 | Initial build with AI parsing |
-
----
-
-*Built to revolutionize the job market. One profile at a time.* ✨
-
-**Status**: ✅ MVP Complete & Live on Production
+*Status: ✅ Career Tree Architecture Complete & Live*
