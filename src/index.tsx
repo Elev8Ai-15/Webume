@@ -4174,6 +4174,102 @@ app.get('/', (c) => {
                   ))}
                 </div>
               </div>
+              
+              {/* Rich Content Summary & Link */}
+              <div style={{
+                marginTop: '20px',
+                padding: '20px',
+                background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(236,72,153,0.05))',
+                borderRadius: '14px',
+                border: '1px solid rgba(139,92,246,0.2)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                  <div>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#fff', marginBottom: '6px' }}>
+                      <i className="fas fa-folder-open" style={{ marginRight: '10px', color: '#A78BFA' }}></i>
+                      Employer Content Library
+                    </h4>
+                    <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                      Add projects, achievements, challenges, photos, videos, and reviews specific to this employer
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Content Summary */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+                  <span style={{ 
+                    padding: '6px 14px', 
+                    background: (exp.projects?.length > 0) ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.05)', 
+                    borderRadius: '8px', 
+                    fontSize: '12px', 
+                    color: (exp.projects?.length > 0) ? '#A78BFA' : 'rgba(255,255,255,0.4)',
+                    fontWeight: '600'
+                  }}>
+                    <i className="fas fa-folder" style={{ marginRight: '6px' }}></i>
+                    {exp.projects?.length || 0} Projects
+                  </span>
+                  <span style={{ 
+                    padding: '6px 14px', 
+                    background: (exp.victories?.length > 0) ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.05)', 
+                    borderRadius: '8px', 
+                    fontSize: '12px', 
+                    color: (exp.victories?.length > 0) ? '#F59E0B' : 'rgba(255,255,255,0.4)',
+                    fontWeight: '600'
+                  }}>
+                    <i className="fas fa-trophy" style={{ marginRight: '6px' }}></i>
+                    {exp.victories?.length || 0} Victories
+                  </span>
+                  <span style={{ 
+                    padding: '6px 14px', 
+                    background: (exp.challenges?.length > 0) ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.05)', 
+                    borderRadius: '8px', 
+                    fontSize: '12px', 
+                    color: (exp.challenges?.length > 0) ? '#EF4444' : 'rgba(255,255,255,0.4)',
+                    fontWeight: '600'
+                  }}>
+                    <i className="fas fa-mountain" style={{ marginRight: '6px' }}></i>
+                    {exp.challenges?.length || 0} Challenges
+                  </span>
+                  <span style={{ 
+                    padding: '6px 14px', 
+                    background: (exp.photos?.length > 0) ? 'rgba(6,182,212,0.2)' : 'rgba(255,255,255,0.05)', 
+                    borderRadius: '8px', 
+                    fontSize: '12px', 
+                    color: (exp.photos?.length > 0) ? '#06B6D4' : 'rgba(255,255,255,0.4)',
+                    fontWeight: '600'
+                  }}>
+                    <i className="fas fa-images" style={{ marginRight: '6px' }}></i>
+                    {exp.photos?.length || 0} Photos
+                  </span>
+                  <span style={{ 
+                    padding: '6px 14px', 
+                    background: (exp.videos?.length > 0) ? 'rgba(236,72,153,0.2)' : 'rgba(255,255,255,0.05)', 
+                    borderRadius: '8px', 
+                    fontSize: '12px', 
+                    color: (exp.videos?.length > 0) ? '#EC4899' : 'rgba(255,255,255,0.4)',
+                    fontWeight: '600'
+                  }}>
+                    <i className="fas fa-video" style={{ marginRight: '6px' }}></i>
+                    {exp.videos?.length || 0} Videos
+                  </span>
+                  <span style={{ 
+                    padding: '6px 14px', 
+                    background: (exp.reviews?.length > 0) ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.05)', 
+                    borderRadius: '8px', 
+                    fontSize: '12px', 
+                    color: (exp.reviews?.length > 0) ? '#10B981' : 'rgba(255,255,255,0.4)',
+                    fontWeight: '600'
+                  }}>
+                    <i className="fas fa-star" style={{ marginRight: '6px' }}></i>
+                    {exp.reviews?.length || 0} Reviews
+                  </span>
+                </div>
+                
+                <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>
+                  <i className="fas fa-lightbulb" style={{ marginRight: '6px' }}></i>
+                  Tip: Go to Live Preview and click on this experience to add rich content
+                </p>
+              </div>
             </div>
           ))}
           
