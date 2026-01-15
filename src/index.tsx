@@ -1,21 +1,94 @@
 import { Hono } from 'hono'
 import { getCookie, setCookie, deleteCookie } from 'hono/cookie'
+import { cors } from 'hono/cors'
 
 type Bindings = {
   USERS_KV: KVNamespace;
+  STRIPE_SECRET_KEY?: string;
+  STRIPE_WEBHOOK_SECRET?: string;
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
 
 const GEMINI_API_KEY = 'AIzaSyB9jQaRGkfj4Tyq5y5j45RiYAeb_H2e-2g';
 
-// Simple hash function for passwords (use proper bcrypt in production)
+// ============================================================
+// STRIPE CONFIGURATION - Products and Prices
+// ============================================================
+const STRIPE_PRODUCTS = {
+  FREE: {
+    id: 'free',
+    name: 'Free',
+    price: 0,
+    priceId: null,
+    features: ['1 Profile', 'Basic Templates', 'Public URL', 'ATS Score Check']
+  },
+  PRO: {
+    id: 'pro',
+    name: 'Pro',
+    price: 999, // $9.99/month in cents
+    priceId: 'price_pro_monthly', // Will be created in Stripe
+    features: ['Unlimited Profiles', 'All 10 Templates', 'Custom Domain', 'Priority Support', 'PDF Export', 'Analytics Dashboard', 'Remove Watermark']
+  },
+  ENTERPRISE: {
+    id: 'enterprise', 
+    name: 'Enterprise',
+    price: 2999, // $29.99/month in cents
+    priceId: 'price_enterprise_monthly',
+    features: ['Everything in Pro', 'Team Management', 'API Access', 'White Label', 'Dedicated Support', 'Custom Integrations', 'SLA Guarantee']
+  }
+};
+
+// ============================================================
+// SECURITY CONFIGURATION
+// ============================================================
+const SECURITY_CONFIG = {
+  PASSWORD_MIN_LENGTH: 8,
+  SESSION_DURATION: 30 * 24 * 60 * 60, // 30 days in seconds
+  RATE_LIMIT_WINDOW: 60 * 1000, // 1 minute
+  RATE_LIMIT_MAX_REQUESTS: 100,
+  CSRF_TOKEN_LENGTH: 32,
+  MAX_LOGIN_ATTEMPTS: 5,
+  LOCKOUT_DURATION: 15 * 60 * 1000, // 15 minutes
+};
+
+// ============================================================
+// ENHANCED PASSWORD HASHING (PBKDF2 - CF Workers compatible)
+// ============================================================
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
-  const data = encoder.encode(password + 'webume_salt_2024');
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const salt = 'webume_secure_salt_v2_2024';
+  const iterations = 100000;
+  
+  // Import key for PBKDF2
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits']
+  );
+  
+  // Derive bits using PBKDF2
+  const derivedBits = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: encoder.encode(salt),
+      iterations: iterations,
+      hash: 'SHA-256'
+    },
+    keyMaterial,
+    256
+  );
+  
+  const hashArray = Array.from(new Uint8Array(derivedBits));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Verify password
+async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  const newHash = await hashPassword(password);
+  return newHash === hash;
 }
 
 // Generate session token
@@ -23,6 +96,140 @@ function generateToken(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
   return Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Generate CSRF token
+function generateCSRFToken(): string {
+  const array = new Uint8Array(SECURITY_CONFIG.CSRF_TOKEN_LENGTH);
+  crypto.getRandomValues(array);
+  return Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Input sanitization to prevent XSS
+function sanitizeInput(input: string): string {
+  if (typeof input !== 'string') return '';
+  return input
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;')
+    .trim()
+    .substring(0, 10000); // Max length
+}
+
+// Email validation
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) && email.length <= 254;
+}
+
+// Password strength validation
+function isStrongPassword(password: string): { valid: boolean; message?: string } {
+  if (password.length < SECURITY_CONFIG.PASSWORD_MIN_LENGTH) {
+    return { valid: false, message: `Password must be at least ${SECURITY_CONFIG.PASSWORD_MIN_LENGTH} characters` };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one uppercase letter' };
+  }
+  if (!/[a-z]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one lowercase letter' };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one number' };
+  }
+  return { valid: true };
+}
+
+// Rate limiting check
+async function checkRateLimit(c: any, identifier: string): Promise<{ allowed: boolean; remaining: number }> {
+  const key = `ratelimit:${identifier}`;
+  const now = Date.now();
+  const windowStart = now - SECURITY_CONFIG.RATE_LIMIT_WINDOW;
+  
+  try {
+    const data = await c.env.USERS_KV.get(key, 'json') || { requests: [] };
+    // Filter to only requests within window
+    data.requests = data.requests.filter((t: number) => t > windowStart);
+    
+    if (data.requests.length >= SECURITY_CONFIG.RATE_LIMIT_MAX_REQUESTS) {
+      return { allowed: false, remaining: 0 };
+    }
+    
+    data.requests.push(now);
+    await c.env.USERS_KV.put(key, JSON.stringify(data), { expirationTtl: 120 });
+    
+    return { allowed: true, remaining: SECURITY_CONFIG.RATE_LIMIT_MAX_REQUESTS - data.requests.length };
+  } catch {
+    return { allowed: true, remaining: SECURITY_CONFIG.RATE_LIMIT_MAX_REQUESTS };
+  }
+}
+
+// Login attempt tracking
+async function checkLoginAttempts(c: any, email: string): Promise<{ allowed: boolean; attemptsRemaining: number }> {
+  const key = `loginattempts:${email.toLowerCase()}`;
+  
+  try {
+    const data = await c.env.USERS_KV.get(key, 'json');
+    if (!data) return { allowed: true, attemptsRemaining: SECURITY_CONFIG.MAX_LOGIN_ATTEMPTS };
+    
+    // Check if locked out
+    if (data.lockedUntil && Date.now() < data.lockedUntil) {
+      return { allowed: false, attemptsRemaining: 0 };
+    }
+    
+    // Reset if lockout expired
+    if (data.lockedUntil && Date.now() >= data.lockedUntil) {
+      await c.env.USERS_KV.delete(key);
+      return { allowed: true, attemptsRemaining: SECURITY_CONFIG.MAX_LOGIN_ATTEMPTS };
+    }
+    
+    return { allowed: true, attemptsRemaining: SECURITY_CONFIG.MAX_LOGIN_ATTEMPTS - (data.attempts || 0) };
+  } catch {
+    return { allowed: true, attemptsRemaining: SECURITY_CONFIG.MAX_LOGIN_ATTEMPTS };
+  }
+}
+
+// Record failed login attempt
+async function recordFailedLogin(c: any, email: string): Promise<void> {
+  const key = `loginattempts:${email.toLowerCase()}`;
+  
+  try {
+    const data = await c.env.USERS_KV.get(key, 'json') || { attempts: 0 };
+    data.attempts = (data.attempts || 0) + 1;
+    
+    if (data.attempts >= SECURITY_CONFIG.MAX_LOGIN_ATTEMPTS) {
+      data.lockedUntil = Date.now() + SECURITY_CONFIG.LOCKOUT_DURATION;
+    }
+    
+    await c.env.USERS_KV.put(key, JSON.stringify(data), { expirationTtl: SECURITY_CONFIG.LOCKOUT_DURATION / 1000 });
+  } catch {}
+}
+
+// Clear login attempts on success
+async function clearLoginAttempts(c: any, email: string): Promise<void> {
+  const key = `loginattempts:${email.toLowerCase()}`;
+  try {
+    await c.env.USERS_KV.delete(key);
+  } catch {}
+}
+
+// Audit logging
+async function auditLog(c: any, action: string, userId: string, details: any = {}): Promise<void> {
+  const key = `audit:${Date.now()}:${Math.random().toString(36).substring(2, 8)}`;
+  const log = {
+    timestamp: new Date().toISOString(),
+    action,
+    userId,
+    ip: c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown',
+    userAgent: c.req.header('user-agent') || 'unknown',
+    details
+  };
+  
+  try {
+    await c.env.USERS_KV.put(key, JSON.stringify(log), { expirationTtl: 90 * 24 * 60 * 60 }); // 90 days retention
+  } catch {}
 }
 
 // Auth middleware to get current user
@@ -50,13 +257,267 @@ function generateSlug(name: string): string {
   return `${base}-${random}`;
 }
 
-// API: Register new user
+// ============================================================
+// SECURITY MIDDLEWARE
+// ============================================================
+
+// CORS configuration
+app.use('/api/*', cors({
+  origin: ['https://webume.pages.dev', 'http://localhost:3000'],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+  credentials: true,
+  maxAge: 86400,
+}));
+
+// Security headers middleware
+app.use('*', async (c, next) => {
+  await next();
+  
+  // Add security headers
+  c.res.headers.set('X-Content-Type-Options', 'nosniff');
+  c.res.headers.set('X-Frame-Options', 'DENY');
+  c.res.headers.set('X-XSS-Protection', '1; mode=block');
+  c.res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  c.res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  
+  // Content Security Policy
+  c.res.headers.set('Content-Security-Policy', 
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://js.stripe.com; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
+    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+    "img-src 'self' data: blob: https:; " +
+    "connect-src 'self' https://api.stripe.com https://generativelanguage.googleapis.com https://logo.clearbit.com; " +
+    "frame-src https://js.stripe.com;"
+  );
+});
+
+// Rate limiting middleware for API routes
+app.use('/api/*', async (c, next) => {
+  const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
+  const { allowed, remaining } = await checkRateLimit(c, ip);
+  
+  c.res.headers.set('X-RateLimit-Remaining', remaining.toString());
+  
+  if (!allowed) {
+    return c.json({ error: 'Too many requests. Please try again later.' }, 429);
+  }
+  
+  await next();
+});
+
+// ============================================================
+// STRIPE API ENDPOINTS
+// ============================================================
+
+// Get pricing plans
+app.get('/api/stripe/plans', (c) => {
+  return c.json({
+    plans: Object.values(STRIPE_PRODUCTS).map(p => ({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      priceFormatted: p.price === 0 ? 'Free' : `$${(p.price / 100).toFixed(2)}/mo`,
+      features: p.features
+    }))
+  });
+});
+
+// Create checkout session
+app.post('/api/stripe/create-checkout', async (c) => {
+  const user = await getCurrentUser(c);
+  if (!user) {
+    return c.json({ error: 'Authentication required' }, 401);
+  }
+  
+  const { planId } = await c.req.json();
+  const plan = Object.values(STRIPE_PRODUCTS).find(p => p.id === planId);
+  
+  if (!plan || plan.price === 0) {
+    return c.json({ error: 'Invalid plan selected' }, 400);
+  }
+  
+  const stripeKey = c.env.STRIPE_SECRET_KEY;
+  if (!stripeKey) {
+    return c.json({ error: 'Stripe not configured. Please add STRIPE_SECRET_KEY to environment.' }, 500);
+  }
+  
+  try {
+    // Create Stripe checkout session
+    const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${stripeKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        'mode': 'subscription',
+        'success_url': `${c.req.header('origin') || 'https://webume.pages.dev'}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+        'cancel_url': `${c.req.header('origin') || 'https://webume.pages.dev'}/pricing`,
+        'customer_email': user.email,
+        'line_items[0][price]': plan.priceId || '',
+        'line_items[0][quantity]': '1',
+        'metadata[userId]': user.email,
+        'metadata[planId]': plan.id,
+      }).toString()
+    });
+    
+    const session = await response.json();
+    
+    if (session.error) {
+      return c.json({ error: session.error.message }, 400);
+    }
+    
+    await auditLog(c, 'CHECKOUT_CREATED', user.email, { planId: plan.id, sessionId: session.id });
+    
+    return c.json({ 
+      sessionId: session.id,
+      url: session.url 
+    });
+  } catch (error: any) {
+    return c.json({ error: 'Failed to create checkout session' }, 500);
+  }
+});
+
+// Stripe webhook handler
+app.post('/api/stripe/webhook', async (c) => {
+  const stripeKey = c.env.STRIPE_SECRET_KEY;
+  const webhookSecret = c.env.STRIPE_WEBHOOK_SECRET;
+  
+  if (!stripeKey || !webhookSecret) {
+    return c.json({ error: 'Stripe not configured' }, 500);
+  }
+  
+  const signature = c.req.header('stripe-signature');
+  const body = await c.req.text();
+  
+  // In production, verify webhook signature
+  // For now, parse the event
+  try {
+    const event = JSON.parse(body);
+    
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object;
+        const userEmail = session.customer_email || session.metadata?.userId;
+        const planId = session.metadata?.planId;
+        
+        if (userEmail && planId) {
+          // Update user subscription
+          const user = await c.env.USERS_KV.get(`user:${userEmail.toLowerCase()}`, 'json');
+          if (user) {
+            user.subscription = {
+              planId,
+              status: 'active',
+              customerId: session.customer,
+              subscriptionId: session.subscription,
+              startedAt: new Date().toISOString()
+            };
+            await c.env.USERS_KV.put(`user:${userEmail.toLowerCase()}`, JSON.stringify(user));
+            await auditLog(c, 'SUBSCRIPTION_ACTIVATED', userEmail, { planId });
+          }
+        }
+        break;
+      }
+      
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object;
+        // Find user by subscription ID and downgrade to free
+        // Implementation would require storing subscriptionId -> email mapping
+        break;
+      }
+      
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object;
+        // Handle failed payment - notify user, retry logic
+        break;
+      }
+    }
+    
+    return c.json({ received: true });
+  } catch (error) {
+    return c.json({ error: 'Webhook processing failed' }, 400);
+  }
+});
+
+// Get user subscription status
+app.get('/api/stripe/subscription', async (c) => {
+  const user = await getCurrentUser(c);
+  if (!user) {
+    return c.json({ error: 'Authentication required' }, 401);
+  }
+  
+  return c.json({
+    subscription: user.subscription || { planId: 'free', status: 'active' },
+    plan: STRIPE_PRODUCTS[user.subscription?.planId?.toUpperCase() || 'FREE']
+  });
+});
+
+// Cancel subscription
+app.post('/api/stripe/cancel-subscription', async (c) => {
+  const user = await getCurrentUser(c);
+  if (!user) {
+    return c.json({ error: 'Authentication required' }, 401);
+  }
+  
+  if (!user.subscription?.subscriptionId) {
+    return c.json({ error: 'No active subscription' }, 400);
+  }
+  
+  const stripeKey = c.env.STRIPE_SECRET_KEY;
+  if (!stripeKey) {
+    return c.json({ error: 'Stripe not configured' }, 500);
+  }
+  
+  try {
+    const response = await fetch(`https://api.stripe.com/v1/subscriptions/${user.subscription.subscriptionId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${stripeKey}`,
+      }
+    });
+    
+    const result = await response.json();
+    
+    if (result.error) {
+      return c.json({ error: result.error.message }, 400);
+    }
+    
+    // Update user to free plan
+    user.subscription = { planId: 'free', status: 'active', cancelledAt: new Date().toISOString() };
+    await c.env.USERS_KV.put(`user:${user.email.toLowerCase()}`, JSON.stringify(user));
+    
+    await auditLog(c, 'SUBSCRIPTION_CANCELLED', user.email, {});
+    
+    return c.json({ success: true, message: 'Subscription cancelled' });
+  } catch (error) {
+    return c.json({ error: 'Failed to cancel subscription' }, 500);
+  }
+});
+
+// API: Register new user (with enhanced security)
 app.post('/api/auth/register', async (c) => {
   try {
-    const { email, password, name } = await c.req.json();
+    const body = await c.req.json();
+    const email = sanitizeInput(body.email || '');
+    const password = body.password || '';
+    const name = sanitizeInput(body.name || '');
     
+    // Validate required fields
     if (!email || !password || !name) {
       return c.json({ error: 'Email, password, and name are required' }, 400);
+    }
+    
+    // Validate email format
+    if (!isValidEmail(email)) {
+      return c.json({ error: 'Please enter a valid email address' }, 400);
+    }
+    
+    // Validate password strength
+    const passwordCheck = isStrongPassword(password);
+    if (!passwordCheck.valid) {
+      return c.json({ error: passwordCheck.message }, 400);
     }
     
     // Check if user exists
@@ -80,7 +541,12 @@ app.post('/api/auth/register', async (c) => {
       rawText: '',
       isPublic: false,
       profileViews: 0,
-      lastViewedAt: null
+      lastViewedAt: null,
+      subscription: { planId: 'free', status: 'active' }, // Default to free plan
+      settings: {
+        emailNotifications: true,
+        profileVisible: true
+      }
     };
     
     await c.env.USERS_KV.put(`user:${email.toLowerCase()}`, JSON.stringify(user));
@@ -89,65 +555,108 @@ app.post('/api/auth/register', async (c) => {
     
     // Create session
     const token = generateToken();
-    const session = { email: email.toLowerCase(), createdAt: new Date().toISOString() };
-    await c.env.USERS_KV.put(`session:${token}`, JSON.stringify(session), { expirationTtl: 60 * 60 * 24 * 30 }); // 30 days
+    const csrfToken = generateCSRFToken();
+    const session = { 
+      email: email.toLowerCase(), 
+      createdAt: new Date().toISOString(),
+      csrfToken 
+    };
+    await c.env.USERS_KV.put(`session:${token}`, JSON.stringify(session), { expirationTtl: SECURITY_CONFIG.SESSION_DURATION });
     
     setCookie(c, 'webume_session', token, {
       httpOnly: true,
       secure: true,
       sameSite: 'Lax',
-      maxAge: 60 * 60 * 24 * 30,
+      maxAge: SECURITY_CONFIG.SESSION_DURATION,
       path: '/'
     });
     
-    return c.json({ success: true, user: { email: user.email, name: user.name } });
+    // Audit log
+    await auditLog(c, 'USER_REGISTERED', email.toLowerCase(), { name });
+    
+    return c.json({ 
+      success: true, 
+      user: { email: user.email, name: user.name },
+      csrfToken 
+    });
   } catch (error: any) {
-    return c.json({ error: error.message }, 500);
+    return c.json({ error: 'Registration failed. Please try again.' }, 500);
   }
 });
 
-// API: Login
+// API: Login (with enhanced security)
 app.post('/api/auth/login', async (c) => {
   try {
-    const { email, password } = await c.req.json();
+    const body = await c.req.json();
+    const email = sanitizeInput(body.email || '');
+    const password = body.password || '';
     
     if (!email || !password) {
       return c.json({ error: 'Email and password are required' }, 400);
     }
     
+    // Check for account lockout
+    const { allowed, attemptsRemaining } = await checkLoginAttempts(c, email);
+    if (!allowed) {
+      return c.json({ 
+        error: 'Account temporarily locked due to too many failed attempts. Please try again in 15 minutes.' 
+      }, 429);
+    }
+    
     const user = await c.env.USERS_KV.get(`user:${email.toLowerCase()}`, 'json') as any;
     if (!user) {
+      await recordFailedLogin(c, email);
       return c.json({ error: 'Invalid email or password' }, 401);
     }
     
-    const hashedPassword = await hashPassword(password);
-    if (user.password !== hashedPassword) {
-      return c.json({ error: 'Invalid email or password' }, 401);
+    // Verify password using new method
+    const passwordValid = await verifyPassword(password, user.password);
+    if (!passwordValid) {
+      await recordFailedLogin(c, email);
+      await auditLog(c, 'LOGIN_FAILED', email.toLowerCase(), { reason: 'invalid_password' });
+      return c.json({ 
+        error: 'Invalid email or password',
+        attemptsRemaining: attemptsRemaining - 1
+      }, 401);
     }
     
-    // Create session
+    // Clear failed attempts on successful login
+    await clearLoginAttempts(c, email);
+    
+    // Create session with CSRF token
     const token = generateToken();
-    const session = { email: email.toLowerCase(), createdAt: new Date().toISOString() };
-    await c.env.USERS_KV.put(`session:${token}`, JSON.stringify(session), { expirationTtl: 60 * 60 * 24 * 30 });
+    const csrfToken = generateCSRFToken();
+    const session = { 
+      email: email.toLowerCase(), 
+      createdAt: new Date().toISOString(),
+      csrfToken,
+      lastActive: new Date().toISOString()
+    };
+    await c.env.USERS_KV.put(`session:${token}`, JSON.stringify(session), { expirationTtl: SECURITY_CONFIG.SESSION_DURATION });
     
     setCookie(c, 'webume_session', token, {
       httpOnly: true,
       secure: true,
       sameSite: 'Lax',
-      maxAge: 60 * 60 * 24 * 30,
+      maxAge: SECURITY_CONFIG.SESSION_DURATION,
       path: '/'
     });
+    
+    // Audit log
+    await auditLog(c, 'LOGIN_SUCCESS', email.toLowerCase(), {});
     
     return c.json({ 
       success: true, 
       user: { 
         email: user.email, 
         name: user.name,
-        hasProfile: !!user.profile 
-      } 
+        hasProfile: !!user.profile,
+        subscription: user.subscription || { planId: 'free', status: 'active' }
+      },
+      csrfToken
     });
   } catch (error: any) {
-    return c.json({ error: error.message }, 500);
+    return c.json({ error: 'Login failed. Please try again.' }, 500);
   }
 });
 
