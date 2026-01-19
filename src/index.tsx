@@ -279,12 +279,13 @@ app.use('*', async (c, next) => {
   
   // Add security headers
   c.res.headers.set('X-Content-Type-Options', 'nosniff');
-  c.res.headers.set('X-Frame-Options', 'DENY');
+  // Allow framing from same origin and trusted domains (for PWA and sandbox preview)
+  c.res.headers.set('X-Frame-Options', 'SAMEORIGIN');
   c.res.headers.set('X-XSS-Protection', '1; mode=block');
   c.res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   c.res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   
-  // Content Security Policy
+  // Content Security Policy - allow framing from self and sandbox domains
   c.res.headers.set('Content-Security-Policy', 
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://js.stripe.com; " +
@@ -292,7 +293,8 @@ app.use('*', async (c, next) => {
     "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
     "img-src 'self' data: blob: https:; " +
     "connect-src 'self' https://api.stripe.com https://generativelanguage.googleapis.com https://logo.clearbit.com; " +
-    "frame-src https://js.stripe.com;"
+    "frame-src https://js.stripe.com; " +
+    "frame-ancestors 'self' https://*.genspark.ai https://*.gensparksite.com https://*.sandbox.novita.ai https://*.pages.dev;"
   );
 });
 
