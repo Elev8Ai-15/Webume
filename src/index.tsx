@@ -2078,6 +2078,9 @@ app.get('/', (c) => {
       -webkit-backdrop-filter: blur(4px);
       border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 20px;
+      position: relative;
+      z-index: 10;
+      pointer-events: auto;
     }
     
     .glass-card {
@@ -2110,6 +2113,9 @@ app.get('/', (c) => {
       font-size: 14px;
       transition: all 0.25s ease;
       width: 100%;
+      position: relative;
+      z-index: 10;
+      pointer-events: auto;
     }
     
     .glass-input:focus {
@@ -2657,6 +2663,9 @@ app.get('/', (c) => {
       cursor: pointer;
       border: none;
       transition: all 0.25s ease;
+      position: relative;
+      z-index: 10;
+      pointer-events: auto;
     }
     
     .btn-primary {
@@ -3514,6 +3523,7 @@ app.get('/', (c) => {
                 type="submit" 
                 className="btn btn-primary"
                 disabled={authLoading}
+                onClick={() => console.log('🖱️ BUTTON CLICKED!')}
                 style={{ 
                   width: '100%', 
                   padding: '16px', 
@@ -3522,7 +3532,9 @@ app.get('/', (c) => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '10px'
+                  gap: '10px',
+                  position: 'relative',
+                  zIndex: 100
                 }}
               >
                 {authLoading ? (
