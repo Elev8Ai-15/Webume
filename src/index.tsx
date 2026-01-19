@@ -2025,6 +2025,12 @@ app.get('/', (c) => {
       overflow: hidden;
     }
     
+    /* CRITICAL: Root element must be above the fixed background */
+    #root {
+      position: relative;
+      z-index: 1;
+    }
+    
     /* ===========================================================
        PREMIUM BACKGROUND - Glass Cards Image - CRYSTAL CLEAR
        The beautiful glass cards image as background - NO BLUR
