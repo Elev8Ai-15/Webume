@@ -3985,6 +3985,10 @@ app.get('/', (c) => {
                 setProfilePhoto={setProfilePhoto}
                 selectedTemplate={selectedTemplate}
                 setTemplate={setTemplate}
+                onBack={() => setView(VIEW.UPLOAD)}
+                onPreview={() => setView(VIEW.PREVIEW)}
+                onSave={saveProgress}
+                saveStatus={saveStatus}
               />
             )}
             {view === VIEW.PREVIEW && profile && (
@@ -4153,12 +4157,75 @@ app.get('/', (c) => {
     };
     
     // Builder View Component
-    const BuilderView = ({ profile, setProfile, activeTab, rawText, profilePhoto, setProfilePhoto, selectedTemplate, setTemplate }) => {
+    const BuilderView = ({ profile, setProfile, activeTab, rawText, profilePhoto, setProfilePhoto, selectedTemplate, setTemplate, onBack, onPreview, onSave, saveStatus }) => {
       const updateField = (key, value) => setProfile(p => ({ ...p, [key]: value }));
       const updateBasics = (key, value) => setProfile(p => ({ ...p, basics: { ...p.basics, [key]: value } }));
       
       return (
         <div>
+          {/* Workflow Progress Indicator */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '0',
+            marginBottom: '24px',
+            padding: '16px 20px',
+            background: 'rgba(0,0,0,0.2)',
+            borderRadius: '16px',
+            border: '1px solid rgba(255,255,255,0.08)'
+          }}>
+            {[
+              { num: 1, label: 'Upload', icon: 'fa-upload', done: true },
+              { num: 2, label: 'Edit Profile', icon: 'fa-edit', active: true },
+              { num: 3, label: 'Preview & Publish', icon: 'fa-eye', done: false }
+            ].map((step, i) => (
+              <React.Fragment key={step.num}>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: step.done ? 'pointer' : 'default',
+                  opacity: step.active ? 1 : step.done ? 0.8 : 0.4
+                }}
+                onClick={() => {
+                  if (step.num === 1) onBack();
+                  if (step.num === 3 && profile) onPreview();
+                }}>
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: step.active ? 'linear-gradient(135deg, #8B5CF6, #EC4899)' : step.done ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.1)',
+                    border: step.active ? 'none' : step.done ? '2px solid #10B981' : '2px solid rgba(255,255,255,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: step.active ? 'white' : step.done ? '#10B981' : 'rgba(255,255,255,0.5)',
+                    fontSize: '14px'
+                  }}>
+                    {step.done && !step.active ? <i className="fas fa-check"></i> : <i className={'fas ' + step.icon}></i>}
+                  </div>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: step.active ? '600' : '500',
+                    color: step.active ? 'white' : 'rgba(255,255,255,0.5)'
+                  }}>{step.label}</span>
+                </div>
+                {i < 2 && (
+                  <div style={{
+                    width: '60px',
+                    height: '2px',
+                    background: step.done ? 'linear-gradient(90deg, #10B981, rgba(255,255,255,0.2))' : 'rgba(255,255,255,0.1)',
+                    margin: '0 8px',
+                    marginBottom: '20px'
+                  }}></div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+          
           <div className="page-header">
             <div>
               <h1 className="page-title">{activeTab === 'templates' ? 'Templates' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h1>
@@ -4296,6 +4363,84 @@ app.get('/', (c) => {
                 setTemplate={setTemplate}
               />
             )}
+          </div>
+          
+          {/* Navigation Footer - Always visible */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginTop: '24px',
+            padding: '20px 24px',
+            background: 'rgba(0,0,0,0.3)',
+            borderRadius: '16px',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }}>
+            <button
+              onClick={onBack}
+              style={{
+                padding: '12px 24px',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: '10px',
+                color: 'rgba(255,255,255,0.7)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '14px'
+              }}
+            >
+              <i className="fas fa-arrow-left"></i>
+              Back to Upload
+            </button>
+            
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={onSave}
+                disabled={saveStatus === 'saving'}
+                style={{
+                  padding: '12px 24px',
+                  background: saveStatus === 'saved' ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.05)',
+                  border: '1px solid ' + (saveStatus === 'saved' ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.15)'),
+                  borderRadius: '10px',
+                  color: saveStatus === 'saved' ? '#10B981' : 'white',
+                  cursor: saveStatus === 'saving' ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '14px'
+                }}
+              >
+                {saveStatus === 'saving' ? (
+                  <><i className="fas fa-spinner fa-spin"></i> Saving...</>
+                ) : saveStatus === 'saved' ? (
+                  <><i className="fas fa-check"></i> Saved!</>
+                ) : (
+                  <><i className="fas fa-save"></i> Save Progress</>
+                )}
+              </button>
+              
+              <button
+                onClick={onPreview}
+                style={{
+                  padding: '12px 28px',
+                  background: 'linear-gradient(135deg, #8B5CF6, #EC4899)',
+                  border: 'none',
+                  borderRadius: '10px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}
+              >
+                Preview & Publish
+                <i className="fas fa-arrow-right"></i>
+              </button>
+            </div>
           </div>
         </div>
       );
@@ -6881,7 +7026,7 @@ app.get('/', (c) => {
                   Upgrade to Pro - $9.99/mo
                 </button>
                 <button
-                  onClick={() => setView(3)}
+                  onClick={() => setView(VIEW.PREVIEW)}
                   style={{
                     padding: '15px 30px',
                     fontSize: '14px',
@@ -6892,7 +7037,7 @@ app.get('/', (c) => {
                     cursor: 'pointer'
                   }}
                 >
-                  Maybe Later
+                  Back to Preview
                 </button>
               </div>
             </div>
@@ -6921,6 +7066,23 @@ app.get('/', (c) => {
               </p>
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => setView(VIEW.PREVIEW)}
+                style={{
+                  padding: '10px 20px',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '10px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <i className="fas fa-arrow-left"></i>
+                Back to Preview
+              </button>
               <button
                 onClick={() => setShowSaved(!showSaved)}
                 style={{
@@ -7701,6 +7863,13 @@ The more detail, the better the tailored resume!"
               </button>
               <button className="btn btn-secondary" onClick={() => setView(VIEW.BUILDER)}>
                 <i className="fas fa-edit"></i> Edit
+              </button>
+              <button className="btn btn-secondary" onClick={() => setView(VIEW.TAILOR)} style={{ 
+                background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+                border: 'none',
+                color: '#fff'
+              }}>
+                <i className="fas fa-magic"></i> AI Tailor
               </button>
               <button className="btn btn-primary" style={{ background: styles.gradient }} onClick={() => setShowPublishModal(true)}>
                 <i className="fas fa-share"></i> {isPublic ? 'Share' : 'Publish'}
