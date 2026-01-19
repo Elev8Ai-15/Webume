@@ -2023,12 +2023,26 @@ app.get('/', (c) => {
       height: 100%;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
     }
     
     /* CRITICAL: Root element must be above the fixed background */
     #root {
       position: relative;
       z-index: 1;
+      pointer-events: auto;
+    }
+    
+    /* Ensure all interactive elements work on touch devices */
+    input, button, textarea, select, a {
+      touch-action: manipulation;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+    
+    button {
+      -webkit-user-select: none;
+      user-select: none;
     }
     
     /* ===========================================================
@@ -3401,13 +3415,19 @@ app.get('/', (c) => {
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          padding: '20px'
+          padding: '20px',
+          position: 'relative',
+          zIndex: 10,
+          pointerEvents: 'auto'
         }}>
           <div className="glass" style={{ 
             width: '100%', 
             maxWidth: '440px', 
             padding: '48px 40px',
-            borderRadius: '28px'
+            borderRadius: '28px',
+            position: 'relative',
+            zIndex: 20,
+            pointerEvents: 'auto'
           }}>
             <div style={{ textAlign: 'center', marginBottom: '36px' }}>
               <div style={{
@@ -3476,9 +3496,11 @@ app.get('/', (c) => {
                   type="email"
                   className="glass-input"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { console.log('📧 Email input changed:', e.target.value); setEmail(e.target.value); }}
+                  onFocus={() => console.log('📧 Email input focused')}
                   placeholder="you@example.com"
-                  style={{ width: '100%', padding: '14px 16px', fontSize: '15px' }}
+                  autoComplete="email"
+                  style={{ width: '100%', padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
                 />
               </div>
               
@@ -3492,9 +3514,11 @@ app.get('/', (c) => {
                     type={showPassword ? 'text' : 'password'}
                     className="glass-input"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => { console.log('🔑 Password input changed'); setPassword(e.target.value); }}
+                    onFocus={() => console.log('🔑 Password input focused')}
                     placeholder="••••••••"
-                    style={{ width: '100%', padding: '14px 16px', fontSize: '15px', paddingRight: '50px' }}
+                    autoComplete="current-password"
+                    style={{ width: '100%', padding: '14px 16px', fontSize: '15px', paddingRight: '50px', touchAction: 'manipulation' }}
                   />
                   <button
                     type="button"
