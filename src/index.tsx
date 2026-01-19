@@ -3313,9 +3313,8 @@ app.get('/', (c) => {
           const data = await res.json();
           if (data.user) {
             setUser(data.user);
-            // Load profile from server
+            // Load profile from server - loadProfile handles setting the view
             await loadProfile();
-            setView(VIEW.UPLOAD);
           } else {
             setView(VIEW.AUTH);
           }
@@ -3330,19 +3329,26 @@ app.get('/', (c) => {
         try {
           const res = await fetch('/api/profile/load');
           const data = await res.json();
+          
           if (data.profile) {
             setProfile(data.profile);
+            if (data.profilePhoto) setProfilePhoto(data.profilePhoto);
+            if (data.selectedTemplate) setTemplate(data.selectedTemplate);
+            if (data.rawText) setRawText(data.rawText);
+            if (data.slug) setSlug(data.slug);
+            if (data.isPublic !== undefined) setIsPublic(data.isPublic);
+            if (data.profileViews) setProfileViews(data.profileViews);
             setView(VIEW.BUILDER);
             console.log('✅ Loaded profile from server');
+          } else {
+            // No profile exists, go to upload
+            setView(VIEW.UPLOAD);
+            console.log('📤 No profile found, redirecting to upload');
           }
-          if (data.profilePhoto) setProfilePhoto(data.profilePhoto);
-          if (data.selectedTemplate) setTemplate(data.selectedTemplate);
-          if (data.rawText) setRawText(data.rawText);
-          if (data.slug) setSlug(data.slug);
-          if (data.isPublic !== undefined) setIsPublic(data.isPublic);
-          if (data.profileViews) setProfileViews(data.profileViews);
         } catch (e) {
           console.error('Error loading profile:', e);
+          // On error, go to upload as fallback
+          setView(VIEW.UPLOAD);
         }
       };
       
