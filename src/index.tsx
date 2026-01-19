@@ -1674,22 +1674,7 @@ app.get('/manifest.json', (c) => {
     ],
     categories: ['business', 'productivity', 'lifestyle'],
     iarc_rating_id: '',
-    screenshots: [
-      {
-        src: '/static/screenshot-wide.png',
-        sizes: '1280x720',
-        type: 'image/png',
-        form_factor: 'wide',
-        label: 'WebUME Dashboard - Build Your Digital Resume'
-      },
-      {
-        src: '/static/screenshot-narrow.png', 
-        sizes: '750x1334',
-        type: 'image/png',
-        form_factor: 'narrow',
-        label: 'WebUME Mobile - Career Timeline View'
-      }
-    ],
+    screenshots: [],  // Screenshots are optional - add when available
     shortcuts: [
       { 
         name: 'Upload Resume', 
