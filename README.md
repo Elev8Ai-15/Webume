@@ -7,8 +7,34 @@
 | Environment | URL |
 |-------------|-----|
 | **Production** | https://webume.pages.dev |
-| **Latest Deploy** | https://67dcea01.webume.pages.dev |
+| **Latest Deploy** | https://d814307c.webume.pages.dev |
 | **Sandbox** | https://3000-izyu2fpqppfan5ciwputt-2e1b9533.sandbox.novita.ai |
+
+---
+
+## 🎯 NEW: AI Resume Tailor (Premium Feature)
+
+Paste any job description and get an AI-customized resume in seconds!
+
+### How It Works:
+1. Navigate to your profile preview
+2. Click "AI Tailor" button
+3. Paste the job description
+4. Get instant results:
+   - **Match Score**: 0-100 compatibility rating
+   - **Keyword Analysis**: ATS-optimized keywords
+   - **Tailored Summary**: Rewritten for the specific role
+   - **Interview Tips**: Role-specific questions to prepare
+   - **Cover Letter Hints**: Key points to emphasize
+
+### Requirements:
+- Pro ($9.99/mo) or Enterprise ($29.99/mo) subscription
+- Active profile with experience data
+
+### Save & Manage:
+- Save unlimited tailored resumes
+- Access saved versions anytime
+- Delete when no longer needed
 
 ---
 
@@ -201,6 +227,10 @@ resume, cv, career, job search, professional profile, digital resume, job applic
 | `/api/stripe/subscription` | GET | Get subscription status |
 | `/api/ats-score` | POST | ATS compatibility |
 | `/api/parse-resume` | POST | AI resume parsing |
+| `/api/tailor-resume` | POST | AI resume tailoring (Pro+) |
+| `/api/tailored-resumes` | GET | List saved tailored resumes |
+| `/api/tailored-resumes/save` | POST | Save a tailored resume |
+| `/api/tailored-resumes/:id` | DELETE | Delete a tailored resume |
 
 ---
 
@@ -246,9 +276,17 @@ npx wrangler pages deploy dist --project-name webume
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 2.2.0 | 2026-01-19 | **AI Resume Tailor**: Job-specific customization, match scoring, interview tips |
 | 2.1.0 | 2026-01-19 | **App Store Ready**: PWA compliance, all icons, service worker, Stripe integration |
 | 2.0.0 | 2026-01-10 | **Career Tree**: Interactive employer pages |
 | 1.0.0 | 2026-01-10 | MVP: Auth, templates, public profiles |
+
+---
+
+## 📄 Documentation
+
+- **README.md**: This file - overview and quick start
+- **[MVP_ROADMAP.md](./MVP_ROADMAP.md)**: Comprehensive MVP analysis, market research, milestones, risks, and resources
 
 ---
 
