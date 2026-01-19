@@ -3356,6 +3356,7 @@ app.get('/', (c) => {
       const [password, setPassword] = useState('');
       const [name, setName] = useState('');
       const [error, setError] = useState('');
+      const [showPassword, setShowPassword] = useState(false);
       
       const handleSubmit = async (e) => {
         e.preventDefault();
@@ -3461,14 +3462,36 @@ app.get('/', (c) => {
                   <i className="fas fa-lock" style={{ marginRight: '8px', color: 'var(--purple-main)' }}></i>
                   Password
                 </label>
-                <input
-                  type="password"
-                  className="glass-input"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  style={{ width: '100%', padding: '14px 16px', fontSize: '15px' }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    className="glass-input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    style={{ width: '100%', padding: '14px 16px', fontSize: '15px', paddingRight: '50px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: 'rgba(255,255,255,0.5)',
+                      cursor: 'pointer',
+                      padding: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <i className={showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'}></i>
+                  </button>
+                </div>
               </div>
               
               <button 
