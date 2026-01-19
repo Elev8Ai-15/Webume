@@ -21,21 +21,24 @@ const STRIPE_PRODUCTS = {
     name: 'Free',
     price: 0,
     priceId: null,
-    features: ['1 Profile', 'Basic Templates', 'Public URL', 'ATS Score Check']
+    features: ['1 Profile', 'Basic Templates', 'Public URL', 'ATS Score Check'],
+    limits: { tailoredResumes: 0, profiles: 1 }
   },
   PRO: {
     id: 'pro',
     name: 'Pro',
     price: 999, // $9.99/month in cents
     priceId: 'price_pro_monthly', // Will be created in Stripe
-    features: ['Unlimited Profiles', 'All 10 Templates', 'Custom Domain', 'Priority Support', 'PDF Export', 'Analytics Dashboard', 'Remove Watermark']
+    features: ['🎯 AI Resume Tailor (Unlimited)', 'Unlimited Profiles', 'All 10 Templates', 'Custom Domain', 'Priority Support', 'PDF Export', 'Analytics Dashboard', 'Remove Watermark'],
+    limits: { tailoredResumes: -1, profiles: -1 } // -1 = unlimited
   },
   ENTERPRISE: {
     id: 'enterprise', 
     name: 'Enterprise',
     price: 2999, // $29.99/month in cents
     priceId: 'price_enterprise_monthly',
-    features: ['Everything in Pro', 'Team Management', 'API Access', 'White Label', 'Dedicated Support', 'Custom Integrations', 'SLA Guarantee']
+    features: ['🎯 AI Resume Tailor (Unlimited)', 'Everything in Pro', 'Team Management', 'API Access', 'White Label', 'Dedicated Support', 'Custom Integrations', 'SLA Guarantee'],
+    limits: { tailoredResumes: -1, profiles: -1 }
   }
 };
 
@@ -1054,6 +1057,279 @@ ABSOLUTE REQUIREMENTS:
       } catch {}
       return c.json({ error: 'Parse failed', raw: aiText }, 500);
     }
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+// ============================================================
+// AI RESUME TAILOR - Premium Feature (Pro/Enterprise only)
+// ============================================================
+
+// Check if user has premium subscription
+function isPremiumUser(user: any): boolean {
+  const planId = user?.subscription?.planId?.toLowerCase();
+  return planId === 'pro' || planId === 'enterprise';
+}
+
+// Get user's tailored resumes
+app.get('/api/tailored-resumes', async (c) => {
+  const user = await getCurrentUser(c);
+  if (!user) {
+    return c.json({ error: 'Authentication required' }, 401);
+  }
+  
+  // Get tailored resumes from user data
+  const tailoredResumes = user.tailoredResumes || [];
+  return c.json({ resumes: tailoredResumes });
+});
+
+// Save a tailored resume
+app.post('/api/tailored-resumes/save', async (c) => {
+  const user = await getCurrentUser(c);
+  if (!user) {
+    return c.json({ error: 'Authentication required' }, 401);
+  }
+  
+  if (!isPremiumUser(user)) {
+    return c.json({ 
+      error: 'Premium feature', 
+      message: 'AI Resume Tailoring requires a Pro or Enterprise subscription',
+      upgradeUrl: '/pricing'
+    }, 403);
+  }
+  
+  try {
+    const { tailoredResume } = await c.req.json();
+    
+    if (!tailoredResume || !tailoredResume.jobTitle || !tailoredResume.company) {
+      return c.json({ error: 'Invalid tailored resume data' }, 400);
+    }
+    
+    // Initialize tailored resumes array if doesn't exist
+    if (!user.tailoredResumes) {
+      user.tailoredResumes = [];
+    }
+    
+    // Add ID and timestamp
+    const newResume = {
+      id: Date.now(),
+      ...tailoredResume,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    // Limit to 50 saved resumes (prevent storage bloat)
+    if (user.tailoredResumes.length >= 50) {
+      user.tailoredResumes = user.tailoredResumes.slice(-49);
+    }
+    
+    user.tailoredResumes.push(newResume);
+    
+    await c.env.USERS_KV.put(`user:${user.email.toLowerCase()}`, JSON.stringify(user));
+    await auditLog(c, 'TAILORED_RESUME_SAVED', user.email, { jobTitle: tailoredResume.jobTitle, company: tailoredResume.company });
+    
+    return c.json({ success: true, resume: newResume });
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+// Delete a tailored resume
+app.delete('/api/tailored-resumes/:id', async (c) => {
+  const user = await getCurrentUser(c);
+  if (!user) {
+    return c.json({ error: 'Authentication required' }, 401);
+  }
+  
+  const id = parseInt(c.req.param('id'));
+  
+  if (!user.tailoredResumes) {
+    return c.json({ error: 'No tailored resumes found' }, 404);
+  }
+  
+  user.tailoredResumes = user.tailoredResumes.filter((r: any) => r.id !== id);
+  await c.env.USERS_KV.put(`user:${user.email.toLowerCase()}`, JSON.stringify(user));
+  
+  return c.json({ success: true });
+});
+
+// AI Resume Tailor - Generate tailored resume for specific job
+app.post('/api/tailor-resume', async (c) => {
+  const user = await getCurrentUser(c);
+  if (!user) {
+    return c.json({ error: 'Authentication required' }, 401);
+  }
+  
+  // Premium feature check
+  if (!isPremiumUser(user)) {
+    return c.json({ 
+      error: 'Premium feature', 
+      message: 'AI Resume Tailoring requires a Pro or Enterprise subscription. Upgrade now to create unlimited tailored resumes for every job application!',
+      upgradeUrl: '/pricing',
+      plans: {
+        pro: { price: '$9.99/mo', features: ['Unlimited Tailored Resumes', 'All 10 Templates', 'PDF Export'] },
+        enterprise: { price: '$29.99/mo', features: ['Everything in Pro', 'Team Management', 'API Access'] }
+      }
+    }, 403);
+  }
+  
+  try {
+    const { jobDescription, jobTitle, company, jobUrl } = await c.req.json();
+    
+    if (!jobDescription) {
+      return c.json({ error: 'Job description is required' }, 400);
+    }
+    
+    if (!user.profile) {
+      return c.json({ error: 'Please complete your master profile first before tailoring resumes' }, 400);
+    }
+    
+    const masterProfile = user.profile;
+    
+    const prompt = `You are an elite executive resume writer, career strategist, and ATS optimization expert. Your task is to create a PERFECTLY TAILORED resume that maximizes this candidate's chances of getting an interview.
+
+## THE TARGET JOB
+Job Title: ${jobTitle || 'Not specified'}
+Company: ${company || 'Not specified'}
+Job Description:
+${jobDescription}
+
+## THE CANDIDATE'S MASTER PROFILE
+${JSON.stringify(masterProfile, null, 2)}
+
+## YOUR MISSION
+Create a tailored version of this candidate's resume that:
+
+1. **KEYWORD OPTIMIZATION** (Critical for ATS):
+   - Extract ALL keywords, skills, and requirements from the job description
+   - Naturally incorporate these keywords throughout the resume
+   - Match the exact terminology used in the job posting
+   - Include both hard skills and soft skills mentioned
+
+2. **EXPERIENCE REFRAMING**:
+   - Reorder and prioritize experiences most relevant to this role
+   - Rewrite bullet points to emphasize transferable skills
+   - Add context that connects past work to this job's requirements
+   - Quantify achievements where possible (%, $, numbers)
+
+3. **SUMMARY CUSTOMIZATION**:
+   - Write a new professional summary specifically targeting this role
+   - Lead with the most relevant qualifications
+   - Include 2-3 key achievements that match job requirements
+   - Use power words that resonate with this industry
+
+4. **SKILLS PRIORITIZATION**:
+   - Reorder skills to put most relevant ones first
+   - Add any skills from job description that candidate has but didn't list
+   - Group skills by category if helpful
+
+5. **MATCH ANALYSIS**:
+   - Calculate a match score (0-100) based on keyword and requirement overlap
+   - List the top 10 matching keywords/skills
+   - Identify any gaps or areas to address in cover letter
+
+Return a JSON object with this structure:
+{
+  "tailoredProfile": {
+    "basics": {
+      "name": "...",
+      "title": "Tailored title matching job",
+      "tagline": "Compelling tagline for this specific role",
+      "summary": "3-4 sentence summary targeting this job",
+      "email": "...",
+      "phone": "...",
+      "location": "..."
+    },
+    "experience": [
+      {
+        "company": "...",
+        "role": "...",
+        "startDate": "...",
+        "endDate": "...",
+        "description": "Rewritten to emphasize relevance",
+        "highlights": ["Achievement 1 with metrics", "Achievement 2", "..."],
+        "relevanceScore": 85
+      }
+    ],
+    "skills": ["Most relevant skill", "Second most relevant", "..."],
+    "education": [...],
+    "certifications": [...]
+  },
+  "matchAnalysis": {
+    "overallScore": 85,
+    "matchedKeywords": ["keyword1", "keyword2", "..."],
+    "missingKeywords": ["keyword they want but candidate lacks"],
+    "strengths": ["Top strength for this role", "..."],
+    "suggestions": ["Consider mentioning X in interview", "..."]
+  },
+  "coverLetterHints": [
+    "Address the X requirement by discussing...",
+    "Emphasize your experience with Y...",
+    "..."
+  ],
+  "interviewTips": [
+    "Be prepared to discuss your experience with...",
+    "Have specific examples ready for...",
+    "..."
+  ]
+}`;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 8192,
+          }
+        })
+      }
+    );
+    
+    const data = await response.json();
+    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!aiText) {
+      return c.json({ error: 'AI failed to generate tailored resume' }, 500);
+    }
+    
+    // Parse JSON from response
+    try {
+      const jsonMatch = aiText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const result = JSON.parse(jsonMatch[0]);
+        
+        // Add metadata
+        result.metadata = {
+          jobTitle: jobTitle || 'Unknown Position',
+          company: company || 'Unknown Company',
+          jobUrl: jobUrl || null,
+          createdAt: new Date().toISOString(),
+          originalJobDescription: jobDescription.substring(0, 500) + '...'
+        };
+        
+        await auditLog(c, 'RESUME_TAILORED', user.email, { 
+          jobTitle: result.metadata.jobTitle, 
+          company: result.metadata.company,
+          matchScore: result.matchAnalysis?.overallScore 
+        });
+        
+        return c.json(result);
+      }
+    } catch (parseError) {
+      // Return raw text if JSON parsing fails
+      return c.json({ 
+        error: 'Failed to parse AI response', 
+        raw: aiText 
+      }, 500);
+    }
+    
+    return c.json({ error: 'Invalid AI response format' }, 500);
+    
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
   }
@@ -2693,7 +2969,7 @@ app.get('/', (c) => {
       }
     };
     
-    const VIEW = { AUTH: 0, UPLOAD: 1, BUILDER: 2, PREVIEW: 3 };
+    const VIEW = { AUTH: 0, UPLOAD: 1, BUILDER: 2, PREVIEW: 3, TAILOR: 4 };
     
     // INDUSTRY-SPECIFIC TEMPLATES - 10 Premium Options
     const TEMPLATE_CATEGORIES = [
@@ -3592,6 +3868,24 @@ app.get('/', (c) => {
                 <i className="fas fa-eye"></i>
                 Live Preview
               </button>
+              <button 
+                className="nav-btn" 
+                onClick={() => profile && setView(VIEW.TAILOR)}
+                style={{ 
+                  background: 'linear-gradient(135deg, rgba(236,72,153,0.2), rgba(139,92,246,0.2))',
+                  borderColor: 'rgba(236,72,153,0.4)'
+                }}
+              >
+                <i className="fas fa-magic" style={{ color: '#EC4899' }}></i>
+                <span style={{ color: '#EC4899' }}>AI Tailor</span>
+                <span style={{ 
+                  fontSize: '9px', 
+                  background: 'linear-gradient(135deg, #EC4899, #8B5CF6)',
+                  padding: '2px 6px',
+                  borderRadius: '10px',
+                  marginLeft: '4px'
+                }}>PRO</span>
+              </button>
               <button className="nav-btn" onClick={() => setView(VIEW.UPLOAD)}>
                 <i className="fas fa-upload"></i>
                 Upload New
@@ -3717,6 +4011,13 @@ app.get('/', (c) => {
                 isPublic={isPublic}
                 setIsPublic={setIsPublic}
                 profileViews={profileViews}
+              />
+            )}
+            {view === VIEW.TAILOR && profile && (
+              <TailorView
+                profile={profile}
+                user={user}
+                setView={setView}
               />
             )}
           </main>
@@ -6419,6 +6720,601 @@ app.get('/', (c) => {
             .media-hover:hover, div:hover > .media-hover { opacity: 1 !important; }
             div:hover > .delete-btn { opacity: 1 !important; }
           \`}</style>
+        </div>
+      );
+    };
+    
+    // ============================================================
+    // AI RESUME TAILOR VIEW - Premium Feature
+    // ============================================================
+    const TailorView = ({ profile, user, setView }) => {
+      const [jobDescription, setJobDescription] = useState('');
+      const [jobTitle, setJobTitle] = useState('');
+      const [company, setCompany] = useState('');
+      const [jobUrl, setJobUrl] = useState('');
+      const [loading, setLoading] = useState(false);
+      const [result, setResult] = useState(null);
+      const [error, setError] = useState(null);
+      const [savedResumes, setSavedResumes] = useState([]);
+      const [showSaved, setShowSaved] = useState(false);
+      const [saving, setSaving] = useState(false);
+      
+      const isPremium = user?.subscription?.planId === 'pro' || user?.subscription?.planId === 'enterprise';
+      
+      // Load saved resumes on mount
+      useEffect(() => {
+        if (isPremium) {
+          fetch('/api/tailored-resumes')
+            .then(res => res.json())
+            .then(data => setSavedResumes(data.resumes || []))
+            .catch(() => {});
+        }
+      }, [isPremium]);
+      
+      const handleTailor = async () => {
+        if (!jobDescription.trim()) {
+          setError('Please paste or enter a job description');
+          return;
+        }
+        
+        setLoading(true);
+        setError(null);
+        setResult(null);
+        
+        try {
+          const res = await fetch('/api/tailor-resume', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jobDescription, jobTitle, company, jobUrl })
+          });
+          
+          const data = await res.json();
+          
+          if (!res.ok) {
+            if (res.status === 403) {
+              setError(data);
+            } else {
+              setError({ message: data.error || 'Failed to tailor resume' });
+            }
+            return;
+          }
+          
+          setResult(data);
+        } catch (err) {
+          setError({ message: 'Network error. Please try again.' });
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      const handleSave = async () => {
+        if (!result) return;
+        
+        setSaving(true);
+        try {
+          const res = await fetch('/api/tailored-resumes/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tailoredResume: {
+                jobTitle: result.metadata?.jobTitle || jobTitle || 'Untitled Position',
+                company: result.metadata?.company || company || 'Unknown Company',
+                jobUrl,
+                matchScore: result.matchAnalysis?.overallScore,
+                tailoredProfile: result.tailoredProfile,
+                matchAnalysis: result.matchAnalysis,
+                coverLetterHints: result.coverLetterHints,
+                interviewTips: result.interviewTips
+              }
+            })
+          });
+          
+          const data = await res.json();
+          if (data.success) {
+            setSavedResumes(prev => [...prev, data.resume]);
+            alert('✅ Tailored resume saved successfully!');
+          }
+        } catch (err) {
+          alert('Failed to save resume');
+        } finally {
+          setSaving(false);
+        }
+      };
+      
+      const handleDelete = async (id) => {
+        if (!confirm('Delete this tailored resume?')) return;
+        
+        try {
+          await fetch(\`/api/tailored-resumes/\${id}\`, { method: 'DELETE' });
+          setSavedResumes(prev => prev.filter(r => r.id !== id));
+        } catch (err) {
+          alert('Failed to delete');
+        }
+      };
+      
+      // Premium upgrade prompt
+      if (!isPremium) {
+        return (
+          <div style={{ padding: '40px', maxWidth: '800px', margin: '0 auto' }}>
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(236,72,153,0.15), rgba(139,92,246,0.15))',
+              border: '1px solid rgba(236,72,153,0.3)',
+              borderRadius: '20px',
+              padding: '50px',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '60px', marginBottom: '20px' }}>🎯</div>
+              <h2 style={{ fontSize: '28px', marginBottom: '15px', background: 'linear-gradient(135deg, #EC4899, #8B5CF6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                AI Resume Tailor
+              </h2>
+              <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.7)', marginBottom: '30px', maxWidth: '500px', margin: '0 auto 30px' }}>
+                Create perfectly tailored resumes for every job application. Our AI analyzes job descriptions and customizes your resume to maximize your chances of landing interviews.
+              </p>
+              
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+                gap: '20px', 
+                marginBottom: '40px',
+                textAlign: 'left'
+              }}>
+                {[
+                  { icon: '🔍', title: 'Keyword Optimization', desc: 'Match exact ATS keywords' },
+                  { icon: '✨', title: 'Smart Reframing', desc: 'Highlight relevant experience' },
+                  { icon: '📊', title: 'Match Score', desc: 'See how well you fit' },
+                  { icon: '💡', title: 'Interview Tips', desc: 'Prep for tough questions' }
+                ].map((f, i) => (
+                  <div key={i} style={{ 
+                    background: 'rgba(0,0,0,0.3)', 
+                    padding: '20px', 
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    <div style={{ fontSize: '24px', marginBottom: '8px' }}>{f.icon}</div>
+                    <div style={{ fontWeight: '600', marginBottom: '4px' }}>{f.title}</div>
+                    <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{f.desc}</div>
+                  </div>
+                ))}
+              </div>
+              
+              <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => window.location.href = '/?upgrade=pro'}
+                  style={{
+                    padding: '15px 40px',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    background: 'linear-gradient(135deg, #EC4899, #8B5CF6)',
+                    border: 'none',
+                    borderRadius: '12px',
+                    color: 'white',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Upgrade to Pro - $9.99/mo
+                </button>
+                <button
+                  onClick={() => setView(3)}
+                  style={{
+                    padding: '15px 30px',
+                    fontSize: '14px',
+                    background: 'transparent',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: '12px',
+                    color: 'rgba(255,255,255,0.6)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      
+      return (
+        <div style={{ padding: '30px', maxWidth: '1400px', margin: '0 auto' }}>
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+            <div>
+              <h1 style={{ 
+                fontSize: '28px', 
+                fontWeight: '700',
+                background: 'linear-gradient(135deg, #EC4899, #8B5CF6)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                marginBottom: '5px'
+              }}>
+                <i className="fas fa-magic" style={{ marginRight: '10px' }}></i>
+                AI Resume Tailor
+              </h1>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>
+                Paste a job description and get a perfectly tailored resume in seconds
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => setShowSaved(!showSaved)}
+                style={{
+                  padding: '10px 20px',
+                  background: showSaved ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '10px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <i className="fas fa-folder-open"></i>
+                Saved ({savedResumes.length})
+              </button>
+            </div>
+          </div>
+          
+          {/* Saved Resumes Panel */}
+          {showSaved && (
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '16px',
+              padding: '20px',
+              marginBottom: '30px',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <h3 style={{ marginBottom: '15px', fontSize: '16px' }}>
+                <i className="fas fa-history" style={{ marginRight: '10px', color: '#8B5CF6' }}></i>
+                Saved Tailored Resumes
+              </h3>
+              {savedResumes.length === 0 ? (
+                <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: '30px' }}>
+                  No saved resumes yet. Tailor your first resume below!
+                </p>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '15px' }}>
+                  {savedResumes.map(resume => (
+                    <div key={resume.id} style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      borderRadius: '12px',
+                      padding: '15px',
+                      border: '1px solid rgba(255,255,255,0.1)'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                        <div>
+                          <div style={{ fontWeight: '600', marginBottom: '4px' }}>{resume.jobTitle}</div>
+                          <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{resume.company}</div>
+                        </div>
+                        <div style={{
+                          background: resume.matchScore >= 80 ? 'rgba(16,185,129,0.2)' : resume.matchScore >= 60 ? 'rgba(245,158,11,0.2)' : 'rgba(239,68,68,0.2)',
+                          color: resume.matchScore >= 80 ? '#10B981' : resume.matchScore >= 60 ? '#F59E0B' : '#EF4444',
+                          padding: '4px 10px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: '600'
+                        }}>
+                          {resume.matchScore}%
+                        </div>
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '10px' }}>
+                        {new Date(resume.createdAt).toLocaleDateString()}
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                        <button
+                          onClick={() => setResult({ tailoredProfile: resume.tailoredProfile, matchAnalysis: resume.matchAnalysis, coverLetterHints: resume.coverLetterHints, interviewTips: resume.interviewTips, metadata: { jobTitle: resume.jobTitle, company: resume.company } })}
+                          style={{ flex: 1, padding: '8px', background: 'rgba(139,92,246,0.2)', border: 'none', borderRadius: '8px', color: '#A78BFA', cursor: 'pointer', fontSize: '12px' }}
+                        >
+                          <i className="fas fa-eye"></i> View
+                        </button>
+                        <button
+                          onClick={() => handleDelete(resume.id)}
+                          style={{ padding: '8px 12px', background: 'rgba(239,68,68,0.1)', border: 'none', borderRadius: '8px', color: '#EF4444', cursor: 'pointer', fontSize: '12px' }}
+                        >
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          
+          <div style={{ display: 'grid', gridTemplateColumns: result ? '1fr 1fr' : '1fr', gap: '30px' }}>
+            {/* Input Section */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '16px',
+              padding: '25px',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <h3 style={{ marginBottom: '20px', fontSize: '16px' }}>
+                <i className="fas fa-paste" style={{ marginRight: '10px', color: '#EC4899' }}></i>
+                Job Details
+              </h3>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                    Job Title
+                  </label>
+                  <input
+                    type="text"
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                    placeholder="e.g., Senior Product Manager"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '10px',
+                      color: 'white',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                    Company
+                  </label>
+                  <input
+                    type="text"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    placeholder="e.g., Google, Stripe, etc."
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '10px',
+                      color: 'white',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+              </div>
+              
+              <div style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                  Job Posting URL (optional)
+                </label>
+                <input
+                  type="url"
+                  value={jobUrl}
+                  onChange={(e) => setJobUrl(e.target.value)}
+                  placeholder="https://..."
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '10px',
+                    color: 'white',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+              
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                  Job Description *
+                </label>
+                <textarea
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  placeholder="Paste the full job description here...
+
+Include:
+• Responsibilities
+• Requirements
+• Qualifications
+• Nice-to-haves
+
+The more detail, the better the tailored resume!"
+                  style={{
+                    width: '100%',
+                    minHeight: '300px',
+                    padding: '15px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '10px',
+                    color: 'white',
+                    fontSize: '14px',
+                    resize: 'vertical',
+                    lineHeight: '1.6'
+                  }}
+                />
+              </div>
+              
+              {error && error.message && (
+                <div style={{
+                  background: 'rgba(239,68,68,0.1)',
+                  border: '1px solid rgba(239,68,68,0.3)',
+                  borderRadius: '10px',
+                  padding: '15px',
+                  marginBottom: '20px',
+                  color: '#EF4444'
+                }}>
+                  <i className="fas fa-exclamation-circle" style={{ marginRight: '8px' }}></i>
+                  {error.message}
+                </div>
+              )}
+              
+              <button
+                onClick={handleTailor}
+                disabled={loading || !jobDescription.trim()}
+                style={{
+                  width: '100%',
+                  padding: '15px',
+                  background: loading ? 'rgba(139,92,246,0.3)' : 'linear-gradient(135deg, #EC4899, #8B5CF6)',
+                  border: 'none',
+                  borderRadius: '12px',
+                  color: 'white',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px'
+                }}
+              >
+                {loading ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin"></i>
+                    Tailoring Your Resume...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-magic"></i>
+                    Tailor My Resume
+                  </>
+                )}
+              </button>
+            </div>
+            
+            {/* Result Section */}
+            {result && (
+              <div style={{
+                background: 'rgba(0,0,0,0.3)',
+                borderRadius: '16px',
+                padding: '25px',
+                border: '1px solid rgba(16,185,129,0.3)',
+                maxHeight: 'calc(100vh - 200px)',
+                overflowY: 'auto'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                  <h3 style={{ fontSize: '16px' }}>
+                    <i className="fas fa-check-circle" style={{ marginRight: '10px', color: '#10B981' }}></i>
+                    Tailored Resume
+                  </h3>
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    style={{
+                      padding: '8px 16px',
+                      background: 'rgba(16,185,129,0.2)',
+                      border: '1px solid rgba(16,185,129,0.3)',
+                      borderRadius: '8px',
+                      color: '#10B981',
+                      cursor: 'pointer',
+                      fontSize: '13px'
+                    }}
+                  >
+                    {saving ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-save"></i>}
+                    {' '}Save
+                  </button>
+                </div>
+                
+                {/* Match Score */}
+                {result.matchAnalysis && (
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.1))',
+                    borderRadius: '12px',
+                    padding: '20px',
+                    marginBottom: '20px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ 
+                      fontSize: '48px', 
+                      fontWeight: '700',
+                      color: result.matchAnalysis.overallScore >= 80 ? '#10B981' : result.matchAnalysis.overallScore >= 60 ? '#F59E0B' : '#EF4444'
+                    }}>
+                      {result.matchAnalysis.overallScore}%
+                    </div>
+                    <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>Match Score</div>
+                    
+                    {result.matchAnalysis.matchedKeywords?.length > 0 && (
+                      <div style={{ marginTop: '15px' }}>
+                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>Matched Keywords</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center' }}>
+                          {result.matchAnalysis.matchedKeywords.slice(0, 8).map((kw, i) => (
+                            <span key={i} style={{
+                              background: 'rgba(16,185,129,0.2)',
+                              padding: '4px 10px',
+                              borderRadius: '20px',
+                              fontSize: '11px',
+                              color: '#10B981'
+                            }}>{kw}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Tailored Summary */}
+                {result.tailoredProfile?.basics && (
+                  <div style={{ marginBottom: '20px' }}>
+                    <h4 style={{ fontSize: '14px', marginBottom: '10px', color: 'rgba(255,255,255,0.6)' }}>
+                      <i className="fas fa-user" style={{ marginRight: '8px' }}></i>
+                      Tailored Summary
+                    </h4>
+                    <div style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      borderRadius: '10px',
+                      padding: '15px'
+                    }}>
+                      <div style={{ fontWeight: '600', marginBottom: '5px' }}>{result.tailoredProfile.basics.title}</div>
+                      <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.6' }}>
+                        {result.tailoredProfile.basics.summary}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Cover Letter Hints */}
+                {result.coverLetterHints?.length > 0 && (
+                  <div style={{ marginBottom: '20px' }}>
+                    <h4 style={{ fontSize: '14px', marginBottom: '10px', color: 'rgba(255,255,255,0.6)' }}>
+                      <i className="fas fa-envelope" style={{ marginRight: '8px' }}></i>
+                      Cover Letter Tips
+                    </h4>
+                    <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '15px' }}>
+                      {result.coverLetterHints.map((hint, i) => (
+                        <div key={i} style={{ 
+                          display: 'flex', 
+                          gap: '10px', 
+                          marginBottom: i < result.coverLetterHints.length - 1 ? '10px' : 0,
+                          fontSize: '13px',
+                          color: 'rgba(255,255,255,0.7)'
+                        }}>
+                          <span style={{ color: '#8B5CF6' }}>•</span>
+                          {hint}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Interview Tips */}
+                {result.interviewTips?.length > 0 && (
+                  <div>
+                    <h4 style={{ fontSize: '14px', marginBottom: '10px', color: 'rgba(255,255,255,0.6)' }}>
+                      <i className="fas fa-comments" style={{ marginRight: '8px' }}></i>
+                      Interview Prep
+                    </h4>
+                    <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '15px' }}>
+                      {result.interviewTips.map((tip, i) => (
+                        <div key={i} style={{ 
+                          display: 'flex', 
+                          gap: '10px', 
+                          marginBottom: i < result.interviewTips.length - 1 ? '10px' : 0,
+                          fontSize: '13px',
+                          color: 'rgba(255,255,255,0.7)'
+                        }}>
+                          <span style={{ color: '#EC4899' }}>•</span>
+                          {tip}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       );
     };
