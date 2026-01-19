@@ -7,135 +7,186 @@
 | Environment | URL |
 |-------------|-----|
 | **Production** | https://webume.pages.dev |
+| **Latest Deploy** | https://67dcea01.webume.pages.dev |
 | **Sandbox** | https://3000-izyu2fpqppfan5ciwputt-2e1b9533.sandbox.novita.ai |
+
+---
+
+## 📱 App Store Publishing Guide
+
+### ✅ PWA Status: READY FOR PUBLISHING
+
+WebUME is fully PWA-compliant and ready for app store submission.
+
+#### PWA Assets Verified:
+- ✅ **Manifest**: Full Web App Manifest with all required fields
+- ✅ **Service Worker**: Offline support, caching, push notifications
+- ✅ **Icons**: All sizes (48, 72, 96, 128, 144, 152, 192, 256, 384, 512, 1024)
+- ✅ **Maskable Icons**: 192x192 and 512x512 for adaptive icons
+- ✅ **Scope**: Properly defined start_url and scope
+- ✅ **Display**: Standalone mode for app-like experience
+
+---
+
+### 🤖 Google Play Store (Android)
+
+**Method 1: PWABuilder (Recommended)**
+1. Go to https://www.pwabuilder.com/
+2. Enter URL: `https://webume.pages.dev`
+3. Click "Start" → PWABuilder will analyze your PWA
+4. Click "Package for stores" → Select "Android"
+5. Choose options:
+   - Package ID: `ai.webume.app`
+   - App name: `Webumé`
+   - Short name: `Webumé`
+   - Version: `1.0.0`
+6. Download the generated APK/AAB
+7. Submit to Google Play Console
+
+**Method 2: Bubblewrap (CLI)**
+```bash
+npx @aspect-dev/aspect-cli pack https://webume.pages.dev
+```
+
+**Google Play Requirements Met:**
+| Requirement | Status |
+|-------------|--------|
+| 512x512 icon | ✅ `/static/icon-512.png` |
+| Maskable icon | ✅ `/static/icon-512-maskable.png` |
+| Manifest | ✅ Complete |
+| HTTPS | ✅ Cloudflare |
+| Service Worker | ✅ `/static/sw.js` |
+
+---
+
+### 🍎 Apple App Store (iOS)
+
+**Requirements:**
+- Apple Developer Account ($99/year)
+- Xcode on macOS
+- App Store Connect access
+
+**Method: PWABuilder**
+1. Go to https://www.pwabuilder.com/
+2. Enter URL: `https://webume.pages.dev`
+3. Click "Package for stores" → Select "iOS"
+4. Download Xcode project
+5. Open in Xcode, sign with your Apple Developer certificate
+6. Archive and submit to App Store Connect
+
+**Apple App Store Requirements Met:**
+| Requirement | Status |
+|-------------|--------|
+| Apple touch icons | ✅ 152x152, 180x180, 167x167 |
+| Web app capable | ✅ `apple-mobile-web-app-capable` |
+| Status bar style | ✅ `black-translucent` |
+| App name meta | ✅ `apple-mobile-web-app-title` |
+
+---
+
+### 🪟 Microsoft Store (Windows)
+
+**Method: PWABuilder**
+1. Go to https://www.pwabuilder.com/
+2. Enter URL: `https://webume.pages.dev`
+3. Click "Package for stores" → Select "Windows"
+4. Download MSIX package
+5. Submit to Microsoft Partner Center
+
+---
+
+### 📋 App Store Listing Content
+
+**App Name:** Webumé - Digital Resume
+
+**Short Description:**
+Transform your resume into an immersive digital experience. AI-powered career profiles that get you hired.
+
+**Full Description:**
+Webumé revolutionizes how professionals present their career history. Stop reducing 10 years of experience to a single paragraph.
+
+🌳 INTERACTIVE CAREER TREE
+• Each employer becomes its own detailed experience page
+• Click to expand: projects, achievements, challenges, media
+• Showcase the full story of your professional journey
+
+🤖 AI-POWERED RESUME PARSING  
+• Upload PDF, DOCX, or TXT resumes
+• Google Gemini AI extracts and structures your data
+• Intelligent keyword optimization
+
+🎨 10 PROFESSIONAL TEMPLATES
+• Executive, Corporate, Nonprofit
+• Healthcare, Restaurant, Trades, Beauty  
+• Creative, Tech Pioneer, Minimal
+
+📊 ATS COMPATIBILITY SCORING
+• Real-time score out of 100
+• Keyword analysis and suggestions
+• Beat the applicant tracking systems
+
+🔗 SHAREABLE PUBLIC PROFILES
+• Custom URLs (webume.pages.dev/p/your-name)
+• QR code generation
+• One-click social sharing
+
+✨ PREMIUM FEATURES
+• Cross-device sync
+• Profile analytics
+• Unlimited media uploads
+
+**Keywords:**
+resume, cv, career, job search, professional profile, digital resume, job application, employment, linkedin alternative, portfolio
+
+**Category:** Business / Productivity
+
+---
+
+## 💳 Pricing Tiers
+
+| Plan | Price | Features |
+|------|-------|----------|
+| **Free** | $0 | 1 Profile, Basic Templates, Public URL, ATS Score |
+| **Pro** | $9.99/mo | Unlimited Profiles, All Templates, Custom Domain, PDF Export, Analytics |
+| **Enterprise** | $29.99/mo | Team Management, API Access, White Label, SLA |
 
 ---
 
 ## 🎯 The Vision: Career Tree Architecture
 
-**The Problem**: Traditional resumes force 10 years of experience into tiny paragraphs. How do you explain your value, tasks, projects, challenges, victories, reviews, and impact from a decade at one company in a single paragraph? **It's ludicrous.**
+**The Problem**: Traditional resumes force 10 years of experience into tiny paragraphs.
 
-**The Solution**: Webumé introduces the **Organic Chronological Career Tree** - each employer on your resume becomes its own **interactive experience page** that expands to reveal the full story:
+**The Solution**: Webumé introduces the **Organic Chronological Career Tree** - each employer becomes its own interactive experience page:
 
-### How It Works
-
-1. **Career Timeline View**: Your resume displays as an elegant timeline with employer cards
-2. **Hover to Preview**: Mouse over any employer card to see content indicators (projects, media, reviews)
-3. **Click to Expand**: Click any employer to open a **full-screen Employer Detail Page**
-4. **Employer Page Sections**:
-   - **Overview**: Company info, role description, tenure, key metrics
-   - **Responsibilities**: Detailed list of duties and scope
-   - **Projects**: Individual projects with tech stacks and outcomes
-   - **Achievements & Victories**: Key wins, awards received at this employer
-   - **Challenges Overcome**: Situation-Approach-Outcome stories
-   - **Media Gallery**: Photos and videos from your time there
-   - **Reviews & Testimonials**: Manager/colleague feedback
-   - **Day in Life**: What a typical day looked like
+1. **Career Timeline View**: Elegant timeline with employer cards
+2. **Hover to Preview**: See content indicators (projects, media, reviews)
+3. **Click to Expand**: Full-screen Employer Detail Page
+4. **8 Sections Per Employer**:
+   - Overview, Responsibilities, Projects
+   - Achievements, Challenges, Media
+   - Reviews, Day in Life
 
 ---
 
 ## ✅ Complete Feature Set
 
+### 🔐 Security (SAAS Compliant)
+- PBKDF2 password hashing (100,000 iterations)
+- Rate limiting (100 req/min per IP)
+- CSRF token protection
+- httpOnly secure cookies
+- Content Security Policy headers
+
 ### 🌳 Interactive Career Tree
-- Clickable employer cards in Career Timeline
-- Hover effects showing content depth
-- Content indicators (projects count, media count, reviews count)
-- Full-screen Employer Detail Page per experience
+- Clickable employer cards
+- Full-screen Employer Detail Pages
 - 8 dedicated sections per employer
 
-### 🔐 User Authentication
-- Email/password signup & login
-- Secure sessions (30-day cookies via Cloudflare KV)
-- Cross-device profile sync
-
-### 📄 10 Industry-Specific Templates
-| Category | Templates |
-|----------|-----------|
-| **Professional** | Executive, Corporate, Nonprofit |
-| **Service Industry** | Healthcare, Restaurant, Trades, Beauty |
-| **Creative** | Creative |
-| **Technical** | Tech Pioneer, Minimal |
-
-### 🌐 Public Profile Sharing
-- Custom URLs: `/p/your-slug`
-- QR Code generation
-- Social sharing (LinkedIn, Twitter, Email)
-- Profile view analytics
-- SEO meta tags
-
-### 📊 ATS Compatibility Scoring
-- Real-time score (0-100)
-- Keyword analysis
-- Improvement suggestions
-
-### 📱 PWA Ready
-- Installable on any device
-- Google Play Store ready via PWABuilder
-
----
-
-## 📊 Data Architecture
-
-### Experience Schema (Per Employer)
-```typescript
-interface Experience {
-  id: number
-  company: string
-  companyInfo: {
-    website: string
-    domain: string
-    industry: string
-    location: string
-    size: string
-    description: string
-  }
-  logoUrl: string | null
-  customLogo: string | null
-  role: string
-  startDate: string
-  endDate: string
-  description: string
-  
-  // Core Content
-  responsibilities: string[]
-  dayInLife: { time: string, activity: string }[]
-  metrics: { value: string, label: string }[]
-  skills: string[]
-  
-  // NEW: Employer-Specific Rich Content
-  projects: Project[]         // Projects at this employer
-  victories: Victory[]        // Key wins and successes
-  challenges: Challenge[]     // Challenges overcome (SAO format)
-  awards: Award[]            // Awards received here
-  reviews: Review[]          // Performance reviews/testimonials
-  photos: Photo[]            // Photos from this employer
-  videos: Video[]            // Videos from this employer
-}
-
-interface Project {
-  id: number
-  name: string
-  description: string
-  url: string
-  techStack: string[]
-  outcome: string
-}
-
-interface Challenge {
-  id: number
-  title: string
-  situation: string    // What was the challenge?
-  approach: string     // How did you tackle it?
-  outcome: string      // What was the result?
-}
-
-interface Victory {
-  id: number
-  title: string
-  description: string
-  impact: string
-}
-```
+### 📱 PWA Features
+- Installable on all devices
+- Offline support via Service Worker
+- Push notification ready
+- Share target for resumes
 
 ---
 
@@ -143,37 +194,13 @@ interface Victory {
 
 | Route | Method | Description |
 |-------|--------|-------------|
-| `/` | GET | Main application |
-| `/p/:slug` | GET | Public profile page |
-| `/manifest.json` | GET | PWA manifest |
-| `/api/auth/register` | POST | User registration |
-| `/api/auth/login` | POST | User login |
-| `/api/auth/logout` | POST | User logout |
-| `/api/auth/me` | GET | Get current user |
-| `/api/profile/load` | GET | Load user profile |
-| `/api/profile/save` | POST | Save user profile |
-| `/api/profile/publish` | POST | Toggle public visibility |
-| `/api/profile/slug` | POST | Update custom URL slug |
-| `/api/profile/public/:slug` | GET | Get public profile data |
+| `/api/auth/*` | POST | Authentication |
+| `/api/profile/*` | GET/POST | Profile operations |
+| `/api/stripe/plans` | GET | Pricing plans |
+| `/api/stripe/create-checkout` | POST | Start subscription |
+| `/api/stripe/subscription` | GET | Get subscription status |
+| `/api/ats-score` | POST | ATS compatibility |
 | `/api/parse-resume` | POST | AI resume parsing |
-| `/api/ats-score` | POST | ATS compatibility check |
-
----
-
-## 🏗️ Technical Stack
-
-| Layer | Technology |
-|-------|------------|
-| **Runtime** | Cloudflare Workers (Edge) |
-| **Framework** | Hono 4.x |
-| **Frontend** | React 18 (CDN + Babel) |
-| **Database** | Cloudflare KV Storage |
-| **AI** | Google Gemini 2.0 Flash |
-| **PDF Parser** | PDF.js 3.11.174 |
-| **DOCX Parser** | Mammoth.js 1.6.0 |
-| **QR Codes** | qrcode.js 1.5.3 |
-| **Build Tool** | Vite |
-| **Deployment** | Cloudflare Pages |
 
 ---
 
@@ -184,10 +211,9 @@ interface Victory {
 2. Create an account
 3. Upload your resume (PDF, DOCX, TXT)
 4. AI extracts your career data
-5. **Click on any experience in Career Timeline** to open the Employer Detail Page
-6. Add rich content: projects, challenges, photos, videos, reviews
-7. Preview with your chosen template
-8. Publish and share your public URL
+5. Click any experience to add rich content
+6. Preview with your chosen template
+7. Publish and share your public URL
 
 ### For Developers
 ```bash
@@ -202,49 +228,17 @@ npx wrangler pages deploy dist --project-name webume
 
 ---
 
-## 📁 Project Structure
+## 🏗️ Technical Stack
 
-```
-webapp/
-├── src/
-│   └── index.tsx           # Main app (7000+ lines)
-│       ├── API Routes      # Auth, Profile, Resume parsing
-│       ├── Components
-│       │   ├── App         # Main state management
-│       │   ├── AuthView    # Login/Signup
-│       │   ├── UploadView  # Resume upload
-│       │   ├── BuilderView # Profile editing
-│       │   ├── PreviewView # Live preview + Career Timeline
-│       │   ├── EmployerDetailPage  # NEW: Full employer experience
-│       │   └── Editors     # Basics, Experience, Skills, etc.
-├── public/static/
-│   ├── logo.png
-│   └── background.png
-├── dist/                   # Build output (~281 KB)
-├── wrangler.jsonc         # Cloudflare config
-└── package.json
-```
-
----
-
-## 🎨 UI Components
-
-### Career Timeline (PreviewView)
-- Interactive employer cards
-- Hover: Shows "View Details" button + content indicators
-- Click: Opens EmployerDetailPage modal
-- Content badges: Projects, Victories, Photos, Videos, Reviews
-
-### EmployerDetailPage
-Full-screen modal with 8 sections:
-1. **Overview** - Company info, metrics, skills used
-2. **Responsibilities** - Numbered list with edit capability
-3. **Projects** - Project cards with tech stacks
-4. **Achievements** - Trophy-styled victory cards
-5. **Challenges** - SAO (Situation-Approach-Outcome) format
-6. **Media** - Photo/video gallery with lightbox
-7. **Reviews** - Testimonial cards with avatars
-8. **Day in Life** - Timeline visualization
+| Layer | Technology |
+|-------|------------|
+| **Runtime** | Cloudflare Workers (Edge) |
+| **Framework** | Hono 4.x |
+| **Frontend** | React 18 |
+| **Database** | Cloudflare KV |
+| **AI** | Google Gemini 2.0 Flash |
+| **Payments** | Stripe |
+| **PWA** | Service Worker + Manifest |
 
 ---
 
@@ -252,22 +246,12 @@ Full-screen modal with 8 sections:
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 2.0.0 | 2026-01-10 | **Career Tree Architecture**: Interactive employer pages, rich content per experience |
-| 1.0.0 | 2026-01-10 | MVP: Auth, templates, public profiles, ATS scoring, PWA |
-
----
-
-## 🔮 Future Roadmap
-
-- [ ] PDF Export with full rich content
-- [ ] Video Introduction Recording
-- [ ] AI-suggested content for each employer
-- [ ] Recruiter/Employer view mode
-- [ ] Analytics dashboard
-- [ ] Premium templates
+| 2.1.0 | 2026-01-19 | **App Store Ready**: PWA compliance, all icons, service worker, Stripe integration |
+| 2.0.0 | 2026-01-10 | **Career Tree**: Interactive employer pages |
+| 1.0.0 | 2026-01-10 | MVP: Auth, templates, public profiles |
 
 ---
 
 **Built to revolutionize the job market. Every experience deserves its full story.** ✨
 
-*Status: ✅ Career Tree Architecture Complete & Live*
+*Status: ✅ App Store Ready*
