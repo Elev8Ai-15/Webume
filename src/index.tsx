@@ -3554,7 +3554,14 @@ app.get('/', (c) => {
     };
     
     const App = () => {
-      const [view, setView] = useState(VIEW.AUTH);
+      const [view, setViewInternal] = useState(VIEW.AUTH);
+      
+      // Wrapper to log view changes
+      const setView = (newView) => {
+        const viewNames = { 0: 'AUTH', 1: 'UPLOAD', 2: 'BUILDER', 3: 'PREVIEW', 4: 'TAILOR' };
+        console.log('📍 View changing from', viewNames[view], 'to', viewNames[newView]);
+        setViewInternal(newView);
+      };
       const [user, setUser] = useState(null);
       const [authLoading, setAuthLoading] = useState(true);
       const [authError, setAuthError] = useState('');
@@ -4281,34 +4288,106 @@ app.get('/', (c) => {
                 onContinue={() => setView(VIEW.BUILDER)}
               />
             )}
-            {view === VIEW.BUILDER && profile && (
-              <BuilderView
-                profile={profile}
-                setProfile={setProfile}
-                activeTab={activeTab}
-                rawText={rawText}
-                profilePhoto={profilePhoto}
-                setProfilePhoto={setProfilePhoto}
-                selectedTemplate={selectedTemplate}
-                setTemplate={setTemplate}
-                onBack={() => setView(VIEW.UPLOAD)}
-                onPreview={() => setView(VIEW.PREVIEW)}
-                onSave={saveProgress}
-                saveStatus={saveStatus}
-              />
+            {view === VIEW.BUILDER && (
+              profile ? (
+                <BuilderView
+                  profile={profile}
+                  setProfile={setProfile}
+                  activeTab={activeTab}
+                  rawText={rawText}
+                  profilePhoto={profilePhoto}
+                  setProfilePhoto={setProfilePhoto}
+                  selectedTemplate={selectedTemplate}
+                  setTemplate={setTemplate}
+                  onBack={() => setView(VIEW.UPLOAD)}
+                  onPreview={() => setView(VIEW.PREVIEW)}
+                  onSave={saveProgress}
+                  saveStatus={saveStatus}
+                />
+              ) : (
+                <div style={{ padding: '60px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '80px', marginBottom: '24px' }}>🚀</div>
+                  <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#fff', marginBottom: '12px' }}>Let's Get Started!</h2>
+                  <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '28px', maxWidth: '400px', margin: '0 auto 28px' }}>
+                    Upload your resume to auto-fill your profile, or create one from scratch.
+                  </p>
+                  <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+                    <button 
+                      className="btn btn-primary" 
+                      onClick={() => setView(VIEW.UPLOAD)}
+                      style={{ padding: '14px 28px', background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}
+                    >
+                      <i className="fas fa-upload" style={{ marginRight: '10px' }}></i>
+                      Upload Resume
+                    </button>
+                    <button 
+                      className="btn btn-secondary" 
+                      onClick={() => {
+                        // Create empty profile to start from scratch
+                        setProfile({
+                          basics: { name: user?.name || '', title: '', tagline: '', email: user?.email || '', phone: '', location: '', linkedin: '', website: '', summary: '' },
+                          experience: [],
+                          skills: [],
+                          achievements: [],
+                          education: [],
+                          certifications: [],
+                          awards: [],
+                          reviews: [],
+                          payHistory: [],
+                          projects: [],
+                          photos: [],
+                          videos: []
+                        });
+                      }}
+                      style={{ padding: '14px 28px' }}
+                    >
+                      <i className="fas fa-pencil-alt" style={{ marginRight: '10px' }}></i>
+                      Start From Scratch
+                    </button>
+                  </div>
+                </div>
+              )
             )}
-            {view === VIEW.PREVIEW && profile && (
-              <PreviewView
-                profile={profile}
-                setProfile={setProfile}
-                setView={setView}
-                profilePhoto={profilePhoto}
-                selectedTemplate={selectedTemplate}
-                slug={slug}
-                isPublic={isPublic}
-                setIsPublic={setIsPublic}
-                profileViews={profileViews}
-              />
+            {view === VIEW.PREVIEW && (
+              profile ? (
+                <PreviewView
+                  profile={profile}
+                  setProfile={setProfile}
+                  setView={setView}
+                  profilePhoto={profilePhoto}
+                  selectedTemplate={selectedTemplate}
+                  slug={slug}
+                  isPublic={isPublic}
+                  setIsPublic={setIsPublic}
+                  profileViews={profileViews}
+                />
+              ) : (
+                <div style={{ padding: '60px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '80px', marginBottom: '24px' }}>📋</div>
+                  <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#fff', marginBottom: '12px' }}>No Profile Data</h2>
+                  <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '28px', maxWidth: '400px', margin: '0 auto 28px' }}>
+                    You need to create or upload a profile before you can preview it.
+                  </p>
+                  <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+                    <button 
+                      className="btn btn-secondary" 
+                      onClick={() => setView(VIEW.UPLOAD)}
+                      style={{ padding: '14px 28px' }}
+                    >
+                      <i className="fas fa-upload" style={{ marginRight: '10px' }}></i>
+                      Upload Resume
+                    </button>
+                    <button 
+                      className="btn btn-primary" 
+                      onClick={() => setView(VIEW.BUILDER)}
+                      style={{ padding: '14px 28px', background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}
+                    >
+                      <i className="fas fa-plus" style={{ marginRight: '10px' }}></i>
+                      Create Profile
+                    </button>
+                  </div>
+                </div>
+              )
             )}
             {view === VIEW.TAILOR && profile && (
               <TailorView
@@ -4738,7 +4817,15 @@ app.get('/', (c) => {
               </button>
               
               <button
-                onClick={onPreview}
+                onClick={() => {
+                  console.log('🔍 Preview clicked - profile:', profile);
+                  console.log('🔍 Preview clicked - profile.basics:', profile?.basics);
+                  if (!profile || !profile.basics) {
+                    alert('Please fill in your basic profile information first (Name, Title, etc.)');
+                    return;
+                  }
+                  onPreview();
+                }}
                 style={{
                   padding: '12px 28px',
                   background: 'linear-gradient(135deg, #8B5CF6, #EC4899)',
@@ -8166,8 +8253,11 @@ The more detail, the better the tailored resume!"
     
     // Preview View with Template Support - ENHANCED for all 10 templates
     const PreviewView = ({ profile, setView, profilePhoto, selectedTemplate, slug, isPublic, setIsPublic, profileViews, setProfile }) => {
+      console.log('🎨 PreviewView rendering with:', { profile, selectedTemplate, slug, isPublic });
+      
       // Safety check - ensure profile has required structure
       if (!profile || !profile.basics) {
+        console.log('⚠️ PreviewView - profile or basics missing:', { profile, basics: profile?.basics });
         return (
           <div style={{ padding: '40px', textAlign: 'center' }}>
             <div style={{ fontSize: '60px', marginBottom: '20px' }}>⚠️</div>
