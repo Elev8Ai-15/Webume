@@ -3876,6 +3876,12 @@ app.get('/', (c) => {
                 logoUrl: logoUrl,
                 customLogo: null, // For manual upload
                 responsibilities: e.responsibilities || [],
+                // Rich content for Employer Detail Page
+                projects: e.projects || [],
+                victories: e.victories || [],
+                challenges: e.challenges || [],
+                reviews: e.reviews || [],
+                media: e.media || { photos: [], videos: [] },
                 dayInLife: e.dayInLife || [
                   { time: '9:00 AM', activity: '' },
                   { time: '10:30 AM', activity: '' },
@@ -8120,6 +8126,32 @@ The more detail, the better the tailored resume!"
     
     // Preview View with Template Support - ENHANCED for all 10 templates
     const PreviewView = ({ profile, setView, profilePhoto, selectedTemplate, slug, isPublic, setIsPublic, profileViews, setProfile }) => {
+      // Safety check - ensure profile has required structure
+      if (!profile || !profile.basics) {
+        return (
+          <div style={{ padding: '40px', textAlign: 'center' }}>
+            <div style={{ fontSize: '60px', marginBottom: '20px' }}>⚠️</div>
+            <h2 style={{ fontSize: '24px', marginBottom: '10px', color: '#fff' }}>Profile Not Ready</h2>
+            <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '20px' }}>
+              Your profile data is incomplete. Please go back and fill in your information.
+            </p>
+            <button 
+              className="btn btn-primary" 
+              onClick={() => setView(VIEW.BUILDER)}
+              style={{ padding: '12px 24px' }}
+            >
+              <i className="fas fa-arrow-left" style={{ marginRight: '8px' }}></i>
+              Back to Builder
+            </button>
+          </div>
+        );
+      }
+      
+      // Ensure experience array exists
+      if (!profile.experience) {
+        profile.experience = [];
+      }
+      
       const template = TEMPLATES.find(t => t.id === selectedTemplate) || TEMPLATES[0];
       const [showPublishModal, setShowPublishModal] = useState(false);
       const [publishing, setPublishing] = useState(false);
