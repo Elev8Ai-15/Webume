@@ -1337,6 +1337,240 @@ Return a JSON object with this structure:
   }
 });
 
+// ============================================================
+// AI CHAT ASSISTANT - Guides users through the app
+// ============================================================
+
+const WEBUME_KNOWLEDGEBASE = `
+# WebUME Assistant Knowledge Base
+
+## About WebUME
+WebUME is a revolutionary digital resume platform that transforms traditional resumes into immersive, interactive career experiences. Instead of reducing 10 years of experience to bullet points, WebUME creates an "Organic Chronological Career Tree" where each employer becomes its own detailed page.
+
+## Core Features
+
+### 1. Resume Upload & AI Parsing
+- Users can upload PDF, DOCX, or TXT resumes
+- AI (Google Gemini) extracts all career information automatically
+- Supports drag-and-drop or click-to-upload
+- Parses: contact info, work experience, skills, education, achievements
+
+### 2. 10 Professional Templates
+Available templates by category:
+- **Professional**: Executive (purple), Corporate (blue), Nonprofit (green)
+- **Service Industry**: Healthcare (teal), Restaurant (orange), Trades (amber), Beauty (pink)
+- **Creative**: Creative Portfolio (rose), Tech Pioneer (cyan), Minimal (gray)
+
+### 3. Career Tree / Experience Builder
+Each job/employer has 8 detailed sections:
+- **Overview**: Company description, your role summary
+- **Responsibilities**: Daily duties and key tasks (bullet points)
+- **Projects**: Major projects you worked on with descriptions
+- **Achievements/Victories**: Accomplishments, metrics, wins
+- **Challenges**: Difficult situations you overcame
+- **Media**: Photos and videos from that role
+- **Reviews**: Testimonials or performance feedback
+- **Day in Life**: Typical daily schedule
+
+### 4. Profile Sections
+- **Basics**: Name, title, tagline, summary, contact info
+- **Experience**: All jobs with rich detail
+- **Skills**: Technical and soft skills with proficiency levels
+- **Achievements**: Career-wide accomplishments
+- **Education**: Degrees, certifications, courses
+- **Awards**: Recognition and honors
+- **Reviews**: Testimonials from colleagues/managers
+
+### 5. ATS Score Checker
+- Analyzes profile for ATS (Applicant Tracking System) compatibility
+- Scores 0-100 with grade (A, B, C, D, F)
+- Shows matched keywords
+- Provides improvement suggestions
+
+### 6. Public Profile Sharing
+- Custom URLs: webume.pages.dev/p/your-name
+- QR code generation
+- Social sharing (LinkedIn, Twitter, Email)
+- Privacy toggle (public/private)
+
+### 7. AI Resume Tailor (Premium)
+- Paste any job description
+- AI creates customized resume for that specific job
+- Match score shows compatibility percentage
+- Interview tips and cover letter hints
+- Save unlimited tailored versions
+
+## Navigation Flow
+1. **AUTH** → Login or Register
+2. **UPLOAD** → Upload resume or start fresh
+3. **BUILDER** → Edit all profile sections
+4. **PREVIEW** → See final result with chosen template
+5. **TAILOR** → AI customize for job applications (Premium)
+
+## Pricing Plans
+- **Free ($0)**: 1 profile, basic templates, public URL, ATS score
+- **Pro ($9.99/mo)**: Unlimited profiles, all templates, AI Tailor, analytics, PDF export
+- **Enterprise ($29.99/mo)**: Team management, API access, white label, SLA
+
+## How to Edit Profile Sections
+
+### To edit Basics (name, title, etc):
+Click the "Basics" tab in the Builder view
+
+### To edit Experience:
+1. Click "Experience" tab
+2. Click on any job card to expand
+3. Edit fields directly or click sections to add content
+
+### To add a new job:
+In Experience tab, scroll to bottom and click "Add Experience"
+
+### To add skills:
+Click "Skills" tab, type skill name, select category (Technical/Soft/Language/Tool)
+
+### To add achievements:
+Click "Achievements" tab, click "Add Achievement", fill in title and description
+
+### To add education:
+Click "Education" tab, fill in degree, school, year, and details
+
+### To add media to a job:
+1. Click on the job in Experience
+2. Scroll to Media section
+3. Click "Add Photo" or "Add Video"
+4. Upload or paste URL
+
+### To change template:
+Click "Templates" tab, browse categories, click any template to select
+
+## Common Questions
+
+Q: How do I save my profile?
+A: Your profile auto-saves every 30 seconds. You can also click "Save Progress" in the navigation.
+
+Q: How do I make my profile public?
+A: Go to Preview, click "Publish", then toggle "Make Public"
+
+Q: How do I get my public URL?
+A: After publishing, your URL is webume.pages.dev/p/your-slug (your name formatted)
+
+Q: Can I download my resume as PDF?
+A: PDF export is available with Pro plan
+
+Q: How does ATS scoring work?
+A: Click "ATS Score" in Preview to analyze your profile against common ATS keywords
+
+Q: What file formats can I upload?
+A: PDF, DOCX, DOC, and TXT files are supported
+
+Q: How do I use AI Resume Tailor?
+A: Go to Preview → Click "AI Tailor" → Paste job description → Get customized resume
+
+## Tips for Best Results
+1. Upload a detailed resume for better AI parsing
+2. Add specific metrics to achievements (%, $, numbers)
+3. Include media (photos, project screenshots) for visual impact
+4. Use keywords from job descriptions in your profile
+5. Check ATS score and aim for 80+
+6. Add a professional photo
+7. Write a compelling tagline and summary
+`;
+
+// Chat endpoint
+app.post('/api/chat', async (c) => {
+  const user = await getCurrentUser(c);
+  
+  try {
+    const { message, context, profile } = await c.req.json();
+    
+    if (!message?.trim()) {
+      return c.json({ error: 'Message is required' }, 400);
+    }
+    
+    // Build context about the user's current state
+    let userContext = '';
+    if (user) {
+      userContext += 'User is logged in as: ' + user.name + ' (' + user.email + ')\n';
+      userContext += 'Subscription: ' + (user.subscription?.planId || 'free') + '\n';
+    } else {
+      userContext += 'User is not logged in.\n';
+    }
+    
+    if (context?.view) {
+      const viewNames = { 0: 'Login/Register', 1: 'Upload Resume', 2: 'Profile Builder', 3: 'Preview', 4: 'AI Tailor' };
+      userContext += 'Current page: ' + (viewNames[context.view] || 'Unknown') + '\n';
+    }
+    
+    if (profile) {
+      userContext += '\nUser Profile Summary:\n';
+      if (profile.basics?.name) userContext += '- Name: ' + profile.basics.name + '\n';
+      if (profile.basics?.title) userContext += '- Title: ' + profile.basics.title + '\n';
+      if (profile.experience?.length) userContext += '- Experiences: ' + profile.experience.length + ' jobs\n';
+      if (profile.skills?.length) userContext += '- Skills: ' + profile.skills.length + ' skills\n';
+      if (profile.achievements?.length) userContext += '- Achievements: ' + profile.achievements.length + '\n';
+      if (profile.education?.length) userContext += '- Education: ' + profile.education.length + ' entries\n';
+    }
+    
+    const systemPrompt = 'You are WebUME Assistant, a helpful AI guide for the WebUME digital resume platform. Your role is to:\n' +
+      '1. Help users navigate the app and understand features\n' +
+      '2. Guide them through creating and improving their profile\n' +
+      '3. Answer questions about functionality\n' +
+      '4. Provide tips for better resumes\n' +
+      '5. Help edit their profile when requested\n\n' +
+      'IMPORTANT: When users ask to edit their profile, respond with a JSON action block that the app will process. Format:\n' +
+      '```action\n{\n  "type": "edit_profile",\n  "section": "basics|experience|skills|achievements|education|awards",\n  "action": "update|add|delete",\n  "data": { ...field values... }\n}\n```\n\n' +
+      'Examples:\n' +
+      '- "Change my title to Software Engineer" → action block with section: "basics", data: { title: "Software Engineer" }\n' +
+      '- "Add Python to my skills" → action block with section: "skills", action: "add", data: { name: "Python", category: "Technical" }\n' +
+      '- "Update my summary" → action block with section: "basics", data: { summary: "new summary text" }\n\n' +
+      'For experience edits, include experienceId if editing existing, or action: "add" for new.\n\n' +
+      'Always be friendly, concise, and helpful. If you do not know something, say so. Keep responses under 200 words unless the user asks for detailed explanations.\n\n' +
+      'KNOWLEDGE BASE:\n' + WEBUME_KNOWLEDGEBASE + '\n\n' +
+      'CURRENT USER CONTEXT:\n' + userContext;
+    
+    const response = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_API_KEY,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: systemPrompt + '\n\nUser message: ' + message }] }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 1024
+          }
+        })
+      }
+    );
+    
+    const data = await response.json();
+    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // Check if response contains an action block
+    const actionMatch = aiText.match(/```action\n([\s\S]*?)```/);
+    let action = null;
+    let textResponse = aiText;
+    
+    if (actionMatch) {
+      try {
+        action = JSON.parse(actionMatch[1]);
+        // Remove action block from text response
+        textResponse = aiText.replace(/```action[\s\S]*?```/g, '').trim();
+      } catch (e) {
+        // Invalid JSON, ignore action
+      }
+    }
+    
+    return c.json({ 
+      response: textResponse,
+      action
+    });
+    
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
 // Public Profile View Page
 app.get('/p/:slug', async (c) => {
   const slug = c.req.param('slug');
@@ -4018,6 +4252,16 @@ app.get('/', (c) => {
               />
             )}
           </main>
+          
+          {/* AI Chat Assistant - Available on all views except AUTH */}
+          {view !== VIEW.AUTH && (
+            <ChatWidget
+              user={user}
+              profile={profile}
+              setProfile={setProfile}
+              view={view}
+            />
+          )}
         </div>
       );
     };
@@ -6859,6 +7103,382 @@ app.get('/', (c) => {
             div:hover > .delete-btn { opacity: 1 !important; }
           \`}</style>
         </div>
+      );
+    };
+    
+    // ============================================================
+    // AI CHAT ASSISTANT WIDGET
+    // ============================================================
+    const ChatWidget = ({ user, profile, setProfile, view }) => {
+      const [isOpen, setIsOpen] = useState(false);
+      const [messages, setMessages] = useState([
+        { role: 'assistant', content: "Hi! I'm your WebUME assistant. I can help you navigate the app, answer questions, or even edit your profile. What would you like to do?" }
+      ]);
+      const [input, setInput] = useState('');
+      const [loading, setLoading] = useState(false);
+      const messagesEndRef = React.useRef(null);
+      
+      const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      };
+      
+      React.useEffect(() => {
+        scrollToBottom();
+      }, [messages]);
+      
+      // Process action from AI response
+      const processAction = (action) => {
+        if (!action || !profile) return false;
+        
+        try {
+          const { type, section, action: actionType, data } = action;
+          
+          if (type !== 'edit_profile') return false;
+          
+          let updatedProfile = { ...profile };
+          
+          switch (section) {
+            case 'basics':
+              updatedProfile.basics = { ...updatedProfile.basics, ...data };
+              break;
+              
+            case 'skills':
+              if (actionType === 'add' && data.name) {
+                const newSkill = {
+                  id: Date.now().toString(),
+                  name: data.name,
+                  category: data.category || 'Technical',
+                  level: data.level || 'Intermediate'
+                };
+                updatedProfile.skills = [...(updatedProfile.skills || []), newSkill];
+              } else if (actionType === 'delete' && data.name) {
+                updatedProfile.skills = (updatedProfile.skills || []).filter(s => 
+                  s.name.toLowerCase() !== data.name.toLowerCase()
+                );
+              }
+              break;
+              
+            case 'achievements':
+              if (actionType === 'add' && data.title) {
+                const newAch = {
+                  id: Date.now().toString(),
+                  title: data.title,
+                  description: data.description || ''
+                };
+                updatedProfile.achievements = [...(updatedProfile.achievements || []), newAch];
+              }
+              break;
+              
+            case 'education':
+              if (actionType === 'add' && data.degree) {
+                const newEdu = {
+                  id: Date.now().toString(),
+                  degree: data.degree,
+                  school: data.school || '',
+                  year: data.year || '',
+                  details: data.details || ''
+                };
+                updatedProfile.education = [...(updatedProfile.education || []), newEdu];
+              }
+              break;
+              
+            case 'experience':
+              if (actionType === 'add' && data.employer) {
+                const newExp = {
+                  id: Date.now().toString(),
+                  employer: data.employer,
+                  title: data.title || '',
+                  startDate: data.startDate || '',
+                  endDate: data.endDate || 'Present',
+                  description: data.description || '',
+                  responsibilities: data.responsibilities || [],
+                  projects: [],
+                  victories: [],
+                  challenges: [],
+                  dayInLife: [],
+                  media: { photos: [], videos: [] }
+                };
+                updatedProfile.experience = [...(updatedProfile.experience || []), newExp];
+              } else if (actionType === 'update' && data.experienceId) {
+                updatedProfile.experience = (updatedProfile.experience || []).map(exp =>
+                  exp.id === data.experienceId ? { ...exp, ...data } : exp
+                );
+              }
+              break;
+              
+            default:
+              return false;
+          }
+          
+          setProfile(updatedProfile);
+          return true;
+        } catch (e) {
+          console.error('Error processing action:', e);
+          return false;
+        }
+      };
+      
+      const sendMessage = async () => {
+        if (!input.trim() || loading) return;
+        
+        const userMessage = input.trim();
+        setInput('');
+        setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+        setLoading(true);
+        
+        try {
+          const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: userMessage,
+              context: { view },
+              profile: profile ? {
+                basics: profile.basics,
+                experience: profile.experience?.map(e => ({ id: e.id, employer: e.employer, title: e.title })),
+                skills: profile.skills?.map(s => ({ name: s.name, category: s.category })),
+                achievements: profile.achievements?.length,
+                education: profile.education?.length
+              } : null
+            })
+          });
+          
+          const data = await res.json();
+          
+          if (data.error) {
+            setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }]);
+          } else {
+            // Process any action first
+            let actionMessage = '';
+            if (data.action) {
+              const success = processAction(data.action);
+              if (success) {
+                actionMessage = '\\n\\n✅ I\\'ve updated your profile!';
+              }
+            }
+            
+            setMessages(prev => [...prev, { 
+              role: 'assistant', 
+              content: data.response + actionMessage 
+            }]);
+          }
+        } catch (e) {
+          setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error. Please check your internet and try again.' }]);
+        }
+        
+        setLoading(false);
+      };
+      
+      const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      };
+      
+      // Quick action buttons
+      const quickActions = [
+        { label: '📝 How to edit?', message: 'How do I edit my profile sections?' },
+        { label: '🎯 Improve ATS', message: 'How can I improve my ATS score?' },
+        { label: '✨ Add skill', message: 'Help me add a new skill to my profile' },
+        { label: '🚀 What\\'s next?', message: 'What should I do next to complete my profile?' }
+      ];
+      
+      return (
+        <>
+          {/* Chat Toggle Button */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            style={{
+              position: 'fixed',
+              bottom: '24px',
+              right: '24px',
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #8B5CF6, #EC4899)',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 8px 32px rgba(139, 92, 246, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9998,
+              transition: 'transform 0.2s, box-shadow 0.2s'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+          >
+            <i className={isOpen ? 'fas fa-times' : 'fas fa-comment-dots'} style={{ fontSize: '24px', color: 'white' }}></i>
+          </button>
+          
+          {/* Chat Window */}
+          {isOpen && (
+            <div style={{
+              position: 'fixed',
+              bottom: '100px',
+              right: '24px',
+              width: '380px',
+              maxWidth: 'calc(100vw - 48px)',
+              height: '500px',
+              maxHeight: 'calc(100vh - 140px)',
+              background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%)',
+              borderRadius: '20px',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              zIndex: 9999
+            }}>
+              {/* Header */}
+              <div style={{
+                padding: '16px 20px',
+                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2))',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px'
+              }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #8B5CF6, #EC4899)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <i className="fas fa-robot" style={{ color: 'white', fontSize: '18px' }}></i>
+                </div>
+                <div>
+                  <div style={{ fontWeight: '700', color: 'white', fontSize: '15px' }}>WebUME Assistant</div>
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>Always here to help</div>
+                </div>
+              </div>
+              
+              {/* Messages */}
+              <div style={{
+                flex: 1,
+                overflowY: 'auto',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px'
+              }}>
+                {messages.map((msg, idx) => (
+                  <div key={idx} style={{
+                    display: 'flex',
+                    justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start'
+                  }}>
+                    <div style={{
+                      maxWidth: '85%',
+                      padding: '12px 16px',
+                      borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                      background: msg.role === 'user' 
+                        ? 'linear-gradient(135deg, #8B5CF6, #7C3AED)' 
+                        : 'rgba(255, 255, 255, 0.08)',
+                      color: 'white',
+                      fontSize: '14px',
+                      lineHeight: '1.5',
+                      whiteSpace: 'pre-wrap'
+                    }}>
+                      {msg.content}
+                    </div>
+                  </div>
+                ))}
+                {loading && (
+                  <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                    <div style={{
+                      padding: '12px 16px',
+                      borderRadius: '16px 16px 16px 4px',
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      color: 'rgba(255,255,255,0.5)',
+                      fontSize: '14px'
+                    }}>
+                      <i className="fas fa-circle-notch fa-spin" style={{ marginRight: '8px' }}></i>
+                      Thinking...
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+              
+              {/* Quick Actions */}
+              {messages.length <= 2 && (
+                <div style={{
+                  padding: '8px 16px',
+                  display: 'flex',
+                  gap: '8px',
+                  flexWrap: 'wrap',
+                  borderTop: '1px solid rgba(255,255,255,0.05)'
+                }}>
+                  {quickActions.map((qa, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => { setInput(qa.message); }}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        background: 'rgba(139, 92, 246, 0.15)',
+                        border: '1px solid rgba(139, 92, 246, 0.3)',
+                        borderRadius: '20px',
+                        color: 'rgba(255,255,255,0.8)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(139, 92, 246, 0.3)'; }}
+                      onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(139, 92, 246, 0.15)'; }}
+                    >
+                      {qa.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {/* Input */}
+              <div style={{
+                padding: '12px 16px',
+                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                display: 'flex',
+                gap: '10px'
+              }}>
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask me anything..."
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '12px',
+                    color: 'white',
+                    fontSize: '14px',
+                    outline: 'none'
+                  }}
+                />
+                <button
+                  onClick={sendMessage}
+                  disabled={loading || !input.trim()}
+                  style={{
+                    padding: '12px 16px',
+                    background: loading || !input.trim() ? 'rgba(139, 92, 246, 0.3)' : 'linear-gradient(135deg, #8B5CF6, #EC4899)',
+                    border: 'none',
+                    borderRadius: '12px',
+                    color: 'white',
+                    cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <i className="fas fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       );
     };
     
