@@ -3586,7 +3586,7 @@ app.get('/', (c) => {
       
       const checkAuth = async () => {
         try {
-          const res = await fetch('/api/auth/me');
+          const res = await fetch('/api/auth/me', { credentials: 'include' });
           const data = await res.json();
           if (data.user) {
             setUser(data.user);
@@ -3604,7 +3604,7 @@ app.get('/', (c) => {
       
       const loadProfile = async () => {
         try {
-          const res = await fetch('/api/profile/load');
+          const res = await fetch('/api/profile/load', { credentials: 'include' });
           const data = await res.json();
           
           if (data.profile) {
@@ -3632,6 +3632,7 @@ app.get('/', (c) => {
       const handleAuth = async (isLogin, email, password, name) => {
         setAuthLoading(true);
         setAuthError('');
+        console.log('🔐 Auth attempt:', isLogin ? 'login' : 'register', email);
         
         try {
           const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
@@ -3640,10 +3641,13 @@ app.get('/', (c) => {
           const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
+            body: JSON.stringify(body),
+            credentials: 'include' // Ensure cookies are sent
           });
           
+          console.log('📡 Auth response status:', res.status);
           const data = await res.json();
+          console.log('📦 Auth response data:', data);
           
           if (data.error) {
             setAuthError(data.error);
@@ -3651,10 +3655,20 @@ app.get('/', (c) => {
             return;
           }
           
+          if (!data.user) {
+            setAuthError('Invalid response from server');
+            setAuthLoading(false);
+            return;
+          }
+          
+          console.log('✅ Auth successful, user:', data.user.email);
           setUser(data.user);
+          
           if (data.user.hasProfile) {
+            console.log('📂 Loading existing profile...');
             await loadProfile();
           } else {
+            console.log('🆕 New user, going to upload');
             setView(VIEW.UPLOAD);
           }
         } catch (e) {
@@ -3665,7 +3679,7 @@ app.get('/', (c) => {
       
       const handleLogout = async () => {
         if (confirm('Are you sure you want to sign out?')) {
-          await fetch('/api/auth/logout', { method: 'POST' });
+          await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
           setUser(null);
           setProfile(null);
           setProfilePhoto(null);
