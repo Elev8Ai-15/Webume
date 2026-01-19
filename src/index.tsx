@@ -2040,6 +2040,7 @@ app.get('/', (c) => {
       inset: 0;
       background: #0a0a12;
       overflow: hidden;
+      pointer-events: none; /* Allow clicks to pass through to content */
     }
     
     /* Background image - NO BLUR - crystal clear glass cards */
@@ -3366,14 +3367,23 @@ app.get('/', (c) => {
       
       const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('📝 Form submitted!', { email, password: '***', name, isLogin });
         setError('');
         
         if (!email || !password || (!isLogin && !name)) {
+          console.log('❌ Validation failed - missing fields');
           setError('Please fill in all fields');
           return;
         }
         
-        onLogin(isLogin, email, password, name);
+        console.log('✅ Validation passed, calling onLogin...');
+        try {
+          await onLogin(isLogin, email, password, name);
+          console.log('✅ onLogin completed');
+        } catch (err) {
+          console.error('❌ onLogin error:', err);
+          setError('An error occurred. Please try again.');
+        }
       };
       
       return (
