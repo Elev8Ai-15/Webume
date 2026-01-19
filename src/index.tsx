@@ -1366,26 +1366,88 @@ app.get('/p/:slug', async (c) => {
 </html>`);
 });
 
-// PWA Manifest
+// PWA Manifest - App Store Ready
 app.get('/manifest.json', (c) => {
   return c.json({
     name: 'Webumé - Digital Resume',
     short_name: 'Webumé',
-    description: 'Transform your resume into an immersive digital experience',
+    description: 'Transform your resume into an immersive digital experience. AI-powered resume parsing, interactive career timeline, 10 professional templates, and instant shareable profiles.',
     start_url: '/',
+    scope: '/',
     display: 'standalone',
     background_color: '#0a0a12',
     theme_color: '#8B5CF6',
     orientation: 'portrait-primary',
+    dir: 'ltr',
+    lang: 'en-US',
+    prefer_related_applications: false,
     icons: [
-      { src: '/static/logo.png', sizes: '192x192', type: 'image/png' },
-      { src: '/static/logo.png', sizes: '512x512', type: 'image/png' }
+      { src: '/static/icon-48.png', sizes: '48x48', type: 'image/png', purpose: 'any' },
+      { src: '/static/icon-72.png', sizes: '72x72', type: 'image/png', purpose: 'any' },
+      { src: '/static/icon-96.png', sizes: '96x96', type: 'image/png', purpose: 'any' },
+      { src: '/static/icon-128.png', sizes: '128x128', type: 'image/png', purpose: 'any' },
+      { src: '/static/icon-144.png', sizes: '144x144', type: 'image/png', purpose: 'any' },
+      { src: '/static/icon-152.png', sizes: '152x152', type: 'image/png', purpose: 'any' },
+      { src: '/static/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: '/static/icon-256.png', sizes: '256x256', type: 'image/png', purpose: 'any' },
+      { src: '/static/icon-384.png', sizes: '384x384', type: 'image/png', purpose: 'any' },
+      { src: '/static/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: '/static/icon-1024.png', sizes: '1024x1024', type: 'image/png', purpose: 'any' },
+      { src: '/static/icon-192-maskable.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+      { src: '/static/icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
     ],
-    categories: ['business', 'productivity'],
-    screenshots: [],
+    categories: ['business', 'productivity', 'lifestyle'],
+    iarc_rating_id: '',
+    screenshots: [
+      {
+        src: '/static/screenshot-wide.png',
+        sizes: '1280x720',
+        type: 'image/png',
+        form_factor: 'wide',
+        label: 'WebUME Dashboard - Build Your Digital Resume'
+      },
+      {
+        src: '/static/screenshot-narrow.png', 
+        sizes: '750x1334',
+        type: 'image/png',
+        form_factor: 'narrow',
+        label: 'WebUME Mobile - Career Timeline View'
+      }
+    ],
     shortcuts: [
-      { name: 'Upload Resume', url: '/', icons: [{ src: '/static/logo.png', sizes: '96x96' }] }
-    ]
+      { 
+        name: 'Upload Resume', 
+        short_name: 'Upload',
+        description: 'Upload and parse your resume with AI',
+        url: '/?action=upload', 
+        icons: [{ src: '/static/icon-96.png', sizes: '96x96', type: 'image/png' }] 
+      },
+      { 
+        name: 'View Profile', 
+        short_name: 'Profile',
+        description: 'Preview your digital resume',
+        url: '/?action=preview', 
+        icons: [{ src: '/static/icon-96.png', sizes: '96x96', type: 'image/png' }] 
+      }
+    ],
+    related_applications: [],
+    protocol_handlers: [],
+    share_target: {
+      action: '/',
+      method: 'POST',
+      enctype: 'multipart/form-data',
+      params: {
+        title: 'title',
+        text: 'text',
+        url: 'url',
+        files: [
+          {
+            name: 'resume',
+            accept: ['application/pdf', '.pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', '.docx', 'text/plain', '.txt']
+          }
+        ]
+      }
+    }
   });
 });
 
@@ -1396,16 +1458,27 @@ app.get('/', (c) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Webumé | Your WebApp Resume</title>
-  <link rel="icon" type="image/png" href="/static/logo.png">
-  <link rel="apple-touch-icon" href="/static/logo.png">
+  <link rel="icon" type="image/png" href="/static/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/static/icon-152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/icon-192.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="/static/icon-192.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#8B5CF6">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Transform your resume into an immersive digital experience">
+  <meta name="apple-mobile-web-app-title" content="Webumé">
+  <meta name="application-name" content="Webumé">
+  <meta name="msapplication-TileColor" content="#8B5CF6">
+  <meta name="msapplication-TileImage" content="/static/icon-144.png">
+  <meta name="description" content="Transform your resume into an immersive digital experience. AI-powered resume parsing, interactive career timeline, and professional templates.">
   <meta property="og:title" content="Webumé - Digital Resume Revolution">
-  <meta property="og:description" content="AI-powered digital profiles that get you hired">
+  <meta property="og:description" content="AI-powered digital profiles that get you hired. Create stunning interactive resumes in minutes.">
   <meta property="og:type" content="website">
+  <meta property="og:image" content="/static/icon-512.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Webumé - Digital Resume Revolution">
+  <meta name="twitter:description" content="AI-powered digital profiles that get you hired">
   
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -7070,6 +7143,19 @@ app.get('/', (c) => {
     };
     
     ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/sw.js')
+          .then(registration => {
+            console.log('✅ ServiceWorker registered:', registration.scope);
+          })
+          .catch(error => {
+            console.log('ServiceWorker registration failed:', error);
+          });
+      });
+    }
   </script>
 </body>
 </html>`)
