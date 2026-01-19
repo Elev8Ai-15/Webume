@@ -3699,6 +3699,7 @@ app.get('/', (c) => {
               const res = await fetch('/api/profile/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({
                   profile,
                   profilePhoto,
@@ -3741,6 +3742,7 @@ app.get('/', (c) => {
           const res = await fetch('/api/profile/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               profile,
               profilePhoto,
@@ -3769,6 +3771,7 @@ app.get('/', (c) => {
             await fetch('/api/profile/save', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
               body: JSON.stringify({
                 profile: null,
                 profilePhoto: null,
@@ -7650,7 +7653,7 @@ app.get('/', (c) => {
         if (!confirm('Delete this tailored resume?')) return;
         
         try {
-          await fetch(\`/api/tailored-resumes/\${id}\`, { method: 'DELETE' });
+          await fetch(\`/api/tailored-resumes/\${id}\`, { method: 'DELETE', credentials: 'include' });
           setSavedResumes(prev => prev.filter(r => r.id !== id));
         } catch (err) {
           alert('Failed to delete');
@@ -8673,7 +8676,7 @@ The more detail, the better the tailored resume!"
                     fontSize: '12px',
                     fontWeight: '500',
                     color: styles.accent
-                  }}>{skill}</span>
+                  }}>{typeof skill === 'string' ? skill : skill.name || skill}</span>
                 ))}
                 {profile.skills.length > 10 && (
                   <span style={{
