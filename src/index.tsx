@@ -1824,15 +1824,16 @@ app.get('/p/:slug', async (c) => {
     }
     
     .hero-photo {
-      width: 180px;
-      height: 180px;
+      width: 220px;
+      height: 220px;
       border-radius: 50%;
       object-fit: cover;
-      border: 5px solid var(--accent);
+      border: 6px solid var(--accent);
       box-shadow: 
-        0 0 0 8px rgba(139, 92, 246, 0.15),
-        0 25px 60px rgba(0, 0, 0, 0.4),
-        0 0 100px rgba(139, 92, 246, 0.2);
+        0 0 0 10px rgba(139, 92, 246, 0.15),
+        0 0 0 20px rgba(139, 92, 246, 0.08),
+        0 30px 80px rgba(0, 0, 0, 0.5),
+        0 0 120px rgba(139, 92, 246, 0.25);
       animation: heroPhotoIn 1s ease-out;
     }
     
@@ -1843,10 +1844,18 @@ app.get('/p/:slug', async (c) => {
     
     .photo-ring {
       position: absolute;
-      inset: -15px;
+      inset: -20px;
       border-radius: 50%;
-      border: 2px dashed rgba(139, 92, 246, 0.3);
+      border: 2px dashed rgba(139, 92, 246, 0.4);
       animation: photoRingSpin 20s linear infinite;
+    }
+    
+    .photo-ring-2 {
+      position: absolute;
+      inset: -35px;
+      border-radius: 50%;
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      animation: photoRingSpin 30s linear infinite reverse;
     }
     
     @keyframes photoRingSpin {
@@ -1854,17 +1863,223 @@ app.get('/p/:slug', async (c) => {
     }
     
     .hero-photo-placeholder {
-      width: 180px;
-      height: 180px;
+      width: 220px;
+      height: 220px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--accent-dark));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 64px;
+      font-size: 72px;
       font-weight: 800;
       color: white;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+      box-shadow: 
+        0 0 0 10px rgba(139, 92, 246, 0.15),
+        0 30px 80px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* ============================================
+       TRADITIONAL RESUME PREVIEW CARD
+       ============================================ */
+    .resume-preview-section {
+      padding: 40px 24px 80px;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .resume-preview-container {
+      max-width: 1100px;
+      width: 100%;
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .resume-card {
+      width: 380px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 
+        0 25px 80px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      transform: perspective(1000px) rotateY(-5deg) rotateX(2deg);
+      transition: transform 0.5s ease;
+      flex-shrink: 0;
+    }
+    
+    .resume-card:hover {
+      transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.02);
+    }
+    
+    .resume-card-header {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      padding: 24px;
+      color: white;
+      text-align: center;
+    }
+    
+    .resume-card-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid white;
+      object-fit: cover;
+      margin-bottom: 12px;
+    }
+    
+    .resume-card-photo-placeholder {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid white;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 auto 12px;
+    }
+    
+    .resume-card-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .resume-card-title {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+    
+    .resume-card-body {
+      padding: 20px;
+      color: #1a1a2e;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+    
+    .resume-card-section {
+      margin-bottom: 16px;
+    }
+    
+    .resume-card-section h4 {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+    }
+    
+    .resume-card-exp {
+      margin-bottom: 10px;
+    }
+    
+    .resume-card-exp strong {
+      font-size: 11px;
+      display: block;
+    }
+    
+    .resume-card-exp span {
+      color: #666;
+      font-size: 10px;
+    }
+    
+    .resume-card-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    
+    .resume-card-skill {
+      padding: 3px 8px;
+      background: rgba(139, 92, 246, 0.1);
+      border-radius: 4px;
+      font-size: 9px;
+      color: var(--accent);
+    }
+    
+    .resume-info-panel {
+      flex: 1;
+      min-width: 300px;
+      max-width: 500px;
+    }
+    
+    .resume-info-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+    
+    .resume-info-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    
+    .resume-stats {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .resume-stat {
+      text-align: center;
+    }
+    
+    .resume-stat-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    
+    .resume-stat-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .resume-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .resume-action-btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+    }
+    
+    .resume-action-btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: white;
+    }
+    
+    .resume-action-btn.secondary {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    
+    .resume-action-btn:hover {
+      transform: translateY(-2px);
     }
     
     .hero-name {
@@ -2075,42 +2290,46 @@ app.get('/p/:slug', async (c) => {
     }
     
     .company-logo {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
       background: white;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       flex-shrink: 0;
-      border: 2px solid var(--border);
-      transition: border-color 0.3s ease;
+      border: 3px solid var(--border);
+      transition: all 0.4s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     }
     
     .timeline-item:hover .company-logo,
     .timeline-item.active .company-logo {
       border-color: var(--accent);
+      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.25);
+      transform: scale(1.05);
     }
     
     .company-logo img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      padding: 8px;
+      padding: 10px;
     }
     
     .company-logo-placeholder {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
       background: linear-gradient(135deg, var(--accent), var(--accent-dark));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 26px;
       font-weight: 700;
       color: white;
+      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
     }
     
     .timeline-info h3 {
@@ -2676,6 +2895,45 @@ app.get('/p/:slug', async (c) => {
         document.body.style.overflow = '';
       };
       
+      // Hover timer for auto-open panel
+      const hoverTimerRef = useRef(null);
+      
+      const handleExpHover = (exp) => {
+        // Clear any existing timer
+        if (hoverTimerRef.current) {
+          clearTimeout(hoverTimerRef.current);
+        }
+        // Set timer to open panel after 400ms hover
+        hoverTimerRef.current = setTimeout(() => {
+          openPanel(exp);
+        }, 400);
+      };
+      
+      const handleExpLeave = () => {
+        // Clear the timer if mouse leaves before 400ms
+        if (hoverTimerRef.current) {
+          clearTimeout(hoverTimerRef.current);
+          hoverTimerRef.current = null;
+        }
+      };
+      
+      const copyProfileUrl = () => {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Profile URL copied to clipboard!');
+      };
+      
+      const shareProfile = () => {
+        if (navigator.share) {
+          navigator.share({
+            title: basics.name + ' - Professional Profile',
+            text: 'Check out my professional profile on Webumé',
+            url: window.location.href
+          });
+        } else {
+          copyProfileUrl();
+        }
+      };
+      
       const scrollToTimeline = () => {
         if (timelineRef.current) {
           timelineRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -2756,6 +3014,7 @@ app.get('/p/:slug', async (c) => {
             <div className="hero-content">
               <div className="hero-photo-container">
                 <div className="photo-ring"></div>
+                <div className="photo-ring-2"></div>
                 {profile.profilePhoto ? (
                   <img src={profile.profilePhoto} alt={basics.name} className="hero-photo" />
                 ) : (
@@ -2806,13 +3065,96 @@ app.get('/p/:slug', async (c) => {
             )}
           </section>
           
+          {/* Traditional Resume Preview */}
+          <section className="resume-preview-section">
+            <div className="resume-preview-container">
+              <div className="resume-card">
+                <div className="resume-card-header">
+                  {profile.profilePhoto ? (
+                    <img src={profile.profilePhoto} alt={basics.name} className="resume-card-photo" />
+                  ) : (
+                    <div className="resume-card-photo-placeholder">{getInitials(basics.name)}</div>
+                  )}
+                  <div className="resume-card-name">{basics.name || 'Your Name'}</div>
+                  <div className="resume-card-title">{basics.title || 'Professional Title'}</div>
+                </div>
+                <div className="resume-card-body">
+                  {experience.length > 0 && (
+                    <div className="resume-card-section">
+                      <h4>Experience</h4>
+                      {experience.slice(0, 3).map((exp, i) => (
+                        <div key={i} className="resume-card-exp">
+                          <strong>{exp.role}</strong>
+                          <span>{exp.company} • {exp.startDate} - {exp.endDate || 'Present'}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {skills.length > 0 && (
+                    <div className="resume-card-section">
+                      <h4>Skills</h4>
+                      <div className="resume-card-skills">
+                        {skills.slice(0, 8).map((skill, i) => (
+                          <span key={i} className="resume-card-skill">{skill}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {education.length > 0 && (
+                    <div className="resume-card-section">
+                      <h4>Education</h4>
+                      {education.slice(0, 2).map((edu, i) => (
+                        <div key={i} className="resume-card-exp">
+                          <strong>{edu.degree}</strong>
+                          <span>{edu.school}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="resume-info-panel">
+                <h2 className="resume-info-title">Your Digital Resume</h2>
+                <p className="resume-info-desc">
+                  This interactive profile showcases your professional journey in a modern, engaging format. 
+                  Explore the career timeline below to discover detailed experiences, achievements, and more.
+                </p>
+                <div className="resume-stats">
+                  <div className="resume-stat">
+                    <div className="resume-stat-value">{experience.length}</div>
+                    <div className="resume-stat-label">Experiences</div>
+                  </div>
+                  <div className="resume-stat">
+                    <div className="resume-stat-value">{skills.length}</div>
+                    <div className="resume-stat-label">Skills</div>
+                  </div>
+                  <div className="resume-stat">
+                    <div className="resume-stat-value">{profile.views || 0}</div>
+                    <div className="resume-stat-label">Views</div>
+                  </div>
+                </div>
+                <div className="resume-actions">
+                  <button className="resume-action-btn primary" onClick={shareProfile}>
+                    <i className="fas fa-share-alt"></i>
+                    Share Profile
+                  </button>
+                  <button className="resume-action-btn secondary" onClick={copyProfileUrl}>
+                    <i className="fas fa-copy"></i>
+                    Copy Link
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+          
           {/* Experience Timeline */}
           {experience.length > 0 && (
             <section className="timeline-section" ref={timelineRef}>
               <div className="section-header">
                 <p className="section-label">Career Journey</p>
                 <h2 className="section-title">Professional Experience</h2>
-                <p className="section-subtitle">Click on any experience to explore the full story</p>
+                <p className="section-subtitle">Hover over any experience to explore the full story</p>
               </div>
               
               <div className="timeline-container">
@@ -2826,8 +3168,10 @@ app.get('/p/:slug', async (c) => {
                         key={exp.id || i}
                         className={"timeline-item" + (isActive ? " active" : "")}
                         onClick={() => openPanel(exp)}
+                        onMouseEnter={() => handleExpHover(exp)}
+                        onMouseLeave={handleExpLeave}
                       >
-                        <span className="view-details-badge">View Details</span>
+                        <span className="view-details-badge">{isActive ? 'Viewing' : 'Hover for Details'}</span>
                         
                         <div className="timeline-header">
                           {logoUrl ? (
@@ -2837,7 +3181,7 @@ app.get('/p/:slug', async (c) => {
                                 alt={exp.company}
                                 onError={(e) => {
                                   e.target.style.display = 'none';
-                                  e.target.parentElement.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,' + accent + ',#6D28D9);border-radius:12px;color:white;font-weight:700;font-size:20px">' + getCompanyInitial(exp.company) + '</div>';
+                                  e.target.parentElement.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,' + accent + ',#6D28D9);border-radius:16px;color:white;font-weight:700;font-size:26px">' + getCompanyInitial(exp.company) + '</div>';
                                 }}
                               />
                             </div>
