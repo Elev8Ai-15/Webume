@@ -3501,7 +3501,7 @@ app.get('/', (c) => {
                       fontSize: '16px',
                       WebkitAppearance: 'none',
                       appearance: 'none'
-                    }
+                    }}
                   />
                 </div>
               )}
