@@ -1598,7 +1598,7 @@ app.get('/p/:slug', async (c) => {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Loading Profile... | Webumé</title>
   <link rel="icon" type="image/png" href="/static/logo.png">
   <meta name="description" content="View professional profile on Webumé">
@@ -1611,61 +1611,1026 @@ app.get('/p/:slug', async (c) => {
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --accent: #8B5CF6;
+      --accent-light: #A78BFA;
+      --accent-dark: #6D28D9;
+      --bg-dark: #0a0a12;
+      --bg-card: rgba(255,255,255,0.03);
+      --border: rgba(255,255,255,0.08);
+      --text: #fff;
+      --text-muted: rgba(255,255,255,0.6);
+      --text-dim: rgba(255,255,255,0.4);
+    }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+    
     body {
       font-family: 'Inter', -apple-system, sans-serif;
-      background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #0f0f1a 100%);
+      background: var(--bg-dark);
       min-height: 100vh;
-      color: #fff;
+      color: var(--text);
+      overflow-x: hidden;
     }
+    
+    /* Loading State */
     .loading {
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
       flex-direction: column;
-      gap: 20px;
+      gap: 24px;
+      background: var(--bg-dark);
     }
-    .spinner {
-      width: 60px;
-      height: 60px;
-      border: 4px solid rgba(139,92,246,0.2);
-      border-top-color: #8B5CF6;
+    
+    .loader-ring {
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
+      position: relative;
+    }
+    
+    .loader-ring::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 4px solid transparent;
+      border-top-color: var(--accent);
       animation: spin 1s linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .error {
-      text-align: center;
-      padding: 60px 20px;
+    
+    .loader-ring::after {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      border: 4px solid transparent;
+      border-top-color: var(--accent-light);
+      animation: spin 0.8s linear infinite reverse;
     }
-    .error h1 { font-size: 72px; margin-bottom: 20px; }
-    .error p { color: rgba(255,255,255,0.6); margin-bottom: 30px; }
-    .error a {
-      display: inline-block;
-      padding: 14px 28px;
-      background: linear-gradient(135deg, #8B5CF6, #EC4899);
-      color: #fff;
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .loading-text {
+      font-size: 14px;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    
+    /* Error State */
+    .error-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: var(--bg-dark);
+    }
+    
+    .error-card {
+      text-align: center;
+      padding: 60px 40px;
+      background: var(--bg-card);
+      border-radius: 32px;
+      border: 1px solid var(--border);
+      max-width: 500px;
+    }
+    
+    .error-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+      opacity: 0.6;
+    }
+    
+    .error-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .error-message {
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: var(--text);
       text-decoration: none;
-      border-radius: 12px;
+      border-radius: 16px;
       font-weight: 600;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+    }
+    
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(139, 92, 246, 0.4);
+    }
+    
+    /* ============================================
+       IMMERSIVE PROFILE LAYOUT
+       ============================================ */
+    
+    /* Animated Background */
+    .profile-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    
+    .bg-gradient-1 {
+      position: absolute;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+      top: -200px;
+      right: -200px;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    .bg-gradient-2 {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 70%);
+      bottom: -150px;
+      left: -150px;
+      animation: float 25s ease-in-out infinite reverse;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -30px) scale(1.05); }
+      66% { transform: translate(-20px, 20px) scale(0.95); }
+    }
+    
+    /* Main Profile Container */
+    .profile-container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+    }
+    
+    /* ============================================
+       HERO SECTION
+       ============================================ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      position: relative;
+    }
+    
+    .hero-content {
+      max-width: 900px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .hero-photo-container {
+      position: relative;
+      margin-bottom: 40px;
+    }
+    
+    .hero-photo {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid var(--accent);
+      box-shadow: 
+        0 0 0 8px rgba(139, 92, 246, 0.15),
+        0 25px 60px rgba(0, 0, 0, 0.4),
+        0 0 100px rgba(139, 92, 246, 0.2);
+      animation: heroPhotoIn 1s ease-out;
+    }
+    
+    @keyframes heroPhotoIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    .photo-ring {
+      position: absolute;
+      inset: -15px;
+      border-radius: 50%;
+      border: 2px dashed rgba(139, 92, 246, 0.3);
+      animation: photoRingSpin 20s linear infinite;
+    }
+    
+    @keyframes photoRingSpin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .hero-photo-placeholder {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      font-weight: 800;
+      color: white;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+    }
+    
+    .hero-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 8vw, 64px);
+      font-weight: 700;
+      margin-bottom: 16px;
+      line-height: 1.1;
+      animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+    
+    .hero-title {
+      font-size: clamp(18px, 4vw, 24px);
+      color: var(--accent-light);
+      font-weight: 600;
+      margin-bottom: 16px;
+      animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+    
+    .hero-tagline {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 600px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+      animation: fadeInUp 0.8s ease-out 0.6s both;
+    }
+    
+    @keyframes fadeInUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .hero-contact {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 48px;
+      animation: fadeInUp 0.8s ease-out 0.8s both;
+    }
+    
+    .contact-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .contact-chip:hover {
+      background: rgba(139, 92, 246, 0.1);
+      border-color: var(--accent);
+      color: var(--text);
+      transform: translateY(-2px);
+    }
+    
+    .contact-chip i {
+      color: var(--accent);
+    }
+    
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      animation: bounce 2s ease-in-out infinite;
+      cursor: pointer;
+    }
+    
+    .scroll-indicator span {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .scroll-arrow {
+      width: 24px;
+      height: 40px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      position: relative;
+    }
+    
+    .scroll-arrow::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 2px;
+      left: 50%;
+      top: 8px;
+      transform: translateX(-50%);
+      animation: scrollDot 2s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(10px); }
+    }
+    
+    @keyframes scrollDot {
+      0%, 100% { top: 8px; opacity: 1; }
+      50% { top: 20px; opacity: 0.5; }
+    }
+    
+    /* ============================================
+       EXPERIENCE TIMELINE SECTION
+       ============================================ */
+    .timeline-section {
+      padding: 80px 24px;
+      position: relative;
+    }
+    
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    
+    .section-label {
+      font-size: 12px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 16px;
+    }
+    
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    
+    .section-subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .timeline-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      gap: 40px;
+    }
+    
+    .timeline-list {
+      flex: 1;
+      max-width: 600px;
+    }
+    
+    .timeline-item {
+      position: relative;
+      padding: 28px;
+      margin-bottom: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--border);
+      border-radius: 4px 0 0 4px;
+      transition: all 0.4s ease;
+    }
+    
+    .timeline-item:hover,
+    .timeline-item.active {
+      background: rgba(139, 92, 246, 0.08);
+      border-color: var(--accent);
+      transform: translateX(8px);
+      box-shadow: 0 10px 40px rgba(139, 92, 246, 0.15);
+    }
+    
+    .timeline-item:hover::before,
+    .timeline-item.active::before {
+      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+      width: 5px;
+    }
+    
+    .timeline-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .company-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 2px solid var(--border);
+      transition: border-color 0.3s ease;
+    }
+    
+    .timeline-item:hover .company-logo,
+    .timeline-item.active .company-logo {
+      border-color: var(--accent);
+    }
+    
+    .company-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 8px;
+    }
+    
+    .company-logo-placeholder {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+    }
+    
+    .timeline-info h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .timeline-company {
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    .timeline-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 12px;
+    }
+    
+    .timeline-meta span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .view-details-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      padding: 6px 12px;
+      background: var(--accent);
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0;
+      transform: translateX(10px);
+      transition: all 0.3s ease;
+    }
+    
+    .timeline-item:hover .view-details-badge,
+    .timeline-item.active .view-details-badge {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    /* ============================================
+       DETAIL PANEL (Side Panel)
+       ============================================ */
+    .detail-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 550px;
+      max-width: 90vw;
+      height: 100vh;
+      background: linear-gradient(180deg, #0f0f1a 0%, #0a0a12 100%);
+      border-left: 1px solid var(--border);
+      z-index: 1000;
+      transform: translateX(100%);
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+      box-shadow: -20px 0 60px rgba(0, 0, 0, 0.5);
+    }
+    
+    .detail-panel.open {
+      transform: translateX(0);
+    }
+    
+    .detail-panel::-webkit-scrollbar { width: 6px; }
+    .detail-panel::-webkit-scrollbar-track { background: transparent; }
+    .detail-panel::-webkit-scrollbar-thumb { 
+      background: rgba(139, 92, 246, 0.3);
+      border-radius: 3px;
+    }
+    
+    .panel-header {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, rgba(15, 15, 26, 0.98) 0%, rgba(15, 15, 26, 0.9) 100%);
+      backdrop-filter: blur(20px);
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+      z-index: 10;
+    }
+    
+    .panel-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .panel-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #EF4444;
+      color: #EF4444;
+    }
+    
+    .panel-company-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-right: 50px;
+    }
+    
+    .panel-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 3px solid var(--accent);
+      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+    }
+    
+    .panel-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 10px;
+    }
+    
+    .panel-logo-placeholder {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+    }
+    
+    .panel-title-section h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    
+    .panel-title-section .role {
+      font-size: 15px;
+      color: var(--accent-light);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .panel-title-section .dates {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    
+    .panel-content {
+      padding: 24px;
+    }
+    
+    /* Detail Sections */
+    .detail-section {
+      margin-bottom: 32px;
+    }
+    
+    .detail-section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .detail-section-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(139, 92, 246, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 14px;
+    }
+    
+    .detail-section-header h3 {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+    }
+    
+    .detail-section-content {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-muted);
+    }
+    
+    .detail-section-content p {
+      margin-bottom: 12px;
+    }
+    
+    .detail-section-content ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .detail-section-content li {
+      position: relative;
+      padding-left: 20px;
+      margin-bottom: 10px;
+    }
+    
+    .detail-section-content li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    
+    .metric-card {
+      padding: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      text-align: center;
+    }
+    
+    .metric-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    
+    .metric-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    /* Media Gallery */
+    .media-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    
+    .media-item {
+      aspect-ratio: 16/10;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+    }
+    
+    .media-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .media-item:hover img {
+      transform: scale(1.05);
+    }
+    
+    /* Awards/Projects */
+    .award-item, .project-item {
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 12px;
+    }
+    
+    .award-item h4, .project-item h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .award-item h4 i {
+      color: #F59E0B;
+    }
+    
+    .project-item h4 i {
+      color: var(--accent);
+    }
+    
+    .award-item p, .project-item p {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    
+    /* Panel Overlay */
+    .panel-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease;
+    }
+    
+    .panel-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    /* ============================================
+       SKILLS & EDUCATION SECTIONS
+       ============================================ */
+    .skills-section, .education-section {
+      padding: 60px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+    
+    .skill-chip {
+      padding: 12px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .skill-chip:hover {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    
+    .education-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    
+    .education-card {
+      padding: 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .education-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+    
+    .education-card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .education-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    
+    .education-card .year {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 6px 14px;
+      background: rgba(139, 92, 246, 0.15);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    /* ============================================
+       FOOTER
+       ============================================ */
+    .profile-footer {
+      text-align: center;
+      padding: 60px 24px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .qr-section {
+      margin-bottom: 32px;
+    }
+    
+    .qr-code {
+      width: 120px;
+      height: 120px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .qr-label {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    
+    .profile-views {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+    
+    .profile-views i {
+      color: var(--accent);
+      margin-right: 8px;
+    }
+    
+    .powered-by {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 24px;
+    }
+    
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 900px) {
+      .timeline-container {
+        flex-direction: column;
+      }
+      
+      .timeline-list {
+        max-width: 100%;
+      }
+      
+      .detail-panel {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .hero {
+        padding: 40px 16px;
+      }
+      
+      .hero-photo, .hero-photo-placeholder {
+        width: 140px;
+        height: 140px;
+      }
+      
+      .hero-contact {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .panel-company-header {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .panel-title-section {
+        text-align: center;
+      }
     }
   </style>
 </head>
 <body>
   <div id="root">
     <div class="loading">
-      <div class="spinner"></div>
-      <p>Loading profile...</p>
+      <div class="loader-ring"></div>
+      <p class="loading-text">Loading Profile</p>
     </div>
   </div>
   
   <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useRef } = React;
     const SLUG = '${slug}';
     
     const PublicProfile = () => {
@@ -1673,6 +2638,9 @@ app.get('/p/:slug', async (c) => {
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState(null);
       const [qrCode, setQrCode] = useState(null);
+      const [selectedExp, setSelectedExp] = useState(null);
+      const [panelOpen, setPanelOpen] = useState(false);
+      const timelineRef = useRef(null);
       
       useEffect(() => {
         fetch('/api/public/' + SLUG)
@@ -1697,202 +2665,503 @@ app.get('/p/:slug', async (c) => {
           });
       }, []);
       
+      const openPanel = (exp) => {
+        setSelectedExp(exp);
+        setPanelOpen(true);
+        document.body.style.overflow = 'hidden';
+      };
+      
+      const closePanel = () => {
+        setPanelOpen(false);
+        document.body.style.overflow = '';
+      };
+      
+      const scrollToTimeline = () => {
+        if (timelineRef.current) {
+          timelineRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      };
+      
+      const getInitials = (name) => {
+        if (!name) return '?';
+        return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      };
+      
+      const getCompanyInitial = (company) => {
+        if (!company) return '?';
+        return company.charAt(0).toUpperCase();
+      };
+      
       if (loading) {
         return (
           <div className="loading">
-            <div className="spinner"></div>
-            <p>Loading profile...</p>
+            <div className="loader-ring"></div>
+            <p className="loading-text">Loading Profile</p>
           </div>
         );
       }
       
       if (error) {
         return (
-          <div className="error">
-            <h1>404</h1>
-            <p>{error}</p>
-            <a href="/">Create Your Own Webumé</a>
+          <div className="error-container">
+            <div className="error-card">
+              <div className="error-icon">🔍</div>
+              <h1 className="error-title">Not Found</h1>
+              <p className="error-message">{error}</p>
+              <a href="/" className="cta-btn">
+                <i className="fas fa-rocket"></i>
+                Create Your Own Webumé
+              </a>
+            </div>
           </div>
         );
       }
       
-      const p = profile.profile;
-      const basics = p?.basics || {};
-      const template = profile.selectedTemplate || 'executive';
+      const p = profile.profile || {};
+      const basics = p.basics || {};
+      const experience = p.experience || [];
+      const skills = p.skills || [];
+      const education = p.education || [];
       
-      const colors = {
-        executive: { accent: '#8B5CF6', gradient: 'linear-gradient(135deg, #8B5CF6, #6D28D9)' },
-        corporate: { accent: '#1E3A5F', gradient: 'linear-gradient(135deg, #1E3A5F, #D4AF37)' },
-        healthcare: { accent: '#0EA5E9', gradient: 'linear-gradient(135deg, #0EA5E9, #14B8A6)' },
-        restaurant: { accent: '#DC2626', gradient: 'linear-gradient(135deg, #DC2626, #F59E0B)' },
-        trades: { accent: '#D97706', gradient: 'linear-gradient(135deg, #D97706, #78716C)' },
-        beauty: { accent: '#EC4899', gradient: 'linear-gradient(135deg, #EC4899, #BE185D)' },
-        creative: { accent: '#F472B6', gradient: 'linear-gradient(135deg, #F472B6, #A855F7)' },
-        tech: { accent: '#06B6D4', gradient: 'linear-gradient(135deg, #06B6D4, #22D3EE)' },
-        nonprofit: { accent: '#0891B2', gradient: 'linear-gradient(135deg, #0891B2, #059669)' },
-        minimal: { accent: '#10B981', gradient: 'linear-gradient(135deg, #10B981, #34D399)' }
+      // Get accent color from template
+      const templateColors = {
+        executive: '#8B5CF6',
+        corporate: '#1E3A5F',
+        healthcare: '#0EA5E9',
+        restaurant: '#DC2626',
+        trades: '#D97706',
+        beauty: '#EC4899',
+        creative: '#F472B6',
+        tech: '#06B6D4',
+        nonprofit: '#0891B2',
+        minimal: '#10B981'
       };
+      const accent = templateColors[profile.selectedTemplate] || '#8B5CF6';
       
-      const style = colors[template] || colors.executive;
+      // Apply accent color to CSS variables
+      useEffect(() => {
+        document.documentElement.style.setProperty('--accent', accent);
+      }, [accent]);
       
       return (
-        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}>
-          {/* Header */}
-          <header style={{ 
-            background: 'rgba(255,255,255,0.03)', 
-            borderRadius: '24px', 
-            padding: '40px',
-            marginBottom: '30px',
-            border: '1px solid rgba(255,255,255,0.08)',
-            display: 'flex',
-            gap: '30px',
-            alignItems: 'center',
-            flexWrap: 'wrap'
-          }}>
-            {profile.profilePhoto && (
-              <img 
-                src={profile.profilePhoto} 
-                style={{ 
-                  width: '140px', 
-                  height: '140px', 
-                  borderRadius: '20px',
-                  objectFit: 'cover',
-                  border: '4px solid ' + style.accent
-                }}
-                alt={basics.name}
-              />
-            )}
-            <div style={{ flex: 1, minWidth: '250px' }}>
-              <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>{basics.name}</h1>
-              <p style={{ fontSize: '18px', color: style.accent, fontWeight: '600', marginBottom: '8px' }}>{basics.title}</p>
-              {basics.tagline && <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', marginBottom: '16px' }}>{basics.tagline}</p>}
-              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>
-                {basics.email && <span><i className="fas fa-envelope" style={{ marginRight: '6px' }}></i>{basics.email}</span>}
-                {basics.location && <span><i className="fas fa-map-marker-alt" style={{ marginRight: '6px' }}></i>{basics.location}</span>}
-                {basics.linkedin && <a href={basics.linkedin.startsWith('http') ? basics.linkedin : 'https://' + basics.linkedin} target="_blank" style={{ color: '#0A66C2' }}><i className="fab fa-linkedin"></i> LinkedIn</a>}
+        <div className="profile-container">
+          {/* Animated Background */}
+          <div className="profile-bg">
+            <div className="bg-gradient-1"></div>
+            <div className="bg-gradient-2"></div>
+          </div>
+          
+          {/* Hero Section */}
+          <section className="hero">
+            <div className="hero-content">
+              <div className="hero-photo-container">
+                <div className="photo-ring"></div>
+                {profile.profilePhoto ? (
+                  <img src={profile.profilePhoto} alt={basics.name} className="hero-photo" />
+                ) : (
+                  <div className="hero-photo-placeholder">{getInitials(basics.name)}</div>
+                )}
+              </div>
+              
+              <h1 className="hero-name">{basics.name || 'Professional'}</h1>
+              <p className="hero-title">{basics.title || 'Career Professional'}</p>
+              {basics.tagline && <p className="hero-tagline">{basics.tagline}</p>}
+              {basics.summary && !basics.tagline && (
+                <p className="hero-tagline">{basics.summary.substring(0, 200)}{basics.summary.length > 200 ? '...' : ''}</p>
+              )}
+              
+              <div className="hero-contact">
+                {basics.email && (
+                  <a href={"mailto:" + basics.email} className="contact-chip">
+                    <i className="fas fa-envelope"></i>
+                    {basics.email}
+                  </a>
+                )}
+                {basics.phone && (
+                  <a href={"tel:" + basics.phone} className="contact-chip">
+                    <i className="fas fa-phone"></i>
+                    {basics.phone}
+                  </a>
+                )}
+                {basics.location && (
+                  <span className="contact-chip">
+                    <i className="fas fa-map-marker-alt"></i>
+                    {basics.location}
+                  </span>
+                )}
+                {basics.linkedin && (
+                  <a href={basics.linkedin.startsWith('http') ? basics.linkedin : 'https://' + basics.linkedin} target="_blank" className="contact-chip">
+                    <i className="fab fa-linkedin"></i>
+                    LinkedIn
+                  </a>
+                )}
               </div>
             </div>
-            {qrCode && (
-              <div style={{ textAlign: 'center' }}>
-                <img src={qrCode} style={{ width: '100px', borderRadius: '8px' }} alt="QR Code" />
-                <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginTop: '6px' }}>Scan to share</p>
+            
+            {experience.length > 0 && (
+              <div className="scroll-indicator" onClick={scrollToTimeline}>
+                <span>Explore Career</span>
+                <div className="scroll-arrow"></div>
               </div>
             )}
-          </header>
+          </section>
           
-          {/* Summary */}
-          {basics.summary && (
-            <section style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '20px', padding: '28px', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <h2 style={{ fontSize: '14px', color: style.accent, marginBottom: '14px', fontWeight: '700' }}>
-                <i className="fas fa-user" style={{ marginRight: '10px' }}></i>About
-              </h2>
-              <p style={{ fontSize: '15px', lineHeight: '1.7', color: 'rgba(255,255,255,0.8)' }}>{basics.summary}</p>
-            </section>
-          )}
-          
-          {/* Experience */}
-          {p?.experience?.length > 0 && (
-            <section style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '20px', padding: '28px', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <h2 style={{ fontSize: '14px', color: style.accent, marginBottom: '20px', fontWeight: '700' }}>
-                <i className="fas fa-briefcase" style={{ marginRight: '10px' }}></i>Experience
-              </h2>
-              {p.experience.map((exp, i) => (
-                <div key={i} style={{ marginBottom: i < p.experience.length - 1 ? '28px' : 0, paddingBottom: i < p.experience.length - 1 ? '28px' : 0, borderBottom: i < p.experience.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '10px' }}>
-                    {exp.companyInfo?.domain && (
-                      <img 
-                        src={'https://logo.clearbit.com/' + exp.companyInfo.domain} 
-                        style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#fff' }}
-                        onError={(e) => e.target.style.display = 'none'}
-                        alt=""
-                      />
-                    )}
-                    <div>
-                      <h3 style={{ fontSize: '16px', fontWeight: '700' }}>{exp.role}</h3>
-                      <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>{exp.company} • {exp.startDate} - {exp.endDate}</p>
-                    </div>
-                  </div>
-                  {exp.description && <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.6', marginTop: '12px' }}>{exp.description}</p>}
-                  {exp.metrics?.length > 0 && (
-                    <div style={{ display: 'flex', gap: '16px', marginTop: '16px', flexWrap: 'wrap' }}>
-                      {exp.metrics.map((m, j) => (
-                        <div key={j} style={{ background: style.accent + '15', padding: '10px 16px', borderRadius: '10px', textAlign: 'center' }}>
-                          <div style={{ fontSize: '18px', fontWeight: '800', color: style.accent }}>{m.value}</div>
-                          <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)' }}>{m.label}</div>
+          {/* Experience Timeline */}
+          {experience.length > 0 && (
+            <section className="timeline-section" ref={timelineRef}>
+              <div className="section-header">
+                <p className="section-label">Career Journey</p>
+                <h2 className="section-title">Professional Experience</h2>
+                <p className="section-subtitle">Click on any experience to explore the full story</p>
+              </div>
+              
+              <div className="timeline-container">
+                <div className="timeline-list">
+                  {experience.map((exp, i) => {
+                    const logoUrl = exp.customLogo || exp.logoUrl || (exp.companyInfo?.domain ? 'https://logo.clearbit.com/' + exp.companyInfo.domain : null);
+                    const isActive = selectedExp?.id === exp.id || (selectedExp && !exp.id && selectedExp.company === exp.company && selectedExp.role === exp.role);
+                    
+                    return (
+                      <div 
+                        key={exp.id || i}
+                        className={"timeline-item" + (isActive ? " active" : "")}
+                        onClick={() => openPanel(exp)}
+                      >
+                        <span className="view-details-badge">View Details</span>
+                        
+                        <div className="timeline-header">
+                          {logoUrl ? (
+                            <div className="company-logo">
+                              <img 
+                                src={logoUrl} 
+                                alt={exp.company}
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.parentElement.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,' + accent + ',#6D28D9);border-radius:12px;color:white;font-weight:700;font-size:20px">' + getCompanyInitial(exp.company) + '</div>';
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="company-logo-placeholder">{getCompanyInitial(exp.company)}</div>
+                          )}
+                          <div className="timeline-info">
+                            <h3>{exp.role}</h3>
+                            <p className="timeline-company">{exp.company}</p>
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                        
+                        <div className="timeline-meta">
+                          <span><i className="far fa-calendar"></i>{exp.startDate} — {exp.endDate || 'Present'}</span>
+                          {exp.companyInfo?.location && (
+                            <span><i className="fas fa-map-marker-alt"></i>{exp.companyInfo.location}</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
+              </div>
             </section>
           )}
           
-          {/* Skills */}
-          {p?.skills?.length > 0 && (
-            <section style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '20px', padding: '28px', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <h2 style={{ fontSize: '14px', color: style.accent, marginBottom: '16px', fontWeight: '700' }}>
-                <i className="fas fa-cogs" style={{ marginRight: '10px' }}></i>Skills
-              </h2>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {p.skills.map((skill, i) => (
-                  <span key={i} style={{ 
-                    padding: '8px 16px', 
-                    background: style.accent + '20',
-                    border: '1px solid ' + style.accent + '40',
-                    borderRadius: '100px',
-                    fontSize: '13px',
-                    fontWeight: '500'
-                  }}>{skill}</span>
+          {/* Skills Section */}
+          {skills.length > 0 && (
+            <section className="skills-section">
+              <div className="section-header">
+                <p className="section-label">Expertise</p>
+                <h2 className="section-title">Skills & Capabilities</h2>
+              </div>
+              
+              <div className="skills-grid">
+                {skills.map((skill, i) => (
+                  <span key={i} className="skill-chip">{skill}</span>
                 ))}
               </div>
             </section>
           )}
           
-          {/* Education */}
-          {p?.education?.length > 0 && (
-            <section style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '20px', padding: '28px', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <h2 style={{ fontSize: '14px', color: style.accent, marginBottom: '16px', fontWeight: '700' }}>
-                <i className="fas fa-graduation-cap" style={{ marginRight: '10px' }}></i>Education
-              </h2>
-              {p.education.map((edu, i) => (
-                <div key={i} style={{ marginBottom: i < p.education.length - 1 ? '16px' : 0 }}>
-                  <h3 style={{ fontSize: '15px', fontWeight: '600' }}>{edu.degree}</h3>
-                  <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>{edu.school} {edu.year && '• ' + edu.year}</p>
-                </div>
-              ))}
+          {/* Education Section */}
+          {education.length > 0 && (
+            <section className="education-section">
+              <div className="section-header">
+                <p className="section-label">Foundation</p>
+                <h2 className="section-title">Education</h2>
+              </div>
+              
+              <div className="education-cards">
+                {education.map((edu, i) => (
+                  <div key={i} className="education-card">
+                    <h3>{edu.degree}</h3>
+                    <p>{edu.school}</p>
+                    {edu.year && <span className="year">{edu.year}</span>}
+                    {edu.details && <p style={{ marginTop: '12px', fontSize: '13px' }}>{edu.details}</p>}
+                  </div>
+                ))}
+              </div>
             </section>
           )}
           
           {/* Footer */}
-          <footer style={{ textAlign: 'center', marginTop: '40px', paddingTop: '30px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '16px' }}>
-              <i className="fas fa-eye" style={{ marginRight: '6px' }}></i>{profile.views || 0} profile views
+          <footer className="profile-footer">
+            {qrCode && (
+              <div className="qr-section">
+                <img src={qrCode} alt="QR Code" className="qr-code" />
+                <p className="qr-label">Scan to share this profile</p>
+              </div>
+            )}
+            
+            <p className="profile-views">
+              <i className="fas fa-eye"></i>
+              {profile.views || 0} profile views
             </p>
-            <a href="/" style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '14px 28px',
-              background: style.gradient,
-              color: '#fff',
-              textDecoration: 'none',
-              borderRadius: '12px',
-              fontWeight: '600',
-              fontSize: '14px'
-            }}>
+            
+            <a href="/" className="cta-btn">
               <i className="fas fa-rocket"></i>
               Create Your Own Webumé
             </a>
-            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '20px' }}>
-              Powered by Webumé • The Digital Resume Revolution
+            
+            <p className="powered-by">
+              Powered by <strong>Webumé</strong> • The Digital Resume Revolution
             </p>
           </footer>
+          
+          {/* Panel Overlay */}
+          <div 
+            className={"panel-overlay" + (panelOpen ? " visible" : "")}
+            onClick={closePanel}
+          ></div>
+          
+          {/* Detail Panel */}
+          <div className={"detail-panel" + (panelOpen ? " open" : "")}>
+            {selectedExp && (
+              <>
+                <div className="panel-header">
+                  <button className="panel-close" onClick={closePanel}>
+                    <i className="fas fa-times"></i>
+                  </button>
+                  
+                  <div className="panel-company-header">
+                    {(selectedExp.customLogo || selectedExp.logoUrl || selectedExp.companyInfo?.domain) ? (
+                      <div className="panel-logo">
+                        <img 
+                          src={selectedExp.customLogo || selectedExp.logoUrl || ('https://logo.clearbit.com/' + selectedExp.companyInfo?.domain)}
+                          alt={selectedExp.company}
+                          onError={(e) => {
+                            e.target.parentElement.innerHTML = '<div class="panel-logo-placeholder">' + getCompanyInitial(selectedExp.company) + '</div>';
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="panel-logo-placeholder">{getCompanyInitial(selectedExp.company)}</div>
+                    )}
+                    
+                    <div className="panel-title-section">
+                      <h2>{selectedExp.company}</h2>
+                      <p className="role">{selectedExp.role}</p>
+                      <p className="dates">{selectedExp.startDate} — {selectedExp.endDate || 'Present'}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="panel-content">
+                  {/* Overview / Description */}
+                  {selectedExp.description && (
+                    <div className="detail-section">
+                      <div className="detail-section-header">
+                        <div className="detail-section-icon"><i className="fas fa-file-alt"></i></div>
+                        <h3>Overview</h3>
+                      </div>
+                      <div className="detail-section-content">
+                        <p>{selectedExp.description}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Metrics / Achievements */}
+                  {selectedExp.metrics && selectedExp.metrics.length > 0 && (
+                    <div className="detail-section">
+                      <div className="detail-section-header">
+                        <div className="detail-section-icon"><i className="fas fa-chart-line"></i></div>
+                        <h3>Key Metrics</h3>
+                      </div>
+                      <div className="metrics-grid">
+                        {selectedExp.metrics.map((metric, i) => (
+                          <div key={i} className="metric-card">
+                            <div className="metric-value">{metric.value}</div>
+                            <div className="metric-label">{metric.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Responsibilities */}
+                  {selectedExp.responsibilities && selectedExp.responsibilities.length > 0 && (
+                    <div className="detail-section">
+                      <div className="detail-section-header">
+                        <div className="detail-section-icon"><i className="fas fa-tasks"></i></div>
+                        <h3>Responsibilities</h3>
+                      </div>
+                      <div className="detail-section-content">
+                        <ul>
+                          {selectedExp.responsibilities.map((resp, i) => (
+                            <li key={i}>{resp}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Victories / Accomplishments */}
+                  {selectedExp.victories && selectedExp.victories.length > 0 && (
+                    <div className="detail-section">
+                      <div className="detail-section-header">
+                        <div className="detail-section-icon"><i className="fas fa-trophy"></i></div>
+                        <h3>Victories</h3>
+                      </div>
+                      <div className="detail-section-content">
+                        <ul>
+                          {selectedExp.victories.map((vic, i) => (
+                            <li key={i}>{vic}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Awards */}
+                  {selectedExp.awards && selectedExp.awards.length > 0 && (
+                    <div className="detail-section">
+                      <div className="detail-section-header">
+                        <div className="detail-section-icon"><i className="fas fa-award"></i></div>
+                        <h3>Awards & Recognition</h3>
+                      </div>
+                      {selectedExp.awards.map((award, i) => (
+                        <div key={i} className="award-item">
+                          <h4><i className="fas fa-star"></i>{award.title || award}</h4>
+                          {award.description && <p>{award.description}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Projects */}
+                  {selectedExp.projects && selectedExp.projects.length > 0 && (
+                    <div className="detail-section">
+                      <div className="detail-section-header">
+                        <div className="detail-section-icon"><i className="fas fa-project-diagram"></i></div>
+                        <h3>Notable Projects</h3>
+                      </div>
+                      {selectedExp.projects.map((project, i) => (
+                        <div key={i} className="project-item">
+                          <h4><i className="fas fa-folder-open"></i>{project.name || project}</h4>
+                          {project.description && <p>{project.description}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Media / Photos */}
+                  {selectedExp.photos && selectedExp.photos.length > 0 && (
+                    <div className="detail-section">
+                      <div className="detail-section-header">
+                        <div className="detail-section-icon"><i className="fas fa-images"></i></div>
+                        <h3>Photos</h3>
+                      </div>
+                      <div className="media-gallery">
+                        {selectedExp.photos.map((photo, i) => (
+                          <div key={i} className="media-item">
+                            <img src={photo.url || photo} alt={photo.caption || 'Work photo'} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Reviews / Testimonials */}
+                  {selectedExp.reviews && selectedExp.reviews.length > 0 && (
+                    <div className="detail-section">
+                      <div className="detail-section-header">
+                        <div className="detail-section-icon"><i className="fas fa-quote-left"></i></div>
+                        <h3>Reviews & Testimonials</h3>
+                      </div>
+                      {selectedExp.reviews.map((review, i) => (
+                        <div key={i} style={{ 
+                          padding: '20px', 
+                          background: 'var(--bg-card)', 
+                          border: '1px solid var(--border)', 
+                          borderRadius: '14px',
+                          marginBottom: '12px',
+                          fontStyle: 'italic',
+                          color: 'var(--text-muted)'
+                        }}>
+                          "{review.text || review}"
+                          {review.author && (
+                            <p style={{ marginTop: '12px', fontStyle: 'normal', fontWeight: '600', color: 'var(--accent)' }}>
+                              — {review.author}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Company Info */}
+                  {selectedExp.companyInfo && (
+                    <div className="detail-section">
+                      <div className="detail-section-header">
+                        <div className="detail-section-icon"><i className="fas fa-building"></i></div>
+                        <h3>About {selectedExp.company}</h3>
+                      </div>
+                      <div className="detail-section-content">
+                        {selectedExp.companyInfo.description && <p>{selectedExp.companyInfo.description}</p>}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '12px' }}>
+                          {selectedExp.companyInfo.industry && (
+                            <span style={{ 
+                              padding: '6px 14px', 
+                              background: 'rgba(139,92,246,0.15)', 
+                              borderRadius: '8px', 
+                              fontSize: '12px' 
+                            }}>
+                              <i className="fas fa-industry" style={{ marginRight: '6px' }}></i>
+                              {selectedExp.companyInfo.industry}
+                            </span>
+                          )}
+                          {selectedExp.companyInfo.location && (
+                            <span style={{ 
+                              padding: '6px 14px', 
+                              background: 'rgba(139,92,246,0.15)', 
+                              borderRadius: '8px', 
+                              fontSize: '12px' 
+                            }}>
+                              <i className="fas fa-map-marker-alt" style={{ marginRight: '6px' }}></i>
+                              {selectedExp.companyInfo.location}
+                            </span>
+                          )}
+                          {selectedExp.companyInfo.size && (
+                            <span style={{ 
+                              padding: '6px 14px', 
+                              background: 'rgba(139,92,246,0.15)', 
+                              borderRadius: '8px', 
+                              fontSize: '12px' 
+                            }}>
+                              <i className="fas fa-users" style={{ marginRight: '6px' }}></i>
+                              {selectedExp.companyInfo.size}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       );
     };
     
-    ReactDOM.render(<PublicProfile />, document.getElementById('root'));
+    ReactDOM.createRoot(document.getElementById('root')).render(<PublicProfile />);
   </script>
 </body>
 </html>`);
@@ -1969,6 +3238,10 @@ app.get('/manifest.json', (c) => {
 });
 
 app.get('/', (c) => {
+  // Prevent caching to ensure fresh JavaScript
+  c.header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  c.header('Pragma', 'no-cache');
+  c.header('Expires', '0');
   return c.html(`<!DOCTYPE html>
 <html lang="en">
 <head>
