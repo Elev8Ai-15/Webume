@@ -3379,7 +3379,7 @@ app.get('/', (c) => {
       LAST_SAVED: 'webume_last_saved'
     };
     
-    // Auth View Component
+    // Auth View Component - Simplified for maximum compatibility
     const AuthView = ({ onLogin, authLoading, authError }) => {
       const [isLogin, setIsLogin] = useState(true);
       const [email, setEmail] = useState('');
@@ -3388,8 +3388,9 @@ app.get('/', (c) => {
       const [error, setError] = useState('');
       const [showPassword, setShowPassword] = useState(false);
       
-      const handleSubmit = async (e) => {
+      const handleSubmit = (e) => {
         e.preventDefault();
+        e.stopPropagation();
         console.log('📝 Form submitted!', { email, password: '***', name, isLogin });
         setError('');
         
@@ -3400,13 +3401,23 @@ app.get('/', (c) => {
         }
         
         console.log('✅ Validation passed, calling onLogin...');
-        try {
-          await onLogin(isLogin, email, password, name);
-          console.log('✅ onLogin completed');
-        } catch (err) {
-          console.error('❌ onLogin error:', err);
-          setError('An error occurred. Please try again.');
-        }
+        onLogin(isLogin, email, password, name);
+      };
+      
+      // Direct input handlers for maximum compatibility
+      const handleEmailChange = (e) => {
+        console.log('📧 Email:', e.target.value);
+        setEmail(e.target.value);
+      };
+      
+      const handlePasswordChange = (e) => {
+        console.log('🔑 Password changed');
+        setPassword(e.target.value);
+      };
+      
+      const handleNameChange = (e) => {
+        console.log('👤 Name:', e.target.value);
+        setName(e.target.value);
       };
       
       return (
@@ -3417,8 +3428,7 @@ app.get('/', (c) => {
           justifyContent: 'center',
           padding: '20px',
           position: 'relative',
-          zIndex: 10,
-          pointerEvents: 'auto'
+          zIndex: 100
         }}>
           <div className="glass" style={{ 
             width: '100%', 
@@ -3426,8 +3436,7 @@ app.get('/', (c) => {
             padding: '48px 40px',
             borderRadius: '28px',
             position: 'relative',
-            zIndex: 20,
-            pointerEvents: 'auto'
+            zIndex: 200
           }}>
             <div style={{ textAlign: 'center', marginBottom: '36px' }}>
               <div style={{
@@ -3479,10 +3488,20 @@ app.get('/', (c) => {
                   <input
                     type="text"
                     className="glass-input"
+                    id="auth-name"
+                    name="name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={handleNameChange}
+                    onFocus={() => console.log('👤 Name focused')}
                     placeholder="John Smith"
-                    style={{ width: '100%', padding: '14px 16px', fontSize: '15px' }}
+                    autoComplete="name"
+                    style={{ 
+                      width: '100%', 
+                      padding: '14px 16px', 
+                      fontSize: '16px',
+                      WebkitAppearance: 'none',
+                      appearance: 'none'
+                    }
                   />
                 </div>
               )}
@@ -3494,13 +3513,25 @@ app.get('/', (c) => {
                 </label>
                 <input
                   type="email"
+                  id="auth-email"
+                  name="email"
                   className="glass-input"
                   value={email}
-                  onChange={(e) => { console.log('📧 Email input changed:', e.target.value); setEmail(e.target.value); }}
-                  onFocus={() => console.log('📧 Email input focused')}
+                  onChange={handleEmailChange}
+                  onFocus={() => console.log('📧 Email focused')}
+                  onTouchStart={() => console.log('📧 Email touch start')}
                   placeholder="you@example.com"
                   autoComplete="email"
-                  style={{ width: '100%', padding: '14px 16px', fontSize: '15px', touchAction: 'manipulation' }}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  style={{ 
+                    width: '100%', 
+                    padding: '14px 16px', 
+                    fontSize: '16px',
+                    WebkitAppearance: 'none',
+                    appearance: 'none'
+                  }}
                 />
               </div>
               
@@ -3512,13 +3543,23 @@ app.get('/', (c) => {
                 <div style={{ position: 'relative' }}>
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    id="auth-password"
+                    name="password"
                     className="glass-input"
                     value={password}
-                    onChange={(e) => { console.log('🔑 Password input changed'); setPassword(e.target.value); }}
-                    onFocus={() => console.log('🔑 Password input focused')}
+                    onChange={handlePasswordChange}
+                    onFocus={() => console.log('🔑 Password focused')}
+                    onTouchStart={() => console.log('🔑 Password touch start')}
                     placeholder="••••••••"
                     autoComplete="current-password"
-                    style={{ width: '100%', padding: '14px 16px', fontSize: '15px', paddingRight: '50px', touchAction: 'manipulation' }}
+                    style={{ 
+                      width: '100%', 
+                      padding: '14px 16px', 
+                      fontSize: '16px',
+                      paddingRight: '50px',
+                      WebkitAppearance: 'none',
+                      appearance: 'none'
+                    }}
                   />
                   <button
                     type="button"
@@ -3547,15 +3588,26 @@ app.get('/', (c) => {
                 type="submit" 
                 className="btn btn-primary"
                 disabled={authLoading}
-                onClick={() => console.log('🖱️ BUTTON CLICKED!')}
+                onClick={(e) => { 
+                  console.log('🖱️ BUTTON CLICKED!');
+                  // If form submit doesn't work, try direct call
+                  if (email && password && (isLogin || name)) {
+                    handleSubmit(e);
+                  }
+                }}
+                onTouchEnd={(e) => {
+                  console.log('👆 BUTTON TOUCH END!');
+                }}
                 style={{ 
                   width: '100%', 
-                  padding: '16px', 
-                  fontSize: '15px',
+                  padding: '18px', 
+                  fontSize: '16px',
                   fontWeight: '700',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  minHeight: '56px',
+                  WebkitTapHighlightColor: 'transparent',
                   gap: '10px',
                   position: 'relative',
                   zIndex: 100
