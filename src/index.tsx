@@ -3217,7 +3217,7 @@ app.get('/', (c) => {
   <div id="root"></div>
   
   <script type="text/babel">
-    const { useState, useRef } = React;
+    const { useState, useRef, useEffect } = React;
     
     // File Parsers
     const FileParser = {
