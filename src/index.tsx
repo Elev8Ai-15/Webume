@@ -3381,7 +3381,7 @@ app.get('/', (c) => {
     };
     
     // Auth View Component - Simplified for maximum compatibility
-    const AuthView = ({ onLogin, authLoading, authError }) => {
+    const AuthView = ({ onLogin, authLoading, authError, clearAuthError }) => {
       const [isLogin, setIsLogin] = useState(true);
       const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
@@ -3632,7 +3632,7 @@ app.get('/', (c) => {
               <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px' }}>
                 {isLogin ? "Don't have an account?" : "Already have an account?"}
                 <button
-                  onClick={() => { setIsLogin(!isLogin); setError(''); }}
+                  onClick={() => { setIsLogin(!isLogin); setError(''); if(clearAuthError) clearAuthError(); }}
                   style={{
                     background: 'none',
                     border: 'none',
@@ -4139,7 +4139,7 @@ app.get('/', (c) => {
       
       // Show Auth view if not logged in
       if (view === VIEW.AUTH) {
-        return <AuthView onLogin={handleAuth} authLoading={authLoading} authError={authError} />;
+        return <AuthView onLogin={handleAuth} authLoading={authLoading} authError={authError} clearAuthError={() => setAuthError('')} />;
       }
       
       return (
