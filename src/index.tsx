@@ -2055,6 +2055,7 @@ app.get('/', (c) => {
       background: #0a0a12;
       overflow: hidden;
       pointer-events: none; /* Allow clicks to pass through to content */
+      z-index: -1; /* Explicitly place behind all content */
     }
     
     /* Background image - NO BLUR - crystal clear glass cards */
@@ -4115,7 +4116,9 @@ app.get('/', (c) => {
             alignItems: 'center', 
             justifyContent: 'center',
             flexDirection: 'column',
-            gap: '20px'
+            gap: '20px',
+            position: 'relative',
+            zIndex: 100
           }}>
             <div style={{
               width: '80px',
