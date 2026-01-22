@@ -7,7 +7,7 @@
 | Environment | URL |
 |-------------|-----|
 | **Production** | https://webume.pages.dev |
-| **Latest Deploy** | https://d814307c.webume.pages.dev |
+| **Latest Deploy** | https://863a604f.webume.pages.dev |
 | **Sandbox** | https://3000-izyu2fpqppfan5ciwputt-2e1b9533.sandbox.novita.ai |
 
 ---
