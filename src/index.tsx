@@ -292,7 +292,7 @@ app.use('*', async (c, next) => {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
     "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
     "img-src 'self' data: blob: https:; " +
-    "connect-src 'self' https://api.stripe.com https://generativelanguage.googleapis.com https://logo.clearbit.com; " +
+    "connect-src 'self' https://api.stripe.com https://generativelanguage.googleapis.com https://logo.clearbit.com https://img.logo.dev https://icons.duckduckgo.com; " +
     "frame-src https://js.stripe.com; " +
     "frame-ancestors 'self' https://*.genspark.ai https://*.gensparksite.com https://*.sandbox.novita.ai https://*.pages.dev;"
   );
@@ -7757,7 +7757,9 @@ app.get('/', (c) => {
       };
       
       const exp = experience || {};
-      const displayLogo = exp.customLogo || exp.logoUrl;
+      // Use customLogo first, then logoUrl, then try logo.dev API with domain
+      const expDomain = exp.companyInfo?.domain;
+      const displayLogo = exp.customLogo || exp.logoUrl || (expDomain ? \`https://img.logo.dev/\${expDomain}?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ\` : null);
       
       // Calculate tenure
       const calculateTenure = () => {
@@ -7907,7 +7909,7 @@ app.get('/', (c) => {
             </button>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
-              {displayLogo && (
+              {displayLogo ? (
                 <div style={{
                   width: '60px',
                   height: '60px',
@@ -7918,7 +7920,33 @@ app.get('/', (c) => {
                   justifyContent: 'center',
                   overflow: 'hidden'
                 }}>
-                  <img src={displayLogo} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} onError={(e) => e.target.style.display = 'none'} />
+                  <img 
+                    src={displayLogo} 
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} 
+                    onError={(e) => {
+                      const ddgUrl = expDomain ? \`https://icons.duckduckgo.com/ip3/\${expDomain}.ico\` : null;
+                      if (ddgUrl && e.target.src !== ddgUrl) {
+                        e.target.src = ddgUrl;
+                      } else {
+                        e.target.style.display = 'none';
+                      }
+                    }} 
+                  />
+                </div>
+              ) : (
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '14px',
+                  background: \`linear-gradient(135deg, \${styles.accent}, #6D28D9)\`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '24px',
+                  fontWeight: '700'
+                }}>
+                  {(exp.company || 'C').charAt(0).toUpperCase()}
                 </div>
               )}
               <div>
@@ -10548,7 +10576,9 @@ The more detail, the better the tailored resume!"
               
               <div className="timeline-wrap" style={{ '--timeline-color': styles.accent }}>
                 {profile.experience.map((exp, idx) => {
-                  const displayLogo = exp.customLogo || exp.logoUrl;
+                  // Use customLogo first, then logoUrl, then try logo.dev API with domain
+                  const timelineDomain = exp.companyInfo?.domain;
+                  const displayLogo = exp.customLogo || exp.logoUrl || (timelineDomain ? \`https://img.logo.dev/\${timelineDomain}?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ\` : null);
                   const isHovered = hoveredExp === exp.id;
                   const hasRichContent = (exp.projects?.length > 0) || (exp.victories?.length > 0) || 
                                          (exp.challenges?.length > 0) || (exp.photos?.length > 0) || 
@@ -10606,9 +10636,34 @@ The more detail, the better the tailored resume!"
                         }}>
                           <img 
                             src={displayLogo} 
-                            onError={(e) => e.target.style.display = 'none'}
+                            onError={(e) => {
+                              // Try DuckDuckGo favicon as fallback
+                              const ddgUrl = timelineDomain ? \`https://icons.duckduckgo.com/ip3/\${timelineDomain}.ico\` : null;
+                              if (ddgUrl && e.target.src !== ddgUrl) {
+                                e.target.src = ddgUrl;
+                              } else {
+                                e.target.style.display = 'none';
+                              }
+                            }}
                             style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} 
                           />
+                        </div>
+                      )}
+                      {!displayLogo && (
+                        <div style={{
+                          width: '56px',
+                          height: '56px',
+                          borderRadius: '12px',
+                          background: \`linear-gradient(135deg, \${styles.accent}, #6D28D9)\`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          color: 'white',
+                          fontSize: '20px',
+                          fontWeight: '700'
+                        }}>
+                          {(exp.company || 'C').charAt(0).toUpperCase()}
                         </div>
                       )}
                       <div style={{ flex: 1 }}>
