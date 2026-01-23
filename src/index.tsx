@@ -3160,7 +3160,9 @@ app.get('/p/:slug', async (c) => {
               <div className="timeline-container">
                 <div className="timeline-list">
                   {experience.map((exp, i) => {
-                    const logoUrl = exp.customLogo || exp.logoUrl || (exp.companyInfo?.domain ? 'https://logo.clearbit.com/' + exp.companyInfo.domain : null);
+                    // Try multiple logo sources: customLogo > logoUrl > logo.dev API > fallback
+                    const domain = exp.companyInfo?.domain;
+                    const logoUrl = exp.customLogo || exp.logoUrl || (domain ? 'https://img.logo.dev/' + domain + '?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ' : null);
                     const isActive = selectedExp?.id === exp.id || (selectedExp && !exp.id && selectedExp.company === exp.company && selectedExp.role === exp.role);
                     
                     return (
@@ -3180,8 +3182,14 @@ app.get('/p/:slug', async (c) => {
                                 src={logoUrl} 
                                 alt={exp.company}
                                 onError={(e) => {
-                                  e.target.style.display = 'none';
-                                  e.target.parentElement.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,' + accent + ',#6D28D9);border-radius:16px;color:white;font-weight:700;font-size:26px">' + getCompanyInitial(exp.company) + '</div>';
+                                  // Fallback: try DuckDuckGo icons
+                                  const ddgUrl = domain ? 'https://icons.duckduckgo.com/ip3/' + domain + '.ico' : null;
+                                  if (ddgUrl && e.target.src !== ddgUrl) {
+                                    e.target.src = ddgUrl;
+                                  } else {
+                                    e.target.style.display = 'none';
+                                    e.target.parentElement.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,' + accent + ',#6D28D9);border-radius:16px;color:white;font-weight:700;font-size:26px">' + getCompanyInitial(exp.company) + '</div>';
+                                  }
                                 }}
                               />
                             </div>
@@ -3285,19 +3293,29 @@ app.get('/p/:slug', async (c) => {
                   </button>
                   
                   <div className="panel-company-header">
-                    {(selectedExp.customLogo || selectedExp.logoUrl || selectedExp.companyInfo?.domain) ? (
-                      <div className="panel-logo">
-                        <img 
-                          src={selectedExp.customLogo || selectedExp.logoUrl || ('https://logo.clearbit.com/' + selectedExp.companyInfo?.domain)}
-                          alt={selectedExp.company}
-                          onError={(e) => {
-                            e.target.parentElement.innerHTML = '<div class="panel-logo-placeholder">' + getCompanyInitial(selectedExp.company) + '</div>';
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <div className="panel-logo-placeholder">{getCompanyInitial(selectedExp.company)}</div>
-                    )}
+                    {(() => {
+                      const panelDomain = selectedExp.companyInfo?.domain;
+                      const panelLogoUrl = selectedExp.customLogo || selectedExp.logoUrl || (panelDomain ? 'https://img.logo.dev/' + panelDomain + '?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ' : null);
+                      
+                      return panelLogoUrl ? (
+                        <div className="panel-logo">
+                          <img 
+                            src={panelLogoUrl}
+                            alt={selectedExp.company}
+                            onError={(e) => {
+                              const ddgUrl = panelDomain ? 'https://icons.duckduckgo.com/ip3/' + panelDomain + '.ico' : null;
+                              if (ddgUrl && e.target.src !== ddgUrl) {
+                                e.target.src = ddgUrl;
+                              } else {
+                                e.target.parentElement.innerHTML = '<div class="panel-logo-placeholder">' + getCompanyInitial(selectedExp.company) + '</div>';
+                              }
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="panel-logo-placeholder">{getCompanyInitial(selectedExp.company)}</div>
+                      );
+                    })()}
                     
                     <div className="panel-title-section">
                       <h2>{selectedExp.company}</h2>
