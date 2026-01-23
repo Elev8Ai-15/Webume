@@ -2976,6 +2976,9 @@ app.get('/p/:slug', async (c) => {
         'in-the-house productions': '/static/inthehouse-logo.png',
         'the house productions': '/static/inthehouse-logo.png',
         'house productions': '/static/inthehouse-logo.png',
+        'chapters health system': '/static/chapters-health-logo.png',
+        'chapters health': '/static/chapters-health-logo.png',
+        'chapters': '/static/chapters-health-logo.png',
       };
       
       const getLocalLogo = (companyName) => {
@@ -7854,6 +7857,9 @@ app.get('/', (c) => {
       'in-the-house productions': '/static/inthehouse-logo.png',
       'the house productions': '/static/inthehouse-logo.png',
       'house productions': '/static/inthehouse-logo.png',
+      'chapters health system': '/static/chapters-health-logo.png',
+      'chapters health': '/static/chapters-health-logo.png',
+      'chapters': '/static/chapters-health-logo.png',
     };
     
     const getLocalLogoForEmployer = (companyName) => {
@@ -10204,6 +10210,9 @@ The more detail, the better the tailored resume!"
       'in-the-house productions': '/static/inthehouse-logo.png',
       'the house productions': '/static/inthehouse-logo.png',
       'house productions': '/static/inthehouse-logo.png',
+      'chapters health system': '/static/chapters-health-logo.png',
+      'chapters health': '/static/chapters-health-logo.png',
+      'chapters': '/static/chapters-health-logo.png',
     };
     
     const getLocalLogoForPreview = (companyName) => {
