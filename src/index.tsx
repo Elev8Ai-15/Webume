@@ -2934,6 +2934,76 @@ app.get('/p/:slug', async (c) => {
         }
       };
       
+      // Known company domain mappings for automatic logo lookup
+      const KNOWN_DOMAINS = {
+        'chapters health system': 'chaptershealth.org',
+        'chapters health': 'chaptershealth.org',
+        "life's treasures": 'chaptershealth.org',
+        "life's treasures thrift stores": 'chaptershealth.org',
+        'lifes treasures': 'chaptershealth.org',
+        'in the house productions': 'inthehouseproductions.com',
+        'in the house production': 'inthehouseproductions.com',
+        'in house productions': 'inthehouseproductions.com',
+        'inthehouseproductions': 'inthehouseproductions.com',
+        'in-the-house productions': 'inthehouseproductions.com',
+        'the house productions': 'inthehouseproductions.com',
+        'house productions': 'inthehouseproductions.com',
+        'google': 'google.com',
+        'stripe': 'stripe.com',
+        'salesforce': 'salesforce.com',
+        'amazon': 'amazon.com',
+        'microsoft': 'microsoft.com',
+        'apple': 'apple.com',
+        'meta': 'meta.com',
+        'facebook': 'facebook.com',
+        'netflix': 'netflix.com',
+        'walmart': 'walmart.com',
+        'target': 'target.com',
+        'starbucks': 'starbucks.com',
+        'mcdonalds': 'mcdonalds.com',
+        "mcdonald's": 'mcdonalds.com',
+        'publix': 'publix.com',
+        'cvs': 'cvs.com',
+        'walgreens': 'walgreens.com',
+        'bank of america': 'bankofamerica.com',
+        'wells fargo': 'wellsfargo.com',
+        'chase': 'chase.com',
+        'jpmorgan': 'jpmorgan.com',
+        'citibank': 'citibank.com',
+      };
+      
+      // Local static logo mappings - for companies without good external logos
+      const LOCAL_LOGOS = {
+        'in the house productions': '/static/inthehouse-logo.png',
+        'in the house production': '/static/inthehouse-logo.png',
+        'in house productions': '/static/inthehouse-logo.png',
+        'inthehouseproductions': '/static/inthehouse-logo.png',
+        'in-the-house productions': '/static/inthehouse-logo.png',
+        'the house productions': '/static/inthehouse-logo.png',
+        'house productions': '/static/inthehouse-logo.png',
+      };
+      
+      const getLocalLogo = (companyName) => {
+        if (!companyName) return null;
+        const lowerName = companyName.toLowerCase().trim();
+        if (LOCAL_LOGOS[lowerName]) return LOCAL_LOGOS[lowerName];
+        for (const [key, path] of Object.entries(LOCAL_LOGOS)) {
+          if (lowerName.includes(key) || key.includes(lowerName)) return path;
+        }
+        return null;
+      };
+      
+      const getKnownDomain = (companyName, existingDomain) => {
+        if (existingDomain) return existingDomain;
+        if (!companyName) return null;
+        const lowerName = companyName.toLowerCase().trim();
+        if (KNOWN_DOMAINS[lowerName]) return KNOWN_DOMAINS[lowerName];
+        for (const [key, domain] of Object.entries(KNOWN_DOMAINS)) {
+          if (lowerName.includes(key) || key.includes(lowerName)) return domain;
+        }
+        return null;
+      };
+      
       const scrollToTimeline = () => {
         if (timelineRef.current) {
           timelineRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -3160,9 +3230,11 @@ app.get('/p/:slug', async (c) => {
               <div className="timeline-container">
                 <div className="timeline-list">
                   {experience.map((exp, i) => {
-                    // Try multiple logo sources: customLogo > logoUrl > logo.dev API > fallback
-                    const domain = exp.companyInfo?.domain;
-                    const logoUrl = exp.customLogo || exp.logoUrl || (domain ? 'https://img.logo.dev/' + domain + '?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ' : null);
+                    // Try multiple logo sources: customLogo > logoUrl > local static > logo.dev API > fallback
+                    // Use getKnownDomain to auto-resolve company names to domains
+                    const localLogo = getLocalLogo(exp.company);
+                    const domain = getKnownDomain(exp.company, exp.companyInfo?.domain);
+                    const logoUrl = exp.customLogo || exp.logoUrl || localLogo || (domain ? 'https://img.logo.dev/' + domain + '?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ' : null);
                     const isActive = selectedExp?.id === exp.id || (selectedExp && !exp.id && selectedExp.company === exp.company && selectedExp.role === exp.role);
                     
                     return (
@@ -3294,8 +3366,10 @@ app.get('/p/:slug', async (c) => {
                   
                   <div className="panel-company-header">
                     {(() => {
-                      const panelDomain = selectedExp.companyInfo?.domain;
-                      const panelLogoUrl = selectedExp.customLogo || selectedExp.logoUrl || (panelDomain ? 'https://img.logo.dev/' + panelDomain + '?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ' : null);
+                      // Use getKnownDomain to auto-resolve company names to domains
+                      const panelLocalLogo = getLocalLogo(selectedExp.company);
+                      const panelDomain = getKnownDomain(selectedExp.company, selectedExp.companyInfo?.domain);
+                      const panelLogoUrl = selectedExp.customLogo || selectedExp.logoUrl || panelLocalLogo || (panelDomain ? 'https://img.logo.dev/' + panelDomain + '?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ' : null);
                       
                       return panelLogoUrl ? (
                         <div className="panel-logo">
@@ -7743,6 +7817,81 @@ app.get('/', (c) => {
       );
     };
     
+    // Known company domain mappings for automatic logo lookup
+    const KNOWN_COMPANY_DOMAINS = {
+      'chapters health system': 'chaptershealth.org',
+      'chapters health': 'chaptershealth.org',
+      "life's treasures": 'chaptershealth.org',
+      "life's treasures thrift stores": 'chaptershealth.org',
+      'lifes treasures': 'chaptershealth.org',
+      'in the house productions': 'inthehouseproductions.com',
+      'in the house production': 'inthehouseproductions.com',
+      'in house productions': 'inthehouseproductions.com',
+      'inthehouseproductions': 'inthehouseproductions.com',
+      'in-the-house productions': 'inthehouseproductions.com',
+      'the house productions': 'inthehouseproductions.com',
+      'house productions': 'inthehouseproductions.com',
+      'google': 'google.com',
+      'stripe': 'stripe.com',
+      'salesforce': 'salesforce.com',
+      'amazon': 'amazon.com',
+      'microsoft': 'microsoft.com',
+      'apple': 'apple.com',
+      'meta': 'meta.com',
+      'facebook': 'facebook.com',
+      'netflix': 'netflix.com',
+      'walmart': 'walmart.com',
+      'target': 'target.com',
+      'starbucks': 'starbucks.com',
+      'mcdonalds': 'mcdonalds.com',
+      "mcdonald's": 'mcdonalds.com',
+      'publix': 'publix.com',
+      'cvs': 'cvs.com',
+      'walgreens': 'walgreens.com',
+      'bank of america': 'bankofamerica.com',
+      'wells fargo': 'wellsfargo.com',
+      'chase': 'chase.com',
+      'jpmorgan': 'jpmorgan.com',
+      'citibank': 'citibank.com',
+    };
+    
+    // Local static logo mappings - for companies without good external logos
+    const LOCAL_LOGOS_EMPLOYER = {
+      'in the house productions': '/static/inthehouse-logo.png',
+      'in the house production': '/static/inthehouse-logo.png',
+      'in house productions': '/static/inthehouse-logo.png',
+      'inthehouseproductions': '/static/inthehouse-logo.png',
+      'in-the-house productions': '/static/inthehouse-logo.png',
+      'the house productions': '/static/inthehouse-logo.png',
+      'house productions': '/static/inthehouse-logo.png',
+    };
+    
+    const getLocalLogoForEmployer = (companyName) => {
+      if (!companyName) return null;
+      const lowerName = companyName.toLowerCase().trim();
+      if (LOCAL_LOGOS_EMPLOYER[lowerName]) return LOCAL_LOGOS_EMPLOYER[lowerName];
+      for (const [key, path] of Object.entries(LOCAL_LOGOS_EMPLOYER)) {
+        if (lowerName.includes(key) || key.includes(lowerName)) return path;
+      }
+      return null;
+    };
+    
+    // Helper to get domain from company name
+    const getCompanyDomainForEmployer = (companyName, existingDomain) => {
+      if (existingDomain) return existingDomain;
+      if (!companyName) return null;
+      const lowerName = companyName.toLowerCase().trim();
+      // Check exact match first
+      if (KNOWN_COMPANY_DOMAINS[lowerName]) return KNOWN_COMPANY_DOMAINS[lowerName];
+      // Check partial matches
+      for (const [key, domain] of Object.entries(KNOWN_COMPANY_DOMAINS)) {
+        if (lowerName.includes(key) || key.includes(lowerName)) {
+          return domain;
+        }
+      }
+      return null;
+    };
+    
     // EMPLOYER DETAIL PAGE - Full immersive view for each employer experience
     const EmployerDetailPage = ({ experience, onClose, template, isEditing, onUpdate }) => {
       const [activeSection, setActiveSection] = useState('overview');
@@ -7757,9 +7906,10 @@ app.get('/', (c) => {
       };
       
       const exp = experience || {};
-      // Use customLogo first, then logoUrl, then try logo.dev API with domain
-      const expDomain = exp.companyInfo?.domain;
-      const displayLogo = exp.customLogo || exp.logoUrl || (expDomain ? \`https://img.logo.dev/\${expDomain}?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ\` : null);
+      // Use customLogo first, then logoUrl, then local static logo, then try logo.dev API with domain
+      const expLocalLogo = getLocalLogoForEmployer(exp.company);
+      const expDomain = getCompanyDomainForEmployer(exp.company, exp.companyInfo?.domain);
+      const displayLogo = exp.customLogo || exp.logoUrl || expLocalLogo || (expDomain ? \`https://img.logo.dev/\${expDomain}?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ\` : null);
       
       // Calculate tenure
       const calculateTenure = () => {
@@ -10022,6 +10172,81 @@ The more detail, the better the tailored resume!"
     };
     
     // Preview View with Template Support - ENHANCED for all 10 templates
+    // Known company domain mappings for automatic logo lookup
+    const KNOWN_COMPANY_DOMAINS = {
+      'chapters health system': 'chaptershealth.org',
+      'chapters health': 'chaptershealth.org',
+      "life's treasures": 'chaptershealth.org',
+      "life's treasures thrift stores": 'chaptershealth.org',
+      'lifes treasures': 'chaptershealth.org',
+      'in the house productions': 'inthehouseproductions.com',
+      'in the house production': 'inthehouseproductions.com',
+      'in house productions': 'inthehouseproductions.com',
+      'inthehouseproductions': 'inthehouseproductions.com',
+      'in-the-house productions': 'inthehouseproductions.com',
+      'the house productions': 'inthehouseproductions.com',
+      'house productions': 'inthehouseproductions.com',
+      'google': 'google.com',
+      'stripe': 'stripe.com',
+      'salesforce': 'salesforce.com',
+      'amazon': 'amazon.com',
+      'microsoft': 'microsoft.com',
+      'apple': 'apple.com',
+      'meta': 'meta.com',
+      'facebook': 'facebook.com',
+      'netflix': 'netflix.com',
+      'walmart': 'walmart.com',
+      'target': 'target.com',
+      'starbucks': 'starbucks.com',
+      'mcdonalds': 'mcdonalds.com',
+      "mcdonald's": 'mcdonalds.com',
+      'publix': 'publix.com',
+      'cvs': 'cvs.com',
+      'walgreens': 'walgreens.com',
+      'bank of america': 'bankofamerica.com',
+      'wells fargo': 'wellsfargo.com',
+      'chase': 'chase.com',
+      'jpmorgan': 'jpmorgan.com',
+      'citibank': 'citibank.com',
+    };
+    
+    // Local static logo mappings - for companies without good external logos
+    const LOCAL_LOGOS_PREVIEW = {
+      'in the house productions': '/static/inthehouse-logo.png',
+      'in the house production': '/static/inthehouse-logo.png',
+      'in house productions': '/static/inthehouse-logo.png',
+      'inthehouseproductions': '/static/inthehouse-logo.png',
+      'in-the-house productions': '/static/inthehouse-logo.png',
+      'the house productions': '/static/inthehouse-logo.png',
+      'house productions': '/static/inthehouse-logo.png',
+    };
+    
+    const getLocalLogoForPreview = (companyName) => {
+      if (!companyName) return null;
+      const lowerName = companyName.toLowerCase().trim();
+      if (LOCAL_LOGOS_PREVIEW[lowerName]) return LOCAL_LOGOS_PREVIEW[lowerName];
+      for (const [key, path] of Object.entries(LOCAL_LOGOS_PREVIEW)) {
+        if (lowerName.includes(key) || key.includes(lowerName)) return path;
+      }
+      return null;
+    };
+    
+    // Helper to get domain from company name
+    const getCompanyDomain = (companyName, existingDomain) => {
+      if (existingDomain) return existingDomain;
+      if (!companyName) return null;
+      const lowerName = companyName.toLowerCase().trim();
+      // Check exact match first
+      if (KNOWN_COMPANY_DOMAINS[lowerName]) return KNOWN_COMPANY_DOMAINS[lowerName];
+      // Check partial matches
+      for (const [key, domain] of Object.entries(KNOWN_COMPANY_DOMAINS)) {
+        if (lowerName.includes(key) || key.includes(lowerName)) {
+          return domain;
+        }
+      }
+      return null;
+    };
+    
     const PreviewView = ({ profile, setView, profilePhoto, selectedTemplate, slug, isPublic, setIsPublic, profileViews, setProfile }) => {
       console.log('🎨 PreviewView rendering with:', { profile, selectedTemplate, slug, isPublic });
       
@@ -10576,9 +10801,10 @@ The more detail, the better the tailored resume!"
               
               <div className="timeline-wrap" style={{ '--timeline-color': styles.accent }}>
                 {profile.experience.map((exp, idx) => {
-                  // Use customLogo first, then logoUrl, then try logo.dev API with domain
-                  const timelineDomain = exp.companyInfo?.domain;
-                  const displayLogo = exp.customLogo || exp.logoUrl || (timelineDomain ? \`https://img.logo.dev/\${timelineDomain}?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ\` : null);
+                  // Use customLogo first, then logoUrl, then local static logo, then try logo.dev API with domain
+                  const timelineLocalLogo = getLocalLogoForPreview(exp.company);
+                  const timelineDomain = getCompanyDomain(exp.company, exp.companyInfo?.domain);
+                  const displayLogo = exp.customLogo || exp.logoUrl || timelineLocalLogo || (timelineDomain ? \`https://img.logo.dev/\${timelineDomain}?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ\` : null);
                   const isHovered = hoveredExp === exp.id;
                   const hasRichContent = (exp.projects?.length > 0) || (exp.victories?.length > 0) || 
                                          (exp.challenges?.length > 0) || (exp.photos?.length > 0) || 
