@@ -2936,11 +2936,6 @@ app.get('/p/:slug', async (c) => {
       
       // Known company domain mappings for automatic logo lookup
       const KNOWN_DOMAINS = {
-        'chapters health system': 'chaptershealth.org',
-        'chapters health': 'chaptershealth.org',
-        "life's treasures": 'chaptershealth.org',
-        "life's treasures thrift stores": 'chaptershealth.org',
-        'lifes treasures': 'chaptershealth.org',
         'in the house productions': 'inthehouseproductions.com',
         'in the house production': 'inthehouseproductions.com',
         'in house productions': 'inthehouseproductions.com',
@@ -7819,11 +7814,6 @@ app.get('/', (c) => {
     
     // Known company domain mappings for automatic logo lookup
     const KNOWN_COMPANY_DOMAINS = {
-      'chapters health system': 'chaptershealth.org',
-      'chapters health': 'chaptershealth.org',
-      "life's treasures": 'chaptershealth.org',
-      "life's treasures thrift stores": 'chaptershealth.org',
-      'lifes treasures': 'chaptershealth.org',
       'in the house productions': 'inthehouseproductions.com',
       'in the house production': 'inthehouseproductions.com',
       'in house productions': 'inthehouseproductions.com',
@@ -10174,11 +10164,6 @@ The more detail, the better the tailored resume!"
     // Preview View with Template Support - ENHANCED for all 10 templates
     // Known company domain mappings for automatic logo lookup
     const KNOWN_COMPANY_DOMAINS = {
-      'chapters health system': 'chaptershealth.org',
-      'chapters health': 'chaptershealth.org',
-      "life's treasures": 'chaptershealth.org',
-      "life's treasures thrift stores": 'chaptershealth.org',
-      'lifes treasures': 'chaptershealth.org',
       'in the house productions': 'inthehouseproductions.com',
       'in the house production': 'inthehouseproductions.com',
       'in house productions': 'inthehouseproductions.com',
