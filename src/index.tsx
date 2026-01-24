@@ -7815,8 +7815,8 @@ app.get('/', (c) => {
       );
     };
     
-    // Known company domain mappings for automatic logo lookup
-    const KNOWN_COMPANY_DOMAINS = {
+    // Known company domain mappings for automatic logo lookup (for EmployerDetailPage)
+    const KNOWN_COMPANY_DOMAINS_EMPLOYER = {
       'in the house productions': 'inthehouseproductions.com',
       'in the house production': 'inthehouseproductions.com',
       'in house productions': 'inthehouseproductions.com',
@@ -7878,9 +7878,9 @@ app.get('/', (c) => {
       if (!companyName) return null;
       const lowerName = companyName.toLowerCase().trim();
       // Check exact match first
-      if (KNOWN_COMPANY_DOMAINS[lowerName]) return KNOWN_COMPANY_DOMAINS[lowerName];
+      if (KNOWN_COMPANY_DOMAINS_EMPLOYER[lowerName]) return KNOWN_COMPANY_DOMAINS_EMPLOYER[lowerName];
       // Check partial matches
-      for (const [key, domain] of Object.entries(KNOWN_COMPANY_DOMAINS)) {
+      for (const [key, domain] of Object.entries(KNOWN_COMPANY_DOMAINS_EMPLOYER)) {
         if (lowerName.includes(key) || key.includes(lowerName)) {
           return domain;
         }
@@ -10168,8 +10168,8 @@ The more detail, the better the tailored resume!"
     };
     
     // Preview View with Template Support - ENHANCED for all 10 templates
-    // Known company domain mappings for automatic logo lookup
-    const KNOWN_COMPANY_DOMAINS = {
+    // Known company domain mappings for automatic logo lookup (for PreviewView)
+    const KNOWN_COMPANY_DOMAINS_PREVIEW = {
       'in the house productions': 'inthehouseproductions.com',
       'in the house production': 'inthehouseproductions.com',
       'in house productions': 'inthehouseproductions.com',
@@ -10231,9 +10231,9 @@ The more detail, the better the tailored resume!"
       if (!companyName) return null;
       const lowerName = companyName.toLowerCase().trim();
       // Check exact match first
-      if (KNOWN_COMPANY_DOMAINS[lowerName]) return KNOWN_COMPANY_DOMAINS[lowerName];
+      if (KNOWN_COMPANY_DOMAINS_PREVIEW[lowerName]) return KNOWN_COMPANY_DOMAINS_PREVIEW[lowerName];
       // Check partial matches
-      for (const [key, domain] of Object.entries(KNOWN_COMPANY_DOMAINS)) {
+      for (const [key, domain] of Object.entries(KNOWN_COMPANY_DOMAINS_PREVIEW)) {
         if (lowerName.includes(key) || key.includes(lowerName)) {
           return domain;
         }
