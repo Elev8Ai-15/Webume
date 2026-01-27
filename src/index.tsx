@@ -1619,23 +1619,23 @@ app.get('/p/:slug', async (c) => {
     
     :root {
       /* ============================================
-         PREMIUM AUTOMOTIVE / TIMEPIECE PALETTE
-         Deep reflective black with dark blue highlights
+         PREMIUM DEEP BLACK PALETTE
+         High-shine reflective black - minimal color
          ============================================ */
-      --accent: #1e3a5f;            /* Dark steel blue */
-      --accent-light: #2d5a87;      /* Lighter blue accent */
-      --accent-dark: #0d1f33;       /* Deep midnight blue */
-      --accent-glow: #3d7ab8;       /* High shine highlight */
-      --chrome: #c0c8d4;            /* Chrome/steel text */
-      --chrome-bright: #e8ecf2;     /* Bright chrome highlight */
-      --bg-dark: #050a10;           /* Deep reflective black */
-      --bg-card: rgba(15,25,40,0.6);
-      --border: rgba(45,90,135,0.2);
-      --text: #e8ecf2;
-      --text-muted: rgba(200,210,220,0.6);
-      --text-dim: rgba(160,175,190,0.4);
-      --surface-black: #050a10;
-      --surface-shine: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%, rgba(255,255,255,0.03) 100%);
+      --accent: #18181b;            /* Dark charcoal */
+      --accent-light: #27272a;      /* Lighter charcoal */
+      --accent-dark: #09090b;       /* Near-black */
+      --accent-glow: #a1a1aa;       /* Silver/chrome */
+      --chrome: #a1a1aa;            /* Chrome/silver */
+      --chrome-bright: #e4e4e7;     /* Bright chrome */
+      --bg-dark: #030303;           /* Deep black */
+      --bg-card: rgba(12,12,14,0.9);
+      --border: rgba(255,255,255,0.06);
+      --text: #e4e4e7;
+      --text-muted: rgba(161,161,170,0.7);
+      --text-dim: rgba(113,113,122,0.5);
+      --surface-black: #030303;
+      --surface-shine: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%, rgba(255,255,255,0.02) 100%);
     }
     
     html {
@@ -3727,26 +3727,26 @@ app.get('/', (c) => {
   <style>
     :root {
       /* ============================================
-         PREMIUM AUTOMOTIVE / TIMEPIECE PALETTE
-         Deep reflective black with dark blue highlights
-         No purple/blue - elegant dark with steel accents
+         PREMIUM DEEP BLACK PALETTE
+         High-shine reflective black like luxury automotive
+         Minimal color - chrome/silver accents only
          ============================================ */
-      --primary: #0a1628;           /* Deep midnight blue-black */
-      --primary-light: #1a2d4a;     /* Slightly lighter for contrast */
-      --accent: #1e3a5f;            /* Dark steel blue */
-      --accent-light: #2d5a87;      /* Lighter blue accent */
-      --accent-dark: #0d1f33;       /* Deep midnight */
-      --accent-glow: #3d7ab8;       /* High shine highlight */
-      --chrome: #c0c8d4;            /* Chrome/steel accent */
-      --chrome-bright: #e8ecf2;     /* Bright chrome highlight */
-      --surface-black: #050a10;     /* Deep reflective black */
-      --surface-shine: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%, rgba(255,255,255,0.03) 100%);
+      --primary: #08080a;           /* Pure deep black */
+      --primary-light: #121215;     /* Slightly lighter black */
+      --accent: #18181b;            /* Dark charcoal accent */
+      --accent-light: #27272a;      /* Lighter charcoal */
+      --accent-dark: #09090b;       /* Near-black */
+      --accent-glow: #a1a1aa;       /* Silver/chrome glow */
+      --chrome: #a1a1aa;            /* Chrome/silver accent */
+      --chrome-bright: #e4e4e7;     /* Bright chrome/white */
+      --surface-black: #030303;     /* Deep reflective black */
+      --surface-shine: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 40%, rgba(255,255,255,0.02) 100%);
       
-      /* Legacy variable aliases - mapped to new premium palette */
-      --purple-main: #1e3a5f;       /* -> Dark steel blue */
-      --purple-light: #3d7ab8;      /* -> Glow blue */
-      --pink-main: #2d5a87;         /* -> Lighter accent */
-      --cyan-main: #4d8ab8;         /* -> Bright steel blue */
+      /* Legacy variable aliases - mapped to black/chrome palette */
+      --purple-main: #18181b;       /* -> Dark charcoal */
+      --purple-light: #a1a1aa;      /* -> Chrome */
+      --pink-main: #27272a;         /* -> Lighter charcoal */
+      --cyan-main: #d4d4d8;         /* -> Light silver */
       
       --green-main: #10B981;        /* Keep for success states */
       --red-main: #ef4444;          /* Keep for error states */
@@ -3793,15 +3793,14 @@ app.get('/', (c) => {
       z-index: -1;
     }
     
-    /* Background - Deep black with subtle blue undertones */
+    /* Background - Pure deep black with subtle shine */
     .bg-image {
       position: absolute;
       inset: 0;
       background: 
-        radial-gradient(ellipse 120% 80% at 50% 0%, rgba(30, 58, 95, 0.15) 0%, transparent 60%),
-        radial-gradient(ellipse 80% 50% at 80% 80%, rgba(30, 58, 95, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 20% 90%, rgba(45, 90, 135, 0.08) 0%, transparent 40%),
-        linear-gradient(180deg, #050a10 0%, #0a1020 50%, #050a10 100%);
+        radial-gradient(ellipse 100% 60% at 50% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 90%, rgba(255, 255, 255, 0.015) 0%, transparent 40%),
+        linear-gradient(180deg, #050505 0%, #030303 50%, #020202 100%);
       background-size: cover;
       background-position: center;
     }
@@ -3934,21 +3933,21 @@ app.get('/', (c) => {
        Alternating glassmorphism for visual rhythm
        =========================================================== */
     
-    /* Base glass - Subtle depth, no blur */
+    /* Base glass - Deep shiny black */
     .glass {
       background: linear-gradient(145deg, 
-        rgba(8, 18, 32, 0.95) 0%, 
-        rgba(5, 10, 16, 0.98) 50%,
-        rgba(3, 6, 10, 1) 100%);
-      border: 1px solid rgba(45, 90, 135, 0.12);
+        rgba(18, 18, 21, 0.98) 0%, 
+        rgba(8, 8, 10, 0.99) 50%,
+        rgba(3, 3, 3, 1) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 16px;
       position: relative;
       z-index: 10;
       pointer-events: auto;
       box-shadow: 
-        0 4px 24px rgba(0, 0, 0, 0.6),
-        0 1px 0 rgba(255, 255, 255, 0.02) inset,
-        0 -1px 0 rgba(0, 0, 0, 0.4) inset;
+        0 4px 32px rgba(0, 0, 0, 0.8),
+        0 1px 0 rgba(255, 255, 255, 0.04) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.5) inset;
     }
     
     /* ============================================
@@ -3957,86 +3956,85 @@ app.get('/', (c) => {
        Even panels: Solid reflective (mirror)
        ============================================ */
     
-    /* Glass panel - WITH blur (use for alternating: 1st, 3rd, 5th...) */
+    /* Glass panel - WITH subtle blur, deep black */
     .glass-panel {
-      background: rgba(8, 18, 32, 0.65);
-      backdrop-filter: blur(16px) saturate(120%);
-      -webkit-backdrop-filter: blur(16px) saturate(120%);
-      border: 1px solid rgba(61, 122, 184, 0.15);
+      background: rgba(10, 10, 12, 0.85);
+      backdrop-filter: blur(12px) saturate(100%);
+      -webkit-backdrop-filter: blur(12px) saturate(100%);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 16px;
       box-shadow: 
-        0 8px 40px rgba(0, 0, 0, 0.6),
-        0 1px 0 rgba(61, 122, 184, 0.08) inset,
-        0 0 80px rgba(30, 58, 95, 0.05) inset;
+        0 8px 48px rgba(0, 0, 0, 0.8),
+        0 1px 0 rgba(255, 255, 255, 0.03) inset;
     }
     
-    /* Solid panel - Deep reflective black (use for alternating: 2nd, 4th, 6th...) */
+    /* Solid panel - Deep reflective black */
     .glass-solid {
       background: linear-gradient(165deg, 
-        #0a1420 0%, 
-        #050a10 40%,
-        #030508 100%);
-      border: 1px solid rgba(45, 90, 135, 0.1);
+        #0c0c0e 0%, 
+        #060606 40%,
+        #030303 100%);
+      border: 1px solid rgba(255, 255, 255, 0.04);
       border-radius: 16px;
       box-shadow: 
-        0 4px 32px rgba(0, 0, 0, 0.7),
+        0 4px 40px rgba(0, 0, 0, 0.85),
         0 1px 0 rgba(255, 255, 255, 0.03) inset,
-        0 -2px 8px rgba(0, 0, 0, 0.4) inset;
+        0 -2px 8px rgba(0, 0, 0, 0.5) inset;
       /* Premium shine highlight */
       background-image: 
         linear-gradient(165deg, 
-          rgba(255,255,255,0.04) 0%, 
-          transparent 30%, 
-          transparent 70%, 
+          rgba(255,255,255,0.03) 0%, 
+          transparent 25%, 
+          transparent 75%, 
           rgba(255,255,255,0.01) 100%);
     }
     
-    /* Glass card - WITH blur, premium automotive finish */
+    /* Glass card - Deep shiny black with subtle highlight */
     .glass-card {
       background: linear-gradient(155deg, 
-        rgba(12, 24, 42, 0.88) 0%, 
-        rgba(6, 12, 20, 0.94) 50%,
-        rgba(3, 6, 10, 0.98) 100%);
-      backdrop-filter: blur(12px) saturate(110%);
-      -webkit-backdrop-filter: blur(12px) saturate(110%);
-      border: 1px solid rgba(45, 90, 135, 0.12);
+        rgba(16, 16, 18, 0.95) 0%, 
+        rgba(8, 8, 10, 0.98) 50%,
+        rgba(3, 3, 3, 1) 100%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 20px;
       box-shadow: 
-        0 12px 48px rgba(0, 0, 0, 0.5),
-        0 1px 0 rgba(192, 200, 212, 0.04) inset,
-        0 -1px 0 rgba(0, 0, 0, 0.3) inset;
+        0 12px 56px rgba(0, 0, 0, 0.75),
+        0 1px 0 rgba(255, 255, 255, 0.04) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.4) inset;
       position: relative;
       overflow: hidden;
     }
     
-    /* Chrome accent highlight - premium automotive detail */
+    /* Chrome accent highlight - subtle silver shine line */
     .glass-card::before {
       content: '';
       position: absolute;
       top: 0;
-      left: 15%;
-      right: 15%;
+      left: 10%;
+      right: 10%;
       height: 1px;
       background: linear-gradient(90deg, 
         transparent 0%, 
-        rgba(192, 200, 212, 0.25) 30%,
-        rgba(232, 236, 242, 0.4) 50%,
-        rgba(192, 200, 212, 0.25) 70%,
+        rgba(255, 255, 255, 0.12) 30%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.12) 70%,
         transparent 100%);
       pointer-events: none;
     }
     
-    /* Solid card - Deep reflective, NO blur (timepiece finish) */
+    /* Solid card - Deep reflective black */
     .glass-card-solid {
       background: linear-gradient(155deg, 
-        #0c1824 0%, 
-        #060c14 40%,
-        #030608 100%);
-      border: 1px solid rgba(45, 90, 135, 0.08);
+        #0e0e10 0%, 
+        #070708 40%,
+        #030303 100%);
+      border: 1px solid rgba(255, 255, 255, 0.04);
       border-radius: 20px;
       box-shadow: 
-        0 8px 36px rgba(0, 0, 0, 0.65),
-        0 1px 0 rgba(255, 255, 255, 0.02) inset;
+        0 8px 44px rgba(0, 0, 0, 0.8),
+        0 1px 0 rgba(255, 255, 255, 0.03) inset;
       position: relative;
     }
     
@@ -4047,39 +4045,39 @@ app.get('/', (c) => {
       top: 0;
       left: 0;
       right: 0;
-      height: 50%;
+      height: 40%;
       background: linear-gradient(180deg, 
-        rgba(255,255,255,0.03) 0%, 
+        rgba(255,255,255,0.025) 0%, 
         transparent 100%);
       pointer-events: none;
       border-radius: 20px 20px 0 0;
     }
     
-    /* Sidebar - Deep reflective with chrome edge */
+    /* Sidebar - Deep black with subtle edge */
     .glass-sidebar {
       background: linear-gradient(180deg, 
-        rgba(8, 18, 32, 0.97) 0%, 
-        rgba(5, 10, 16, 0.99) 100%);
-      border-right: 1px solid rgba(45, 90, 135, 0.1);
+        rgba(12, 12, 14, 0.98) 0%, 
+        rgba(5, 5, 6, 0.99) 100%);
+      border-right: 1px solid rgba(255, 255, 255, 0.04);
       box-shadow: 
-        4px 0 32px rgba(0, 0, 0, 0.4),
-        1px 0 0 rgba(61, 122, 184, 0.08);
+        4px 0 40px rgba(0, 0, 0, 0.6),
+        1px 0 0 rgba(255, 255, 255, 0.02);
     }
     
-    /* Input - Recessed panel effect */
+    /* Input - Recessed deep black */
     .glass-input {
       background: linear-gradient(165deg, 
-        rgba(3, 6, 10, 0.95) 0%, 
-        rgba(8, 18, 32, 0.85) 100%);
-      border: 1px solid rgba(45, 90, 135, 0.15);
+        rgba(5, 5, 6, 0.98) 0%, 
+        rgba(10, 10, 12, 0.95) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 12px;
       padding: 14px 18px;
-      color: #e8ecf2;
+      color: #e4e4e7;
       font-family: inherit;
       font-size: 14px;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 
-        inset 0 2px 4px rgba(0, 0, 0, 0.3),
+        inset 0 2px 6px rgba(0, 0, 0, 0.5),
         0 1px 0 rgba(255, 255, 255, 0.02);
       width: 100%;
       position: relative;
@@ -4090,15 +4088,15 @@ app.get('/', (c) => {
     
     .glass-input:focus {
       outline: none;
-      border-color: var(--accent-light);
+      border-color: rgba(255, 255, 255, 0.15);
       box-shadow: 
-        0 0 0 3px rgba(45, 90, 135, 0.3),
-        inset 0 2px 4px rgba(0, 0, 0, 0.3),
-        0 0 20px rgba(45, 90, 135, 0.15);
+        0 0 0 3px rgba(255, 255, 255, 0.08),
+        inset 0 2px 6px rgba(0, 0, 0, 0.5),
+        0 0 24px rgba(255, 255, 255, 0.03);
     }
     
     .glass-input::placeholder {
-      color: rgba(192, 200, 212, 0.4);
+      color: rgba(161, 161, 170, 0.5);
     }
     
     /* ===========================================================
@@ -4694,49 +4692,49 @@ app.get('/', (c) => {
     }
     
     .btn-primary {
-      background: linear-gradient(145deg, var(--accent-light) 0%, var(--accent) 50%, var(--primary) 100%);
+      background: linear-gradient(145deg, #1a1a1c 0%, #0e0e10 50%, #080808 100%);
       color: var(--chrome-bright);
-      border: 1px solid rgba(45, 90, 135, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 
-        0 10px 30px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15),
-        0 0 20px rgba(45, 90, 135, 0.2);
+        0 10px 36px rgba(0, 0, 0, 0.7),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 0 1px rgba(255, 255, 255, 0.1);
     }
     
     .btn-primary:hover {
       transform: translateY(-3px);
       box-shadow: 
-        0 15px 40px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        0 0 30px rgba(45, 90, 135, 0.3);
-      background: linear-gradient(145deg, var(--accent-glow) 0%, var(--accent-light) 50%, var(--accent) 100%);
+        0 15px 48px rgba(0, 0, 0, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        0 0 2px rgba(255, 255, 255, 0.15);
+      background: linear-gradient(145deg, #222224 0%, #141416 50%, #0a0a0b 100%);
     }
     
     .btn-secondary {
-      background: linear-gradient(145deg, rgba(10, 22, 40, 0.9) 0%, rgba(5, 10, 16, 0.95) 100%);
+      background: linear-gradient(145deg, rgba(14, 14, 16, 0.95) 0%, rgba(6, 6, 8, 0.98) 100%);
       color: var(--chrome);
-      border: 1px solid rgba(45, 90, 135, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
     
     .btn-secondary:hover {
-      background: linear-gradient(145deg, rgba(30, 58, 95, 0.5) 0%, rgba(10, 22, 40, 0.8) 100%);
+      background: linear-gradient(145deg, rgba(22, 22, 24, 0.95) 0%, rgba(10, 10, 12, 0.98) 100%);
       color: var(--chrome-bright);
-      border-color: rgba(45, 90, 135, 0.5);
+      border-color: rgba(255, 255, 255, 0.1);
     }
     
     .btn-ghost {
       width: 100%;
       padding: 18px;
       background: transparent;
-      border: 2px dashed rgba(45, 90, 135, 0.3);
-      color: rgba(192, 200, 212, 0.5);
+      border: 2px dashed rgba(255, 255, 255, 0.1);
+      color: rgba(161, 161, 170, 0.6);
       border-radius: 14px;
     }
     
     .btn-ghost:hover {
-      border-color: var(--accent-light);
+      border-color: rgba(255, 255, 255, 0.2);
       color: var(--chrome);
-      background: rgba(30, 58, 95, 0.1);
+      background: rgba(255, 255, 255, 0.02);
     }
     
     .btn-icon {
@@ -4745,17 +4743,17 @@ app.get('/', (c) => {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(145deg, rgba(10, 22, 40, 0.8) 0%, rgba(5, 10, 16, 0.9) 100%);
-      border: 1px solid rgba(45, 90, 135, 0.2);
+      background: linear-gradient(145deg, rgba(14, 14, 16, 0.9) 0%, rgba(6, 6, 8, 0.95) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 10px;
-      color: rgba(192, 200, 212, 0.5);
+      color: rgba(161, 161, 170, 0.6);
       cursor: pointer;
       font-size: 14px;
     }
     
     .btn-icon:hover {
-      background: linear-gradient(145deg, rgba(239, 68, 68, 0.2) 0%, rgba(10, 22, 40, 0.9) 100%);
-      border-color: rgba(239, 68, 68, 0.4);
+      background: linear-gradient(145deg, rgba(239, 68, 68, 0.15) 0%, rgba(10, 10, 12, 0.95) 100%);
+      border-color: rgba(239, 68, 68, 0.3);
       color: #EF4444;
     }
     
