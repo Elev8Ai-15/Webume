@@ -1618,15 +1618,24 @@ app.get('/p/:slug', async (c) => {
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     :root {
-      --accent: #8B5CF6;
-      --accent-light: #A78BFA;
-      --accent-dark: #6D28D9;
-      --bg-dark: #0a0a12;
-      --bg-card: rgba(255,255,255,0.03);
-      --border: rgba(255,255,255,0.08);
-      --text: #fff;
-      --text-muted: rgba(255,255,255,0.6);
-      --text-dim: rgba(255,255,255,0.4);
+      /* ============================================
+         PREMIUM AUTOMOTIVE / TIMEPIECE PALETTE
+         Deep reflective black with dark blue highlights
+         ============================================ */
+      --accent: #1e3a5f;            /* Dark steel blue */
+      --accent-light: #2d5a87;      /* Lighter blue accent */
+      --accent-dark: #0d1f33;       /* Deep midnight blue */
+      --accent-glow: #3d7ab8;       /* High shine highlight */
+      --chrome: #c0c8d4;            /* Chrome/steel text */
+      --chrome-bright: #e8ecf2;     /* Bright chrome highlight */
+      --bg-dark: #050a10;           /* Deep reflective black */
+      --bg-card: rgba(15,25,40,0.6);
+      --border: rgba(45,90,135,0.2);
+      --text: #e8ecf2;
+      --text-muted: rgba(200,210,220,0.6);
+      --text-dim: rgba(160,175,190,0.4);
+      --surface-black: #050a10;
+      --surface-shine: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%, rgba(255,255,255,0.03) 100%);
     }
     
     html {
@@ -1741,12 +1750,12 @@ app.get('/p/:slug', async (c) => {
       font-weight: 600;
       font-size: 15px;
       transition: all 0.3s ease;
-      box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+      box-shadow: 0 8px 32px rgba(30, 58, 95, 0.3);
     }
     
     .cta-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(139, 92, 246, 0.4);
+      box-shadow: 0 12px 40px rgba(30, 58, 95, 0.4);
     }
     
     /* ============================================
@@ -1767,7 +1776,7 @@ app.get('/p/:slug', async (c) => {
       width: 800px;
       height: 800px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(30, 58, 95, 0.15) 0%, transparent 70%);
       top: -200px;
       right: -200px;
       animation: float 20s ease-in-out infinite;
@@ -1830,10 +1839,10 @@ app.get('/p/:slug', async (c) => {
       object-fit: cover;
       border: 6px solid var(--accent);
       box-shadow: 
-        0 0 0 10px rgba(139, 92, 246, 0.15),
-        0 0 0 20px rgba(139, 92, 246, 0.08),
+        0 0 0 10px rgba(30, 58, 95, 0.15),
+        0 0 0 20px rgba(30, 58, 95, 0.08),
         0 30px 80px rgba(0, 0, 0, 0.5),
-        0 0 120px rgba(139, 92, 246, 0.25);
+        0 0 120px rgba(30, 58, 95, 0.25);
       animation: heroPhotoIn 1s ease-out;
     }
     
@@ -1846,7 +1855,7 @@ app.get('/p/:slug', async (c) => {
       position: absolute;
       inset: -20px;
       border-radius: 50%;
-      border: 2px dashed rgba(139, 92, 246, 0.4);
+      border: 2px dashed rgba(30, 58, 95, 0.4);
       animation: photoRingSpin 20s linear infinite;
     }
     
@@ -1854,7 +1863,7 @@ app.get('/p/:slug', async (c) => {
       position: absolute;
       inset: -35px;
       border-radius: 50%;
-      border: 1px solid rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(30, 58, 95, 0.15);
       animation: photoRingSpin 30s linear infinite reverse;
     }
     
@@ -1874,7 +1883,7 @@ app.get('/p/:slug', async (c) => {
       font-weight: 800;
       color: white;
       box-shadow: 
-        0 0 0 10px rgba(139, 92, 246, 0.15),
+        0 0 0 10px rgba(30, 58, 95, 0.15),
         0 30px 80px rgba(0, 0, 0, 0.5);
     }
     
@@ -1973,7 +1982,7 @@ app.get('/p/:slug', async (c) => {
       color: var(--accent);
       margin-bottom: 8px;
       padding-bottom: 4px;
-      border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+      border-bottom: 1px solid rgba(30, 58, 95, 0.2);
     }
     
     .resume-card-exp {
@@ -1998,7 +2007,7 @@ app.get('/p/:slug', async (c) => {
     
     .resume-card-skill {
       padding: 3px 8px;
-      background: rgba(139, 92, 246, 0.1);
+      background: rgba(30, 58, 95, 0.1);
       border-radius: 4px;
       font-size: 9px;
       color: var(--accent);
@@ -2137,7 +2146,7 @@ app.get('/p/:slug', async (c) => {
     }
     
     .contact-chip:hover {
-      background: rgba(139, 92, 246, 0.1);
+      background: rgba(30, 58, 95, 0.1);
       border-color: var(--accent);
       color: var(--text);
       transform: translateY(-2px);
@@ -2270,10 +2279,10 @@ app.get('/p/:slug', async (c) => {
     
     .timeline-item:hover,
     .timeline-item.active {
-      background: rgba(139, 92, 246, 0.08);
+      background: rgba(30, 58, 95, 0.08);
       border-color: var(--accent);
       transform: translateX(8px);
-      box-shadow: 0 10px 40px rgba(139, 92, 246, 0.15);
+      box-shadow: 0 10px 40px rgba(30, 58, 95, 0.15);
     }
     
     .timeline-item:hover::before,
@@ -2307,7 +2316,7 @@ app.get('/p/:slug', async (c) => {
     .timeline-item:hover .company-logo,
     .timeline-item.active .company-logo {
       border-color: var(--accent);
-      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.25);
+      box-shadow: 0 8px 24px rgba(30, 58, 95, 0.25);
       transform: scale(1.05);
     }
     
@@ -2329,7 +2338,7 @@ app.get('/p/:slug', async (c) => {
       font-size: 26px;
       font-weight: 700;
       color: white;
-      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+      box-shadow: 0 4px 16px rgba(30, 58, 95, 0.3);
     }
     
     .timeline-info h3 {
@@ -2406,7 +2415,7 @@ app.get('/p/:slug', async (c) => {
     .detail-panel::-webkit-scrollbar { width: 6px; }
     .detail-panel::-webkit-scrollbar-track { background: transparent; }
     .detail-panel::-webkit-scrollbar-thumb { 
-      background: rgba(139, 92, 246, 0.3);
+      background: rgba(30, 58, 95, 0.3);
       border-radius: 3px;
     }
     
@@ -2461,7 +2470,7 @@ app.get('/p/:slug', async (c) => {
       justify-content: center;
       overflow: hidden;
       border: 3px solid var(--accent);
-      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+      box-shadow: 0 8px 24px rgba(30, 58, 95, 0.2);
     }
     
     .panel-logo img {
@@ -2525,7 +2534,7 @@ app.get('/p/:slug', async (c) => {
       width: 36px;
       height: 36px;
       border-radius: 10px;
-      background: rgba(139, 92, 246, 0.15);
+      background: rgba(30, 58, 95, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2704,7 +2713,7 @@ app.get('/p/:slug', async (c) => {
     }
     
     .skill-chip:hover {
-      background: rgba(139, 92, 246, 0.15);
+      background: rgba(30, 58, 95, 0.15);
       border-color: var(--accent);
       transform: translateY(-2px);
     }
@@ -2743,7 +2752,7 @@ app.get('/p/:slug', async (c) => {
       display: inline-block;
       margin-top: 12px;
       padding: 6px 14px;
-      background: rgba(139, 92, 246, 0.15);
+      background: rgba(30, 58, 95, 0.15);
       border-radius: 8px;
       font-size: 12px;
       color: var(--accent);
@@ -3049,20 +3058,20 @@ app.get('/p/:slug', async (c) => {
       const skills = p.skills || [];
       const education = p.education || [];
       
-      // Get accent color from template
+      // Get accent color from template - Premium dark palette
       const templateColors = {
-        executive: '#8B5CF6',
-        corporate: '#1E3A5F',
-        healthcare: '#0EA5E9',
-        restaurant: '#DC2626',
-        trades: '#D97706',
-        beauty: '#EC4899',
-        creative: '#F472B6',
-        tech: '#06B6D4',
-        nonprofit: '#0891B2',
-        minimal: '#10B981'
+        executive: '#1e3a5f',     /* Dark steel blue */
+        corporate: '#1a2d4a',     /* Midnight blue */
+        healthcare: '#0d4a6f',    /* Deep medical blue */
+        restaurant: '#8b2020',    /* Deep crimson */
+        trades: '#7a4a10',        /* Burnished bronze */
+        beauty: '#6b2744',        /* Deep rose */
+        creative: '#4a2d5a',      /* Deep violet */
+        tech: '#0a4a5a',          /* Dark teal */
+        nonprofit: '#0a4050',     /* Ocean depth */
+        minimal: '#1a3a35'        /* Forest depths */
       };
-      const accent = templateColors[profile.selectedTemplate] || '#8B5CF6';
+      const accent = templateColors[profile.selectedTemplate] || '#1e3a5f';
       
       // Apply accent color to CSS variables
       useEffect(() => {
@@ -3258,7 +3267,7 @@ app.get('/p/:slug', async (c) => {
                                     e.target.src = ddgUrl;
                                   } else {
                                     e.target.style.display = 'none';
-                                    e.target.parentElement.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,' + accent + ',#6D28D9);border-radius:16px;color:white;font-weight:700;font-size:26px">' + getCompanyInitial(exp.company) + '</div>';
+                                    e.target.parentElement.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,' + accent + ',#0d1f33);border-radius:16px;color:white;font-weight:700;font-size:26px">' + getCompanyInitial(exp.company) + '</div>';
                                   }
                                 }}
                               />
@@ -3553,7 +3562,7 @@ app.get('/p/:slug', async (c) => {
                           {selectedExp.companyInfo.industry && (
                             <span style={{ 
                               padding: '6px 14px', 
-                              background: 'rgba(139,92,246,0.15)', 
+                              background: 'rgba(30, 58, 95,0.15)', 
                               borderRadius: '8px', 
                               fontSize: '12px' 
                             }}>
@@ -3564,7 +3573,7 @@ app.get('/p/:slug', async (c) => {
                           {selectedExp.companyInfo.location && (
                             <span style={{ 
                               padding: '6px 14px', 
-                              background: 'rgba(139,92,246,0.15)', 
+                              background: 'rgba(30, 58, 95,0.15)', 
                               borderRadius: '8px', 
                               fontSize: '12px' 
                             }}>
@@ -3575,7 +3584,7 @@ app.get('/p/:slug', async (c) => {
                           {selectedExp.companyInfo.size && (
                             <span style={{ 
                               padding: '6px 14px', 
-                              background: 'rgba(139,92,246,0.15)', 
+                              background: 'rgba(30, 58, 95,0.15)', 
                               borderRadius: '8px', 
                               fontSize: '12px' 
                             }}>
@@ -3611,7 +3620,7 @@ app.get('/manifest.json', (c) => {
     scope: '/',
     display: 'standalone',
     background_color: '#0a0a12',
-    theme_color: '#8B5CF6',
+    theme_color: '#1e3a5f',
     orientation: 'portrait-primary',
     dir: 'ltr',
     lang: 'en-US',
@@ -3688,12 +3697,12 @@ app.get('/', (c) => {
   <link rel="apple-touch-icon" sizes="180x180" href="/static/icon-192.png">
   <link rel="apple-touch-icon" sizes="167x167" href="/static/icon-192.png">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#8B5CF6">
+  <meta name="theme-color" content="#1e3a5f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Webumé">
   <meta name="application-name" content="Webumé">
-  <meta name="msapplication-TileColor" content="#8B5CF6">
+  <meta name="msapplication-TileColor" content="#1e3a5f">
   <meta name="msapplication-TileImage" content="/static/icon-144.png">
   <meta name="description" content="Transform your resume into an immersive digital experience. AI-powered resume parsing, interactive career timeline, and professional templates.">
   <meta property="og:title" content="Webumé - Digital Resume Revolution">
@@ -3717,11 +3726,30 @@ app.get('/', (c) => {
   
   <style>
     :root {
-      --purple-main: #8B5CF6;
-      --purple-light: #A78BFA;
-      --pink-main: #EC4899;
-      --cyan-main: #06B6D4;
-      --green-main: #10B981;
+      /* ============================================
+         PREMIUM AUTOMOTIVE / TIMEPIECE PALETTE
+         Deep reflective black with dark blue highlights
+         No purple/blue - elegant dark with steel accents
+         ============================================ */
+      --primary: #0a1628;           /* Deep midnight blue-black */
+      --primary-light: #1a2d4a;     /* Slightly lighter for contrast */
+      --accent: #1e3a5f;            /* Dark steel blue */
+      --accent-light: #2d5a87;      /* Lighter blue accent */
+      --accent-dark: #0d1f33;       /* Deep midnight */
+      --accent-glow: #3d7ab8;       /* High shine highlight */
+      --chrome: #c0c8d4;            /* Chrome/steel accent */
+      --chrome-bright: #e8ecf2;     /* Bright chrome highlight */
+      --surface-black: #050a10;     /* Deep reflective black */
+      --surface-shine: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%, rgba(255,255,255,0.03) 100%);
+      
+      /* Legacy variable aliases - mapped to new premium palette */
+      --purple-main: #1e3a5f;       /* -> Dark steel blue */
+      --purple-light: #3d7ab8;      /* -> Glow blue */
+      --pink-main: #2d5a87;         /* -> Lighter accent */
+      --cyan-main: #4d8ab8;         /* -> Bright steel blue */
+      
+      --green-main: #10B981;        /* Keep for success states */
+      --red-main: #ef4444;          /* Keep for error states */
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -3753,101 +3781,323 @@ app.get('/', (c) => {
     }
     
     /* ===========================================================
-       PREMIUM BACKGROUND - Glass Cards Image - CRYSTAL CLEAR
-       The beautiful glass cards image as background - NO BLUR
+       PREMIUM BACKGROUND - Deep Reflective Black
+       Automotive-grade finish with subtle depth
        =========================================================== */
     .premium-bg {
       position: fixed;
       inset: 0;
-      background: #0a0a12;
+      background: var(--surface-black);
       overflow: hidden;
-      pointer-events: none; /* Allow clicks to pass through to content */
-      z-index: -1; /* Explicitly place behind all content */
+      pointer-events: none;
+      z-index: -1;
     }
     
-    /* Background image - NO BLUR - crystal clear glass cards */
+    /* Background - Deep black with subtle blue undertones */
     .bg-image {
       position: absolute;
       inset: 0;
-      background-image: url('/static/background.png');
+      background: 
+        radial-gradient(ellipse 120% 80% at 50% 0%, rgba(30, 58, 95, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 50% at 80% 80%, rgba(30, 58, 95, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 20% 90%, rgba(45, 90, 135, 0.08) 0%, transparent 40%),
+        linear-gradient(180deg, #050a10 0%, #0a1020 50%, #050a10 100%);
       background-size: cover;
       background-position: center;
-      background-repeat: no-repeat;
-      /* NO BLUR - show the beautiful glass cards clearly */
-      filter: brightness(1) saturate(1.05);
-      opacity: 1;
     }
     
-    /* Minimal overlay - just a hint of darkness for text readability */
+    /* Reflective shine overlay - automotive clear coat effect */
     .bg-gradient {
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.25) 100%);
+      background: 
+        linear-gradient(165deg, rgba(255,255,255,0.03) 0%, transparent 30%, transparent 70%, rgba(255,255,255,0.02) 100%),
+        linear-gradient(45deg, transparent 40%, rgba(30,58,95,0.05) 50%, transparent 60%);
+      pointer-events: none;
     }
     
-    /* No noise overlay - keep it clean */
+    /* Subtle texture for depth - like brushed metal */
     .noise-overlay {
-      display: none;
+      position: absolute;
+      inset: 0;
+      opacity: 0.015;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    
+    /* ============================================
+       PREMIUM DEPTH & TEXTURE EFFECTS
+       Automotive-grade finish details
+       ============================================ */
+    
+    /* Chrome highlight line - like a polished bezel */
+    .chrome-line {
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(192, 200, 212, 0.15) 20%,
+        rgba(232, 236, 242, 0.35) 50%,
+        rgba(192, 200, 212, 0.15) 80%,
+        transparent 100%);
+      margin: 16px 0;
+    }
+    
+    /* Deep embossed effect - recessed panel */
+    .embossed {
+      box-shadow: 
+        inset 0 2px 6px rgba(0, 0, 0, 0.4),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+        0 1px 0 rgba(255, 255, 255, 0.02);
+    }
+    
+    /* Raised element - polished button/badge */
+    .raised {
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.4),
+        0 1px 0 rgba(255, 255, 255, 0.06) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.2) inset;
+    }
+    
+    /* High-shine accent - like chrome trim */
+    .shine-accent {
+      position: relative;
+    }
+    .shine-accent::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(180deg, 
+        rgba(255, 255, 255, 0.05) 0%, 
+        transparent 100%);
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    
+    /* Steel border - refined edge */
+    .steel-border {
+      border: 1px solid rgba(45, 90, 135, 0.12);
+      box-shadow: 
+        0 0 0 1px rgba(0, 0, 0, 0.3),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+    
+    /* Glow accent - for active/highlight states */
+    .glow-accent {
+      box-shadow: 
+        0 0 20px rgba(61, 122, 184, 0.2),
+        0 0 40px rgba(30, 58, 95, 0.1);
+    }
+    
+    /* Premium text styles */
+    .text-chrome {
+      color: var(--chrome);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+    
+    .text-chrome-bright {
+      color: var(--chrome-bright);
+      text-shadow: 
+        0 1px 2px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(232, 236, 242, 0.1);
+    }
+    
+    .text-glow {
+      color: var(--accent-glow);
+      text-shadow: 0 0 12px rgba(61, 122, 184, 0.4);
+    }
+    
+    /* Brushed metal texture overlay */
+    .brushed-metal {
+      position: relative;
+    }
+    .brushed-metal::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        rgba(255, 255, 255, 0.01) 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      border-radius: inherit;
     }
     
     /* ===========================================================
-       GLASSMORPHISM COMPONENTS
-       Semi-transparent cards with blur effect
+       GLASSMORPHISM COMPONENTS - Alternating Panels
+       PREMIUM AUTOMOTIVE / TIMEPIECE DESIGN SYSTEM
+       Deep reflective black with high-shine dark blue highlights
+       Alternating glassmorphism for visual rhythm
        =========================================================== */
+    
+    /* Base glass - Subtle depth, no blur */
     .glass {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 20px;
+      background: linear-gradient(145deg, 
+        rgba(8, 18, 32, 0.95) 0%, 
+        rgba(5, 10, 16, 0.98) 50%,
+        rgba(3, 6, 10, 1) 100%);
+      border: 1px solid rgba(45, 90, 135, 0.12);
+      border-radius: 16px;
       position: relative;
       z-index: 10;
       pointer-events: auto;
-    }
-    
-    .glass-card {
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 24px;
       box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        0 4px 24px rgba(0, 0, 0, 0.6),
+        0 1px 0 rgba(255, 255, 255, 0.02) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.4) inset;
     }
     
+    /* ============================================
+       ALTERNATING PANEL SYSTEM
+       Odd panels: Glass blur effect (frost)
+       Even panels: Solid reflective (mirror)
+       ============================================ */
+    
+    /* Glass panel - WITH blur (use for alternating: 1st, 3rd, 5th...) */
+    .glass-panel {
+      background: rgba(8, 18, 32, 0.65);
+      backdrop-filter: blur(16px) saturate(120%);
+      -webkit-backdrop-filter: blur(16px) saturate(120%);
+      border: 1px solid rgba(61, 122, 184, 0.15);
+      border-radius: 16px;
+      box-shadow: 
+        0 8px 40px rgba(0, 0, 0, 0.6),
+        0 1px 0 rgba(61, 122, 184, 0.08) inset,
+        0 0 80px rgba(30, 58, 95, 0.05) inset;
+    }
+    
+    /* Solid panel - Deep reflective black (use for alternating: 2nd, 4th, 6th...) */
+    .glass-solid {
+      background: linear-gradient(165deg, 
+        #0a1420 0%, 
+        #050a10 40%,
+        #030508 100%);
+      border: 1px solid rgba(45, 90, 135, 0.1);
+      border-radius: 16px;
+      box-shadow: 
+        0 4px 32px rgba(0, 0, 0, 0.7),
+        0 1px 0 rgba(255, 255, 255, 0.03) inset,
+        0 -2px 8px rgba(0, 0, 0, 0.4) inset;
+      /* Premium shine highlight */
+      background-image: 
+        linear-gradient(165deg, 
+          rgba(255,255,255,0.04) 0%, 
+          transparent 30%, 
+          transparent 70%, 
+          rgba(255,255,255,0.01) 100%);
+    }
+    
+    /* Glass card - WITH blur, premium automotive finish */
+    .glass-card {
+      background: linear-gradient(155deg, 
+        rgba(12, 24, 42, 0.88) 0%, 
+        rgba(6, 12, 20, 0.94) 50%,
+        rgba(3, 6, 10, 0.98) 100%);
+      backdrop-filter: blur(12px) saturate(110%);
+      -webkit-backdrop-filter: blur(12px) saturate(110%);
+      border: 1px solid rgba(45, 90, 135, 0.12);
+      border-radius: 20px;
+      box-shadow: 
+        0 12px 48px rgba(0, 0, 0, 0.5),
+        0 1px 0 rgba(192, 200, 212, 0.04) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.3) inset;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Chrome accent highlight - premium automotive detail */
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 15%;
+      right: 15%;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(192, 200, 212, 0.25) 30%,
+        rgba(232, 236, 242, 0.4) 50%,
+        rgba(192, 200, 212, 0.25) 70%,
+        transparent 100%);
+    }
+    
+    /* Solid card - Deep reflective, NO blur (timepiece finish) */
+    .glass-card-solid {
+      background: linear-gradient(155deg, 
+        #0c1824 0%, 
+        #060c14 40%,
+        #030608 100%);
+      border: 1px solid rgba(45, 90, 135, 0.08);
+      border-radius: 20px;
+      box-shadow: 
+        0 8px 36px rgba(0, 0, 0, 0.65),
+        0 1px 0 rgba(255, 255, 255, 0.02) inset;
+      position: relative;
+    }
+    
+    /* Reflective shine overlay for solid cards */
+    .glass-card-solid::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(180deg, 
+        rgba(255,255,255,0.03) 0%, 
+        transparent 100%);
+      pointer-events: none;
+      border-radius: 20px 20px 0 0;
+    }
+    
+    /* Sidebar - Deep reflective with chrome edge */
     .glass-sidebar {
-      background: rgba(15, 8, 24, 0.5);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      background: linear-gradient(180deg, 
+        rgba(8, 18, 32, 0.97) 0%, 
+        rgba(5, 10, 16, 0.99) 100%);
+      border-right: 1px solid rgba(45, 90, 135, 0.1);
+      box-shadow: 
+        4px 0 32px rgba(0, 0, 0, 0.4),
+        1px 0 0 rgba(61, 122, 184, 0.08);
     }
     
+    /* Input - Recessed panel effect */
     .glass-input {
-      background: rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(165deg, 
+        rgba(3, 6, 10, 0.95) 0%, 
+        rgba(8, 18, 32, 0.85) 100%);
+      border: 1px solid rgba(45, 90, 135, 0.15);
       border-radius: 12px;
       padding: 14px 18px;
-      color: #fff;
+      color: #e8ecf2;
       font-family: inherit;
       font-size: 14px;
-      transition: all 0.25s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.3),
+        0 1px 0 rgba(255, 255, 255, 0.02);
       width: 100%;
       position: relative;
       z-index: 10;
       pointer-events: auto;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
     }
     
     .glass-input:focus {
       outline: none;
-      border-color: var(--purple-main);
-      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+      border-color: var(--accent-light);
+      box-shadow: 
+        0 0 0 3px rgba(45, 90, 135, 0.3),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(45, 90, 135, 0.15);
     }
     
     .glass-input::placeholder {
-      color: rgba(255, 255, 255, 0.3);
+      color: rgba(192, 200, 212, 0.4);
     }
     
     /* ===========================================================
@@ -3880,13 +4130,13 @@ app.get('/', (c) => {
     .logo-img {
       width: 180px;
       height: auto;
-      filter: drop-shadow(0 8px 24px rgba(139, 92, 246, 0.4));
+      filter: drop-shadow(0 8px 24px rgba(30, 58, 95, 0.5)) brightness(1.1);
       transition: transform 0.3s ease, filter 0.3s ease;
     }
     
     .logo-img:hover {
       transform: scale(1.05);
-      filter: drop-shadow(0 12px 32px rgba(139, 92, 246, 0.5));
+      filter: drop-shadow(0 12px 32px rgba(45, 90, 135, 0.6)) brightness(1.15);
     }
     
     .nav-group {
@@ -3896,7 +4146,7 @@ app.get('/', (c) => {
     .nav-label {
       font-size: 11px;
       font-weight: 600;
-      color: rgba(255, 255, 255, 0.35);
+      color: rgba(192, 200, 212, 0.4);
       text-transform: uppercase;
       letter-spacing: 1.2px;
       padding: 0 16px;
@@ -3912,37 +4162,43 @@ app.get('/', (c) => {
       border-radius: 14px;
       border: none;
       background: transparent;
-      color: rgba(255, 255, 255, 0.55);
+      color: rgba(192, 200, 212, 0.6);
       font-family: inherit;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
       text-align: left;
     }
     
     .nav-btn:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
+      background: linear-gradient(135deg, rgba(30, 58, 95, 0.3) 0%, rgba(10, 22, 40, 0.5) 100%);
+      color: var(--chrome-bright);
+      border: 1px solid rgba(45, 90, 135, 0.2);
     }
     
     .nav-btn.active {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(236, 72, 153, 0.15));
-      color: #fff;
-      border: 1px solid rgba(139, 92, 246, 0.3);
+      background: linear-gradient(135deg, rgba(30, 58, 95, 0.5) 0%, rgba(10, 22, 40, 0.7) 100%);
+      color: var(--chrome-bright);
+      border: 1px solid rgba(45, 90, 135, 0.4);
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
     
     .nav-btn i {
       width: 20px;
       font-size: 15px;
+      color: var(--accent-light);
     }
     
     .sidebar-footer {
       margin-top: auto;
       padding: 20px;
-      background: rgba(139, 92, 246, 0.1);
-      border: 1px solid rgba(139, 92, 246, 0.2);
+      background: linear-gradient(145deg, rgba(10, 22, 40, 0.8) 0%, rgba(5, 10, 16, 0.9) 100%);
+      border: 1px solid rgba(45, 90, 135, 0.25);
       border-radius: 16px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
     
     .stat-row {
@@ -3953,18 +4209,19 @@ app.get('/', (c) => {
     }
     
     .stat-row:not(:last-child) {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid rgba(45, 90, 135, 0.15);
     }
     
     .stat-name {
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(192, 200, 212, 0.5);
     }
     
     .stat-num {
       font-size: 20px;
       font-weight: 700;
-      color: var(--purple-light);
+      color: var(--chrome-bright);
+      text-shadow: 0 0 20px rgba(45, 90, 135, 0.5);
     }
     
     /* Main Content Area */
@@ -3975,13 +4232,13 @@ app.get('/', (c) => {
     }
     
     .main::-webkit-scrollbar { width: 6px; }
-    .main::-webkit-scrollbar-track { background: transparent; }
+    .main::-webkit-scrollbar-track { background: rgba(5, 10, 16, 0.5); }
     .main::-webkit-scrollbar-thumb { 
-      background: rgba(139, 92, 246, 0.3); 
+      background: linear-gradient(180deg, var(--accent) 0%, var(--primary) 100%); 
       border-radius: 3px;
     }
     .main::-webkit-scrollbar-thumb:hover {
-      background: rgba(139, 92, 246, 0.5);
+      background: linear-gradient(180deg, var(--accent-light) 0%, var(--accent) 100%);
     }
     
     /* Page Header */
@@ -3996,18 +4253,19 @@ app.get('/', (c) => {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 32px;
       font-weight: 700;
-      color: #fff;
+      color: var(--chrome-bright);
       letter-spacing: -0.5px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     
     .page-desc {
       font-size: 14px;
-      color: rgba(255, 255, 255, 0.45);
+      color: rgba(192, 200, 212, 0.5);
       margin-top: 6px;
     }
     
     /* ===========================================================
-       STAT CARDS GRID
+       STAT CARDS GRID - Premium Automotive Style
        =========================================================== */
     .stats-grid {
       display: grid;
@@ -4020,6 +4278,9 @@ app.get('/', (c) => {
       padding: 24px;
       position: relative;
       overflow: hidden;
+      background: linear-gradient(145deg, rgba(10, 22, 40, 0.9) 0%, rgba(5, 10, 16, 0.95) 100%);
+      border: 1px solid rgba(45, 90, 135, 0.2);
+      border-radius: 16px;
     }
     
     .stat-card::before {
@@ -4028,44 +4289,59 @@ app.get('/', (c) => {
       top: 0;
       left: 0;
       right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--purple-main), var(--pink-main));
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light), var(--accent));
+    }
+    
+    /* Chrome accent shine */
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(192, 200, 212, 0.2), transparent);
     }
     
     .stat-card.cyan::before {
-      background: linear-gradient(90deg, var(--cyan-main), #22D3EE);
+      background: linear-gradient(90deg, #1a4d5c, #2d7a8c, #1a4d5c);
     }
     
     .stat-card.green::before {
-      background: linear-gradient(90deg, var(--green-main), #34D399);
+      background: linear-gradient(90deg, #0d4a3a, var(--green-main), #0d4a3a);
     }
     
     .stat-icon-wrap {
       width: 52px;
       height: 52px;
-      background: rgba(139, 92, 246, 0.15);
+      background: linear-gradient(145deg, rgba(30, 58, 95, 0.4) 0%, rgba(10, 22, 40, 0.6) 100%);
+      border: 1px solid rgba(45, 90, 135, 0.3);
       border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 18px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
     
     .stat-icon-wrap i {
       font-size: 22px;
-      color: var(--purple-main);
+      color: var(--accent-light);
     }
     
     .stat-card.cyan .stat-icon-wrap {
-      background: rgba(6, 182, 212, 0.15);
+      background: linear-gradient(145deg, rgba(26, 77, 92, 0.4) 0%, rgba(10, 22, 40, 0.6) 100%);
+      border-color: rgba(45, 122, 140, 0.3);
     }
     
     .stat-card.cyan .stat-icon-wrap i {
-      color: var(--cyan-main);
+      color: #4da6b8;
     }
     
     .stat-card.green .stat-icon-wrap {
-      background: rgba(16, 185, 129, 0.15);
+      background: linear-gradient(145deg, rgba(13, 74, 58, 0.4) 0%, rgba(10, 22, 40, 0.6) 100%);
+      border-color: rgba(16, 185, 129, 0.3);
     }
     
     .stat-card.green .stat-icon-wrap i {
@@ -4076,19 +4352,20 @@ app.get('/', (c) => {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 40px;
       font-weight: 700;
-      color: #fff;
+      color: var(--chrome-bright);
       line-height: 1;
       margin-bottom: 6px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     
     .stat-card .label {
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.45);
+      color: rgba(192, 200, 212, 0.5);
       font-weight: 500;
     }
     
     /* ===========================================================
-       UPLOAD ZONE
+       UPLOAD ZONE - Premium Automotive Style
        =========================================================== */
     .upload-zone {
       padding: 60px 48px;
@@ -4097,66 +4374,91 @@ app.get('/', (c) => {
     
     .dropzone {
       padding: 70px 50px;
-      border: 2px dashed rgba(139, 92, 246, 0.4);
+      border: 2px dashed rgba(45, 90, 135, 0.5);
       border-radius: 24px;
       cursor: pointer;
       transition: all 0.3s ease;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(236, 72, 153, 0.03));
+      background: linear-gradient(145deg, rgba(10, 22, 40, 0.6) 0%, rgba(5, 10, 16, 0.8) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Subtle shine effect */
+    .dropzone::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(192, 200, 212, 0.03), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .dropzone:hover::before {
+      left: 100%;
     }
     
     .dropzone:hover {
-      border-color: var(--purple-main);
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.06));
+      border-color: var(--accent-light);
+      background: linear-gradient(145deg, rgba(30, 58, 95, 0.3) 0%, rgba(10, 22, 40, 0.7) 100%);
       transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(45, 90, 135, 0.15);
     }
     
     .dropzone.drag-active {
-      border-color: var(--cyan-main);
+      border-color: var(--accent-glow);
       border-style: solid;
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.05));
+      background: linear-gradient(145deg, rgba(45, 90, 135, 0.2) 0%, rgba(10, 22, 40, 0.8) 100%);
+      box-shadow: 0 0 40px rgba(45, 90, 135, 0.3);
     }
     
     .upload-logo {
       width: 280px;
       height: auto;
       margin: 0 auto 32px;
-      filter: drop-shadow(0 20px 50px rgba(139, 92, 246, 0.5));
+      filter: drop-shadow(0 20px 50px rgba(30, 58, 95, 0.6)) brightness(1.1);
       animation: floatLogo 4s ease-in-out infinite;
     }
     
     @keyframes floatLogo {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-15px) scale(1.02); }
+      0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 20px 50px rgba(30, 58, 95, 0.6)) brightness(1.1); }
+      50% { transform: translateY(-15px) scale(1.02); filter: drop-shadow(0 30px 60px rgba(45, 90, 135, 0.7)) brightness(1.15); }
     }
     
     .upload-icon-wrap {
       width: 80px;
       height: 80px;
       margin: 0 auto 20px;
-      background: linear-gradient(135deg, var(--purple-main), var(--pink-main));
+      background: linear-gradient(145deg, var(--accent) 0%, var(--primary) 100%);
+      border: 1px solid rgba(45, 90, 135, 0.4);
       border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 16px 40px rgba(139, 92, 246, 0.4);
+      box-shadow: 
+        0 16px 40px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 30px rgba(45, 90, 135, 0.2);
     }
     
     .upload-icon-wrap i {
       font-size: 32px;
-      color: #fff;
+      color: var(--chrome-bright);
     }
     
     .upload-title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 30px;
       font-weight: 700;
-      color: #fff;
+      color: var(--chrome-bright);
       margin-bottom: 10px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     
     .upload-subtitle {
       font-size: 15px;
-      color: rgba(255, 255, 255, 0.45);
+      color: rgba(192, 200, 212, 0.5);
       margin-bottom: 32px;
     }
     
@@ -4171,16 +4473,16 @@ app.get('/', (c) => {
       align-items: center;
       gap: 10px;
       padding: 12px 22px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(145deg, rgba(10, 22, 40, 0.8) 0%, rgba(5, 10, 16, 0.9) 100%);
+      border: 1px solid rgba(45, 90, 135, 0.25);
       border-radius: 100px;
       font-size: 13px;
       font-weight: 500;
-      color: rgba(255, 255, 255, 0.7);
+      color: rgba(192, 200, 212, 0.7);
     }
     
     .format-pill i {
-      color: var(--purple-main);
+      color: var(--accent-light);
     }
     
     /* ===========================================================
@@ -4207,7 +4509,7 @@ app.get('/', (c) => {
       height: 70px;
       background: linear-gradient(135deg, var(--purple-main), var(--pink-main));
       border-radius: 50%;
-      box-shadow: 0 0 60px rgba(139, 92, 246, 0.5);
+      box-shadow: 0 0 60px rgba(30, 58, 95, 0.5);
       animation: pulsate 2s ease-in-out infinite;
     }
     
@@ -4322,8 +4624,8 @@ app.get('/', (c) => {
     }
     
     .step-item.active {
-      background: rgba(139, 92, 246, 0.12);
-      border-color: rgba(139, 92, 246, 0.25);
+      background: rgba(30, 58, 95, 0.12);
+      border-color: rgba(30, 58, 95, 0.25);
       color: var(--purple-light);
     }
     
@@ -4391,38 +4693,49 @@ app.get('/', (c) => {
     }
     
     .btn-primary {
-      background: linear-gradient(135deg, var(--purple-main), var(--pink-main));
-      color: #fff;
-      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.35);
+      background: linear-gradient(145deg, var(--accent-light) 0%, var(--accent) 50%, var(--primary) 100%);
+      color: var(--chrome-bright);
+      border: 1px solid rgba(45, 90, 135, 0.4);
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 0 20px rgba(45, 90, 135, 0.2);
     }
     
     .btn-primary:hover {
       transform: translateY(-3px);
-      box-shadow: 0 15px 40px rgba(139, 92, 246, 0.45);
+      box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 0 30px rgba(45, 90, 135, 0.3);
+      background: linear-gradient(145deg, var(--accent-glow) 0%, var(--accent-light) 50%, var(--accent) 100%);
     }
     
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.08);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: linear-gradient(145deg, rgba(10, 22, 40, 0.9) 0%, rgba(5, 10, 16, 0.95) 100%);
+      color: var(--chrome);
+      border: 1px solid rgba(45, 90, 135, 0.3);
     }
     
     .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: linear-gradient(145deg, rgba(30, 58, 95, 0.5) 0%, rgba(10, 22, 40, 0.8) 100%);
+      color: var(--chrome-bright);
+      border-color: rgba(45, 90, 135, 0.5);
     }
     
     .btn-ghost {
       width: 100%;
       padding: 18px;
       background: transparent;
-      border: 2px dashed rgba(255, 255, 255, 0.15);
-      color: rgba(255, 255, 255, 0.45);
+      border: 2px dashed rgba(45, 90, 135, 0.3);
+      color: rgba(192, 200, 212, 0.5);
       border-radius: 14px;
     }
     
     .btn-ghost:hover {
-      border-color: var(--purple-main);
-      color: var(--purple-light);
+      border-color: var(--accent-light);
+      color: var(--chrome);
+      background: rgba(30, 58, 95, 0.1);
     }
     
     .btn-icon {
@@ -4431,27 +4744,28 @@ app.get('/', (c) => {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(145deg, rgba(10, 22, 40, 0.8) 0%, rgba(5, 10, 16, 0.9) 100%);
+      border: 1px solid rgba(45, 90, 135, 0.2);
       border-radius: 10px;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(192, 200, 212, 0.5);
       cursor: pointer;
       font-size: 14px;
     }
     
     .btn-icon:hover {
-      background: rgba(239, 68, 68, 0.15);
-      border-color: rgba(239, 68, 68, 0.3);
+      background: linear-gradient(145deg, rgba(239, 68, 68, 0.2) 0%, rgba(10, 22, 40, 0.9) 100%);
+      border-color: rgba(239, 68, 68, 0.4);
       color: #EF4444;
     }
     
     /* ===========================================================
-       EXPERIENCE CARDS
+       EXPERIENCE CARDS - Premium Style
        =========================================================== */
     .exp-entry {
       padding: 26px;
       margin-bottom: 18px;
-      border-left: 4px solid var(--purple-main);
+      border-left: 4px solid var(--accent);
+      background: linear-gradient(145deg, rgba(10, 22, 40, 0.6) 0%, rgba(5, 10, 16, 0.8) 100%);
     }
     
     .exp-head {
@@ -4597,12 +4911,12 @@ app.get('/', (c) => {
       align-items: center;
       gap: 10px;
       padding: 10px 18px;
-      background: rgba(139, 92, 246, 0.15);
-      border: 1px solid rgba(139, 92, 246, 0.25);
+      background: rgba(30, 58, 95, 0.15);
+      border: 1px solid rgba(30, 58, 95, 0.25);
       border-radius: 100px;
       font-size: 13px;
       font-weight: 500;
-      color: #E9D5FF;
+      color: #c0c8d4;
     }
     
     .skill-chip button {
@@ -4648,7 +4962,7 @@ app.get('/', (c) => {
       font-size: 40px;
       font-weight: 700;
       color: #fff;
-      box-shadow: 0 20px 50px rgba(139, 92, 246, 0.35);
+      box-shadow: 0 20px 50px rgba(30, 58, 95, 0.35);
     }
     
     .profile-name {
@@ -4726,8 +5040,8 @@ app.get('/', (c) => {
     .timeline-dates {
       display: inline-block;
       padding: 6px 14px;
-      background: rgba(139, 92, 246, 0.15);
-      border: 1px solid rgba(139, 92, 246, 0.25);
+      background: rgba(30, 58, 95, 0.15);
+      border: 1px solid rgba(30, 58, 95, 0.25);
       border-radius: 100px;
       font-size: 12px;
       font-weight: 600;
@@ -4794,8 +5108,8 @@ app.get('/', (c) => {
     .resp-section {
       margin-top: 24px;
       padding: 20px;
-      background: rgba(139, 92, 246, 0.06);
-      border: 1px solid rgba(139, 92, 246, 0.15);
+      background: rgba(30, 58, 95, 0.06);
+      border: 1px solid rgba(30, 58, 95, 0.15);
       border-radius: 14px;
     }
     
@@ -4820,7 +5134,7 @@ app.get('/', (c) => {
       width: 24px;
       height: 24px;
       min-width: 24px;
-      background: rgba(139, 92, 246, 0.2);
+      background: rgba(30, 58, 95, 0.2);
       border-radius: 6px;
       display: flex;
       align-items: center;
@@ -4873,7 +5187,7 @@ app.get('/', (c) => {
       padding: 12px;
       margin-top: 12px;
       background: transparent;
-      border: 2px dashed rgba(139, 92, 246, 0.3);
+      border: 2px dashed rgba(30, 58, 95, 0.3);
       border-radius: 8px;
       color: var(--purple-light);
       font-size: 12px;
@@ -4884,7 +5198,7 @@ app.get('/', (c) => {
     
     .add-resp-btn:hover {
       border-color: var(--purple-main);
-      background: rgba(139, 92, 246, 0.1);
+      background: rgba(30, 58, 95, 0.1);
     }
     
     /* Enhanced image quality rendering */
@@ -4965,10 +5279,10 @@ app.get('/', (c) => {
         category: 'professional',
         name: 'Executive', 
         desc: 'Bold & authoritative for C-suite and senior leaders', 
-        color: '#8B5CF6', 
-        accent2: '#6D28D9',
+        color: '#1e3a5f', 
+        accent2: '#0d1f33',
         icon: 'fa-crown',
-        gradient: 'linear-gradient(135deg, #8B5CF6, #6D28D9, #4C1D95)',
+        gradient: 'linear-gradient(135deg, #1e3a5f, #0d1f33, #0a1628)',
         industries: ['Finance', 'Consulting', 'Legal', 'Corporate']
       },
       { 
@@ -5033,10 +5347,10 @@ app.get('/', (c) => {
         category: 'service',
         name: 'Beauty & Wellness', 
         desc: 'Elegant rose gold & soft tones for salons & spas', 
-        color: '#EC4899', 
-        accent2: '#BE185D',
+        color: '#3d7ab8', 
+        accent2: '#1a2d4a',
         icon: 'fa-spa',
-        gradient: 'linear-gradient(135deg, #EC4899, #DB2777, #BE185D)',
+        gradient: 'linear-gradient(135deg, #3d7ab8, #2d5a87, #1a2d4a)',
         industries: ['Hair Salon', 'Spa', 'Makeup', 'Fitness']
       },
       
@@ -5046,10 +5360,10 @@ app.get('/', (c) => {
         category: 'creative',
         name: 'Creative', 
         desc: 'Vibrant gradients for designers & artists', 
-        color: '#F472B6', 
-        accent2: '#A855F7',
+        color: '#4d8ab8', 
+        accent2: '#3d7ab8',
         icon: 'fa-paint-brush',
-        gradient: 'linear-gradient(135deg, #F472B6, #E879F9, #A855F7)',
+        gradient: 'linear-gradient(135deg, #4d8ab8, #4d8ab8, #3d7ab8)',
         industries: ['Design', 'Art', 'Photography', 'Marketing']
       },
       
@@ -5156,7 +5470,7 @@ app.get('/', (c) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 margin: '0 auto 20px',
-                boxShadow: '0 12px 40px rgba(139,92,246,0.4)'
+                boxShadow: '0 12px 40px rgba(30, 58, 95,0.4)'
               }}>
                 <i className="fas fa-rocket" style={{ fontSize: '32px', color: '#fff' }}></i>
               </div>
@@ -5835,7 +6149,7 @@ app.get('/', (c) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 12px 40px rgba(139,92,246,0.4)'
+              boxShadow: '0 12px 40px rgba(30, 58, 95,0.4)'
             }}>
               <i className="fas fa-spinner fa-spin" style={{ fontSize: '32px', color: '#fff' }}></i>
             </div>
@@ -5868,10 +6182,10 @@ app.get('/', (c) => {
               boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
               animation: 'slideIn 0.3s ease',
               background: saveStatus === 'saving' 
-                ? 'linear-gradient(135deg, rgba(6,182,212,0.9), rgba(139,92,246,0.9))' 
+                ? 'linear-gradient(135deg, rgba(6,182,212,0.9), rgba(30, 58, 95,0.9))' 
                 : saveStatus === 'saved'
                 ? 'linear-gradient(135deg, rgba(16,185,129,0.9), rgba(6,182,212,0.9))'
-                : 'linear-gradient(135deg, rgba(239,68,68,0.9), rgba(236,72,153,0.9))',
+                : 'linear-gradient(135deg, rgba(239,68,68,0.9), rgba(61, 122, 184,0.9))',
               color: '#fff',
               backdropFilter: 'blur(10px)'
             }}>
@@ -5907,9 +6221,9 @@ app.get('/', (c) => {
               <div style={{
                 padding: '16px',
                 margin: '0 16px 16px',
-                background: 'rgba(139,92,246,0.1)',
+                background: 'rgba(30, 58, 95,0.1)',
                 borderRadius: '12px',
-                border: '1px solid rgba(139,92,246,0.2)'
+                border: '1px solid rgba(30, 58, 95,0.2)'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                   <div style={{
@@ -5986,15 +6300,15 @@ app.get('/', (c) => {
                 className="nav-btn" 
                 onClick={() => profile && setView(VIEW.TAILOR)}
                 style={{ 
-                  background: 'linear-gradient(135deg, rgba(236,72,153,0.2), rgba(139,92,246,0.2))',
-                  borderColor: 'rgba(236,72,153,0.4)'
+                  background: 'linear-gradient(135deg, rgba(61, 122, 184,0.2), rgba(30, 58, 95,0.2))',
+                  borderColor: 'rgba(61, 122, 184,0.4)'
                 }}
               >
-                <i className="fas fa-magic" style={{ color: '#EC4899' }}></i>
-                <span style={{ color: '#EC4899' }}>AI Tailor</span>
+                <i className="fas fa-magic" style={{ color: '#3d7ab8' }}></i>
+                <span style={{ color: '#3d7ab8' }}>AI Tailor</span>
                 <span style={{ 
                   fontSize: '9px', 
-                  background: 'linear-gradient(135deg, #EC4899, #8B5CF6)',
+                  background: 'linear-gradient(135deg, #3d7ab8, #1e3a5f)',
                   padding: '2px 6px',
                   borderRadius: '10px',
                   marginLeft: '4px'
@@ -6129,7 +6443,7 @@ app.get('/', (c) => {
                     <button 
                       className="btn btn-primary" 
                       onClick={() => setView(VIEW.UPLOAD)}
-                      style={{ padding: '14px 28px', background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}
+                      style={{ padding: '14px 28px', background: 'linear-gradient(135deg, #1e3a5f, #3d7ab8)' }}
                     >
                       <i className="fas fa-upload" style={{ marginRight: '10px' }}></i>
                       Upload Resume
@@ -6194,7 +6508,7 @@ app.get('/', (c) => {
                     <button 
                       className="btn btn-primary" 
                       onClick={() => setView(VIEW.BUILDER)}
-                      style={{ padding: '14px 28px', background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}
+                      style={{ padding: '14px 28px', background: 'linear-gradient(135deg, #1e3a5f, #3d7ab8)' }}
                     >
                       <i className="fas fa-plus" style={{ marginRight: '10px' }}></i>
                       Create Profile
@@ -6406,7 +6720,7 @@ app.get('/', (c) => {
                     width: '36px',
                     height: '36px',
                     borderRadius: '50%',
-                    background: step.active ? 'linear-gradient(135deg, #8B5CF6, #EC4899)' : step.done ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.1)',
+                    background: step.active ? 'linear-gradient(135deg, #1e3a5f, #3d7ab8)' : step.done ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.1)',
                     border: step.active ? 'none' : step.done ? '2px solid #10B981' : '2px solid rgba(255,255,255,0.2)',
                     display: 'flex',
                     alignItems: 'center',
@@ -6642,7 +6956,7 @@ app.get('/', (c) => {
                 }}
                 style={{
                   padding: '12px 28px',
-                  background: 'linear-gradient(135deg, #8B5CF6, #EC4899)',
+                  background: 'linear-gradient(135deg, #1e3a5f, #3d7ab8)',
                   border: 'none',
                   borderRadius: '10px',
                   color: 'white',
@@ -6729,7 +7043,7 @@ app.get('/', (c) => {
       return (
         <div>
           {/* Profile Photo Section - ENHANCED */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '28px', marginBottom: '32px', padding: '24px', background: 'rgba(139,92,246,0.08)', borderRadius: '20px', border: '1px solid rgba(139,92,246,0.2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '28px', marginBottom: '32px', padding: '24px', background: 'rgba(30, 58, 95,0.08)', borderRadius: '20px', border: '1px solid rgba(30, 58, 95,0.2)' }}>
             <input
               type="file"
               ref={photoInputRef}
@@ -6752,7 +7066,7 @@ app.get('/', (c) => {
                 overflow: 'hidden',
                 flexShrink: 0,
                 transition: 'all 0.3s ease',
-                boxShadow: profilePhoto ? '0 12px 40px rgba(139,92,246,0.35)' : '0 8px 32px rgba(139,92,246,0.25)',
+                boxShadow: profilePhoto ? '0 12px 40px rgba(30, 58, 95,0.35)' : '0 8px 32px rgba(30, 58, 95,0.25)',
                 position: 'relative'
               }}
             >
@@ -7166,7 +7480,7 @@ app.get('/', (c) => {
                       className="btn-icon" 
                       onClick={() => clearCustomLogo(idx)}
                       title="Remove custom logo"
-                      style={{ background: 'rgba(236,72,153,0.15)', borderColor: 'rgba(236,72,153,0.3)' }}
+                      style={{ background: 'rgba(61, 122, 184,0.15)', borderColor: 'rgba(61, 122, 184,0.3)' }}
                     >
                       <i className="fas fa-image" style={{ color: 'var(--pink-main)' }}></i>
                     </button>
@@ -7411,14 +7725,14 @@ app.get('/', (c) => {
               <div style={{
                 marginTop: '20px',
                 padding: '20px',
-                background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(236,72,153,0.05))',
+                background: 'linear-gradient(135deg, rgba(30, 58, 95,0.1), rgba(61, 122, 184,0.05))',
                 borderRadius: '14px',
-                border: '1px solid rgba(139,92,246,0.2)'
+                border: '1px solid rgba(30, 58, 95,0.2)'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                   <div>
                     <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#fff', marginBottom: '6px' }}>
-                      <i className="fas fa-folder-open" style={{ marginRight: '10px', color: '#A78BFA' }}></i>
+                      <i className="fas fa-folder-open" style={{ marginRight: '10px', color: '#2d5a87' }}></i>
                       Employer Content Library
                     </h4>
                     <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
@@ -7431,10 +7745,10 @@ app.get('/', (c) => {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
                   <span style={{ 
                     padding: '6px 14px', 
-                    background: (exp.projects?.length > 0) ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.05)', 
+                    background: (exp.projects?.length > 0) ? 'rgba(30, 58, 95,0.2)' : 'rgba(255,255,255,0.05)', 
                     borderRadius: '8px', 
                     fontSize: '12px', 
-                    color: (exp.projects?.length > 0) ? '#A78BFA' : 'rgba(255,255,255,0.4)',
+                    color: (exp.projects?.length > 0) ? '#2d5a87' : 'rgba(255,255,255,0.4)',
                     fontWeight: '600'
                   }}>
                     <i className="fas fa-folder" style={{ marginRight: '6px' }}></i>
@@ -7475,10 +7789,10 @@ app.get('/', (c) => {
                   </span>
                   <span style={{ 
                     padding: '6px 14px', 
-                    background: (exp.videos?.length > 0) ? 'rgba(236,72,153,0.2)' : 'rgba(255,255,255,0.05)', 
+                    background: (exp.videos?.length > 0) ? 'rgba(61, 122, 184,0.2)' : 'rgba(255,255,255,0.05)', 
                     borderRadius: '8px', 
                     fontSize: '12px', 
-                    color: (exp.videos?.length > 0) ? '#EC4899' : 'rgba(255,255,255,0.4)',
+                    color: (exp.videos?.length > 0) ? '#3d7ab8' : 'rgba(255,255,255,0.4)',
                     fontWeight: '600'
                   }}>
                     <i className="fas fa-video" style={{ marginRight: '6px' }}></i>
@@ -7642,7 +7956,7 @@ app.get('/', (c) => {
                 padding: '10px 18px',
                 borderRadius: '100px',
                 border: activeCategory === 'all' ? '2px solid var(--purple-main)' : '2px solid rgba(255,255,255,0.1)',
-                background: activeCategory === 'all' ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.03)',
+                background: activeCategory === 'all' ? 'rgba(30, 58, 95,0.2)' : 'rgba(255,255,255,0.03)',
                 color: activeCategory === 'all' ? '#fff' : 'rgba(255,255,255,0.5)',
                 fontSize: '13px',
                 fontWeight: '600',
@@ -7661,7 +7975,7 @@ app.get('/', (c) => {
                   padding: '10px 18px',
                   borderRadius: '100px',
                   border: activeCategory === cat.id ? '2px solid var(--purple-main)' : '2px solid rgba(255,255,255,0.1)',
-                  background: activeCategory === cat.id ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.03)',
+                  background: activeCategory === cat.id ? 'rgba(30, 58, 95,0.2)' : 'rgba(255,255,255,0.03)',
                   color: activeCategory === cat.id ? '#fff' : 'rgba(255,255,255,0.5)',
                   fontSize: '13px',
                   fontWeight: '600',
@@ -7685,7 +7999,7 @@ app.get('/', (c) => {
                   padding: '24px',
                   borderRadius: '20px',
                   background: selectedTemplate === template.id 
-                    ? 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(236,72,153,0.08))'
+                    ? 'linear-gradient(135deg, rgba(30, 58, 95,0.15), rgba(61, 122, 184,0.08))'
                     : 'rgba(255,255,255,0.03)',
                   border: selectedTemplate === template.id 
                     ? '2px solid ' + template.color
@@ -7897,8 +8211,8 @@ app.get('/', (c) => {
       const videoInputRef = useRef(null);
       
       const styles = {
-        accent: template?.color || '#8B5CF6',
-        gradient: template?.gradient || 'linear-gradient(135deg, #8B5CF6, #6D28D9)',
+        accent: template?.color || '#1e3a5f',
+        gradient: template?.gradient || 'linear-gradient(135deg, #1e3a5f, #0d1f33)',
       };
       
       const exp = experience || {};
@@ -8084,7 +8398,7 @@ app.get('/', (c) => {
                   width: '60px',
                   height: '60px',
                   borderRadius: '14px',
-                  background: \`linear-gradient(135deg, \${styles.accent}, #6D28D9)\`,
+                  background: \`linear-gradient(135deg, \${styles.accent}, #0d1f33)\`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -8434,15 +8748,15 @@ app.get('/', (c) => {
                   {/* Awards at this company */}
                   {(exp.awards || []).map((award, idx) => (
                     <div key={award.id || idx} style={{
-                      background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.02))',
+                      background: 'linear-gradient(135deg, rgba(30, 58, 95,0.1), rgba(30, 58, 95,0.02))',
                       borderRadius: '18px',
                       padding: '28px',
-                      border: '1px solid rgba(139,92,246,0.2)',
+                      border: '1px solid rgba(30, 58, 95,0.2)',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '20px'
                     }}>
-                      <div style={{ width: '60px', height: '60px', borderRadius: '16px', background: 'linear-gradient(135deg, #8B5CF6, #6D28D9)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: '60px', height: '60px', borderRadius: '16px', background: 'linear-gradient(135deg, #1e3a5f, #0d1f33)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <i className="fas fa-award" style={{ fontSize: '28px', color: '#fff' }}></i>
                       </div>
                       <div>
@@ -9112,7 +9426,7 @@ app.get('/', (c) => {
                         width: '30px',
                         height: '30px',
                         borderRadius: '8px',
-                        background: 'rgba(236,72,153,0.2)',
+                        background: 'rgba(61, 122, 184,0.2)',
                         border: 'none',
                         color: 'var(--pink-main)',
                         cursor: 'pointer',
@@ -9148,8 +9462,8 @@ app.get('/', (c) => {
               style={{
                 aspectRatio: '16/9',
                 borderRadius: '14px',
-                border: '2px dashed rgba(236,72,153,0.4)',
-                background: 'rgba(236,72,153,0.05)',
+                border: '2px dashed rgba(61, 122, 184,0.4)',
+                background: 'rgba(61, 122, 184,0.05)',
                 cursor: 'pointer',
                 color: 'var(--pink-main)',
                 fontSize: '18px',
@@ -9369,10 +9683,10 @@ app.get('/', (c) => {
               width: '60px',
               height: '60px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #8B5CF6, #EC4899)',
+              background: 'linear-gradient(135deg, #1e3a5f, #3d7ab8)',
               border: 'none',
               cursor: 'pointer',
-              boxShadow: '0 8px 32px rgba(139, 92, 246, 0.4)',
+              boxShadow: '0 8px 32px rgba(30, 58, 95, 0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -9397,7 +9711,7 @@ app.get('/', (c) => {
               maxHeight: 'calc(100vh - 140px)',
               background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%)',
               borderRadius: '20px',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
+              border: '1px solid rgba(30, 58, 95, 0.3)',
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
               display: 'flex',
               flexDirection: 'column',
@@ -9407,7 +9721,7 @@ app.get('/', (c) => {
               {/* Header */}
               <div style={{
                 padding: '16px 20px',
-                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2))',
+                background: 'linear-gradient(135deg, rgba(30, 58, 95, 0.2), rgba(236, 72, 153, 0.2))',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
@@ -9417,7 +9731,7 @@ app.get('/', (c) => {
                   width: '40px',
                   height: '40px',
                   borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #8B5CF6, #EC4899)',
+                  background: 'linear-gradient(135deg, #1e3a5f, #3d7ab8)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -9449,7 +9763,7 @@ app.get('/', (c) => {
                       padding: '12px 16px',
                       borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                       background: msg.role === 'user' 
-                        ? 'linear-gradient(135deg, #8B5CF6, #7C3AED)' 
+                        ? 'linear-gradient(135deg, #1e3a5f, #2d5a87)' 
                         : 'rgba(255, 255, 255, 0.08)',
                       color: 'white',
                       fontSize: '14px',
@@ -9493,15 +9807,15 @@ app.get('/', (c) => {
                       style={{
                         padding: '6px 12px',
                         fontSize: '12px',
-                        background: 'rgba(139, 92, 246, 0.15)',
-                        border: '1px solid rgba(139, 92, 246, 0.3)',
+                        background: 'rgba(30, 58, 95, 0.15)',
+                        border: '1px solid rgba(30, 58, 95, 0.3)',
                         borderRadius: '20px',
                         color: 'rgba(255,255,255,0.8)',
                         cursor: 'pointer',
                         transition: 'all 0.2s'
                       }}
-                      onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(139, 92, 246, 0.3)'; }}
-                      onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(139, 92, 246, 0.15)'; }}
+                      onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(30, 58, 95, 0.3)'; }}
+                      onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(30, 58, 95, 0.15)'; }}
                     >
                       {qa.label}
                     </button>
@@ -9538,7 +9852,7 @@ app.get('/', (c) => {
                   disabled={loading || !input.trim()}
                   style={{
                     padding: '12px 16px',
-                    background: loading || !input.trim() ? 'rgba(139, 92, 246, 0.3)' : 'linear-gradient(135deg, #8B5CF6, #EC4899)',
+                    background: loading || !input.trim() ? 'rgba(30, 58, 95, 0.3)' : 'linear-gradient(135deg, #1e3a5f, #3d7ab8)',
                     border: 'none',
                     borderRadius: '12px',
                     color: 'white',
@@ -9668,14 +9982,14 @@ app.get('/', (c) => {
         return (
           <div style={{ padding: '40px', maxWidth: '800px', margin: '0 auto' }}>
             <div style={{
-              background: 'linear-gradient(135deg, rgba(236,72,153,0.15), rgba(139,92,246,0.15))',
-              border: '1px solid rgba(236,72,153,0.3)',
+              background: 'linear-gradient(135deg, rgba(61, 122, 184,0.15), rgba(30, 58, 95,0.15))',
+              border: '1px solid rgba(61, 122, 184,0.3)',
               borderRadius: '20px',
               padding: '50px',
               textAlign: 'center'
             }}>
               <div style={{ fontSize: '60px', marginBottom: '20px' }}>🎯</div>
-              <h2 style={{ fontSize: '28px', marginBottom: '15px', background: 'linear-gradient(135deg, #EC4899, #8B5CF6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <h2 style={{ fontSize: '28px', marginBottom: '15px', background: 'linear-gradient(135deg, #3d7ab8, #1e3a5f)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 AI Resume Tailor
               </h2>
               <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.7)', marginBottom: '30px', maxWidth: '500px', margin: '0 auto 30px' }}>
@@ -9715,7 +10029,7 @@ app.get('/', (c) => {
                     padding: '15px 40px',
                     fontSize: '16px',
                     fontWeight: '600',
-                    background: 'linear-gradient(135deg, #EC4899, #8B5CF6)',
+                    background: 'linear-gradient(135deg, #3d7ab8, #1e3a5f)',
                     border: 'none',
                     borderRadius: '12px',
                     color: 'white',
@@ -9752,7 +10066,7 @@ app.get('/', (c) => {
               <h1 style={{ 
                 fontSize: '28px', 
                 fontWeight: '700',
-                background: 'linear-gradient(135deg, #EC4899, #8B5CF6)',
+                background: 'linear-gradient(135deg, #3d7ab8, #1e3a5f)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 marginBottom: '5px'
@@ -9786,7 +10100,7 @@ app.get('/', (c) => {
                 onClick={() => setShowSaved(!showSaved)}
                 style={{
                   padding: '10px 20px',
-                  background: showSaved ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.05)',
+                  background: showSaved ? 'rgba(30, 58, 95,0.2)' : 'rgba(255,255,255,0.05)',
                   border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: '10px',
                   color: 'white',
@@ -9812,7 +10126,7 @@ app.get('/', (c) => {
               border: '1px solid rgba(255,255,255,0.1)'
             }}>
               <h3 style={{ marginBottom: '15px', fontSize: '16px' }}>
-                <i className="fas fa-history" style={{ marginRight: '10px', color: '#8B5CF6' }}></i>
+                <i className="fas fa-history" style={{ marginRight: '10px', color: '#1e3a5f' }}></i>
                 Saved Tailored Resumes
               </h3>
               {savedResumes.length === 0 ? (
@@ -9850,7 +10164,7 @@ app.get('/', (c) => {
                       <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
                         <button
                           onClick={() => setResult({ tailoredProfile: resume.tailoredProfile, matchAnalysis: resume.matchAnalysis, coverLetterHints: resume.coverLetterHints, interviewTips: resume.interviewTips, metadata: { jobTitle: resume.jobTitle, company: resume.company } })}
-                          style={{ flex: 1, padding: '8px', background: 'rgba(139,92,246,0.2)', border: 'none', borderRadius: '8px', color: '#A78BFA', cursor: 'pointer', fontSize: '12px' }}
+                          style={{ flex: 1, padding: '8px', background: 'rgba(30, 58, 95,0.2)', border: 'none', borderRadius: '8px', color: '#2d5a87', cursor: 'pointer', fontSize: '12px' }}
                         >
                           <i className="fas fa-eye"></i> View
                         </button>
@@ -9877,7 +10191,7 @@ app.get('/', (c) => {
               border: '1px solid rgba(255,255,255,0.1)'
             }}>
               <h3 style={{ marginBottom: '20px', fontSize: '16px' }}>
-                <i className="fas fa-paste" style={{ marginRight: '10px', color: '#EC4899' }}></i>
+                <i className="fas fa-paste" style={{ marginRight: '10px', color: '#3d7ab8' }}></i>
                 Job Details
               </h3>
               
@@ -9996,7 +10310,7 @@ The more detail, the better the tailored resume!"
                 style={{
                   width: '100%',
                   padding: '15px',
-                  background: loading ? 'rgba(139,92,246,0.3)' : 'linear-gradient(135deg, #EC4899, #8B5CF6)',
+                  background: loading ? 'rgba(30, 58, 95,0.3)' : 'linear-gradient(135deg, #3d7ab8, #1e3a5f)',
                   border: 'none',
                   borderRadius: '12px',
                   color: 'white',
@@ -10129,7 +10443,7 @@ The more detail, the better the tailored resume!"
                           fontSize: '13px',
                           color: 'rgba(255,255,255,0.7)'
                         }}>
-                          <span style={{ color: '#8B5CF6' }}>•</span>
+                          <span style={{ color: '#1e3a5f' }}>•</span>
                           {hint}
                         </div>
                       ))}
@@ -10153,7 +10467,7 @@ The more detail, the better the tailored resume!"
                           fontSize: '13px',
                           color: 'rgba(255,255,255,0.7)'
                         }}>
-                          <span style={{ color: '#EC4899' }}>•</span>
+                          <span style={{ color: '#3d7ab8' }}>•</span>
                           {tip}
                         </div>
                       ))}
@@ -10376,7 +10690,7 @@ The more detail, the better the tailored resume!"
                 padding: '36px',
                 maxWidth: '500px',
                 width: '100%',
-                border: '1px solid rgba(139,92,246,0.3)'
+                border: '1px solid rgba(30, 58, 95,0.3)'
               }}>
                 <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '8px', color: '#fff' }}>
                   <i className="fas fa-share-alt" style={{ marginRight: '12px', color: 'var(--purple-main)' }}></i>
@@ -10517,7 +10831,7 @@ The more detail, the better the tailored resume!"
                 
                 {/* View Stats */}
                 {isPublic && profileViews > 0 && (
-                  <div style={{ marginTop: '20px', textAlign: 'center', padding: '14px', background: 'rgba(139,92,246,0.1)', borderRadius: '10px' }}>
+                  <div style={{ marginTop: '20px', textAlign: 'center', padding: '14px', background: 'rgba(30, 58, 95,0.1)', borderRadius: '10px' }}>
                     <span style={{ fontSize: '24px', fontWeight: '800', color: 'var(--purple-main)' }}>{profileViews}</span>
                     <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginLeft: '8px' }}>profile views</span>
                   </div>
@@ -10666,7 +10980,7 @@ The more detail, the better the tailored resume!"
                 <i className="fas fa-edit"></i> Edit
               </button>
               <button className="btn btn-secondary" onClick={() => setView(VIEW.TAILOR)} style={{ 
-                background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+                background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%)',
                 border: 'none',
                 color: '#fff'
               }}>
@@ -10874,7 +11188,7 @@ The more detail, the better the tailored resume!"
                           width: '56px',
                           height: '56px',
                           borderRadius: '12px',
-                          background: \`linear-gradient(135deg, \${styles.accent}, #6D28D9)\`,
+                          background: \`linear-gradient(135deg, \${styles.accent}, #0d1f33)\`,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -10948,7 +11262,7 @@ The more detail, the better the tailored resume!"
                         </span>
                       )}
                       {exp.projects?.length > 0 && (
-                        <span style={{ padding: '4px 10px', background: 'rgba(139,92,246,0.1)', borderRadius: '6px', fontSize: '10px', color: '#A78BFA' }}>
+                        <span style={{ padding: '4px 10px', background: 'rgba(30, 58, 95,0.1)', borderRadius: '6px', fontSize: '10px', color: '#2d5a87' }}>
                           <i className="fas fa-folder" style={{ marginRight: '4px' }}></i>{exp.projects.length} Projects
                         </span>
                       )}
@@ -10963,7 +11277,7 @@ The more detail, the better the tailored resume!"
                         </span>
                       )}
                       {exp.videos?.length > 0 && (
-                        <span style={{ padding: '4px 10px', background: 'rgba(236,72,153,0.1)', borderRadius: '6px', fontSize: '10px', color: '#EC4899' }}>
+                        <span style={{ padding: '4px 10px', background: 'rgba(61, 122, 184,0.1)', borderRadius: '6px', fontSize: '10px', color: '#3d7ab8' }}>
                           <i className="fas fa-video" style={{ marginRight: '4px' }}></i>{exp.videos.length} Videos
                         </span>
                       )}
