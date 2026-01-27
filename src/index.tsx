@@ -4023,6 +4023,7 @@ app.get('/', (c) => {
         rgba(232, 236, 242, 0.4) 50%,
         rgba(192, 200, 212, 0.25) 70%,
         transparent 100%);
+      pointer-events: none;
     }
     
     /* Solid card - Deep reflective, NO blur (timepiece finish) */
