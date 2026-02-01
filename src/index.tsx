@@ -3760,6 +3760,11 @@ app.get('/', (c) => {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       overflow: hidden;
       -webkit-tap-highlight-color: transparent;
+      /* Safe area support for notched devices */
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
     }
     
     /* CRITICAL: Root element must be above the fixed background */
@@ -5430,6 +5435,85 @@ app.get('/', (c) => {
       }
     }
     
+    /* ============================================
+       MOBILE BOTTOM NAVIGATION BAR
+       Appears when sidebar is hidden (< 800px)
+       ============================================ */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      padding-bottom: env(safe-area-inset-bottom);
+      background: linear-gradient(180deg, rgba(12, 12, 14, 0.98) 0%, rgba(3, 3, 3, 1) 100%);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 1000;
+      box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
+    }
+    
+    .mobile-bottom-nav-inner {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 64px;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 0 8px;
+    }
+    
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px 12px;
+      min-width: 64px;
+      border-radius: 12px;
+      background: transparent;
+      border: none;
+      color: rgba(161, 161, 170, 0.7);
+      font-size: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .mobile-nav-item i {
+      font-size: 20px;
+      transition: transform 0.2s ease;
+    }
+    
+    .mobile-nav-item.active {
+      color: var(--chrome-bright);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    
+    .mobile-nav-item.active i {
+      transform: scale(1.1);
+    }
+    
+    .mobile-nav-item:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    @media (max-width: 800px) {
+      .mobile-bottom-nav {
+        display: block;
+      }
+      
+      /* Adjust main content to not be hidden by bottom nav */
+      .main-content {
+        padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+      }
+    }
+    
     /* Animation for floating save indicator */
     @keyframes slideIn {
       from { transform: translateX(100px); opacity: 0; }
@@ -5776,19 +5860,22 @@ app.get('/', (c) => {
       
       return (
         <div className="auth-container" style={{ 
-          minHeight: '100vh', 
-          minHeight: '100dvh', /* Dynamic viewport height for mobile */
+          minHeight: '100dvh', /* Dynamic viewport height for mobile - handles keyboard */
+          minHeight: '-webkit-fill-available', /* Fallback for older Safari */
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          padding: 'clamp(16px, 4vw, 24px)',
+          padding: 'clamp(12px, 3vw, 24px)',
+          paddingTop: 'max(env(safe-area-inset-top), clamp(20px, 5vh, 40px))',
+          paddingBottom: 'max(env(safe-area-inset-bottom), 20px)',
           position: 'relative',
           zIndex: 100,
-          overflowY: 'auto'
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch'
         }}>
           <div className="glass auth-card" style={{ 
             width: '100%', 
-            maxWidth: 'min(440px, 100%)', 
+            maxWidth: 'min(420px, calc(100% - 24px))', 
             padding: 'clamp(24px, 5vw, 48px) clamp(20px, 5vw, 40px)',
             borderRadius: 'clamp(20px, 4vw, 28px)',
             position: 'relative',
@@ -6975,6 +7062,50 @@ app.get('/', (c) => {
               view={view}
             />
           )}
+          
+          {/* MOBILE BOTTOM NAVIGATION BAR */}
+          <nav className="mobile-bottom-nav">
+            <div className="mobile-bottom-nav-inner">
+              <button 
+                className={'mobile-nav-item' + (view === VIEW.UPLOAD ? ' active' : '')}
+                onClick={() => setView(VIEW.UPLOAD)}
+              >
+                <i className="fas fa-upload"></i>
+                <span>Upload</span>
+              </button>
+              <button 
+                className={'mobile-nav-item' + (view === VIEW.BUILDER ? ' active' : '')}
+                onClick={() => profile && setView(VIEW.BUILDER)}
+                style={{ opacity: profile ? 1 : 0.4 }}
+              >
+                <i className="fas fa-edit"></i>
+                <span>Edit</span>
+              </button>
+              <button 
+                className={'mobile-nav-item' + (view === VIEW.PREVIEW ? ' active' : '')}
+                onClick={() => profile && setView(VIEW.PREVIEW)}
+                style={{ opacity: profile ? 1 : 0.4 }}
+              >
+                <i className="fas fa-eye"></i>
+                <span>Preview</span>
+              </button>
+              <button 
+                className={'mobile-nav-item' + (view === VIEW.TAILOR ? ' active' : '')}
+                onClick={() => profile && setView(VIEW.TAILOR)}
+                style={{ opacity: profile ? 1 : 0.4 }}
+              >
+                <i className="fas fa-magic"></i>
+                <span>AI Tailor</span>
+              </button>
+              <button 
+                className="mobile-nav-item"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <i className="fas fa-ellipsis-h"></i>
+                <span>More</span>
+              </button>
+            </div>
+          </nav>
         </div>
       );
     };
@@ -7090,6 +7221,14 @@ app.get('/', (c) => {
               onDragLeave={() => setDragging(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
+              onTouchStart={() => {}} // Enable touch feedback
+              style={{ 
+                cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent'
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label="Upload resume file"
             >
               <input
                 type="file"
@@ -7105,7 +7244,7 @@ app.get('/', (c) => {
                 <i className="fas fa-cloud-upload-alt"></i>
               </div>
               
-              <h2 className="upload-title">Drop Your Resume Here</h2>
+              <h2 className="upload-title">Tap to Upload Resume</h2>
               <p className="upload-subtitle">Powered by Gemini AI • Instant Career Analysis</p>
               
               <div className="format-pills">
@@ -7113,6 +7252,23 @@ app.get('/', (c) => {
                 <span className="format-pill"><i className="fas fa-file-word"></i> DOCX</span>
                 <span className="format-pill"><i className="fas fa-file-alt"></i> TXT</span>
               </div>
+              
+              {/* Mobile-friendly tap button */}
+              <button 
+                className="btn btn-primary"
+                onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                style={{ 
+                  marginTop: '20px',
+                  padding: '14px 32px',
+                  fontSize: '15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}
+              >
+                <i className="fas fa-folder-open"></i>
+                Choose File
+              </button>
             </div>
           </div>
         </div>
