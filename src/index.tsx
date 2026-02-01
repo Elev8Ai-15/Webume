@@ -5098,6 +5098,338 @@ app.get('/', (c) => {
       .stats-grid, .form-row { grid-template-columns: 1fr; }
     }
     
+    /* ===========================================================
+       COMPREHENSIVE MOBILE RESPONSIVE STYLES
+       Optimized for 320px-480px screens (iPhone SE to standard phones)
+       =========================================================== */
+    
+    /* Mobile Navigation - Show hamburger menu when sidebar hidden */
+    .mobile-nav-toggle {
+      display: none;
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 1000;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: rgba(12, 12, 14, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e4e4e7;
+      font-size: 20px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    @media (max-width: 800px) {
+      .mobile-nav-toggle { display: flex; align-items: center; justify-content: center; }
+    }
+    
+    /* Mobile sidebar drawer */
+    .mobile-sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 998;
+      backdrop-filter: blur(4px);
+    }
+    
+    .mobile-sidebar-overlay.active { display: block; }
+    
+    .mobile-sidebar {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(180deg, rgba(12, 12, 14, 0.98) 0%, rgba(5, 5, 6, 0.99) 100%);
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      z-index: 999;
+      transition: left 0.3s ease;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    
+    .mobile-sidebar.active { left: 0; }
+    
+    /* Tablet breakpoint (600-800px) */
+    @media (max-width: 800px) and (min-width: 601px) {
+      .main-content { padding: 20px; }
+      .page-header { margin-bottom: 20px; }
+      .glass-card { padding: 20px; }
+    }
+    
+    /* Mobile breakpoint (max 600px) - Primary mobile styles */
+    @media (max-width: 600px) {
+      /* ===== GLOBAL MOBILE ADJUSTMENTS ===== */
+      body, #root {
+        font-size: 14px;
+      }
+      
+      .main-content {
+        padding: 16px;
+        padding-top: 70px; /* Space for mobile nav */
+      }
+      
+      /* ===== AUTH/LOGIN SCREEN MOBILE ===== */
+      .auth-container {
+        padding: 16px !important;
+        min-height: 100vh;
+        align-items: flex-start !important;
+        padding-top: 40px !important;
+      }
+      
+      .auth-card {
+        padding: 28px 20px !important;
+        max-width: 100% !important;
+        border-radius: 20px !important;
+      }
+      
+      .auth-logo {
+        width: 80px !important;
+        margin-bottom: 16px !important;
+      }
+      
+      .auth-title {
+        font-size: 22px !important;
+        margin-bottom: 6px !important;
+      }
+      
+      .auth-subtitle {
+        font-size: 13px !important;
+      }
+      
+      .auth-form-label {
+        font-size: 12px !important;
+      }
+      
+      .auth-input {
+        padding: 12px 14px !important;
+        font-size: 16px !important; /* Prevent iOS zoom */
+      }
+      
+      .auth-submit-btn {
+        padding: 14px !important;
+        font-size: 15px !important;
+        min-height: 50px !important;
+      }
+      
+      /* ===== PAGE HEADERS MOBILE ===== */
+      .page-header {
+        margin-bottom: 16px;
+      }
+      
+      .page-title {
+        font-size: 22px !important;
+      }
+      
+      .page-desc {
+        font-size: 13px !important;
+      }
+      
+      /* ===== UPLOAD ZONE MOBILE ===== */
+      .upload-zone {
+        padding: 24px 16px !important;
+      }
+      
+      .upload-logo {
+        width: 160px !important;
+        margin-bottom: 16px !important;
+      }
+      
+      .upload-icon-wrap {
+        width: 64px !important;
+        height: 64px !important;
+        font-size: 28px !important;
+      }
+      
+      .upload-title {
+        font-size: 18px !important;
+      }
+      
+      .upload-subtitle {
+        font-size: 12px !important;
+      }
+      
+      .format-pills {
+        gap: 8px !important;
+      }
+      
+      .format-pill {
+        padding: 8px 12px !important;
+        font-size: 11px !important;
+      }
+      
+      /* ===== BUILDER VIEW MOBILE ===== */
+      .builder-header {
+        padding: 12px 16px !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+      }
+      
+      .builder-header-logo {
+        height: 28px !important;
+      }
+      
+      /* Workflow steps - stack vertically on mobile */
+      .workflow-progress {
+        flex-direction: column !important;
+        gap: 12px !important;
+        padding: 16px !important;
+      }
+      
+      .workflow-step {
+        flex-direction: row !important;
+        gap: 12px !important;
+        width: 100% !important;
+      }
+      
+      .workflow-connector {
+        display: none !important;
+      }
+      
+      .workflow-step-circle {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+      }
+      
+      .workflow-step-label {
+        font-size: 12px !important;
+      }
+      
+      /* ===== GLASS CARDS MOBILE ===== */
+      .glass, .glass-card, .glass-panel, .glass-solid {
+        border-radius: 16px !important;
+      }
+      
+      .glass-card {
+        padding: 16px !important;
+      }
+      
+      /* ===== BUTTONS MOBILE ===== */
+      .btn {
+        padding: 12px 16px !important;
+        font-size: 14px !important;
+        min-height: 44px !important; /* Apple touch target guideline */
+      }
+      
+      .btn-icon {
+        width: 40px !important;
+        height: 40px !important;
+      }
+      
+      /* ===== INPUTS MOBILE ===== */
+      .glass-input {
+        padding: 12px 14px !important;
+        font-size: 16px !important; /* Prevent iOS zoom */
+        border-radius: 10px !important;
+      }
+      
+      /* ===== PREVIEW/PUBLIC PROFILE MOBILE ===== */
+      .preview-header {
+        padding: 12px 16px !important;
+      }
+      
+      .preview-header-logo {
+        height: 28px !important;
+      }
+      
+      /* ===== TAILOR VIEW MOBILE ===== */
+      .tailor-header {
+        padding: 20px 16px !important;
+      }
+      
+      .tailor-title {
+        font-size: 22px !important;
+      }
+      
+      .tailor-logo {
+        height: 32px !important;
+      }
+      
+      /* ===== NAV ITEMS MOBILE ===== */
+      .nav-btn {
+        padding: 12px 14px !important;
+        font-size: 13px !important;
+      }
+      
+      .nav-btn i {
+        width: 18px !important;
+        font-size: 14px !important;
+      }
+      
+      /* ===== SAVE INDICATOR MOBILE ===== */
+      .save-indicator {
+        top: 70px !important;
+        right: 12px !important;
+        padding: 10px 14px !important;
+        font-size: 12px !important;
+      }
+      
+      /* ===== EXPERIENCE CARDS MOBILE ===== */
+      .experience-card {
+        padding: 16px !important;
+      }
+      
+      .experience-header {
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      
+      .company-logo {
+        width: 48px !important;
+        height: 48px !important;
+      }
+      
+      /* ===== FORM SECTIONS MOBILE ===== */
+      .form-section-title {
+        font-size: 16px !important;
+      }
+      
+      .form-row {
+        gap: 12px !important;
+      }
+      
+      /* ===== MODALS MOBILE ===== */
+      .modal-content {
+        padding: 20px !important;
+        margin: 16px !important;
+        max-height: 90vh !important;
+        border-radius: 20px !important;
+      }
+    }
+    
+    /* Extra small screens (iPhone SE, 320px) */
+    @media (max-width: 375px) {
+      .auth-card {
+        padding: 24px 16px !important;
+      }
+      
+      .auth-logo {
+        width: 64px !important;
+      }
+      
+      .auth-title {
+        font-size: 20px !important;
+      }
+      
+      .upload-logo {
+        width: 120px !important;
+      }
+      
+      .page-title {
+        font-size: 20px !important;
+      }
+      
+      .btn {
+        padding: 10px 14px !important;
+        font-size: 13px !important;
+      }
+    }
+    
     /* Animation for floating save indicator */
     @keyframes slideIn {
       from { transform: translateX(100px); opacity: 0; }
@@ -5443,39 +5775,42 @@ app.get('/', (c) => {
       };
       
       return (
-        <div style={{ 
+        <div className="auth-container" style={{ 
           minHeight: '100vh', 
+          minHeight: '100dvh', /* Dynamic viewport height for mobile */
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          padding: '20px',
+          padding: 'clamp(16px, 4vw, 24px)',
           position: 'relative',
-          zIndex: 100
+          zIndex: 100,
+          overflowY: 'auto'
         }}>
-          <div className="glass" style={{ 
+          <div className="glass auth-card" style={{ 
             width: '100%', 
-            maxWidth: '440px', 
-            padding: '48px 40px',
-            borderRadius: '28px',
+            maxWidth: 'min(440px, 100%)', 
+            padding: 'clamp(24px, 5vw, 48px) clamp(20px, 5vw, 40px)',
+            borderRadius: 'clamp(20px, 4vw, 28px)',
             position: 'relative',
             zIndex: 200
           }}>
-            <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+            <div style={{ textAlign: 'center', marginBottom: 'clamp(24px, 5vw, 36px)' }}>
               <img 
                 src="/static/logo.png" 
                 alt="Webumé" 
+                className="auth-logo"
                 style={{
-                  width: '120px',
+                  width: 'clamp(80px, 20vw, 120px)',
                   height: 'auto',
-                  margin: '0 auto 24px',
+                  margin: '0 auto clamp(16px, 4vw, 24px)',
                   display: 'block',
                   filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.5))'
                 }}
               />
-              <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#fff', marginBottom: '8px' }}>
+              <h1 className="auth-title" style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: '800', color: '#fff', marginBottom: '8px' }}>
                 {isLogin ? 'Welcome Back!' : 'Create Account'}
               </h1>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>
+              <p className="auth-subtitle" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(13px, 3vw, 14px)' }}>
                 {isLogin ? 'Sign in to access your saved profiles' : 'Start building your digital profile'}
               </p>
             </div>
@@ -5500,14 +5835,14 @@ app.get('/', (c) => {
             
             <form onSubmit={handleSubmit}>
               {!isLogin && (
-                <div style={{ marginBottom: '18px' }}>
-                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
-                    <i className="fas fa-user" style={{ marginRight: '8px', color: 'var(--purple-main)' }}></i>
+                <div style={{ marginBottom: 'clamp(14px, 3vw, 18px)' }}>
+                  <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(12px, 2.5vw, 13px)', fontWeight: '600', marginBottom: '8px' }}>
+                    <i className="fas fa-user" style={{ marginRight: '8px', color: 'var(--chrome)' }}></i>
                     Full Name
                   </label>
                   <input
                     type="text"
-                    className="glass-input"
+                    className="glass-input auth-input"
                     id="auth-name"
                     name="name"
                     value={name}
@@ -5517,7 +5852,7 @@ app.get('/', (c) => {
                     autoComplete="name"
                     style={{ 
                       width: '100%', 
-                      padding: '14px 16px', 
+                      padding: 'clamp(12px, 3vw, 14px) clamp(14px, 3vw, 16px)', 
                       fontSize: '16px',
                       WebkitAppearance: 'none',
                       appearance: 'none'
@@ -5526,16 +5861,16 @@ app.get('/', (c) => {
                 </div>
               )}
               
-              <div style={{ marginBottom: '18px' }}>
-                <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
-                  <i className="fas fa-envelope" style={{ marginRight: '8px', color: 'var(--purple-main)' }}></i>
+              <div style={{ marginBottom: 'clamp(14px, 3vw, 18px)' }}>
+                <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(12px, 2.5vw, 13px)', fontWeight: '600', marginBottom: '8px' }}>
+                  <i className="fas fa-envelope" style={{ marginRight: '8px', color: 'var(--chrome)' }}></i>
                   Email Address
                 </label>
                 <input
                   type="email"
                   id="auth-email"
                   name="email"
-                  className="glass-input"
+                  className="glass-input auth-input"
                   value={email}
                   onChange={handleEmailChange}
                   onFocus={() => console.log('📧 Email focused')}
@@ -5545,9 +5880,10 @@ app.get('/', (c) => {
                   autoCapitalize="none"
                   autoCorrect="off"
                   spellCheck="false"
+                  inputMode="email"
                   style={{ 
                     width: '100%', 
-                    padding: '14px 16px', 
+                    padding: 'clamp(12px, 3vw, 14px) clamp(14px, 3vw, 16px)', 
                     fontSize: '16px',
                     WebkitAppearance: 'none',
                     appearance: 'none'
@@ -5555,9 +5891,9 @@ app.get('/', (c) => {
                 />
               </div>
               
-              <div style={{ marginBottom: '28px' }}>
-                <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
-                  <i className="fas fa-lock" style={{ marginRight: '8px', color: 'var(--purple-main)' }}></i>
+              <div style={{ marginBottom: 'clamp(20px, 4vw, 28px)' }}>
+                <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(12px, 2.5vw, 13px)', fontWeight: '600', marginBottom: '8px' }}>
+                  <i className="fas fa-lock" style={{ marginRight: '8px', color: 'var(--chrome)' }}></i>
                   Password
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -5565,7 +5901,7 @@ app.get('/', (c) => {
                     type={showPassword ? 'text' : 'password'}
                     id="auth-password"
                     name="password"
-                    className="glass-input"
+                    className="glass-input auth-input"
                     value={password}
                     onChange={handlePasswordChange}
                     onFocus={() => console.log('🔑 Password focused')}
@@ -5574,7 +5910,7 @@ app.get('/', (c) => {
                     autoComplete="current-password"
                     style={{ 
                       width: '100%', 
-                      padding: '14px 16px', 
+                      padding: 'clamp(12px, 3vw, 14px) clamp(14px, 3vw, 16px)', 
                       fontSize: '16px',
                       paddingRight: '50px',
                       WebkitAppearance: 'none',
@@ -5593,10 +5929,12 @@ app.get('/', (c) => {
                       border: 'none',
                       color: 'rgba(255,255,255,0.5)',
                       cursor: 'pointer',
-                      padding: '8px',
+                      padding: '12px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
+                      minWidth: '44px',
+                      minHeight: '44px'
                     }}
                   >
                     <i className={showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'}></i>
@@ -5606,7 +5944,7 @@ app.get('/', (c) => {
               
               <button 
                 type="submit" 
-                className="btn btn-primary"
+                className="btn btn-primary auth-submit-btn"
                 disabled={authLoading}
                 onClick={(e) => { 
                   console.log('🖱️ BUTTON CLICKED!');
@@ -5620,13 +5958,13 @@ app.get('/', (c) => {
                 }}
                 style={{ 
                   width: '100%', 
-                  padding: '18px', 
-                  fontSize: '16px',
+                  padding: 'clamp(14px, 3.5vw, 18px)', 
+                  fontSize: 'clamp(14px, 3vw, 16px)',
                   fontWeight: '700',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  minHeight: '56px',
+                  minHeight: 'clamp(48px, 10vw, 56px)',
                   WebkitTapHighlightColor: 'transparent',
                   gap: '10px',
                   position: 'relative',
@@ -5647,18 +5985,20 @@ app.get('/', (c) => {
               </button>
             </form>
             
-            <div style={{ marginTop: '28px', textAlign: 'center' }}>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px' }}>
+            <div style={{ marginTop: 'clamp(20px, 4vw, 28px)', textAlign: 'center' }}>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(12px, 2.5vw, 13px)' }}>
                 {isLogin ? "Don't have an account?" : "Already have an account?"}
                 <button
                   onClick={() => { setIsLogin(!isLogin); setError(''); if(clearAuthError) clearAuthError(); }}
                   style={{
                     background: 'none',
                     border: 'none',
-                    color: 'var(--purple-light)',
+                    color: 'var(--chrome)',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    marginLeft: '6px'
+                    marginLeft: '6px',
+                    padding: '8px 4px',
+                    minHeight: '44px'
                   }}
                 >
                   {isLogin ? 'Sign Up' : 'Sign In'}
@@ -5666,8 +6006,8 @@ app.get('/', (c) => {
               </p>
             </div>
             
-            <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
-              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '11px' }}>
+            <div style={{ marginTop: 'clamp(24px, 5vw, 32px)', paddingTop: 'clamp(16px, 4vw, 24px)', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 'clamp(10px, 2vw, 11px)' }}>
                 <i className="fas fa-shield-alt" style={{ marginRight: '6px' }}></i>
                 Your data is securely stored and never shared
               </p>
@@ -5701,6 +6041,7 @@ app.get('/', (c) => {
       const [slug, setSlug] = useState('');
       const [isPublic, setIsPublic] = useState(false);
       const [profileViews, setProfileViews] = useState(0);
+      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
       const [steps, setSteps] = useState([
         { text: 'Reading file', state: 'pending' },
         { text: 'Extracting text', state: 'pending' },
@@ -6163,19 +6504,119 @@ app.get('/', (c) => {
       
       return (
         <div className="app-container">
+          {/* MOBILE NAVIGATION */}
+          <button 
+            className="mobile-nav-toggle"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            <i className={mobileMenuOpen ? 'fas fa-times' : 'fas fa-bars'}></i>
+          </button>
+          
+          {/* Mobile sidebar overlay */}
+          <div 
+            className={'mobile-sidebar-overlay' + (mobileMenuOpen ? ' active' : '')}
+            onClick={() => setMobileMenuOpen(false)}
+          ></div>
+          
+          {/* Mobile sidebar drawer */}
+          <div className={'mobile-sidebar' + (mobileMenuOpen ? ' active' : '')}>
+            <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+              <img src="/static/logo.png" alt="Webumé" style={{ width: '140px', height: 'auto' }} />
+            </div>
+            
+            {user && (
+              <div style={{
+                padding: '14px',
+                marginBottom: '16px',
+                background: 'rgba(255, 255, 255, 0.03)',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.06)'
+              }}>
+                <div style={{ color: '#fff', fontWeight: '600', fontSize: '14px', marginBottom: '4px' }}>
+                  {user.name}
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>
+                  {user.email}
+                </div>
+              </div>
+            )}
+            
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: '10px', paddingLeft: '12px' }}>
+                Navigation
+              </div>
+              {[
+                { view: VIEW.UPLOAD, icon: 'fa-upload', label: 'Upload Resume' },
+                { view: VIEW.BUILDER, icon: 'fa-edit', label: 'Edit Profile', needsProfile: true },
+                { view: VIEW.PREVIEW, icon: 'fa-eye', label: 'Preview', needsProfile: true },
+                { view: VIEW.TAILOR, icon: 'fa-magic', label: 'AI Tailor', needsProfile: true }
+              ].map(item => (
+                <button
+                  key={item.label}
+                  onClick={() => {
+                    if (!item.needsProfile || profile) {
+                      setView(item.view);
+                      setMobileMenuOpen(false);
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    background: view === item.view ? 'rgba(255,255,255,0.08)' : 'transparent',
+                    border: 'none',
+                    borderRadius: '10px',
+                    color: item.needsProfile && !profile ? 'rgba(255,255,255,0.3)' : '#e4e4e7',
+                    fontSize: '14px',
+                    textAlign: 'left',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    cursor: item.needsProfile && !profile ? 'not-allowed' : 'pointer',
+                    marginBottom: '4px'
+                  }}
+                >
+                  <i className={'fas ' + item.icon} style={{ width: '18px' }}></i>
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            
+            <button
+              onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(239,68,68,0.1)',
+                border: '1px solid rgba(239,68,68,0.2)',
+                borderRadius: '10px',
+                color: '#EF4444',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                cursor: 'pointer',
+                marginTop: 'auto'
+              }}
+            >
+              <i className="fas fa-sign-out-alt"></i>
+              Sign Out
+            </button>
+          </div>
+          
           {/* FLOATING AUTO-SAVE INDICATOR - Always visible */}
           {saveStatus && (
-            <div style={{
+            <div className="save-indicator" style={{
               position: 'fixed',
               top: '20px',
               right: '20px',
               zIndex: 9999,
-              padding: '12px 20px',
+              padding: 'clamp(10px, 2vw, 12px) clamp(14px, 3vw, 20px)',
               borderRadius: '12px',
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
-              fontSize: '13px',
+              fontSize: 'clamp(11px, 2.5vw, 13px)',
               fontWeight: '600',
               boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
               animation: 'slideIn 0.3s ease',
