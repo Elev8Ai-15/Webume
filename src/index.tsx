@@ -3058,20 +3058,20 @@ app.get('/p/:slug', async (c) => {
       const skills = p.skills || [];
       const education = p.education || [];
       
-      // Get accent color from template - Premium dark palette
+      // Get accent color from template - Deep black with subtle tints
       const templateColors = {
-        executive: '#1e3a5f',     /* Dark steel blue */
-        corporate: '#1a2d4a',     /* Midnight blue */
-        healthcare: '#0d4a6f',    /* Deep medical blue */
-        restaurant: '#8b2020',    /* Deep crimson */
-        trades: '#7a4a10',        /* Burnished bronze */
-        beauty: '#6b2744',        /* Deep rose */
-        creative: '#4a2d5a',      /* Deep violet */
-        tech: '#0a4a5a',          /* Dark teal */
-        nonprofit: '#0a4050',     /* Ocean depth */
-        minimal: '#1a3a35'        /* Forest depths */
+        executive: '#18181b',     /* Charcoal */
+        corporate: '#1c1c1e',     /* Dark gray */
+        healthcare: '#151820',    /* Deep blue-gray */
+        restaurant: '#1a1515',    /* Warm charcoal */
+        trades: '#1a1816',        /* Warm dark */
+        beauty: '#1a1518',        /* Rose charcoal */
+        creative: '#18161a',      /* Purple charcoal */
+        tech: '#151818',          /* Teal charcoal */
+        nonprofit: '#151819',     /* Cool charcoal */
+        minimal: '#171918'        /* Green charcoal */
       };
-      const accent = templateColors[profile.selectedTemplate] || '#1e3a5f';
+      const accent = templateColors[profile.selectedTemplate] || '#18181b';
       
       // Apply accent color to CSS variables
       useEffect(() => {
@@ -3351,9 +3351,10 @@ app.get('/p/:slug', async (c) => {
               Create Your Own Webumé
             </a>
             
-            <p className="powered-by">
-              Powered by <strong>Webumé</strong> • The Digital Resume Revolution
-            </p>
+            <div className="powered-by" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginTop: '24px' }}>
+              <img src="/static/logo.png" alt="Webumé" style={{ height: '28px', width: 'auto', opacity: 0.8 }} />
+              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>The Digital Resume Revolution</span>
+            </div>
           </footer>
           
           {/* Panel Overlay */}
@@ -5460,19 +5461,17 @@ app.get('/', (c) => {
             zIndex: 200
           }}>
             <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-              <div style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '24px',
-                background: 'linear-gradient(135deg, var(--purple-main), var(--pink-main))',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 20px',
-                boxShadow: '0 12px 40px rgba(30, 58, 95,0.4)'
-              }}>
-                <i className="fas fa-rocket" style={{ fontSize: '32px', color: '#fff' }}></i>
-              </div>
+              <img 
+                src="/static/logo.png" 
+                alt="Webumé" 
+                style={{
+                  width: '120px',
+                  height: 'auto',
+                  margin: '0 auto 24px',
+                  display: 'block',
+                  filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.5))'
+                }}
+              />
               <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#fff', marginBottom: '8px' }}>
                 {isLogin ? 'Welcome Back!' : 'Create Account'}
               </h1>
@@ -6220,20 +6219,21 @@ app.get('/', (c) => {
               <div style={{
                 padding: '16px',
                 margin: '0 16px 16px',
-                background: 'rgba(30, 58, 95,0.1)',
+                background: 'rgba(255, 255, 255, 0.03)',
                 borderRadius: '12px',
-                border: '1px solid rgba(30, 58, 95,0.2)'
+                border: '1px solid rgba(255, 255, 255, 0.06)'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                   <div style={{
                     width: '40px',
                     height: '40px',
                     borderRadius: '10px',
-                    background: 'linear-gradient(135deg, var(--purple-main), var(--pink-main))',
+                    background: 'linear-gradient(135deg, #1a1a1c, #0e0e10)',
+                    border: '1px solid rgba(255,255,255,0.08)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#fff',
+                    color: '#a1a1aa',
                     fontWeight: '700',
                     fontSize: '14px'
                   }}>
@@ -6685,6 +6685,21 @@ app.get('/', (c) => {
       
       return (
         <div>
+          {/* Header with Logo */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '20px',
+            padding: '16px 20px',
+            background: 'rgba(0,0,0,0.3)',
+            borderRadius: '16px',
+            border: '1px solid rgba(255,255,255,0.06)'
+          }}>
+            <img src="/static/logo.png" alt="Webumé" style={{ height: '36px', width: 'auto' }} />
+            <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px' }}>Profile Builder</span>
+          </div>
+          
           {/* Workflow Progress Indicator */}
           <div style={{
             display: 'flex',
@@ -6719,12 +6734,12 @@ app.get('/', (c) => {
                     width: '36px',
                     height: '36px',
                     borderRadius: '50%',
-                    background: step.active ? 'linear-gradient(135deg, #1e3a5f, #3d7ab8)' : step.done ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.1)',
-                    border: step.active ? 'none' : step.done ? '2px solid #10B981' : '2px solid rgba(255,255,255,0.2)',
+                    background: step.active ? 'linear-gradient(135deg, #1a1a1c, #27272a)' : step.done ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.05)',
+                    border: step.active ? '1px solid rgba(255,255,255,0.15)' : step.done ? '2px solid #10B981' : '2px solid rgba(255,255,255,0.1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: step.active ? 'white' : step.done ? '#10B981' : 'rgba(255,255,255,0.5)',
+                    color: step.active ? '#e4e4e7' : step.done ? '#10B981' : 'rgba(255,255,255,0.4)',
                     fontSize: '14px'
                   }}>
                     {step.done && !step.active ? <i className="fas fa-check"></i> : <i className={'fas ' + step.icon}></i>}
@@ -9980,15 +9995,16 @@ app.get('/', (c) => {
       if (!isPremium) {
         return (
           <div style={{ padding: '40px', maxWidth: '800px', margin: '0 auto' }}>
+            <img src="/static/logo.png" alt="Webumé" style={{ height: '40px', width: 'auto', marginBottom: '30px', display: 'block' }} />
             <div style={{
-              background: 'linear-gradient(135deg, rgba(61, 122, 184,0.15), rgba(30, 58, 95,0.15))',
-              border: '1px solid rgba(61, 122, 184,0.3)',
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               borderRadius: '20px',
               padding: '50px',
               textAlign: 'center'
             }}>
               <div style={{ fontSize: '60px', marginBottom: '20px' }}>🎯</div>
-              <h2 style={{ fontSize: '28px', marginBottom: '15px', background: 'linear-gradient(135deg, #3d7ab8, #1e3a5f)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <h2 style={{ fontSize: '28px', marginBottom: '15px', color: '#e4e4e7' }}>
                 AI Resume Tailor
               </h2>
               <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.7)', marginBottom: '30px', maxWidth: '500px', margin: '0 auto 30px' }}>
@@ -10061,21 +10077,22 @@ app.get('/', (c) => {
         <div style={{ padding: '30px', maxWidth: '1400px', margin: '0 auto' }}>
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-            <div>
-              <h1 style={{ 
-                fontSize: '28px', 
-                fontWeight: '700',
-                background: 'linear-gradient(135deg, #3d7ab8, #1e3a5f)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                marginBottom: '5px'
-              }}>
-                <i className="fas fa-magic" style={{ marginRight: '10px' }}></i>
-                AI Resume Tailor
-              </h1>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>
-                Paste a job description and get a perfectly tailored resume in seconds
-              </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <img src="/static/logo.png" alt="Webumé" style={{ height: '40px', width: 'auto' }} />
+              <div>
+                <h1 style={{ 
+                  fontSize: '24px', 
+                  fontWeight: '700',
+                  color: '#e4e4e7',
+                  marginBottom: '5px'
+                }}>
+                  <i className="fas fa-magic" style={{ marginRight: '10px', color: '#a1a1aa' }}></i>
+                  AI Resume Tailor
+                </h1>
+                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>
+                  Paste a job description and get a perfectly tailored resume in seconds
+                </p>
+              </div>
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
@@ -10939,8 +10956,10 @@ The more detail, the better the tailored resume!"
           )}
           
           <div className="glass preview-header">
-            <div>
-              <h1 className="page-title">Live Preview</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <img src="/static/logo.png" alt="Webumé" style={{ height: '40px', width: 'auto' }} />
+              <div>
+                <h1 className="page-title">Live Preview</h1>
               <p className="page-desc">
                 <span style={{ 
                   display: 'inline-flex', 
@@ -10970,6 +10989,7 @@ The more detail, the better the tailored resume!"
                   </span>
                 )}
               </p>
+              </div>
             </div>
             <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
               <button className="btn btn-secondary" onClick={checkAtsScore}>
