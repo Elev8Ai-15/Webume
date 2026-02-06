@@ -1,5 +1,5 @@
 {
-  "name": "webapp",
+  "name": "webume",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,16 +9,33 @@
     "deploy": "npm run build && wrangler pages deploy dist",
     "deploy:prod": "npm run build && wrangler pages deploy dist --project-name webume",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
-    "clean-port": "fuser -k 3000/tcp 2>/dev/null || true"
+    "clean-port": "fuser -k 3000/tcp 2>/dev/null || true",
+    "lint": "eslint src/ --ext .ts,.tsx",
+    "lint:fix": "eslint src/ --ext .ts,.tsx --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx}'",
+    "format:check": "prettier --check 'src/**/*.{ts,tsx}'",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "check": "npm run typecheck && npm run lint && npm run test",
+    "prebuild": "npm run typecheck"
   },
   "dependencies": {
     "hono": "^4.11.3"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260206.0",
+    "@eslint/js": "^9.17.0",
     "@hono/vite-build": "^1.2.0",
     "@hono/vite-dev-server": "^0.18.2",
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2",
     "puppeteer": "^24.36.1",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0",
     "vite": "^6.3.5",
+    "vitest": "^2.1.8",
     "wrangler": "^4.4.0"
   }
 }

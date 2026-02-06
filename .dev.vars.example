@@ -1,0 +1,10 @@
+# Cloudflare Workers Development Variables
+# Copy this to .dev.vars and fill in your values
+# These are injected as environment bindings in local development
+
+# Google Gemini AI API Key (for resume parsing & tailoring)
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Stripe Payment Integration
+STRIPE_SECRET_KEY=sk_test_your_stripe_key_here
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
