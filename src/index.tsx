@@ -57,13 +57,14 @@ const SECURITY_CONFIG = {
 
 // ============================================================
 // ENHANCED PASSWORD HASHING (PBKDF2 - CF Workers compatible)
+// Per-user random salt stored alongside hash as "salt:hash"
+// Backward compatible with legacy static-salt hashes
 // ============================================================
-async function hashPassword(password: string): Promise<string> {
+const LEGACY_SALT = 'webume_secure_salt_v2_2024';
+const PBKDF2_ITERATIONS = 100000;
+
+async function deriveHash(password: string, salt: string): Promise<string> {
   const encoder = new TextEncoder();
-  const salt = 'webume_secure_salt_v2_2024';
-  const iterations = 100000;
-  
-  // Import key for PBKDF2
   const keyMaterial = await crypto.subtle.importKey(
     'raw',
     encoder.encode(password),
@@ -71,27 +72,41 @@ async function hashPassword(password: string): Promise<string> {
     false,
     ['deriveBits']
   );
-  
-  // Derive bits using PBKDF2
   const derivedBits = await crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
       salt: encoder.encode(salt),
-      iterations: iterations,
+      iterations: PBKDF2_ITERATIONS,
       hash: 'SHA-256'
     },
     keyMaterial,
     256
   );
-  
   const hashArray = Array.from(new Uint8Array(derivedBits));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Verify password
-async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  const newHash = await hashPassword(password);
-  return newHash === hash;
+async function hashPassword(password: string): Promise<string> {
+  // Generate a random 16-byte salt per user
+  const saltBytes = new Uint8Array(16);
+  crypto.getRandomValues(saltBytes);
+  const salt = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  const hash = await deriveHash(password, salt);
+  // Store as "salt:hash" so we can extract the salt during verification
+  return `${salt}:${hash}`;
+}
+
+// Verify password - supports both new "salt:hash" and legacy static-salt format
+async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
+  if (storedHash.includes(':')) {
+    // New format: "salt:hash"
+    const [salt, hash] = storedHash.split(':');
+    const newHash = await deriveHash(password, salt);
+    return newHash === hash;
+  }
+  // Legacy format: static salt hash (backward compatible)
+  const legacyHash = await deriveHash(password, LEGACY_SALT);
+  return legacyHash === storedHash;
 }
 
 // Generate session token
@@ -141,6 +156,9 @@ function isStrongPassword(password: string): { valid: boolean; message?: string 
   }
   if (!/[0-9]/.test(password)) {
     return { valid: false, message: 'Password must contain at least one number' };
+  }
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one special character' };
   }
   return { valid: true };
 }
@@ -302,14 +320,13 @@ app.use('*', async (c, next) => {
 app.use('/api/*', async (c, next) => {
   const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
   const { allowed, remaining } = await checkRateLimit(c, ip);
-  
-  c.res.headers.set('X-RateLimit-Remaining', remaining.toString());
-  
+
   if (!allowed) {
     return c.json({ error: 'Too many requests. Please try again later.' }, 429);
   }
-  
+
   await next();
+  c.header('X-RateLimit-Remaining', remaining.toString());
 });
 
 // ============================================================
@@ -371,7 +388,8 @@ app.post('/api/stripe/create-checkout', async (c) => {
     const session = await response.json();
     
     if (session.error) {
-      return c.json({ error: session.error.message }, 400);
+      console.error('Stripe checkout error:', session.error.message);
+      return c.json({ error: 'Failed to create checkout session. Please try again.' }, 400);
     }
     
     await auditLog(c, 'CHECKOUT_CREATED', user.email, { planId: plan.id, sessionId: session.id });
@@ -396,10 +414,39 @@ app.post('/api/stripe/webhook', async (c) => {
   
   const signature = c.req.header('stripe-signature');
   const body = await c.req.text();
-  
-  // In production, verify webhook signature
-  // For now, parse the event
+
+  if (!signature) {
+    return c.json({ error: 'Missing stripe-signature header' }, 400);
+  }
+
+  // Verify webhook signature using HMAC-SHA256 (Stripe v1 scheme)
   try {
+    const elements = signature.split(',');
+    const timestampStr = elements.find((e: string) => e.startsWith('t='))?.slice(2);
+    const expectedSig = elements.find((e: string) => e.startsWith('v1='))?.slice(3);
+
+    if (!timestampStr || !expectedSig) {
+      return c.json({ error: 'Invalid signature format' }, 400);
+    }
+
+    // Reject events older than 5 minutes to prevent replay attacks
+    const timestamp = parseInt(timestampStr, 10);
+    if (Math.abs(Date.now() / 1000 - timestamp) > 300) {
+      return c.json({ error: 'Webhook timestamp too old' }, 400);
+    }
+
+    const signedPayload = `${timestampStr}.${body}`;
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw', encoder.encode(webhookSecret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+    );
+    const sigBytes = await crypto.subtle.sign('HMAC', key, encoder.encode(signedPayload));
+    const computedSig = Array.from(new Uint8Array(sigBytes)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+    if (computedSig !== expectedSig) {
+      return c.json({ error: 'Signature verification failed' }, 400);
+    }
+
     const event = JSON.parse(body);
     
     switch (event.type) {
@@ -455,7 +502,7 @@ app.get('/api/stripe/subscription', async (c) => {
   
   return c.json({
     subscription: user.subscription || { planId: 'free', status: 'active' },
-    plan: STRIPE_PRODUCTS[user.subscription?.planId?.toUpperCase() || 'FREE']
+    plan: (STRIPE_PRODUCTS as Record<string, typeof STRIPE_PRODUCTS.FREE>)[user.subscription?.planId?.toUpperCase() || 'FREE'] || STRIPE_PRODUCTS.FREE
   });
 });
 
@@ -486,7 +533,8 @@ app.post('/api/stripe/cancel-subscription', async (c) => {
     const result = await response.json();
     
     if (result.error) {
-      return c.json({ error: result.error.message }, 400);
+      console.error('Stripe cancellation error:', result.error.message);
+      return c.json({ error: 'Failed to cancel subscription. Please contact support.' }, 400);
     }
     
     // Update user to free plan
@@ -710,7 +758,8 @@ app.post('/api/profile/save', async (c) => {
     
     return c.json({ success: true, savedAt: user.updatedAt });
   } catch (error: any) {
-    return c.json({ error: error.message }, 500);
+    console.error('Profile save error:', error);
+    return c.json({ error: 'Failed to save profile. Please try again.' }, 500);
   }
 });
 
@@ -757,7 +806,11 @@ app.post('/api/profile/slug', async (c) => {
     return c.json({ error: 'Not authenticated' }, 401);
   }
   
-  const { slug } = await c.req.json();
+  const body = await c.req.json();
+  const slug = body?.slug;
+  if (!slug || typeof slug !== 'string') {
+    return c.json({ error: 'Slug is required' }, 400);
+  }
   const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, '').substring(0, 30);
   
   if (cleanSlug.length < 3) {
@@ -785,7 +838,11 @@ app.post('/api/profile/slug', async (c) => {
 
 // API: Get public profile by slug (for viewing)
 app.get('/api/public/:slug', async (c) => {
-  const slug = c.req.param('slug');
+  const rawSlug = c.req.param('slug');
+  const slug = rawSlug?.toLowerCase().replace(/[^a-z0-9-]/g, '').substring(0, 30);
+  if (!slug) {
+    return c.json({ error: 'Invalid profile URL' }, 400);
+  }
   
   const email = await c.env.USERS_KV.get(`slug:${slug}`);
   if (!email) {
@@ -797,10 +854,22 @@ app.get('/api/public/:slug', async (c) => {
     return c.json({ error: 'Profile not found or private' }, 404);
   }
   
-  // Increment view count
-  user.profileViews = (user.profileViews || 0) + 1;
-  user.lastViewedAt = new Date().toISOString();
-  await c.env.USERS_KV.put(`user:${email}`, JSON.stringify(user));
+  // Increment view count asynchronously to avoid blocking the response
+  // Uses a separate counter key to reduce read-modify-write contention
+  const viewCountKey = `views:${slug}`;
+  const currentCount = parseInt(await c.env.USERS_KV.get(viewCountKey) || '0', 10);
+  const newCount = currentCount + 1;
+  // Fire-and-forget: update counter and user record without blocking response
+  c.executionCtx.waitUntil(
+    Promise.all([
+      c.env.USERS_KV.put(viewCountKey, String(newCount), { expirationTtl: 365 * 24 * 60 * 60 }),
+      c.env.USERS_KV.put(`user:${email}`, JSON.stringify({
+        ...user,
+        profileViews: newCount,
+        lastViewedAt: new Date().toISOString()
+      }))
+    ]).catch(() => { /* best-effort view tracking */ })
+  );
   
   // Return public profile data (no sensitive info)
   return c.json({
@@ -808,7 +877,7 @@ app.get('/api/public/:slug', async (c) => {
     profile: user.profile,
     profilePhoto: user.profilePhoto,
     selectedTemplate: user.selectedTemplate,
-    views: user.profileViews
+    views: newCount
   });
 });
 
@@ -874,7 +943,8 @@ app.post('/api/ats-score', async (c) => {
       ].filter(Boolean)
     });
   } catch (error: any) {
-    return c.json({ error: error.message }, 500);
+    console.error('ATS score error:', error);
+    return c.json({ error: 'Failed to calculate ATS score. Please try again.' }, 500);
   }
 });
 
@@ -1028,7 +1098,7 @@ ABSOLUTE REQUIREMENTS:
     );
 
     const data = await response.json();
-    if (data.error) return c.json({ error: data.error.message }, 500);
+    if (data.error) return c.json({ error: 'AI service temporarily unavailable. Please try again.' }, 500);
     
     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     if (!aiText) return c.json({ error: 'No response from AI' }, 500);
@@ -1057,10 +1127,11 @@ ABSOLUTE REQUIREMENTS:
           return c.json(JSON.parse(match[0]));
         }
       } catch {}
-      return c.json({ error: 'Parse failed', raw: aiText }, 500);
+      return c.json({ error: 'Failed to parse AI response. Please try again.' }, 500);
     }
   } catch (error: any) {
-    return c.json({ error: error.message }, 500);
+    console.error('Parse resume error:', error);
+    return c.json({ error: 'Failed to parse resume. Please try again.' }, 500);
   }
 });
 
@@ -1133,7 +1204,8 @@ app.post('/api/tailored-resumes/save', async (c) => {
     
     return c.json({ success: true, resume: newResume });
   } catch (error: any) {
-    return c.json({ error: error.message }, 500);
+    console.error('Save tailored resume error:', error);
+    return c.json({ error: 'Failed to save tailored resume. Please try again.' }, 500);
   }
 });
 
@@ -1311,7 +1383,7 @@ Return a JSON object with this structure:
           company: company || 'Unknown Company',
           jobUrl: jobUrl || null,
           createdAt: new Date().toISOString(),
-          originalJobDescription: jobDescription.substring(0, 500) + '...'
+          originalJobDescription: jobDescription.length > 500 ? jobDescription.substring(0, 500) + '...' : jobDescription
         };
         
         await auditLog(c, 'RESUME_TAILORED', user.email, { 
@@ -1323,17 +1395,14 @@ Return a JSON object with this structure:
         return c.json(result);
       }
     } catch (parseError) {
-      // Return raw text if JSON parsing fails
-      return c.json({ 
-        error: 'Failed to parse AI response', 
-        raw: aiText 
-      }, 500);
+      return c.json({ error: 'Failed to parse AI response. Please try again.' }, 500);
     }
     
     return c.json({ error: 'Invalid AI response format' }, 500);
     
   } catch (error: any) {
-    return c.json({ error: error.message }, 500);
+    console.error('Tailor resume error:', error);
+    return c.json({ error: 'Failed to tailor resume. Please try again.' }, 500);
   }
 });
 
@@ -1587,7 +1656,8 @@ app.post('/api/chat', async (c) => {
     });
     
   } catch (error: any) {
-    return c.json({ error: error.message }, 500);
+    console.error('Chat error:', error);
+    return c.json({ error: 'Chat service temporarily unavailable. Please try again.' }, 500);
   }
 });
 
@@ -4082,14 +4152,13 @@ app.get('/', (c) => {
       font-family: inherit;
       font-size: 14px;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 
+      box-shadow:
         inset 0 2px 6px rgba(0, 0, 0, 0.5),
         0 1px 0 rgba(255, 255, 255, 0.02);
       width: 100%;
       position: relative;
       z-index: 10;
       pointer-events: auto;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
     }
     
     .glass-input:focus {
@@ -5841,39 +5910,24 @@ app.get('/', (c) => {
       const handleSubmit = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('📝 Form submitted!', { email, password: '***', name, isLogin });
         setError('');
-        
+
         if (!email || !password || (!isLogin && !name)) {
-          console.log('❌ Validation failed - missing fields');
           setError('Please fill in all fields');
           return;
         }
-        
-        console.log('✅ Validation passed, calling onLogin...');
+
         onLogin(isLogin, email, password, name);
       };
       
       // Direct input handlers for maximum compatibility
-      const handleEmailChange = (e) => {
-        console.log('📧 Email:', e.target.value);
-        setEmail(e.target.value);
-      };
-      
-      const handlePasswordChange = (e) => {
-        console.log('🔑 Password changed');
-        setPassword(e.target.value);
-      };
-      
-      const handleNameChange = (e) => {
-        console.log('👤 Name:', e.target.value);
-        setName(e.target.value);
-      };
+      const handleEmailChange = (e) => setEmail(e.target.value);
+      const handlePasswordChange = (e) => setPassword(e.target.value);
+      const handleNameChange = (e) => setName(e.target.value);
       
       return (
         <div className="auth-container" style={{ 
           minHeight: '100dvh',
-          minHeight: '-webkit-fill-available',
           display: 'flex', 
           flexDirection: 'column',
           alignItems: 'center', 
@@ -5989,7 +6043,6 @@ app.get('/', (c) => {
                     name="name"
                     value={name}
                     onChange={handleNameChange}
-                    onFocus={() => console.log('👤 Name focused')}
                     placeholder="John Smith"
                     autoComplete="name"
                     style={{ 
@@ -6015,8 +6068,6 @@ app.get('/', (c) => {
                   className="glass-input auth-input"
                   value={email}
                   onChange={handleEmailChange}
-                  onFocus={() => console.log('📧 Email focused')}
-                  onTouchStart={() => console.log('📧 Email touch start')}
                   placeholder="you@example.com"
                   autoComplete="email"
                   autoCapitalize="none"
@@ -6046,8 +6097,6 @@ app.get('/', (c) => {
                     className="glass-input auth-input"
                     value={password}
                     onChange={handlePasswordChange}
-                    onFocus={() => console.log('🔑 Password focused')}
-                    onTouchStart={() => console.log('🔑 Password touch start')}
                     placeholder="••••••••"
                     autoComplete="current-password"
                     style={{ 
@@ -6088,16 +6137,11 @@ app.get('/', (c) => {
                 type="submit" 
                 className="btn btn-primary auth-submit-btn"
                 disabled={authLoading}
-                onClick={(e) => { 
-                  console.log('🖱️ BUTTON CLICKED!');
-                  // If form submit doesn't work, try direct call
+                onClick={(e) => {
                   if (email && password && (isLogin || name)) {
                     handleSubmit(e);
                   }
-                }}
-                onTouchEnd={(e) => {
-                  console.log('👆 BUTTON TOUCH END!');
-                }}
+                }
                 style={{ 
                   width: '100%', 
                   padding: 'clamp(14px, 3.5vw, 18px)', 
@@ -6162,12 +6206,7 @@ app.get('/', (c) => {
     const App = () => {
       const [view, setViewInternal] = useState(VIEW.AUTH);
       
-      // Wrapper to log view changes
-      const setView = (newView) => {
-        const viewNames = { 0: 'AUTH', 1: 'UPLOAD', 2: 'BUILDER', 3: 'PREVIEW', 4: 'TAILOR' };
-        console.log('📍 View changing from', viewNames[view], 'to', viewNames[newView]);
-        setViewInternal(newView);
-      };
+      const setView = (newView) => setViewInternal(newView);
       const [user, setUser] = useState(null);
       const [authLoading, setAuthLoading] = useState(true);
       const [authError, setAuthError] = useState('');
@@ -6230,11 +6269,8 @@ app.get('/', (c) => {
             if (data.isPublic !== undefined) setIsPublic(data.isPublic);
             if (data.profileViews) setProfileViews(data.profileViews);
             setView(VIEW.BUILDER);
-            console.log('✅ Loaded profile from server');
           } else {
-            // No profile exists, go to upload
             setView(VIEW.UPLOAD);
-            console.log('📤 No profile found, redirecting to upload');
           }
         } catch (e) {
           console.error('Error loading profile:', e);
@@ -6246,7 +6282,6 @@ app.get('/', (c) => {
       const handleAuth = async (isLogin, email, password, name) => {
         setAuthLoading(true);
         setAuthError('');
-        console.log('🔐 Auth attempt:', isLogin ? 'login' : 'register', email);
         
         try {
           const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
@@ -6259,9 +6294,7 @@ app.get('/', (c) => {
             credentials: 'include' // Ensure cookies are sent
           });
           
-          console.log('📡 Auth response status:', res.status);
           const data = await res.json();
-          console.log('📦 Auth response data:', data);
           
           if (data.error) {
             setAuthError(data.error);
@@ -6275,14 +6308,11 @@ app.get('/', (c) => {
             return;
           }
           
-          console.log('✅ Auth successful, user:', data.user.email);
           setUser(data.user);
-          
+
           if (data.user.hasProfile) {
-            console.log('📂 Loading existing profile...');
             await loadProfile();
           } else {
-            console.log('🆕 New user, going to upload');
             setView(VIEW.UPLOAD);
           }
         } catch (e) {
@@ -6326,7 +6356,7 @@ app.get('/', (c) => {
               if (data.success) {
                 setLastSaved(new Date(data.savedAt));
                 setSaveStatus('saved');
-                console.log('✅ Auto-saved to server at', data.savedAt);
+                // Auto-save succeeded
               } else {
                 throw new Error(data.error);
               }
@@ -7612,8 +7642,6 @@ app.get('/', (c) => {
               
               <button
                 onClick={() => {
-                  console.log('🔍 Preview clicked - profile:', profile);
-                  console.log('🔍 Preview clicked - profile.basics:', profile?.basics);
                   if (!profile || !profile.basics) {
                     alert('Please fill in your basic profile information first (Name, Title, etc.)');
                     return;
@@ -7692,8 +7720,8 @@ app.get('/', (c) => {
               setPhotoLoading(false);
             };
             img.onerror = () => {
-              // Fallback to original if processing fails
-              setProfilePhoto(URL.createObjectURL(file));
+              // Fallback: use the data URL directly (already read by FileReader)
+              setProfilePhoto(event.target.result);
               setPhotoLoading(false);
             };
             img.src = event.target.result;
@@ -7701,8 +7729,14 @@ app.get('/', (c) => {
           reader.readAsDataURL(file);
         } catch (err) {
           console.error('Photo processing error:', err);
-          setProfilePhoto(URL.createObjectURL(file));
-          setPhotoLoading(false);
+          // Fallback: read as data URL without processing
+          const fallbackReader = new FileReader();
+          fallbackReader.onload = (e) => {
+            setProfilePhoto(e.target.result);
+            setPhotoLoading(false);
+          };
+          fallbackReader.onerror = () => setPhotoLoading(false);
+          fallbackReader.readAsDataURL(file);
         }
       };
       
