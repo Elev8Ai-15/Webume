@@ -5589,6 +5589,18 @@ app.get('/', (c) => {
       to { transform: translateX(0); opacity: 1; }
     }
     
+    /* Hero logo floating animation */
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+    
+    /* Hero logo glow pulse */
+    @keyframes logoPulse {
+      0%, 100% { filter: drop-shadow(0 20px 60px rgba(30, 58, 95, 0.4)) drop-shadow(0 8px 20px rgba(0,0,0,0.6)); }
+      50% { filter: drop-shadow(0 25px 70px rgba(61, 122, 184, 0.5)) drop-shadow(0 12px 30px rgba(0,0,0,0.7)); }
+    }
+    
     /* Responsibilities editor styles */
     .resp-section {
       margin-top: 24px;
@@ -5917,41 +5929,84 @@ app.get('/', (c) => {
         <div className="auth-container" style={{ 
           minHeight: '100dvh',
           display: 'flex', 
+          flexDirection: 'column',
           alignItems: 'center', 
-          justifyContent: 'center',
-          padding: 'clamp(12px, 3vw, 24px)',
-          paddingTop: 'max(env(safe-area-inset-top), clamp(20px, 5vh, 40px))',
-          paddingBottom: 'max(env(safe-area-inset-bottom), 20px)',
+          justifyContent: 'flex-start',
+          padding: '0',
           position: 'relative',
           zIndex: 100,
           overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch'
+          WebkitOverflowScrolling: 'touch',
+          background: 'linear-gradient(180deg, #030303 0%, #050508 50%, #030303 100%)'
         }}>
+          {/* HERO LOGO SECTION - Full width, prominent display */}
+          <div style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 'clamp(40px, 8vh, 80px) 20px clamp(30px, 5vh, 50px)',
+            background: 'radial-gradient(ellipse 80% 50% at 50% 30%, rgba(30, 58, 95, 0.15) 0%, transparent 70%)',
+            position: 'relative'
+          }}>
+            {/* Decorative glow behind logo */}
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 'clamp(300px, 60vw, 500px)',
+              height: 'clamp(200px, 40vw, 350px)',
+              background: 'radial-gradient(ellipse, rgba(30, 58, 95, 0.2) 0%, rgba(61, 122, 184, 0.1) 30%, transparent 70%)',
+              filter: 'blur(40px)',
+              pointerEvents: 'none'
+            }}></div>
+            
+            <img 
+              src="/static/logo.png" 
+              alt="Webumé" 
+              className="auth-hero-logo"
+              style={{
+                width: 'clamp(280px, 50vw, 450px)',
+                maxWidth: '90%',
+                height: 'auto',
+                display: 'block',
+                filter: 'drop-shadow(0 20px 60px rgba(30, 58, 95, 0.4)) drop-shadow(0 8px 20px rgba(0,0,0,0.6))',
+                animation: 'logoFloat 6s ease-in-out infinite',
+                position: 'relative',
+                zIndex: 2
+              }}
+            />
+            
+            {/* Tagline under logo */}
+            <p style={{
+              marginTop: 'clamp(20px, 4vh, 32px)',
+              fontSize: 'clamp(14px, 2.5vw, 18px)',
+              color: 'rgba(161, 161, 170, 0.8)',
+              textAlign: 'center',
+              letterSpacing: '0.5px',
+              fontWeight: '400'
+            }}>
+              Transform Your Resume Into An Interactive Experience
+            </p>
+          </div>
+          
+          {/* AUTH FORM SECTION */}
           <div className="glass auth-card" style={{ 
             width: '100%', 
-            maxWidth: 'min(420px, calc(100% - 24px))', 
-            padding: 'clamp(24px, 5vw, 48px) clamp(20px, 5vw, 40px)',
-            borderRadius: 'clamp(20px, 4vw, 28px)',
+            maxWidth: 'min(440px, calc(100% - 32px))', 
+            padding: 'clamp(28px, 5vw, 40px) clamp(24px, 5vw, 36px)',
+            borderRadius: '24px',
             position: 'relative',
-            zIndex: 200
+            zIndex: 200,
+            marginBottom: 'clamp(30px, 5vh, 50px)'
           }}>
-            <div style={{ textAlign: 'center', marginBottom: 'clamp(24px, 5vw, 36px)' }}>
-              <img 
-                src="/static/logo.png" 
-                alt="Webumé" 
-                className="auth-logo"
-                style={{
-                  width: 'clamp(80px, 20vw, 120px)',
-                  height: 'auto',
-                  margin: '0 auto clamp(16px, 4vw, 24px)',
-                  display: 'block',
-                  filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.5))'
-                }}
-              />
-              <h1 className="auth-title" style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: '800', color: '#fff', marginBottom: '8px' }}>
+            <div style={{ textAlign: 'center', marginBottom: 'clamp(20px, 4vw, 28px)' }}>
+              <h1 className="auth-title" style={{ fontSize: 'clamp(24px, 5vw, 30px)', fontWeight: '800', color: '#fff', marginBottom: '8px' }}>
                 {isLogin ? 'Welcome Back!' : 'Create Account'}
               </h1>
-              <p className="auth-subtitle" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(13px, 3vw, 14px)' }}>
+              <p className="auth-subtitle" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(13px, 3vw, 15px)' }}>
                 {isLogin ? 'Sign in to access your saved profiles' : 'Start building your digital profile'}
               </p>
             </div>
