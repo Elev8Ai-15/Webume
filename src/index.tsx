@@ -5249,45 +5249,51 @@ app.get('/', (c) => {
       
       /* ===== AUTH/LOGIN SCREEN MOBILE ===== */
       .auth-container {
-        padding: 16px !important;
-        min-height: 100vh;
-        align-items: flex-start !important;
-        padding-top: 40px !important;
+        padding: 0 !important;
+        min-height: 100dvh;
+        min-height: -webkit-fill-available;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
       }
       
       .auth-card {
-        padding: 28px 20px !important;
-        max-width: 100% !important;
+        padding: 20px 16px !important;
+        max-width: calc(100% - 24px) !important;
         border-radius: 20px !important;
+        margin: 0 12px 24px !important;
       }
       
-      .auth-logo {
-        width: 80px !important;
-        margin-bottom: 16px !important;
+      .auth-hero-logo {
+        width: clamp(180px, 55vw, 280px) !important;
       }
       
       .auth-title {
-        font-size: 22px !important;
-        margin-bottom: 6px !important;
+        font-size: 20px !important;
+        margin-bottom: 4px !important;
       }
       
       .auth-subtitle {
-        font-size: 13px !important;
+        font-size: 12px !important;
       }
       
       .auth-form-label {
-        font-size: 12px !important;
+        font-size: 11px !important;
+        margin-bottom: 6px !important;
       }
       
       .auth-input {
         padding: 12px 14px !important;
         font-size: 16px !important; /* Prevent iOS zoom */
+        border-radius: 12px !important;
       }
       
       .auth-submit-btn {
         padding: 14px !important;
-        font-size: 15px !important;
-        min-height: 50px !important;
+        font-size: 14px !important;
+        min-height: 48px !important;
+        border-radius: 12px !important;
       }
       
       /* ===== PAGE HEADERS MOBILE ===== */
@@ -5374,13 +5380,29 @@ app.get('/', (c) => {
         font-size: 12px !important;
       }
       
-      /* ===== GLASS CARDS MOBILE ===== */
+      /* ===== GLASS CARDS MOBILE - Curvy borders ===== */
       .glass, .glass-card, .glass-panel, .glass-solid {
-        border-radius: 16px !important;
+        border-radius: 20px !important;
       }
       
       .glass-card {
         padding: 16px !important;
+        border-radius: 20px !important;
+      }
+      
+      /* ===== AUTH PAGE MOBILE ===== */
+      .auth-container {
+        padding: 0 !important;
+      }
+      
+      .auth-card {
+        border-radius: 20px !important;
+        margin: 0 12px 24px !important;
+        padding: 20px 16px !important;
+      }
+      
+      .auth-hero-logo {
+        width: clamp(200px, 60vw, 320px) !important;
       }
       
       /* ===== BUTTONS MOBILE ===== */
@@ -5936,19 +5958,21 @@ app.get('/', (c) => {
           position: 'relative',
           zIndex: 100,
           overflowY: 'auto',
+          overflowX: 'hidden',
           WebkitOverflowScrolling: 'touch',
           background: 'linear-gradient(180deg, #030303 0%, #050508 50%, #030303 100%)'
         }}>
-          {/* HERO LOGO SECTION - Full width, prominent display */}
+          {/* HERO LOGO SECTION - Responsive for mobile */}
           <div style={{
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: 'clamp(40px, 8vh, 80px) 20px clamp(30px, 5vh, 50px)',
+            padding: 'clamp(24px, 5vh, 60px) 16px clamp(16px, 3vh, 30px)',
             background: 'radial-gradient(ellipse 80% 50% at 50% 30%, rgba(30, 58, 95, 0.15) 0%, transparent 70%)',
-            position: 'relative'
+            position: 'relative',
+            flexShrink: 0
           }}>
             {/* Decorative glow behind logo */}
             <div style={{
@@ -5956,8 +5980,8 @@ app.get('/', (c) => {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: 'clamp(300px, 60vw, 500px)',
-              height: 'clamp(200px, 40vw, 350px)',
+              width: 'clamp(250px, 50vw, 400px)',
+              height: 'clamp(150px, 30vw, 280px)',
               background: 'radial-gradient(ellipse, rgba(30, 58, 95, 0.2) 0%, rgba(61, 122, 184, 0.1) 30%, transparent 70%)',
               filter: 'blur(40px)',
               pointerEvents: 'none'
@@ -5968,11 +5992,11 @@ app.get('/', (c) => {
               alt="Webumé" 
               className="auth-hero-logo"
               style={{
-                width: 'clamp(280px, 50vw, 450px)',
-                maxWidth: '90%',
+                width: 'clamp(220px, 65vw, 400px)',
+                maxWidth: '85%',
                 height: 'auto',
                 display: 'block',
-                filter: 'drop-shadow(0 20px 60px rgba(30, 58, 95, 0.4)) drop-shadow(0 8px 20px rgba(0,0,0,0.6))',
+                filter: 'drop-shadow(0 16px 48px rgba(30, 58, 95, 0.4)) drop-shadow(0 6px 16px rgba(0,0,0,0.6))',
                 animation: 'logoFloat 6s ease-in-out infinite',
                 position: 'relative',
                 zIndex: 2
@@ -5981,12 +6005,14 @@ app.get('/', (c) => {
             
             {/* Tagline under logo */}
             <p style={{
-              marginTop: 'clamp(20px, 4vh, 32px)',
-              fontSize: 'clamp(14px, 2.5vw, 18px)',
+              marginTop: 'clamp(12px, 2vh, 24px)',
+              fontSize: 'clamp(13px, 3.5vw, 17px)',
               color: 'rgba(161, 161, 170, 0.8)',
               textAlign: 'center',
-              letterSpacing: '0.5px',
-              fontWeight: '400'
+              letterSpacing: '0.3px',
+              fontWeight: '400',
+              padding: '0 16px',
+              lineHeight: '1.5'
             }}>
               Transform Your Resume Into An Interactive Experience
             </p>
@@ -5995,19 +6021,20 @@ app.get('/', (c) => {
           {/* AUTH FORM SECTION */}
           <div className="glass auth-card" style={{ 
             width: '100%', 
-            maxWidth: 'min(440px, calc(100% - 32px))', 
-            padding: 'clamp(28px, 5vw, 40px) clamp(24px, 5vw, 36px)',
-            borderRadius: '24px',
+            maxWidth: 'min(420px, calc(100% - 24px))', 
+            padding: 'clamp(20px, 4vw, 36px) clamp(18px, 4vw, 32px)',
+            borderRadius: '20px',
             position: 'relative',
             zIndex: 200,
-            marginBottom: 'clamp(30px, 5vh, 50px)'
+            marginBottom: 'clamp(24px, 4vh, 40px)',
+            marginTop: 'auto'
           }}>
-            <div style={{ textAlign: 'center', marginBottom: 'clamp(20px, 4vw, 28px)' }}>
-              <h1 className="auth-title" style={{ fontSize: 'clamp(24px, 5vw, 30px)', fontWeight: '800', color: '#fff', marginBottom: '8px' }}>
-                {isLogin ? 'Welcome Back!' : 'Create Account'}
+            <div style={{ textAlign: 'center', marginBottom: 'clamp(16px, 3vw, 24px)' }}>
+              <h1 className="auth-title" style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: '800', color: '#fff', marginBottom: '6px' }}>
+                {isLogin ? 'Welcome Back!' : 'Get Started'}
               </h1>
-              <p className="auth-subtitle" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(13px, 3vw, 15px)' }}>
-                {isLogin ? 'Sign in to access your saved profiles' : 'Start building your digital profile'}
+              <p className="auth-subtitle" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(12px, 3vw, 14px)' }}>
+                {isLogin ? 'Sign in to access your saved profiles' : 'Create your free account in seconds'}
               </p>
             </div>
             
@@ -6031,8 +6058,8 @@ app.get('/', (c) => {
             
             <form onSubmit={handleSubmit}>
               {!isLogin && (
-                <div style={{ marginBottom: 'clamp(14px, 3vw, 18px)' }}>
-                  <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(12px, 2.5vw, 13px)', fontWeight: '600', marginBottom: '8px' }}>
+                <div style={{ marginBottom: 'clamp(12px, 2.5vw, 16px)' }}>
+                  <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(11px, 2.5vw, 13px)', fontWeight: '600', marginBottom: '6px' }}>
                     <i className="fas fa-user" style={{ marginRight: '8px', color: 'var(--chrome)' }}></i>
                     Full Name
                   </label>
@@ -6056,8 +6083,8 @@ app.get('/', (c) => {
                 </div>
               )}
               
-              <div style={{ marginBottom: 'clamp(14px, 3vw, 18px)' }}>
-                <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(12px, 2.5vw, 13px)', fontWeight: '600', marginBottom: '8px' }}>
+              <div style={{ marginBottom: 'clamp(12px, 2.5vw, 16px)' }}>
+                <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(11px, 2.5vw, 13px)', fontWeight: '600', marginBottom: '6px' }}>
                   <i className="fas fa-envelope" style={{ marginRight: '8px', color: 'var(--chrome)' }}></i>
                   Email Address
                 </label>
@@ -6084,8 +6111,8 @@ app.get('/', (c) => {
                 />
               </div>
               
-              <div style={{ marginBottom: 'clamp(20px, 4vw, 28px)' }}>
-                <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(12px, 2.5vw, 13px)', fontWeight: '600', marginBottom: '8px' }}>
+              <div style={{ marginBottom: 'clamp(16px, 3vw, 24px)' }}>
+                <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(11px, 2.5vw, 13px)', fontWeight: '600', marginBottom: '6px' }}>
                   <i className="fas fa-lock" style={{ marginRight: '8px', color: 'var(--chrome)' }}></i>
                   Password
                 </label>
@@ -6192,8 +6219,8 @@ app.get('/', (c) => {
               </p>
             </div>
             
-            <div style={{ marginTop: 'clamp(24px, 5vw, 32px)', paddingTop: 'clamp(16px, 4vw, 24px)', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
-              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 'clamp(10px, 2vw, 11px)' }}>
+            <div style={{ marginTop: 'clamp(16px, 3vw, 24px)', paddingTop: 'clamp(12px, 2vw, 16px)', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 'clamp(9px, 2vw, 11px)' }}>
                 <i className="fas fa-shield-alt" style={{ marginRight: '6px' }}></i>
                 Your data is securely stored and never shared
               </p>
