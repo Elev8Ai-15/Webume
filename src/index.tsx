@@ -5950,10 +5950,11 @@ app.get('/', (c) => {
       return (
         <div className="auth-container" style={{ 
           minHeight: '100dvh',
+          minHeight: '100vh',
           display: 'flex', 
           flexDirection: 'column',
           alignItems: 'center', 
-          justifyContent: 'flex-start',
+          justifyContent: 'space-between',
           padding: '0',
           position: 'relative',
           zIndex: 100,
@@ -5962,42 +5963,27 @@ app.get('/', (c) => {
           WebkitOverflowScrolling: 'touch',
           background: 'linear-gradient(180deg, #030303 0%, #050508 50%, #030303 100%)'
         }}>
-          {/* HERO LOGO SECTION - Responsive for mobile */}
+          {/* HERO LOGO SECTION - Compact for mobile */}
           <div style={{
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: 'clamp(24px, 5vh, 60px) 16px clamp(16px, 3vh, 30px)',
+            padding: '16px 16px 12px',
             background: 'radial-gradient(ellipse 80% 50% at 50% 30%, rgba(30, 58, 95, 0.15) 0%, transparent 70%)',
             position: 'relative',
-            flexShrink: 0
+            flexShrink: 1
           }}>
-            {/* Decorative glow behind logo */}
-            <div style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: 'clamp(250px, 50vw, 400px)',
-              height: 'clamp(150px, 30vw, 280px)',
-              background: 'radial-gradient(ellipse, rgba(30, 58, 95, 0.2) 0%, rgba(61, 122, 184, 0.1) 30%, transparent 70%)',
-              filter: 'blur(40px)',
-              pointerEvents: 'none'
-            }}></div>
-            
             <img 
               src="/static/logo.png" 
               alt="Webumé" 
               className="auth-hero-logo"
               style={{
-                width: 'clamp(220px, 65vw, 400px)',
-                maxWidth: '85%',
+                width: 'min(200px, 50vw)',
                 height: 'auto',
                 display: 'block',
-                filter: 'drop-shadow(0 16px 48px rgba(30, 58, 95, 0.4)) drop-shadow(0 6px 16px rgba(0,0,0,0.6))',
-                animation: 'logoFloat 6s ease-in-out infinite',
+                filter: 'drop-shadow(0 12px 32px rgba(30, 58, 95, 0.4)) drop-shadow(0 4px 12px rgba(0,0,0,0.5))',
                 position: 'relative',
                 zIndex: 2
               }}
@@ -6005,60 +5991,58 @@ app.get('/', (c) => {
             
             {/* Tagline under logo */}
             <p style={{
-              marginTop: 'clamp(12px, 2vh, 24px)',
-              fontSize: 'clamp(13px, 3.5vw, 17px)',
-              color: 'rgba(161, 161, 170, 0.8)',
+              marginTop: '8px',
+              fontSize: '12px',
+              color: 'rgba(161, 161, 170, 0.7)',
               textAlign: 'center',
-              letterSpacing: '0.3px',
-              fontWeight: '400',
-              padding: '0 16px',
-              lineHeight: '1.5'
+              letterSpacing: '0.2px',
+              fontWeight: '400'
             }}>
               Transform Your Resume Into An Interactive Experience
             </p>
           </div>
           
-          {/* AUTH FORM SECTION */}
+          {/* AUTH FORM SECTION - Takes remaining space */}
           <div className="glass auth-card" style={{ 
-            width: '100%', 
-            maxWidth: 'min(420px, calc(100% - 24px))', 
-            padding: 'clamp(20px, 4vw, 36px) clamp(18px, 4vw, 32px)',
+            width: 'calc(100% - 24px)', 
+            maxWidth: '400px', 
+            padding: '20px 16px',
             borderRadius: '20px',
             position: 'relative',
             zIndex: 200,
-            marginBottom: 'clamp(24px, 4vh, 40px)',
-            marginTop: 'auto'
+            marginBottom: '16px',
+            flexShrink: 0
           }}>
-            {/* Auth Mode Tabs */}
+            {/* Auth Mode Tabs - Compact */}
             <div style={{
               display: 'flex',
-              marginBottom: 'clamp(16px, 3vw, 24px)',
+              marginBottom: '12px',
               background: 'rgba(255,255,255,0.05)',
-              borderRadius: '12px',
-              padding: '4px',
-              gap: '4px'
+              borderRadius: '10px',
+              padding: '3px',
+              gap: '3px'
             }}>
               <button
                 type="button"
                 onClick={() => { setIsLogin(true); setError(''); if(clearAuthError) clearAuthError(); }}
                 style={{
                   flex: 1,
-                  padding: '12px 16px',
-                  borderRadius: '10px',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
                   border: 'none',
                   background: isLogin ? 'rgba(255,255,255,0.1)' : 'transparent',
                   color: isLogin ? '#fff' : 'rgba(255,255,255,0.5)',
                   fontWeight: '600',
-                  fontSize: '14px',
+                  fontSize: '13px',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px'
+                  gap: '6px'
                 }}
               >
-                <i className="fas fa-sign-in-alt"></i>
+                <i className="fas fa-sign-in-alt" style={{ fontSize: '12px' }}></i>
                 Sign In
               </button>
               <button
@@ -6066,32 +6050,32 @@ app.get('/', (c) => {
                 onClick={() => { setIsLogin(false); setError(''); if(clearAuthError) clearAuthError(); }}
                 style={{
                   flex: 1,
-                  padding: '12px 16px',
-                  borderRadius: '10px',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
                   border: 'none',
                   background: !isLogin ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(6, 182, 212, 0.2))' : 'transparent',
                   color: !isLogin ? '#10B981' : 'rgba(255,255,255,0.5)',
                   fontWeight: '600',
-                  fontSize: '14px',
+                  fontSize: '13px',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px'
+                  gap: '6px'
                 }}
               >
-                <i className="fas fa-user-plus"></i>
+                <i className="fas fa-user-plus" style={{ fontSize: '12px' }}></i>
                 Sign Up
               </button>
             </div>
             
-            <div style={{ textAlign: 'center', marginBottom: 'clamp(12px, 2vw, 18px)' }}>
-              <h1 className="auth-title" style={{ fontSize: 'clamp(20px, 4.5vw, 26px)', fontWeight: '800', color: '#fff', marginBottom: '4px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+              <h1 className="auth-title" style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '2px' }}>
                 {isLogin ? 'Welcome Back!' : 'Create Account'}
               </h1>
-              <p className="auth-subtitle" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(11px, 2.5vw, 13px)' }}>
-                {isLogin ? 'Sign in to access your profiles' : 'Free account • No credit card required'}
+              <p className="auth-subtitle" style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px' }}>
+                {isLogin ? 'Sign in to access your profiles' : 'Free • No credit card required'}
               </p>
             </div>
             
@@ -6140,9 +6124,9 @@ app.get('/', (c) => {
             
             <form onSubmit={handleSubmit}>
               {!isLogin && (
-                <div style={{ marginBottom: 'clamp(12px, 2.5vw, 16px)' }}>
-                  <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(11px, 2.5vw, 13px)', fontWeight: '600', marginBottom: '6px' }}>
-                    <i className="fas fa-user" style={{ marginRight: '8px', color: 'var(--chrome)' }}></i>
+                <div style={{ marginBottom: '10px' }}>
+                  <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>
+                    <i className="fas fa-user" style={{ marginRight: '6px', color: 'var(--chrome)', fontSize: '10px' }}></i>
                     Full Name
                   </label>
                   <input
@@ -6156,8 +6140,9 @@ app.get('/', (c) => {
                     autoComplete="name"
                     style={{ 
                       width: '100%', 
-                      padding: 'clamp(12px, 3vw, 14px) clamp(14px, 3vw, 16px)', 
+                      padding: '10px 12px', 
                       fontSize: '16px',
+                      borderRadius: '10px',
                       WebkitAppearance: 'none',
                       appearance: 'none'
                     }}
@@ -6165,9 +6150,9 @@ app.get('/', (c) => {
                 </div>
               )}
               
-              <div style={{ marginBottom: 'clamp(12px, 2.5vw, 16px)' }}>
-                <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(11px, 2.5vw, 13px)', fontWeight: '600', marginBottom: '6px' }}>
-                  <i className="fas fa-envelope" style={{ marginRight: '8px', color: 'var(--chrome)' }}></i>
+              <div style={{ marginBottom: '10px' }}>
+                <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>
+                  <i className="fas fa-envelope" style={{ marginRight: '6px', color: 'var(--chrome)', fontSize: '10px' }}></i>
                   Email Address
                 </label>
                 <input
@@ -6185,17 +6170,18 @@ app.get('/', (c) => {
                   inputMode="email"
                   style={{ 
                     width: '100%', 
-                    padding: 'clamp(12px, 3vw, 14px) clamp(14px, 3vw, 16px)', 
+                    padding: '10px 12px', 
                     fontSize: '16px',
+                    borderRadius: '10px',
                     WebkitAppearance: 'none',
                     appearance: 'none'
                   }}
                 />
               </div>
               
-              <div style={{ marginBottom: 'clamp(16px, 3vw, 24px)' }}>
-                <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(11px, 2.5vw, 13px)', fontWeight: '600', marginBottom: '6px' }}>
-                  <i className="fas fa-lock" style={{ marginRight: '8px', color: 'var(--chrome)' }}></i>
+              <div style={{ marginBottom: '14px' }}>
+                <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>
+                  <i className="fas fa-lock" style={{ marginRight: '6px', color: 'var(--chrome)', fontSize: '10px' }}></i>
                   Password
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -6206,13 +6192,14 @@ app.get('/', (c) => {
                     className="glass-input auth-input"
                     value={password}
                     onChange={handlePasswordChange}
-                    placeholder="••••••••"
-                    autoComplete="current-password"
+                    placeholder={isLogin ? '••••••••' : 'Min 8 chars, Aa1!'}
+                    autoComplete={isLogin ? 'current-password' : 'new-password'}
                     style={{ 
                       width: '100%', 
-                      padding: 'clamp(12px, 3vw, 14px) clamp(14px, 3vw, 16px)', 
+                      padding: '10px 12px', 
                       fontSize: '16px',
-                      paddingRight: '50px',
+                      paddingRight: '44px',
+                      borderRadius: '10px',
                       WebkitAppearance: 'none',
                       appearance: 'none'
                     }}
@@ -6240,6 +6227,12 @@ app.get('/', (c) => {
                     <i className={showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'}></i>
                   </button>
                 </div>
+                {!isLogin && (
+                  <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>
+                    <i className="fas fa-info-circle" style={{ marginRight: '4px' }}></i>
+                    8+ chars with uppercase, lowercase, number & special (!@#$)
+                  </p>
+                )}
               </div>
               
               <button 
@@ -6253,15 +6246,16 @@ app.get('/', (c) => {
                 }}
                 style={{ 
                   width: '100%', 
-                  padding: 'clamp(14px, 3.5vw, 18px)', 
-                  fontSize: 'clamp(14px, 3vw, 16px)',
+                  padding: '12px 16px', 
+                  fontSize: '14px',
                   fontWeight: '700',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  minHeight: 'clamp(48px, 10vw, 56px)',
+                  minHeight: '44px',
+                  borderRadius: '10px',
                   WebkitTapHighlightColor: 'transparent',
-                  gap: '10px',
+                  gap: '8px',
                   position: 'relative',
                   zIndex: 100
                 }}
