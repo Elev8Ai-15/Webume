@@ -6029,30 +6029,112 @@ app.get('/', (c) => {
             marginBottom: 'clamp(24px, 4vh, 40px)',
             marginTop: 'auto'
           }}>
-            <div style={{ textAlign: 'center', marginBottom: 'clamp(16px, 3vw, 24px)' }}>
-              <h1 className="auth-title" style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: '800', color: '#fff', marginBottom: '6px' }}>
-                {isLogin ? 'Welcome Back!' : 'Get Started'}
+            {/* Auth Mode Tabs */}
+            <div style={{
+              display: 'flex',
+              marginBottom: 'clamp(16px, 3vw, 24px)',
+              background: 'rgba(255,255,255,0.05)',
+              borderRadius: '12px',
+              padding: '4px',
+              gap: '4px'
+            }}>
+              <button
+                type="button"
+                onClick={() => { setIsLogin(true); setError(''); if(clearAuthError) clearAuthError(); }}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: isLogin ? 'rgba(255,255,255,0.1)' : 'transparent',
+                  color: isLogin ? '#fff' : 'rgba(255,255,255,0.5)',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                <i className="fas fa-sign-in-alt"></i>
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => { setIsLogin(false); setError(''); if(clearAuthError) clearAuthError(); }}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: !isLogin ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(6, 182, 212, 0.2))' : 'transparent',
+                  color: !isLogin ? '#10B981' : 'rgba(255,255,255,0.5)',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                <i className="fas fa-user-plus"></i>
+                Sign Up
+              </button>
+            </div>
+            
+            <div style={{ textAlign: 'center', marginBottom: 'clamp(12px, 2vw, 18px)' }}>
+              <h1 className="auth-title" style={{ fontSize: 'clamp(20px, 4.5vw, 26px)', fontWeight: '800', color: '#fff', marginBottom: '4px' }}>
+                {isLogin ? 'Welcome Back!' : 'Create Account'}
               </h1>
-              <p className="auth-subtitle" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(12px, 3vw, 14px)' }}>
-                {isLogin ? 'Sign in to access your saved profiles' : 'Create your free account in seconds'}
+              <p className="auth-subtitle" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(11px, 2.5vw, 13px)' }}>
+                {isLogin ? 'Sign in to access your profiles' : 'Free account • No credit card required'}
               </p>
             </div>
             
             {(error || authError) && (
               <div style={{
-                padding: '14px 18px',
+                padding: '12px 16px',
                 background: 'rgba(239,68,68,0.15)',
                 border: '1px solid rgba(239,68,68,0.3)',
                 borderRadius: '12px',
-                marginBottom: '20px',
+                marginBottom: '16px',
                 color: '#EF4444',
                 fontSize: '13px',
                 display: 'flex',
-                alignItems: 'center',
-                gap: '10px'
+                flexDirection: 'column',
+                gap: '8px'
               }}>
-                <i className="fas fa-exclamation-circle"></i>
-                {error || authError}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <i className="fas fa-exclamation-circle"></i>
+                  {error || authError}
+                </div>
+                {isLogin && (authError === 'Invalid email or password' || error === 'Invalid email or password') && (
+                  <button
+                    type="button"
+                    onClick={() => { setIsLogin(false); setError(''); if(clearAuthError) clearAuthError(); }}
+                    style={{
+                      background: 'rgba(16, 185, 129, 0.2)',
+                      border: '1px solid rgba(16, 185, 129, 0.4)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      color: '#10B981',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      marginTop: '4px'
+                    }}
+                  >
+                    <i className="fas fa-user-plus"></i>
+                    New user? Create an account instead
+                  </button>
+                )}
               </div>
             )}
             
@@ -6168,7 +6250,7 @@ app.get('/', (c) => {
                   if (email && password && (isLogin || name)) {
                     handleSubmit(e);
                   }
-                }
+                }}
                 style={{ 
                   width: '100%', 
                   padding: 'clamp(14px, 3.5vw, 18px)', 
@@ -6198,28 +6280,7 @@ app.get('/', (c) => {
               </button>
             </form>
             
-            <div style={{ marginTop: 'clamp(20px, 4vw, 28px)', textAlign: 'center' }}>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'clamp(12px, 2.5vw, 13px)' }}>
-                {isLogin ? "Don't have an account?" : "Already have an account?"}
-                <button
-                  onClick={() => { setIsLogin(!isLogin); setError(''); if(clearAuthError) clearAuthError(); }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--chrome)',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    marginLeft: '6px',
-                    padding: '8px 4px',
-                    minHeight: '44px'
-                  }}
-                >
-                  {isLogin ? 'Sign Up' : 'Sign In'}
-                </button>
-              </p>
-            </div>
-            
-            <div style={{ marginTop: 'clamp(16px, 3vw, 24px)', paddingTop: 'clamp(12px, 2vw, 16px)', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+            <div style={{ marginTop: 'clamp(12px, 2vw, 16px)', paddingTop: 'clamp(10px, 2vw, 14px)', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
               <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 'clamp(9px, 2vw, 11px)' }}>
                 <i className="fas fa-shield-alt" style={{ marginRight: '6px' }}></i>
                 Your data is securely stored and never shared
