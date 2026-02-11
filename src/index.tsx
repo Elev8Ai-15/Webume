@@ -2992,6 +2992,39 @@ app.get('/p/:slug', async (c) => {
     const { useState, useEffect, useRef } = React;
     const SLUG = '${slug}';
     
+    // Utility: Parse date string to comparable value for sorting
+    const parseDateForSort = (dateStr) => {
+      if (!dateStr) return 0;
+      const str = dateStr.trim();
+      if (str.toLowerCase() === 'present' || str.toLowerCase() === 'current') return Date.now();
+      const parsed = new Date(str);
+      if (!isNaN(parsed.getTime())) return parsed.getTime();
+      const monthYearMatch = str.match(/^([A-Za-z]+)\\s*(\\d{4})$/);
+      if (monthYearMatch) {
+        const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+        const monthIdx = months.findIndex(m => monthYearMatch[1].toLowerCase().startsWith(m));
+        if (monthIdx !== -1) return new Date(parseInt(monthYearMatch[2]), monthIdx, 1).getTime();
+      }
+      const slashMatch = str.match(/^(\\d{1,2})\\/(\\d{4})$/);
+      if (slashMatch) return new Date(parseInt(slashMatch[2]), parseInt(slashMatch[1]) - 1, 1).getTime();
+      const dashMatch = str.match(/^(\\d{4})-(\\d{1,2})$/);
+      if (dashMatch) return new Date(parseInt(dashMatch[1]), parseInt(dashMatch[2]) - 1, 1).getTime();
+      const yearMatch = str.match(/^(\\d{4})$/);
+      if (yearMatch) return new Date(parseInt(yearMatch[1]), 0, 1).getTime();
+      return 0;
+    };
+    
+    // Sort experiences in reverse chronological order (newest first)
+    const sortExperiencesByDate = (experiences) => {
+      if (!experiences || !Array.isArray(experiences)) return [];
+      return [...experiences].sort((a, b) => {
+        const aStart = parseDateForSort(a.startDate);
+        const bStart = parseDateForSort(b.startDate);
+        if (aStart !== bStart) return bStart - aStart;
+        return parseDateForSort(b.endDate) - parseDateForSort(a.endDate);
+      });
+    };
+    
     const PublicProfile = () => {
       const [profile, setProfile] = useState(null);
       const [loading, setLoading] = useState(true);
@@ -3185,7 +3218,8 @@ app.get('/p/:slug', async (c) => {
       
       const p = profile.profile || {};
       const basics = p.basics || {};
-      const experience = p.experience || [];
+      // Sort experiences in reverse chronological order for display
+      const experience = sortExperiencesByDate(p.experience || []);
       const skills = p.skills || [];
       const education = p.education || [];
       
@@ -6793,6 +6827,73 @@ app.get('/', (c) => {
         return \`https://logo.clearbit.com/\${cleanDomain}\`;
       };
       
+      // Utility: Parse date string to comparable value for sorting
+      // Handles formats: "Jan 2020", "January 2020", "2020", "01/2020", "2020-01", "Present"
+      const parseDateForSort = (dateStr) => {
+        if (!dateStr) return 0;
+        const str = dateStr.trim();
+        
+        // Handle "Present" or "Current" as current date
+        if (str.toLowerCase() === 'present' || str.toLowerCase() === 'current') {
+          return Date.now();
+        }
+        
+        // Try parsing as full date first
+        const parsed = new Date(str);
+        if (!isNaN(parsed.getTime())) {
+          return parsed.getTime();
+        }
+        
+        // Handle "Month Year" format (Jan 2020, January 2020)
+        const monthYearMatch = str.match(/^([A-Za-z]+)\s*(\d{4})$/);
+        if (monthYearMatch) {
+          const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+          const monthIdx = months.findIndex(m => monthYearMatch[1].toLowerCase().startsWith(m));
+          if (monthIdx !== -1) {
+            return new Date(parseInt(monthYearMatch[2]), monthIdx, 1).getTime();
+          }
+        }
+        
+        // Handle "MM/YYYY" or "YYYY-MM" format
+        const slashMatch = str.match(/^(\d{1,2})\/(\d{4})$/);
+        if (slashMatch) {
+          return new Date(parseInt(slashMatch[2]), parseInt(slashMatch[1]) - 1, 1).getTime();
+        }
+        const dashMatch = str.match(/^(\d{4})-(\d{1,2})$/);
+        if (dashMatch) {
+          return new Date(parseInt(dashMatch[1]), parseInt(dashMatch[2]) - 1, 1).getTime();
+        }
+        
+        // Handle just year "2020"
+        const yearMatch = str.match(/^(\d{4})$/);
+        if (yearMatch) {
+          return new Date(parseInt(yearMatch[1]), 0, 1).getTime();
+        }
+        
+        return 0; // Unknown format, sort to end
+      };
+      
+      // Sort experiences in reverse chronological order (newest first)
+      // Uses startDate for sorting, with endDate as tiebreaker
+      const sortExperiencesByDate = (experiences) => {
+        if (!experiences || !Array.isArray(experiences)) return [];
+        
+        return [...experiences].sort((a, b) => {
+          // First compare by start date (newer first)
+          const aStart = parseDateForSort(a.startDate);
+          const bStart = parseDateForSort(b.startDate);
+          
+          if (aStart !== bStart) {
+            return bStart - aStart; // Descending (newest first)
+          }
+          
+          // If start dates are equal, compare by end date
+          const aEnd = parseDateForSort(a.endDate);
+          const bEnd = parseDateForSort(b.endDate);
+          return bEnd - aEnd; // Descending (newest first)
+        });
+      };
+      
       const buildProfile = (aiData, text) => {
         if (aiData && !aiData.error && aiData.basics) {
           return {
@@ -6800,7 +6901,8 @@ app.get('/', (c) => {
               ...aiData.basics,
               summary: aiData.basics.summary || ''
             },
-            experience: (aiData.experience || []).map((e, i) => {
+            // Sort experiences in reverse chronological order (newest first)
+            experience: sortExperiencesByDate((aiData.experience || []).map((e, i) => {
               // Auto-generate logo URL from company domain
               const companyInfo = e.companyInfo || {};
               const domain = companyInfo.domain || '';
@@ -6841,7 +6943,7 @@ app.get('/', (c) => {
                   { value: '', label: '' }
                 ]
               };
-            }),
+            })),
             skills: aiData.skills || [],
             achievements: (aiData.achievements || []).map((a, i) => ({
               id: Date.now() + i + 1000,
@@ -11555,6 +11657,7 @@ The more detail, the better the tailored resume!"
       const [showAtsModal, setShowAtsModal] = useState(false);
       const [selectedEmployer, setSelectedEmployer] = useState(null); // For employer detail page
       const [hoveredExp, setHoveredExp] = useState(null); // For hover effect
+      const [viewFormat, setViewFormat] = useState('interactive'); // 'interactive' or 'traditional'
       
       // Update experience data when editing in employer detail page
       const updateExperienceField = (expId, field, value) => {
@@ -11957,6 +12060,218 @@ The more detail, the better the tailored resume!"
             </div>
           </div>
           
+          {/* Format Toggle */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            marginBottom: '24px',
+            padding: '6px',
+            background: 'rgba(255,255,255,0.03)',
+            borderRadius: '12px',
+            width: 'fit-content',
+            margin: '0 auto 24px'
+          }}>
+            <button
+              onClick={() => setViewFormat('interactive')}
+              style={{
+                padding: '10px 20px',
+                borderRadius: '8px',
+                border: 'none',
+                background: viewFormat === 'interactive' ? styles.accent : 'transparent',
+                color: viewFormat === 'interactive' ? '#fff' : 'rgba(255,255,255,0.5)',
+                fontWeight: '600',
+                fontSize: '13px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <i className="fas fa-magic"></i>
+              Interactive View
+            </button>
+            <button
+              onClick={() => setViewFormat('traditional')}
+              style={{
+                padding: '10px 20px',
+                borderRadius: '8px',
+                border: 'none',
+                background: viewFormat === 'traditional' ? styles.accent : 'transparent',
+                color: viewFormat === 'traditional' ? '#fff' : 'rgba(255,255,255,0.5)',
+                fontWeight: '600',
+                fontSize: '13px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <i className="fas fa-file-alt"></i>
+              Traditional Resume
+            </button>
+          </div>
+          
+          {/* Traditional Resume Format */}
+          {viewFormat === 'traditional' && (
+            <div className="glass-card" style={{ 
+              maxWidth: '850px', 
+              margin: '0 auto', 
+              padding: '48px',
+              background: '#fff',
+              color: '#1a1a2e',
+              fontFamily: 'Georgia, serif'
+            }}>
+              {/* Header */}
+              <div style={{ textAlign: 'center', marginBottom: '32px', borderBottom: '2px solid #1a1a2e', paddingBottom: '24px' }}>
+                <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#1a1a2e', marginBottom: '8px', letterSpacing: '2px' }}>
+                  {profile.basics.name?.toUpperCase() || 'YOUR NAME'}
+                </h1>
+                <p style={{ fontSize: '16px', color: '#4a4a6a', fontStyle: 'italic', marginBottom: '12px' }}>
+                  {profile.basics.title || 'Professional Title'}
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '16px', fontSize: '13px', color: '#666' }}>
+                  {profile.basics.email && <span><i className="fas fa-envelope" style={{ marginRight: '6px' }}></i>{profile.basics.email}</span>}
+                  {profile.basics.phone && <span><i className="fas fa-phone" style={{ marginRight: '6px' }}></i>{profile.basics.phone}</span>}
+                  {profile.basics.location && <span><i className="fas fa-map-marker-alt" style={{ marginRight: '6px' }}></i>{profile.basics.location}</span>}
+                  {profile.basics.linkedin && <span><i className="fab fa-linkedin" style={{ marginRight: '6px' }}></i>{profile.basics.linkedin.replace('https://linkedin.com/in/', '').replace('https://www.linkedin.com/in/', '')}</span>}
+                </div>
+              </div>
+              
+              {/* Professional Summary */}
+              {profile.basics.summary && (
+                <div style={{ marginBottom: '28px' }}>
+                  <h2 style={{ fontSize: '14px', fontWeight: '700', color: '#1a1a2e', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px', borderBottom: '1px solid #ddd', paddingBottom: '6px' }}>
+                    Professional Summary
+                  </h2>
+                  <p style={{ fontSize: '14px', lineHeight: '1.7', color: '#333', textAlign: 'justify' }}>
+                    {profile.basics.summary}
+                  </p>
+                </div>
+              )}
+              
+              {/* Experience */}
+              {profile.experience?.length > 0 && (
+                <div style={{ marginBottom: '28px' }}>
+                  <h2 style={{ fontSize: '14px', fontWeight: '700', color: '#1a1a2e', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px', borderBottom: '1px solid #ddd', paddingBottom: '6px' }}>
+                    Professional Experience
+                  </h2>
+                  {sortExperiencesByDate(profile.experience).map((exp, idx) => (
+                    <div key={exp.id || idx} style={{ marginBottom: '20px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
+                        <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1a1a2e' }}>{exp.role}</h3>
+                        <span style={{ fontSize: '13px', color: '#666', fontStyle: 'italic' }}>{exp.startDate} — {exp.endDate || 'Present'}</span>
+                      </div>
+                      <p style={{ fontSize: '14px', color: '#4a4a6a', fontStyle: 'italic', marginBottom: '8px' }}>
+                        {exp.company}{exp.companyInfo?.location ? ', ' + exp.companyInfo.location : ''}
+                      </p>
+                      {exp.description && (
+                        <p style={{ fontSize: '13px', lineHeight: '1.6', color: '#444', marginBottom: '8px' }}>{exp.description}</p>
+                      )}
+                      {exp.responsibilities?.length > 0 && (
+                        <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                          {exp.responsibilities.map((resp, ridx) => (
+                            <li key={ridx} style={{ fontSize: '13px', lineHeight: '1.6', color: '#444', marginBottom: '4px' }}>{resp}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Skills */}
+              {profile.skills?.length > 0 && (
+                <div style={{ marginBottom: '28px' }}>
+                  <h2 style={{ fontSize: '14px', fontWeight: '700', color: '#1a1a2e', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px', borderBottom: '1px solid #ddd', paddingBottom: '6px' }}>
+                    Skills
+                  </h2>
+                  <p style={{ fontSize: '13px', lineHeight: '1.8', color: '#333' }}>
+                    {profile.skills.join(' • ')}
+                  </p>
+                </div>
+              )}
+              
+              {/* Education */}
+              {profile.education?.length > 0 && (
+                <div style={{ marginBottom: '28px' }}>
+                  <h2 style={{ fontSize: '14px', fontWeight: '700', color: '#1a1a2e', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px', borderBottom: '1px solid #ddd', paddingBottom: '6px' }}>
+                    Education
+                  </h2>
+                  {profile.education.map((edu, idx) => (
+                    <div key={edu.id || idx} style={{ marginBottom: '12px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                        <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#1a1a2e' }}>{edu.degree}</h3>
+                        {edu.year && <span style={{ fontSize: '13px', color: '#666' }}>{edu.year}</span>}
+                      </div>
+                      <p style={{ fontSize: '13px', color: '#4a4a6a', fontStyle: 'italic' }}>{edu.school}</p>
+                      {edu.details && <p style={{ fontSize: '13px', color: '#555', marginTop: '4px' }}>{edu.details}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Certifications */}
+              {profile.certifications?.length > 0 && (
+                <div style={{ marginBottom: '28px' }}>
+                  <h2 style={{ fontSize: '14px', fontWeight: '700', color: '#1a1a2e', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px', borderBottom: '1px solid #ddd', paddingBottom: '6px' }}>
+                    Certifications
+                  </h2>
+                  <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                    {profile.certifications.map((cert, idx) => (
+                      <li key={idx} style={{ fontSize: '13px', lineHeight: '1.6', color: '#333', marginBottom: '4px' }}>{cert}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {/* Achievements */}
+              {profile.achievements?.length > 0 && (
+                <div>
+                  <h2 style={{ fontSize: '14px', fontWeight: '700', color: '#1a1a2e', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px', borderBottom: '1px solid #ddd', paddingBottom: '6px' }}>
+                    Key Achievements
+                  </h2>
+                  <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                    {profile.achievements.map((ach, idx) => (
+                      <li key={ach.id || idx} style={{ fontSize: '13px', lineHeight: '1.6', color: '#333', marginBottom: '4px' }}>
+                        {ach.title}{ach.description ? ': ' + ach.description : ''}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {/* Print Button */}
+              <div style={{ marginTop: '32px', textAlign: 'center', borderTop: '1px solid #eee', paddingTop: '24px' }}>
+                <button
+                  onClick={() => window.print()}
+                  style={{
+                    padding: '12px 32px',
+                    background: '#1a1a2e',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <i className="fas fa-print"></i>
+                  Print / Save as PDF
+                </button>
+              </div>
+            </div>
+          )}
+          
+          {/* Interactive View - Profile Hero with Photo Support */}
+          {viewFormat === 'interactive' && (
+            <>
           {/* Profile Hero with Photo Support */}
           <div className="glass-card profile-hero" style={{ borderTop: '4px solid ' + styles.accent }}>
             {profilePhoto ? (
@@ -12073,7 +12388,7 @@ The more detail, the better the tailored resume!"
               </p>
               
               <div className="timeline-wrap" style={{ '--timeline-color': styles.accent }}>
-                {profile.experience.map((exp, idx) => {
+                {sortExperiencesByDate(profile.experience).map((exp, idx) => {
                   // Use customLogo first, then logoUrl, then local static logo, then try logo.dev API with domain
                   const timelineLocalLogo = getLocalLogoForPreview(exp.company);
                   const timelineDomain = getCompanyDomain(exp.company, exp.companyInfo?.domain);
@@ -12297,6 +12612,8 @@ The more detail, the better the tailored resume!"
                 ))}
               </div>
             </div>
+          )}
+            </>
           )}
         </div>
       );
