@@ -723,6 +723,67 @@ app.post('/api/auth/logout', async (c) => {
   return c.json({ success: true });
 });
 
+// API: Reset password (for users who forgot or need to update)
+app.post('/api/auth/reset-password', async (c) => {
+  try {
+    const body = await c.req.json();
+    const email = sanitizeInput(body.email || '');
+    const newPassword = body.newPassword || '';
+    
+    if (!email || !newPassword) {
+      return c.json({ error: 'Email and new password are required' }, 400);
+    }
+    
+    // Validate password strength
+    const passwordCheck = isStrongPassword(newPassword);
+    if (!passwordCheck.valid) {
+      return c.json({ error: passwordCheck.message }, 400);
+    }
+    
+    // Check if user exists
+    const userData = await c.env.USERS_KV.get(`user:${email.toLowerCase()}`, 'json') as any;
+    if (!userData) {
+      return c.json({ error: 'No account found with this email. Please sign up instead.' }, 404);
+    }
+    
+    // Update password
+    const hashedPassword = await hashPassword(newPassword);
+    userData.password = hashedPassword;
+    userData.updatedAt = new Date().toISOString();
+    
+    await c.env.USERS_KV.put(`user:${email.toLowerCase()}`, JSON.stringify(userData));
+    
+    // Clear any failed login attempts
+    await clearLoginAttempts(c, email);
+    
+    // Create new session and log user in
+    const token = generateToken();
+    const csrfToken = generateCSRFToken();
+    const session = { 
+      email: email.toLowerCase(), 
+      createdAt: new Date().toISOString(),
+      csrfToken 
+    };
+    await c.env.USERS_KV.put(`session:${token}`, JSON.stringify(session), { expirationTtl: SECURITY_CONFIG.SESSION_DURATION });
+    
+    setCookie(c, 'webume_session', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Lax',
+      maxAge: SECURITY_CONFIG.SESSION_DURATION,
+      path: '/'
+    });
+    
+    return c.json({ 
+      success: true, 
+      message: 'Password updated successfully',
+      user: { email: userData.email, name: userData.name, hasProfile: !!userData.profile }
+    });
+  } catch (error: any) {
+    return c.json({ error: 'Password reset failed. Please try again.' }, 500);
+  }
+});
+
 // API: Get current user
 app.get('/api/auth/me', async (c) => {
   const user = await getCurrentUser(c);
@@ -5922,30 +5983,67 @@ app.get('/', (c) => {
     
     // Auth View Component - Simplified for maximum compatibility
     const AuthView = ({ onLogin, authLoading, authError, clearAuthError }) => {
-      const [isLogin, setIsLogin] = useState(true);
+      const [mode, setMode] = useState('login'); // 'login', 'signup', 'reset'
       const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
       const [name, setName] = useState('');
       const [error, setError] = useState('');
+      const [success, setSuccess] = useState('');
       const [showPassword, setShowPassword] = useState(false);
+      const [isSubmitting, setIsSubmitting] = useState(false);
       
-      const handleSubmit = (e) => {
+      const isLogin = mode === 'login';
+      const isReset = mode === 'reset';
+      
+      const handleSubmit = async (e) => {
         e.preventDefault();
         e.stopPropagation();
         setError('');
+        setSuccess('');
 
-        if (!email || !password || (!isLogin && !name)) {
+        if (!email || !password || (mode === 'signup' && !name)) {
           setError('Please fill in all fields');
           return;
         }
 
-        onLogin(isLogin, email, password, name);
+        if (isReset) {
+          // Handle password reset
+          setIsSubmitting(true);
+          try {
+            const res = await fetch('/api/auth/reset-password', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, newPassword: password }),
+              credentials: 'include'
+            });
+            const data = await res.json();
+            if (data.error) {
+              setError(data.error);
+            } else if (data.success) {
+              setSuccess('Password reset successful! Logging you in...');
+              // Reload to trigger auth check with new session
+              setTimeout(() => window.location.reload(), 1000);
+            }
+          } catch (err) {
+            setError('Connection error. Please try again.');
+          }
+          setIsSubmitting(false);
+        } else {
+          onLogin(isLogin, email, password, name);
+        }
       };
       
       // Direct input handlers for maximum compatibility
       const handleEmailChange = (e) => setEmail(e.target.value);
       const handlePasswordChange = (e) => setPassword(e.target.value);
       const handleNameChange = (e) => setName(e.target.value);
+      
+      const switchMode = (newMode) => {
+        setMode(newMode);
+        setError('');
+        setSuccess('');
+        if (clearAuthError) clearAuthError();
+      };
       
       return (
         <div className="auth-container" style={{ 
@@ -6014,70 +6112,112 @@ app.get('/', (c) => {
             flexShrink: 0
           }}>
             {/* Auth Mode Tabs - Compact */}
-            <div style={{
-              display: 'flex',
-              marginBottom: '12px',
-              background: 'rgba(255,255,255,0.05)',
-              borderRadius: '10px',
-              padding: '3px',
-              gap: '3px'
-            }}>
+            {!isReset && (
+              <div style={{
+                display: 'flex',
+                marginBottom: '12px',
+                background: 'rgba(255,255,255,0.05)',
+                borderRadius: '10px',
+                padding: '3px',
+                gap: '3px'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => switchMode('login')}
+                  style={{
+                    flex: 1,
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: mode === 'login' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                    color: mode === 'login' ? '#fff' : 'rgba(255,255,255,0.5)',
+                    fontWeight: '600',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <i className="fas fa-sign-in-alt" style={{ fontSize: '12px' }}></i>
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => switchMode('signup')}
+                  style={{
+                    flex: 1,
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: mode === 'signup' ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(6, 182, 212, 0.2))' : 'transparent',
+                    color: mode === 'signup' ? '#10B981' : 'rgba(255,255,255,0.5)',
+                    fontWeight: '600',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <i className="fas fa-user-plus" style={{ fontSize: '12px' }}></i>
+                  Sign Up
+                </button>
+              </div>
+            )}
+            
+            {isReset && (
               <button
                 type="button"
-                onClick={() => { setIsLogin(true); setError(''); if(clearAuthError) clearAuthError(); }}
+                onClick={() => switchMode('login')}
                 style={{
-                  flex: 1,
-                  padding: '10px 12px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: isLogin ? 'rgba(255,255,255,0.1)' : 'transparent',
-                  color: isLogin ? '#fff' : 'rgba(255,255,255,0.5)',
-                  fontWeight: '600',
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
-                <i className="fas fa-sign-in-alt" style={{ fontSize: '12px' }}></i>
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={() => { setIsLogin(false); setError(''); if(clearAuthError) clearAuthError(); }}
-                style={{
-                  flex: 1,
-                  padding: '10px 12px',
-                  borderRadius: '8px',
+                  gap: '6px',
+                  background: 'none',
                   border: 'none',
-                  background: !isLogin ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(6, 182, 212, 0.2))' : 'transparent',
-                  color: !isLogin ? '#10B981' : 'rgba(255,255,255,0.5)',
-                  fontWeight: '600',
-                  fontSize: '13px',
+                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: '12px',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
+                  marginBottom: '12px',
+                  padding: '0'
                 }}
               >
-                <i className="fas fa-user-plus" style={{ fontSize: '12px' }}></i>
-                Sign Up
+                <i className="fas fa-arrow-left"></i>
+                Back to Sign In
               </button>
-            </div>
+            )}
             
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
               <h1 className="auth-title" style={{ fontSize: '18px', fontWeight: '700', color: '#fff', marginBottom: '2px' }}>
-                {isLogin ? 'Welcome Back!' : 'Create Account'}
+                {isReset ? 'Reset Password' : (isLogin ? 'Welcome Back!' : 'Create Account')}
               </h1>
               <p className="auth-subtitle" style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px' }}>
-                {isLogin ? 'Sign in to access your profiles' : 'Free • No credit card required'}
+                {isReset ? 'Enter your email and new password' : (isLogin ? 'Sign in to access your profiles' : 'Free • No credit card required')}
               </p>
             </div>
+            
+            {success && (
+              <div style={{
+                padding: '12px 16px',
+                background: 'rgba(16,185,129,0.15)',
+                border: '1px solid rgba(16,185,129,0.3)',
+                borderRadius: '12px',
+                marginBottom: '16px',
+                color: '#10B981',
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <i className="fas fa-check-circle"></i>
+                {success}
+              </div>
+            )}
             
             {(error || authError) && (
               <div style={{
@@ -6097,33 +6237,54 @@ app.get('/', (c) => {
                   {error || authError}
                 </div>
                 {isLogin && (authError === 'Invalid email or password' || error === 'Invalid email or password') && (
-                  <button
-                    type="button"
-                    onClick={() => { setIsLogin(false); setError(''); if(clearAuthError) clearAuthError(); }}
-                    style={{
-                      background: 'rgba(16, 185, 129, 0.2)',
-                      border: '1px solid rgba(16, 185, 129, 0.4)',
-                      borderRadius: '8px',
-                      padding: '8px 12px',
-                      color: '#10B981',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      marginTop: '4px'
-                    }}
-                  >
-                    <i className="fas fa-user-plus"></i>
-                    New user? Create an account instead
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={() => switchMode('signup')}
+                      style={{
+                        background: 'rgba(16, 185, 129, 0.2)',
+                        border: '1px solid rgba(16, 185, 129, 0.4)',
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        color: '#10B981',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <i className="fas fa-user-plus"></i>
+                      New? Sign Up
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchMode('reset')}
+                      style={{
+                        background: 'rgba(59, 130, 246, 0.2)',
+                        border: '1px solid rgba(59, 130, 246, 0.4)',
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        color: '#3B82F6',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <i className="fas fa-key"></i>
+                      Reset Password
+                    </button>
+                  </div>
                 )}
               </div>
             )}
             
             <form onSubmit={handleSubmit}>
-              {!isLogin && (
+              {mode === 'signup' && (
                 <div style={{ marginBottom: '10px' }}>
                   <label className="auth-form-label" style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>
                     <i className="fas fa-user" style={{ marginRight: '6px', color: 'var(--chrome)', fontSize: '10px' }}></i>
@@ -6192,8 +6353,8 @@ app.get('/', (c) => {
                     className="glass-input auth-input"
                     value={password}
                     onChange={handlePasswordChange}
-                    placeholder={isLogin ? '••••••••' : 'Min 8 chars, Aa1!'}
-                    autoComplete={isLogin ? 'current-password' : 'new-password'}
+                    placeholder={isLogin && !isReset ? '••••••••' : 'Min 8 chars, Aa1!'}
+                    autoComplete={isLogin && !isReset ? 'current-password' : 'new-password'}
                     style={{ 
                       width: '100%', 
                       padding: '10px 12px', 
@@ -6227,7 +6388,7 @@ app.get('/', (c) => {
                     <i className={showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'}></i>
                   </button>
                 </div>
-                {!isLogin && (
+                {(mode === 'signup' || mode === 'reset') && (
                   <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>
                     <i className="fas fa-info-circle" style={{ marginRight: '4px' }}></i>
                     8+ chars with uppercase, lowercase, number & special (!@#$)
@@ -6238,7 +6399,7 @@ app.get('/', (c) => {
               <button 
                 type="submit" 
                 className="btn btn-primary auth-submit-btn"
-                disabled={authLoading}
+                disabled={authLoading || isSubmitting}
                 style={{ 
                   width: '100%', 
                   padding: '12px 16px', 
@@ -6257,19 +6418,39 @@ app.get('/', (c) => {
                   touchAction: 'manipulation'
                 }}
               >
-                {authLoading ? (
+                {(authLoading || isSubmitting) ? (
                   <>
                     <i className="fas fa-spinner fa-spin"></i>
-                    {isLogin ? 'Signing in...' : 'Creating account...'}
+                    {isReset ? 'Resetting...' : (isLogin ? 'Signing in...' : 'Creating account...')}
                   </>
                 ) : (
                   <>
-                    <i className={isLogin ? 'fas fa-sign-in-alt' : 'fas fa-user-plus'}></i>
-                    {isLogin ? 'Sign In' : 'Create Account'}
+                    <i className={isReset ? 'fas fa-key' : (isLogin ? 'fas fa-sign-in-alt' : 'fas fa-user-plus')}></i>
+                    {isReset ? 'Reset Password' : (isLogin ? 'Sign In' : 'Create Account')}
                   </>
                 )}
               </button>
             </form>
+            
+            {/* Forgot Password link - only show on login mode */}
+            {isLogin && !isReset && (
+              <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                <button
+                  type="button"
+                  onClick={() => switchMode('reset')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'rgba(255,255,255,0.5)',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  Forgot password? Reset it here
+                </button>
+              </div>
+            )}
             
             <div style={{ marginTop: 'clamp(12px, 2vw, 16px)', paddingTop: 'clamp(10px, 2vw, 14px)', borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
               <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 'clamp(9px, 2vw, 11px)' }}>
