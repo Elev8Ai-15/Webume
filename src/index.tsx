@@ -2999,17 +2999,17 @@ app.get('/p/:slug', async (c) => {
       if (str.toLowerCase() === 'present' || str.toLowerCase() === 'current') return Date.now();
       const parsed = new Date(str);
       if (!isNaN(parsed.getTime())) return parsed.getTime();
-      const monthYearMatch = str.match(/^([A-Za-z]+)\\s*(\\d{4})$/);
+      const monthYearMatch = str.match(/^([A-Za-z]+)[ ]*([0-9]{4})$/);
       if (monthYearMatch) {
         const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
         const monthIdx = months.findIndex(m => monthYearMatch[1].toLowerCase().startsWith(m));
         if (monthIdx !== -1) return new Date(parseInt(monthYearMatch[2]), monthIdx, 1).getTime();
       }
-      const slashMatch = str.match(/^(\\d{1,2})\\/(\\d{4})$/);
+      const slashMatch = str.match(/^([0-9]{1,2})[/]([0-9]{4})$/);
       if (slashMatch) return new Date(parseInt(slashMatch[2]), parseInt(slashMatch[1]) - 1, 1).getTime();
-      const dashMatch = str.match(/^(\\d{4})-(\\d{1,2})$/);
+      const dashMatch = str.match(/^([0-9]{4})[-]([0-9]{1,2})$/);
       if (dashMatch) return new Date(parseInt(dashMatch[1]), parseInt(dashMatch[2]) - 1, 1).getTime();
-      const yearMatch = str.match(/^(\\d{4})$/);
+      const yearMatch = str.match(/^([0-9]{4})$/);
       if (yearMatch) return new Date(parseInt(yearMatch[1]), 0, 1).getTime();
       return 0;
     };
@@ -6845,7 +6845,7 @@ app.get('/', (c) => {
         }
         
         // Handle "Month Year" format (Jan 2020, January 2020)
-        const monthYearMatch = str.match(/^([A-Za-z]+)\s*(\d{4})$/);
+        const monthYearMatch = str.match(/^([A-Za-z]+)[ ]*([0-9]{4})$/);
         if (monthYearMatch) {
           const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
           const monthIdx = months.findIndex(m => monthYearMatch[1].toLowerCase().startsWith(m));
@@ -6855,17 +6855,17 @@ app.get('/', (c) => {
         }
         
         // Handle "MM/YYYY" or "YYYY-MM" format
-        const slashMatch = str.match(/^(\d{1,2})\/(\d{4})$/);
+        const slashMatch = str.match(/^([0-9]{1,2})[/]([0-9]{4})$/);
         if (slashMatch) {
           return new Date(parseInt(slashMatch[2]), parseInt(slashMatch[1]) - 1, 1).getTime();
         }
-        const dashMatch = str.match(/^(\d{4})-(\d{1,2})$/);
+        const dashMatch = str.match(/^([0-9]{4})[-]([0-9]{1,2})$/);
         if (dashMatch) {
           return new Date(parseInt(dashMatch[1]), parseInt(dashMatch[2]) - 1, 1).getTime();
         }
         
         // Handle just year "2020"
-        const yearMatch = str.match(/^(\d{4})$/);
+        const yearMatch = str.match(/^([0-9]{4})$/);
         if (yearMatch) {
           return new Date(parseInt(yearMatch[1]), 0, 1).getTime();
         }
