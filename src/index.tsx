@@ -6093,7 +6093,8 @@ app.get('/', (c) => {
           overflowY: 'auto',
           overflowX: 'hidden',
           WebkitOverflowScrolling: 'touch',
-          background: 'linear-gradient(180deg, #030303 0%, #050508 50%, #030303 100%)'
+          background: 'linear-gradient(180deg, #030303 0%, #050508 50%, #030303 100%)',
+          color: '#ffffff'
         }}>
           {/* HERO LOGO SECTION - Compact for mobile */}
           <div style={{
@@ -6107,6 +6108,16 @@ app.get('/', (c) => {
             position: 'relative',
             flexShrink: 1
           }}>
+            {/* Fallback title if logo fails to load */}
+            <h1 style={{
+              fontSize: '32px',
+              fontWeight: '700',
+              color: '#3d7ab8',
+              fontFamily: 'Space Grotesk, Inter, sans-serif',
+              margin: '0 0 8px 0',
+              textShadow: '0 2px 8px rgba(61, 122, 184, 0.3)',
+              display: 'none'
+            }} className="logo-fallback">Webumé</h1>
             <img 
               src="/static/logo.png" 
               alt="Webumé" 
@@ -6118,6 +6129,11 @@ app.get('/', (c) => {
                 filter: 'drop-shadow(0 12px 32px rgba(30, 58, 95, 0.4)) drop-shadow(0 4px 12px rgba(0,0,0,0.5))',
                 position: 'relative',
                 zIndex: 2
+              }}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                const fallback = e.target.previousElementSibling;
+                if (fallback) fallback.style.display = 'block';
               }}
             />
             
@@ -6498,9 +6514,13 @@ app.get('/', (c) => {
     };
     
     const App = () => {
+      console.log('🚀 App component initializing...');
       const [view, setViewInternal] = useState(VIEW.AUTH);
       
-      const setView = (newView) => setViewInternal(newView);
+      const setView = (newView) => {
+        console.log('📍 View changing to:', newView);
+        setViewInternal(newView);
+      };
       const [user, setUser] = useState(null);
       const [authLoading, setAuthLoading] = useState(true);
       const [authError, setAuthError] = useState('');
@@ -6532,20 +6552,26 @@ app.get('/', (c) => {
       }, []);
       
       const checkAuth = async () => {
+        console.log('🔐 Starting auth check...');
         try {
           const res = await fetch('/api/auth/me', { credentials: 'include' });
+          console.log('🔐 Auth response status:', res.status);
           const data = await res.json();
+          console.log('🔐 Auth data:', data);
           if (data.user) {
+            console.log('✅ User found, loading profile...');
             setUser(data.user);
             // Load profile from server - loadProfile handles setting the view
             await loadProfile();
           } else {
+            console.log('⚠️ No user, showing AUTH view');
             setView(VIEW.AUTH);
           }
         } catch (e) {
-          console.error('Auth check failed:', e);
+          console.error('❌ Auth check failed:', e);
           setView(VIEW.AUTH);
         }
+        console.log('🔓 Setting authLoading to false');
         setAuthLoading(false);
       };
       
@@ -7018,14 +7044,16 @@ app.get('/', (c) => {
               width: '80px',
               height: '80px',
               borderRadius: '24px',
-              background: 'linear-gradient(135deg, var(--purple-main), var(--pink-main))',
+              background: 'linear-gradient(135deg, #1e3a5f, #3d7ab8)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 12px 40px rgba(30, 58, 95,0.4)'
+              boxShadow: '0 12px 40px rgba(30, 58, 95, 0.5)',
+              border: '1px solid rgba(61, 122, 184, 0.3)'
             }}>
               <i className="fas fa-spinner fa-spin" style={{ fontSize: '32px', color: '#fff' }}></i>
             </div>
+            <img src="/static/logo.png" alt="Webumé" style={{ height: '32px', marginTop: '8px', opacity: 0.9 }} />
             <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px' }}>Loading...</p>
           </div>
         );
