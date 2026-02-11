@@ -6239,11 +6239,6 @@ app.get('/', (c) => {
                 type="submit" 
                 className="btn btn-primary auth-submit-btn"
                 disabled={authLoading}
-                onClick={(e) => {
-                  if (email && password && (isLogin || name)) {
-                    handleSubmit(e);
-                  }
-                }}
                 style={{ 
                   width: '100%', 
                   padding: '12px 16px', 
@@ -6252,12 +6247,14 @@ app.get('/', (c) => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  minHeight: '44px',
+                  minHeight: '48px',
                   borderRadius: '10px',
                   WebkitTapHighlightColor: 'transparent',
                   gap: '8px',
                   position: 'relative',
-                  zIndex: 100
+                  zIndex: 100,
+                  cursor: 'pointer',
+                  touchAction: 'manipulation'
                 }}
               >
                 {authLoading ? (
