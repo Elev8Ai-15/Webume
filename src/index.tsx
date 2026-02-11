@@ -6514,11 +6514,9 @@ app.get('/', (c) => {
     };
     
     const App = () => {
-      console.log('🚀 App component initializing...');
       const [view, setViewInternal] = useState(VIEW.AUTH);
       
       const setView = (newView) => {
-        console.log('📍 View changing to:', newView);
         setViewInternal(newView);
       };
       const [user, setUser] = useState(null);
@@ -6552,27 +6550,20 @@ app.get('/', (c) => {
       }, []);
       
       const checkAuth = async () => {
-        console.log('🔐 Starting auth check...');
         try {
           const res = await fetch('/api/auth/me', { credentials: 'include' });
-          console.log('🔐 Auth response status:', res.status);
           const data = await res.json();
-          console.log('🔐 Auth data:', data);
           if (data.user) {
-            console.log('✅ User found, loading profile...');
             setUser(data.user);
-            // Load profile from server - loadProfile handles setting the view
             await loadProfile();
           } else {
-            console.log('⚠️ No user, showing AUTH view');
             setView(VIEW.AUTH);
           }
         } catch (e) {
-          console.error('❌ Auth check failed:', e);
           setView(VIEW.AUTH);
+        } finally {
+          setAuthLoading(false);
         }
-        console.log('🔓 Setting authLoading to false');
-        setAuthLoading(false);
       };
       
       const loadProfile = async () => {
@@ -11648,11 +11639,8 @@ The more detail, the better the tailored resume!"
     };
     
     const PreviewView = ({ profile, setView, profilePhoto, selectedTemplate, slug, isPublic, setIsPublic, profileViews, setProfile }) => {
-      console.log('🎨 PreviewView rendering with:', { profile, selectedTemplate, slug, isPublic });
-      
       // Safety check - ensure profile has required structure
       if (!profile || !profile.basics) {
-        console.log('⚠️ PreviewView - profile or basics missing:', { profile, basics: profile?.basics });
         return (
           <div style={{ padding: '40px', textAlign: 'center' }}>
             <div style={{ fontSize: '60px', marginBottom: '20px' }}>⚠️</div>
