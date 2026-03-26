@@ -1,0 +1,9 @@
+# Ignores
+node_modules/
+.env
+.env.*
+*.log
+rclone_upload*.log
+duplicates_deleted.txt
+media_scan_results.txt
+video_list.txt
