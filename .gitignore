@@ -7,3 +7,6 @@ rclone_upload*.log
 duplicates_deleted.txt
 media_scan_results.txt
 video_list.txt
+.claude/settings.local.json
+.claude/launch.json
+BRAD_G_POWELL_Resume_ATS.docx
