@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "cleanupPeriodDays": 14,
+  "preferences": {
+    "reducedMotion": true,
+    "showSpinnerTips": false
+  },
+  "env": {
+    "ENABLE_TOOL_SEARCH": "1"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -ExecutionPolicy Bypass -File \".claude/hooks/block-sensitive-writes.ps1\"",
+            "statusMessage": "Checking for sensitive file writes..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "The session is ending. Check if significant work was done. If so, append a brief log entry to notes/session-log.md with today's date, topic, and 3-5 bullet points of what was accomplished plus any open items. Use the format: ## YYYY-MM-DD | Topic. If nothing meaningful happened, skip the log.",
+            "statusMessage": "Updating session log..."
+          }
+        ]
+      }
+    ]
+  }
+}

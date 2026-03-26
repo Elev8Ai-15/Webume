@@ -1,12 +1,34 @@
 # Elev8 AI — Agent Roster
-## Last Updated: March 11, 2026
+## Last Updated: March 26, 2026
 
 ---
 
 ## How This Works
-Each "agent" is a Claude prompt template with a specific role, tone, and output format.
-You invoke them by telling Claude: "Act as [Agent Name] and do [task]."
-Outputs go to `/outputs/` organized by type.
+
+**Three layers of agents are available:**
+
+### Layer 1: Skills (fastest — invoke with `/skill-name`)
+These are fully automated with structured output, auto-triggering, and file saving:
+- `/content-strategist` — weekly content calendar planning
+- `/linkedin-writer` — LinkedIn posts with hooks and CTAs
+- `/social-media-writer` — FB, IG, TikTok posts
+- `/lead-qualifier` — score and qualify incoming leads
+- `/proposal-writer` — draft client proposals with real pricing
+- `/ops-daily-briefing` — morning briefing with priorities
+- `/ops-executive-brief` — turn findings into executive summaries
+- `/ops-deep-research-lite` — multi-source research with synthesis
+- `/ops-document-output` — convert notes into polished documents
+
+### Layer 2: Subagents (powerful — Claude dispatches automatically)
+These have full tool access and run as background workers:
+- **ops-chief-of-staff** — routing, prioritization, delegation
+- **ops-comms-operator** — email drafts, client follow-ups, proposals
+- **ops-marketing-operator** — campaign ideas, content, lead gen
+- **ops-research-analyst** — market research, competitor analysis
+- **ops-quality-critic** — final review, QA, error checking
+
+### Layer 3: Prompt Templates (manual — "Act as [Agent Name]")
+For tasks that don't need full automation. See sections below.
 
 ---
 
@@ -122,20 +144,26 @@ Outputs go to `/outputs/` organized by type.
 
 ## QUICK REFERENCE — Agent by Task
 
-| I need to...                          | Use Agent              |
-|---------------------------------------|------------------------|
-| Plan next week's content              | Content Strategist     |
-| Write a LinkedIn post                 | LinkedIn Writer        |
-| Write FB/IG/TikTok posts              | Social Media Writer    |
-| Score a new lead                      | Lead Qualifier         |
-| Write a client proposal               | Proposal Writer        |
-| Draft a follow-up email               | Email Drafter          |
-| Write a blog post                     | Blog Writer            |
-| Review weekly metrics                 | Analytics Reporter     |
-| Research competitors                  | Competitor Scout       |
-| Handle client communication           | Client Success Manager |
-| Run industry-specific outreach        | Campaign Manager       |
-| Create HeyGen video scripts           | HeyGen Video Strategist|
-| Find new revenue opportunities        | Growth Strategist      |
-| Check brand consistency               | Brand Guardian         |
-| Review financials vs $500k target     | Financial Analyst      |
+| I need to...                          | Best Method | Invocation |
+|---------------------------------------|-------------|------------|
+| Plan next week's content              | Skill | `/content-strategist` |
+| Write a LinkedIn post                 | Skill | `/linkedin-writer` |
+| Write FB/IG/TikTok posts              | Skill | `/social-media-writer` |
+| Score a new lead                      | Skill | `/lead-qualifier` |
+| Write a client proposal               | Skill | `/proposal-writer` |
+| Get a morning briefing                | Skill | `/ops-daily-briefing` |
+| Summarize findings                    | Skill | `/ops-executive-brief` |
+| Research a topic                      | Skill | `/ops-deep-research-lite` |
+| Draft a follow-up email               | Subagent | ops-comms-operator |
+| Route/prioritize tasks                | Subagent | ops-chief-of-staff |
+| Review output quality                 | Subagent | ops-quality-critic |
+| Research competitors                  | Subagent | ops-research-analyst |
+| Plan marketing campaigns              | Subagent | ops-marketing-operator |
+| Write a blog post                     | Template | "Act as my Blog Writer..." |
+| Review weekly metrics                 | Template | "Act as my Analytics Reporter..." |
+| Handle client communication           | Template | "Act as my Client Success Manager..." |
+| Run industry-specific outreach        | Template | "Act as my Campaign Manager..." |
+| Create HeyGen video scripts           | Template | "Act as my HeyGen Video Strategist..." |
+| Find new revenue opportunities        | Template | "Act as my Growth Strategist..." |
+| Check brand consistency               | Template | "Act as my Brand Guardian..." |
+| Review financials vs $500k target     | Template | "Act as my Financial Analyst..." |
