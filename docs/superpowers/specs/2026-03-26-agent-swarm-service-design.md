@@ -15,7 +15,7 @@ Productize Brad's personal Claude Code multi-agent assistant as a premium servic
 
 ## 1. The Playbook
 
-A step-by-step deployment guide that lives in the `ai-agent-swarm` repo (https://github.com/Elev8Ai-15/ai-agent-swarm). It enables Brad (or eventually a contractor) to deploy a customized swarm for any SMB client in under 4 hours.
+A step-by-step deployment guide that lives in the `ai-agent-swarm` repo (https://github.com/Elev8Ai-15/ai-agent-swarm). It enables Brad (or eventually a contractor) to deploy a customized swarm for any SMB client in under 6 hours (Self-serve) or 8 hours (Managed).
 
 ### Playbook contents:
 1. **Pre-deployment checklist** — client requirements, hardware specs, account setup
@@ -89,7 +89,7 @@ The playbook is a **working directory template** in the repo, not a PDF.
 ### Phase 1: Discovery (30 min)
 1. Client call: business details, pain points, tools they use
 2. Pick tier (Self-serve or Managed)
-3. Confirm MCP access — client shares Gmail, GCal, etc. credentials
+3. Confirm MCP access — client sets up OAuth app passwords / tokens (NOT raw passwords). Brad guides them through this.
 4. Sign contract + collect setup fee
 
 ### Phase 2: Deploy (2-3 hours)
@@ -128,6 +128,20 @@ The playbook is a **working directory template** in the repo, not a PDF.
 6. **Billing**: Setup fee upfront. Monthly on the 1st. Month-to-month after setup.
 7. **Termination**: Either party, 30 days notice. Client keeps their setup.
 
+### Credential security (Managed tier):
+- Use OAuth tokens / app passwords instead of raw credentials wherever possible
+- All credentials stored in encrypted vault (not plaintext files)
+- Access limited to Brad only — no shared drives or unencrypted backups
+- Breach notification: Brad notifies client within 24 hours of any suspected credential compromise
+- Contract includes credential handling clause
+
+### Failure modes (top 5):
+1. **Agent sends bad output to customer** — Managed: all external-facing outputs require Brad's review before sending. Self-serve: onboarding doc warns client to review before acting.
+2. **API token expires** — MCP connection fails silently. Monthly check-in catches this. Playbook includes token refresh procedure.
+3. **Agent hallucination** — disclaimer in contract covers this. Quality Critic agent reviews outputs in Managed tier.
+4. **Service outage (Anthropic down)** — agents simply don't run. No client harm. Resume when service returns.
+5. **Client breaks the setup** — Git-backed configs. Brad can restore from last known-good commit.
+
 ### Not included:
 - Custom software development
 - Hardware purchases or IT support
@@ -136,6 +150,7 @@ The playbook is a **working directory template** in the repo, not a PDF.
 
 ### Follow-up (before first paying client):
 - Have a Florida business attorney review the contract template (~$75-150)
+- Attorney should check FL requirements for electronic communications on behalf of licensed contractors
 
 ---
 
@@ -150,7 +165,7 @@ The playbook is a **working directory template** in the repo, not a PDF.
 
 ### Week 2: Find the first client
 - Reach out to 5-10 home services businesses in Tampa Bay
-- Offer beta deal: $2,500 setup (50% off) + $500/mo in exchange for testimonial
+- Offer beta deal: $2,500 setup (50% off) + $500/mo in exchange for testimonial. Beta rate locked for 6 months, then transitions to standard pricing. Specify in beta contract.
 - Use existing home services campaign playbook for outreach
 - Demo Brad's own setup on a screen share — that's the pitch
 
@@ -169,19 +184,24 @@ The playbook is a **working directory template** in the repo, not a PDF.
 |----------|---------|-------------------|--------|
 | 5 Self-serve | 5 | $2,500/mo | $30,000 + $25,000 setup = $55,000 |
 | 3 Managed | 3 | $4,500/mo | $54,000 + $30,000 setup = $84,000 |
-| **Combined (8 clients)** | **8** | **$7,000/mo** | **$84,000 + $55,000 = $139,000** |
+| **Combined (8 clients)** | **8** | **$7,000/mo** | **$84,000 recurring + $55,000 setup = $139,000** |
 
 API costs (Managed tier): ~$100/mo per client x 3 = $300/mo = $3,600/yr
 **Net after API costs**: ~$135,400/yr from 8 clients
+
+**API cost gate**: Track actual API costs daily during beta. If per-client cost exceeds $150/mo, revise Managed tier pricing before taking a second Managed client.
 
 ---
 
 ## 8. Open Questions
 
-1. **API cost model validation** — monitor actual Claude usage during beta to confirm $100/mo estimate
+1. **API cost model validation** — monitor actual Claude usage during beta to confirm $100/mo estimate. Gate: revise pricing if >$150/mo.
 2. **Hardware minimum specs** — define for Self-serve tier (likely: any modern Windows/Mac, 8GB RAM, internet)
 3. **Scaling beyond Brad** — at what client count does Brad need a contractor? (Likely 10+ managed clients)
 4. **Additional verticals** — after home services, expand to: real estate, restaurants, professional services (playbooks already exist)
+5. **Anthropic pricing risk** — if Claude Max subscription or API pricing changes, Managed tier pricing may need adjustment
+6. **Self-serve CLI friction** — target tech-comfortable clients for Self-serve tier. Consider a launcher script to reduce CLI intimidation. Gauge during beta.
+7. **Beta success criteria** — client saves 5+ hours/week on admin tasks, agents handle 80%+ of routine inquiries without major edits, client renews after month 2
 
 ---
 
