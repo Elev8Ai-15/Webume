@@ -43,3 +43,5 @@ rclone_upload*.log
 video_list.txt
 yarn-debug.log*
 yarn-error.log*
+
+/src/generated/prisma
