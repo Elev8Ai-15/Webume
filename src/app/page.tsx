@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   return (
@@ -11,12 +10,18 @@ export default function HomePage() {
           organic timeline of your professional journey.
         </p>
         <div className="mt-8 flex items-center justify-center gap-4">
-          <Button size="lg" asChild>
-            <Link href="/sign-up">Get Started</Link>
-          </Button>
-          <Button variant="outline" size="lg" asChild>
-            <Link href="/sign-in">Sign In</Link>
-          </Button>
+          <Link
+            href="/sign-up"
+            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+          >
+            Get Started
+          </Link>
+          <Link
+            href="/sign-in"
+            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-4 text-sm font-medium transition-colors hover:bg-muted"
+          >
+            Sign In
+          </Link>
         </div>
       </div>
     </div>

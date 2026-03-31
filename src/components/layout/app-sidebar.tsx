@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard" },
@@ -22,14 +22,18 @@ export function AppSidebar() {
       </div>
       <nav className="flex flex-col gap-1 p-2">
         {navItems.map((item) => (
-          <Button
+          <Link
             key={item.href}
-            variant={pathname === item.href ? "secondary" : "ghost"}
-            className={cn("justify-start")}
-            asChild
+            href={item.href}
+            className={cn(
+              buttonVariants({
+                variant: pathname === item.href ? "secondary" : "ghost",
+              }),
+              "justify-start",
+            )}
           >
-            <Link href={item.href}>{item.label}</Link>
-          </Button>
+            {item.label}
+          </Link>
         ))}
       </nav>
     </aside>
