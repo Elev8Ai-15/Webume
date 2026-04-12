@@ -7,6 +7,8 @@ import { buttonVariants } from "@/components/ui/button";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard" },
+  { label: "Resume", href: "/resume" },
+  { label: "Profile", href: "/profile" },
   { label: "Settings", href: "/settings" },
 ];
 
