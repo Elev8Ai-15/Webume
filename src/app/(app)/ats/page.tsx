@@ -3,18 +3,16 @@ import { redirect } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getUserByClerkId } from "@/lib/repositories/user.repository";
+import { getProfileByClerkId } from "@/lib/profile/profile.service";
 import { calculateATSScore } from "@/lib/ai/ats-score";
-import type { ProfileData } from "@/lib/types/profile";
 
 export default async function ATSPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
-  const user = await getUserByClerkId(userId);
-  if (!user) redirect("/sign-in");
-
-  const profileData = user.profileData as unknown as ProfileData | null;
+  const profileResult = await getProfileByClerkId(userId);
+  if (!profileResult) redirect("/sign-in");
+  const { profileData } = profileResult;
 
   if (!profileData) {
     return (

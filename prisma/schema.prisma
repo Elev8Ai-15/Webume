@@ -33,9 +33,95 @@ model User {
   commentsRcvd       Comment[]        @relation("CommentRecipient")
   mediaAssets        MediaAsset[]
   activities         CareerActivity[]
+  experiences        Experience[]
+  documents          Document[]
+  testimonialsRcvd   Testimonial[]    @relation("TestimonialRecipient")
 
   @@index([slug])
   @@index([clerkId])
+}
+
+// Experiences are relational rows (not JSON) so media, metrics, documents, and
+// testimonials can attach per-job, and Phase 6 employer search can query them.
+// User.profileData retains only header data: basics, skills, achievements,
+// education, certifications.
+model Experience {
+  id               String   @id @default(cuid())
+  userId           String
+  company          String
+  role             String
+  // ponytail: display-format strings ("Jan 2020", "Present") to match the AI
+  // parse pipeline; add sortable date columns when Phase 6 search needs them.
+  startDate        String
+  endDate          String
+  description      String   @default("")
+  responsibilities String[]
+  companyInfo      Json?    // { website, domain, industry, location, size, description }
+  dayInLife        Json?    // [{ time, activity }]
+  displayOrder     Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metrics      ExperienceMetric[]
+  media        MediaAsset[]
+  documents    Document[]
+  testimonials Testimonial[]
+
+  @@index([userId, displayOrder])
+}
+
+model ExperienceMetric {
+  id           String @id @default(cuid())
+  experienceId String
+  value        String // "$1.2M", "35", "3x"
+  label        String // "revenue managed", "team size"
+
+  experience Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+
+  @@index([experienceId])
+}
+
+// Awards, certifications, recommendation letters — attachable per-job or profile-wide.
+model Document {
+  id           String   @id @default(cuid())
+  userId       String
+  experienceId String?
+  url          String
+  kind         String // "award", "certification", "recommendation", "other"
+  title        String
+  year         String?
+  createdAt    DateTime @default(now())
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experience Experience? @relation(fields: [experienceId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+// W3C Verifiable-Credential-shaped testimonial (PDR A7): issuer + subject +
+// claims + signature slot. Givers don't need an account. Publishes only after
+// owner approval (PDR §5.4). UI ships at Gate C; the shape is locked now.
+model Testimonial {
+  id                String    @id @default(cuid())
+  recipientId       String // subject
+  experienceId      String? // ties the vouch to a specific job
+  issuerName        String
+  issuerEmail       String
+  issuerUserId      String? // set if the giver has a Webume account
+  relationship      String // "coworker", "manager", "direct report", ...
+  sharedCompany     String?
+  body              String
+  status            String    @default("pending") // pending | approved | rejected
+  verificationLevel Int       @default(1) // 1 named, 2 overlap-verified, 3 employer-confirmed
+  vcJwt             String? // signed W3C VC serialization, when issued
+  createdAt         DateTime  @default(now())
+  approvedAt        DateTime?
+
+  recipient  User        @relation("TestimonialRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  experience Experience? @relation(fields: [experienceId], references: [id], onDelete: SetNull)
+
+  @@index([recipientId, status])
 }
 
 model Endorsement {
@@ -74,6 +160,7 @@ model Comment {
 model MediaAsset {
   id           String   @id @default(cuid())
   userId       String
+  experienceId String?
   url          String
   kind         String   // "event", "award", "fundraiser", "promotion", "other"
   caption      String?
@@ -81,7 +168,8 @@ model MediaAsset {
   year         String?
   createdAt    DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experience Experience? @relation(fields: [experienceId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([kind])

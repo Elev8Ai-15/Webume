@@ -5,6 +5,7 @@ import { put } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { parseResumeWithAI } from "@/lib/ai/parse-resume";
+import { saveParsedProfile } from "@/lib/profile/profile.service";
 import type { ActionState } from "@/lib/types/actions";
 import type { ProfileData } from "@/lib/types/profile";
 
@@ -54,6 +55,11 @@ export async function uploadAndParseResume(
     return { success: false, error: "Not authenticated" };
   }
 
+  const user = await db.user.findUnique({ where: { clerkId: userId } });
+  if (!user) {
+    return { success: false, error: "User not found" };
+  }
+
   const file = formData.get("resume") as File | null;
   if (!file || file.size === 0) {
     return { success: false, error: "No file provided" };
@@ -88,14 +94,10 @@ export async function uploadAndParseResume(
     // 3. AI parse
     const profileData = await parseResumeWithAI(rawText);
 
-    // 4. Save to database
-    await db.user.update({
-      where: { clerkId: userId },
-      data: {
-        profileData: JSON.parse(JSON.stringify(profileData)),
-        rawText,
-        resumeUrl: blob.url,
-      },
+    // 4. Save header JSON + relational Experience rows
+    await saveParsedProfile(user.id, profileData, {
+      rawText,
+      resumeUrl: blob.url,
     });
 
     // 5. Revalidate

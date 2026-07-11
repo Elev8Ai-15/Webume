@@ -5,8 +5,8 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { tailorResumeWithAI } from "@/lib/ai/tailor-resume";
 import { isPremiumUser } from "@/lib/stripe/plans";
+import { getProfileByClerkId } from "@/lib/profile/profile.service";
 import type { ActionState } from "@/lib/types/actions";
-import type { ProfileData } from "@/lib/types/profile";
 import type { TailorResult } from "@/lib/ai/tailor-resume";
 
 export async function tailorResume(
@@ -18,18 +18,14 @@ export async function tailorResume(
   const { userId } = await auth();
   if (!userId) return { success: false, error: "Not authenticated" };
 
-  const user = await db.user.findUnique({
-    where: { clerkId: userId },
-    include: { subscription: true },
-  });
-
-  if (!user) return { success: false, error: "User not found" };
+  const result0 = await getProfileByClerkId(userId);
+  if (!result0) return { success: false, error: "User not found" };
+  const { user, profileData } = result0;
 
   if (!isPremiumUser(user.subscription?.planId ?? "free")) {
     return { success: false, error: "Premium subscription required" };
   }
 
-  const profileData = user.profileData as unknown as ProfileData | null;
   if (!profileData) {
     return { success: false, error: "Upload a resume first" };
   }

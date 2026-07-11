@@ -3,10 +3,10 @@ import { after } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import {
-  getUserBySlug,
   incrementProfileViews,
   getUserByClerkId,
 } from "@/lib/repositories/user.repository";
+import { getProfileBySlug } from "@/lib/profile/profile.service";
 import {
   getEndorsementsForUser,
   getCommentsForUser,
@@ -20,7 +20,7 @@ import { CommentsDisplay } from "@/components/social/comments-display";
 import { GalleryDisplay } from "@/components/social/gallery-display";
 import { ActivityFeed } from "@/components/social/activity-feed";
 import { SocialActionsPanel } from "@/components/social/social-actions-panel";
-import type { ProfileData, TemplateId } from "@/lib/types/profile";
+import type { TemplateId } from "@/lib/types/profile";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -28,13 +28,13 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const user = await getUserBySlug(slug);
+  const result = await getProfileBySlug(slug);
 
-  if (!user || !user.isPublic || !user.profileData) {
+  if (!result || !result.user.isPublic || !result.profileData) {
     return { title: "Profile Not Found" };
   }
 
-  const profile = user.profileData as unknown as ProfileData;
+  const profile = result.profileData;
 
   return {
     title: `${profile.basics.name} — ${profile.basics.title}`,
@@ -49,11 +49,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PublicProfilePage({ params }: Props) {
   const { slug } = await params;
-  const user = await getUserBySlug(slug);
+  const result = await getProfileBySlug(slug);
 
-  if (!user || !user.isPublic || !user.profileData) {
+  if (!result || !result.user.isPublic || !result.profileData) {
     notFound();
   }
+  const { user, profileData } = result;
 
   // Determine if the viewer is the profile owner
   const { userId: viewerClerkId } = await auth();
@@ -73,7 +74,6 @@ export default async function PublicProfilePage({ params }: Props) {
     getActivityForUser(user.id),
   ]);
 
-  const profileData = user.profileData as unknown as ProfileData;
   const template = getTemplate(user.selectedTemplate as TemplateId);
   const accent = template.color;
 

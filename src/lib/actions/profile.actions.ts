@@ -16,8 +16,11 @@ export async function updateProfileData(
   const user = await db.user.findUnique({ where: { clerkId: userId } });
   if (!user) return { success: false, error: "User not found" };
 
+  // Experiences live as relational rows now — this action patches header
+  // fields only (basics, skills, achievements, education, certifications).
+  const { experience: _experience, ...headerPatch } = data;
   const existing = (user.profileData as unknown as ProfileData | null) ?? {};
-  const merged = { ...existing, ...data };
+  const merged = { ...existing, ...headerPatch };
 
   await db.user.update({
     where: { clerkId: userId },

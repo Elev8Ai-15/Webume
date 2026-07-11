@@ -1,19 +1,18 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
-import { getUserByClerkId } from "@/lib/repositories/user.repository";
+import { getProfileByClerkId } from "@/lib/profile/profile.service";
 import { TemplateRenderer } from "@/components/templates/template-renderer";
 import { TemplatePicker } from "./template-picker";
-import type { ProfileData, TemplateId } from "@/lib/types/profile";
+import type { TemplateId } from "@/lib/types/profile";
 
 export default async function ProfilePage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
-  const user = await getUserByClerkId(userId);
-  if (!user) redirect("/sign-in");
-
-  const profileData = user.profileData as unknown as ProfileData | null;
+  const result = await getProfileByClerkId(userId);
+  if (!result) redirect("/sign-in");
+  const { user, profileData } = result;
 
   if (!profileData) {
     return (
