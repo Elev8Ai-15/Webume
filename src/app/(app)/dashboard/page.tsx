@@ -8,7 +8,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { CopyLinkButton } from "@/components/copy-link-button";
 import { getUserByClerkId } from "@/lib/repositories/user.repository";
 
 export default async function DashboardPage() {
@@ -27,6 +29,40 @@ export default async function DashboardPage() {
         </p>
       </div>
       <Separator />
+      {hasProfile && !user?.isPublic && (
+        <Card className="border-primary/50">
+          <CardHeader>
+            <CardTitle>Publish your Webume</CardTitle>
+            <CardDescription>
+              Your profile is ready but not public yet. Publish it to get a
+              shareable link.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/settings" className={buttonVariants()}>
+              Publish your Webume
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+      {user?.isPublic && user?.slug && (
+        <Card>
+          <CardHeader>
+            <CardDescription>Your Webume is live</CardDescription>
+            <CardTitle className="text-base font-medium break-all">
+              <Link
+                href={`/p/${user.slug}`}
+                className="text-primary hover:underline"
+              >
+                /p/{user.slug}
+              </Link>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CopyLinkButton slug={user.slug} />
+          </CardContent>
+        </Card>
+      )}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader>

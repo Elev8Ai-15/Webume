@@ -32,14 +32,19 @@ export async function createCheckoutSession(
   });
   if (!user) return { success: false, error: "User not found" };
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!appUrl) {
+    return { success: false, error: "App URL not configured" };
+  }
+
   const stripe = getStripe();
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     payment_method_types: ["card"],
     line_items: [{ price: plan.priceId, quantity: 1 }],
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://youthful-lalande.vercel.app"}/dashboard?upgraded=true`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://youthful-lalande.vercel.app"}/pricing`,
+    success_url: `${appUrl}/dashboard?upgraded=true`,
+    cancel_url: `${appUrl}/pricing`,
     client_reference_id: user.id,
     customer_email: user.email,
     metadata: { userId: user.id, planId },

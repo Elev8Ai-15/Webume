@@ -10,11 +10,9 @@ import type { ActionState } from "@/lib/types/actions";
 import type { ProfileData } from "@/lib/types/profile";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = [
-  "application/pdf",
-  "text/plain",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-];
+// ponytail: DOCX cut for v1 — regex tag-stripping on zipped XML produced
+// garbage; add mammoth-based parsing at Gate B if users ask for it.
+const ALLOWED_TYPES = ["application/pdf", "text/plain"];
 
 async function extractTextFromFile(file: File): Promise<string> {
   const type = file.type;
@@ -41,10 +39,7 @@ async function extractTextFromFile(file: File): Promise<string> {
     return pages.join("\n\n");
   }
 
-  // For DOCX, extract as plain text (basic approach)
-  const text = await file.text();
-  // Strip XML tags for basic DOCX text extraction
-  return text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  throw new Error("Unsupported file type");
 }
 
 export async function uploadAndParseResume(
@@ -72,7 +67,7 @@ export async function uploadAndParseResume(
   if (!ALLOWED_TYPES.includes(file.type)) {
     return {
       success: false,
-      error: "Unsupported file type. Please upload PDF, TXT, or DOCX.",
+      error: "Unsupported file type. Please upload a PDF or TXT file.",
     };
   }
 

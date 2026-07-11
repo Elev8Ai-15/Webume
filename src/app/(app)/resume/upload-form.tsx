@@ -24,14 +24,14 @@ export function UploadForm() {
         <form action={action} className="space-y-4">
           <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-border p-8 text-center">
             <p className="text-sm text-muted-foreground">
-              Upload your resume (PDF, TXT, or DOCX)
+              Upload your resume (PDF or TXT)
             </p>
             <p className="mt-1 text-xs text-muted-foreground">Max 5MB</p>
             <input
               ref={fileRef}
               type="file"
               name="resume"
-              accept=".pdf,.txt,.docx"
+              accept=".pdf,.txt"
               className="mt-4 text-sm"
               required
             />

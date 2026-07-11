@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { auth } from "@clerk/nextjs/server";
@@ -11,14 +12,12 @@ import {
   getEndorsementsForUser,
   getCommentsForUser,
   getMediaForUser,
-  getActivityForUser,
 } from "@/lib/repositories/social.repository";
 import { TemplateRenderer } from "@/components/templates/template-renderer";
 import { getTemplate } from "@/lib/templates/template-registry";
 import { EndorsementsDisplay } from "@/components/social/endorsements-display";
 import { CommentsDisplay } from "@/components/social/comments-display";
 import { GalleryDisplay } from "@/components/social/gallery-display";
-import { ActivityFeed } from "@/components/social/activity-feed";
 import { SocialActionsPanel } from "@/components/social/social-actions-panel";
 import type { TemplateId } from "@/lib/types/profile";
 
@@ -67,11 +66,10 @@ export default async function PublicProfilePage({ params }: Props) {
   }
 
   // Load social data in parallel
-  const [endorsements, comments, media, activities] = await Promise.all([
+  const [endorsements, comments, media] = await Promise.all([
     getEndorsementsForUser(user.id),
     getCommentsForUser(user.id),
     getMediaForUser(user.id),
-    getActivityForUser(user.id),
   ]);
 
   const template = getTemplate(user.selectedTemplate as TemplateId);
@@ -98,12 +96,20 @@ export default async function PublicProfilePage({ params }: Props) {
             accentColor={accent}
           />
 
-          <ActivityFeed activities={activities} accentColor={accent} />
-
           <GalleryDisplay media={media} accentColor={accent} />
 
           <CommentsDisplay comments={comments} accentColor={accent} />
         </div>
+
+        <footer className="pt-4 pb-8 text-center text-sm text-muted-foreground">
+          <Link
+            href="/"
+            className="font-medium text-primary hover:underline"
+          >
+            Create your own Webume — free
+          </Link>
+          <p className="mt-1">The last resume you&apos;ll ever make.</p>
+        </footer>
       </div>
     </div>
   );

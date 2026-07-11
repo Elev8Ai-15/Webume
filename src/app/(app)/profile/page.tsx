@@ -1,5 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getProfileByClerkId } from "@/lib/profile/profile.service";
 import { TemplateRenderer } from "@/components/templates/template-renderer";
@@ -20,12 +22,19 @@ export default async function ProfilePage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
           <p className="text-muted-foreground">
-            You haven&apos;t uploaded a resume yet.{" "}
-            <a href="/resume" className="text-primary hover:underline">
-              Upload one now
-            </a>{" "}
-            to build your profile.
+            No profile yet. Upload a resume, or build one by hand.
           </p>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Link href="/resume" className={buttonVariants()}>
+            Upload resume
+          </Link>
+          <Link
+            href="/profile/edit"
+            className={buttonVariants({ variant: "outline" })}
+          >
+            Start from scratch
+          </Link>
         </div>
       </div>
     );
@@ -33,11 +42,19 @@ export default async function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
-        <p className="text-muted-foreground">
-          Preview your profile and choose a template.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
+          <p className="text-muted-foreground">
+            Preview your profile and choose a template.
+          </p>
+        </div>
+        <Link
+          href="/profile/edit"
+          className={buttonVariants({ variant: "outline" })}
+        >
+          Edit profile
+        </Link>
       </div>
       <Separator />
 
