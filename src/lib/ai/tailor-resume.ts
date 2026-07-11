@@ -1,6 +1,7 @@
 "use server";
 
 import { generateText, Output } from "ai";
+import { google } from "@ai-sdk/google";
 import { z } from "zod";
 import type { ProfileData } from "@/lib/types/profile";
 
@@ -106,7 +107,7 @@ export async function tailorResumeWithAI(
   );
 
   const { output } = await generateText({
-    model: "google/gemini-2.0-flash",
+    model: google("gemini-2.0-flash"),
     output: Output.object({ schema: tailoredProfileSchema }),
     temperature: 0.2,
     maxOutputTokens: 8192,

@@ -1,5 +1,3 @@
-[dotenv@17.3.1] injecting env (0) from .env.local -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
-[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
 

@@ -1,6 +1,7 @@
 "use server";
 
 import { generateText, Output } from "ai";
+import { google } from "@ai-sdk/google";
 import { profileDataSchema } from "@/lib/schemas/profile.schema";
 import type { ProfileData } from "@/lib/types/profile";
 
@@ -25,7 +26,8 @@ export async function parseResumeWithAI(
   rawText: string,
 ): Promise<ProfileData> {
   const { output } = await generateText({
-    model: "google/gemini-2.0-flash",
+    // Direct Google provider (GOOGLE_GENERATIVE_AI_API_KEY) — no AI Gateway.
+    model: google("gemini-2.0-flash"),
     output: Output.object({ schema: profileDataSchema }),
     temperature: 0.1,
     maxOutputTokens: 8192,
