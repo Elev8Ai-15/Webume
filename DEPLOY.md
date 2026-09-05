@@ -18,7 +18,7 @@ Add with `vercel env add <KEY> production --cwd C:/Users/bradg/dev/Webume` (valu
 
 ## Database
 
-First time: `npx prisma migrate deploy` from the repo with `DATABASE_URL` in `.env.local`. Migration `0001_init` creates everything.
+Migrations run automatically on every Vercel build (`build` script = `prisma migrate deploy && next build`). No local DB access needed.
 
 ## Build
 

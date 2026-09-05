@@ -2,6 +2,7 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import type { WebhookEvent } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
+import { createUserFromClerk } from "@/lib/repositories/user.repository";
 
 export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
@@ -42,51 +43,9 @@ export async function POST(req: Request) {
 
     const name =
       [first_name, last_name].filter(Boolean).join(" ") || "User";
-    const baseSlug = name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-
-    // Find unique slug, retry on constraint violation
-    let slug = baseSlug;
-    let counter = 1;
-    while (await db.user.findUnique({ where: { slug } })) {
-      slug = `${baseSlug}-${counter}`;
-      counter++;
-    }
-
-    try {
-      await db.user.create({
-        data: {
-          clerkId: id,
-          email,
-          name,
-          slug,
-          subscription: { create: { planId: "free", status: "active" } },
-          settings: { create: {} },
-        },
-      });
-    } catch (error: unknown) {
-      // Handle race condition on slug uniqueness
-      if (
-        error instanceof Error &&
-        error.message.includes("Unique constraint")
-      ) {
-        slug = `${baseSlug}-${Date.now()}`;
-        await db.user.create({
-          data: {
-            clerkId: id,
-            email,
-            name,
-            slug,
-            subscription: { create: { planId: "free", status: "active" } },
-            settings: { create: {} },
-          },
-        });
-      } else {
-        throw error;
-      }
-    }
+    // ensureUser (app layout) may have created the row already.
+    const exists = await db.user.findUnique({ where: { clerkId: id } });
+    if (!exists) await createUserFromClerk({ clerkId: id, email, name });
   }
 
   if (evt.type === "user.updated") {
