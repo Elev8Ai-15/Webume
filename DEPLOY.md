@@ -18,11 +18,11 @@ Add with `vercel env add <KEY> production --cwd C:/Users/bradg/dev/Webume` (valu
 
 ## Database
 
-Migrations run automatically on every Vercel build (`build` script = `prisma migrate deploy && next build`). No local DB access needed.
+Migrations run automatically on every Vercel build (`build` script = `prisma generate && prisma migrate deploy && next build`; the generated client is gitignored). No local DB access needed.
 
 ## Build
 
-`next build`. Prisma client is committed under `src/generated/prisma`; regenerate with `npx prisma generate` after any schema change.
+`next build`. Prisma client is gitignored and generated at build time.
 
 ## L4 check (real request, after deploy)
 
