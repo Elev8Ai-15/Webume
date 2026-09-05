@@ -7,11 +7,11 @@ Vercel project `webume` (team `bradgpowell1123-2659s-projects`), GitHub-linked t
 | Key | Source | Status |
 |---|---|---|
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob store `webume` (store_X1RD8tnhvUaKNEth), auto-injected | set 2026-09-05 |
-| `DATABASE_URL` | Postgres (Neon via Vercel Marketplace or Supabase) | pending |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | Clerk app "Webume", dashboard.clerk.com → API Keys | pending (Brad) |
+| `DATABASE_URL` | Neon via Vercel Marketplace, resource `webume`, auto-injected | set 2026-09-05 |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | Clerk app "Webume", dashboard.clerk.com → API Keys | set 2026-09-05 |
 | `CLERK_WEBHOOK_SECRET` | Clerk → Webhooks → endpoint `https://<prod-url>/api/webhooks/clerk`, event `user.created`/`user.updated`/`user.deleted` | after first deploy |
-| `ANTHROPIC_API_KEY` | shared Anthropic org (same key ResolveAI uses) | Abe sets |
-| `NEXT_PUBLIC_APP_URL` | production URL, no trailing slash | after first deploy |
+| `ANTHROPIC_API_KEY` | shared Anthropic org | set 2026-09-05 |
+| `NEXT_PUBLIC_APP_URL` | https://webume-bradgpowell1123-2659s-projects.vercel.app | set 2026-09-05 |
 | `STRIPE_*` | not needed until Pro checkout ships | skip |
 
 Add with `vercel env add <KEY> production --cwd C:/Users/bradg/dev/Webume` (value from stdin, never on the command line).
@@ -30,6 +30,10 @@ Migrations run automatically on every Vercel build (`build` script = `prisma gen
 2. Sign up → dashboard loads (proves Clerk + DB).
 3. Publish profile → open `https://<prod-url>/p/<slug>` logged out on a phone.
 4. `vercel logs <deployment-url>` shows the `/p/<slug>` request.
+
+## Access
+
+Vercel Authentication is OFF for this project (free plan has no preview-only mode; Standard blocks every *.vercel.app URL). Production URL: https://webume-bradgpowell1123-2659s-projects.vercel.app
 
 ## Rollback
 
