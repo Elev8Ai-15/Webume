@@ -6,7 +6,7 @@ Canonical product decisions live in the PDR (`dev/my-assistant/notes/webume-buil
 
 ## Stack
 
-Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind v4 + shadcn/ui · Prisma 7 + Neon Postgres · Clerk (auth) · Vercel Blob (uploads) · Stripe (subscriptions) · Gemini 2.0 Flash via Vercel AI Gateway (resume parsing, tailoring)
+Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind v4 + shadcn/ui · Prisma 7 + Neon Postgres · Clerk (auth) · Vercel Blob (uploads) · Stripe (subscriptions) · Claude Opus 5 via `@ai-sdk/anthropic` (resume parsing, tailoring)
 
 ## Architecture notes
 

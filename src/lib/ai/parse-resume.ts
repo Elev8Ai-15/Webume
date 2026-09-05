@@ -1,21 +1,20 @@
 "use server";
 
 import { generateText, Output } from "ai";
-import { google } from "@ai-sdk/google";
+import { anthropic } from "@ai-sdk/anthropic";
 import { profileDataSchema } from "@/lib/schemas/profile.schema";
 import type { ProfileData } from "@/lib/types/profile";
 
 const PARSE_PROMPT = `You are an expert resume parser. Analyze the following resume/CV text and extract structured information.
 
 IMPORTANT INSTRUCTIONS:
-- Extract ALL information accurately from the text
-- For each work experience, provide detailed responsibilities (5-8 bullet points)
-- Generate a "day in the life" narrative (3-5 entries) showing what a typical workday looks like in that role
-- Extract or estimate performance metrics where possible
-- For company info, include what you know about the company (industry, size, location)
-- Generate a professional tagline based on the person's experience
-- Extract 15-25 relevant skills
-- If information is not available, use empty strings, not null
+- Extract ONLY what the text states. Never invent or estimate employers, titles, dates, metrics, or achievements. A missing fact stays empty.
+- For each work experience, list the responsibilities the text supports (rephrase for clarity; do not add new ones)
+- Metrics only when the text gives a number; otherwise leave metrics empty
+- Company info only as stated in the text (location, industry); leave the rest empty
+- Write a one-line professional tagline that summarizes the stated experience
+- List the skills the text supports
+- If information is not available, use empty strings or empty arrays, not null
 - Ensure all dates are in "Mon YYYY" format (e.g., "Jan 2020")
 - For current positions, use "Present" as the end date
 
@@ -26,11 +25,10 @@ export async function parseResumeWithAI(
   rawText: string,
 ): Promise<ProfileData> {
   const { output } = await generateText({
-    // Direct Google provider (GOOGLE_GENERATIVE_AI_API_KEY) — no AI Gateway.
-    model: google("gemini-2.0-flash"),
+    // Anthropic direct (ANTHROPIC_API_KEY). Opus 5 rejects temperature; omit it.
+    model: anthropic("claude-opus-5"),
     output: Output.object({ schema: profileDataSchema }),
-    temperature: 0.1,
-    maxOutputTokens: 8192,
+    maxOutputTokens: 16000,
     prompt: PARSE_PROMPT + rawText,
   });
 
