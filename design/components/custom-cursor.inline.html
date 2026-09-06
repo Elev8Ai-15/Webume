@@ -1,0 +1,29 @@
+<style>
+.lx-cursor-dot,.lx-cursor-ring{position:fixed;top:0;left:0;border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:difference}
+.lx-cursor-dot{width:6px;height:6px;background:#fff}
+.lx-cursor-ring{width:34px;height:34px;border:1px solid #fff;transition:width .25s ease,height .25s ease}
+@media (pointer:coarse){.lx-cursor-dot,.lx-cursor-ring{display:none}}
+</style>
+<script>
+(function(){
+  if(!matchMedia('(pointer:fine)').matches)return;
+  if(document.querySelector('.lx-cursor-dot'))return; /* idempotent: pasted twice = one cursor */
+  var d=document.createElement('div');d.className='lx-cursor-dot';
+  var g=document.createElement('div');g.className='lx-cursor-ring';
+  document.body.append(d,g);
+  var x=innerWidth/2,y=innerHeight/2,rx=x,ry=y,running=false;
+  function loop(){
+    rx+=(x-rx)*0.14;ry+=(y-ry)*0.14;
+    g.style.transform='translate('+rx+'px,'+ry+'px) translate(-50%,-50%)';
+    /* idle when the ring has caught up — no permanent 60Hz tick */
+    if(Math.abs(x-rx)+Math.abs(y-ry)>0.2){requestAnimationFrame(loop);}else{running=false;}
+  }
+  addEventListener('mousemove',function(e){x=e.clientX;y=e.clientY;
+    d.style.transform='translate('+x+'px,'+y+'px) translate(-50%,-50%)';
+    if(!running){running=true;requestAnimationFrame(loop);}});
+  document.querySelectorAll('a,button').forEach(function(el){
+    el.addEventListener('mouseenter',function(){g.style.width='52px';g.style.height='52px';});
+    el.addEventListener('mouseleave',function(){g.style.width='34px';g.style.height='34px';});
+  });
+})();
+</script>

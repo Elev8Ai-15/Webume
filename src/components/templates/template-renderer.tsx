@@ -19,11 +19,13 @@ export function TemplateRenderer({
   profilePhoto,
 }: Props) {
   const template = getTemplate(templateId);
-  const accent = template.color;
+  // One system for every profile (Vision Plan v2: one template, done well).
+  // Template color skins are ignored; the signature color comes from the tokens.
+  const accent = "var(--primary)";
 
   return (
     <div
-      className="mx-auto max-w-3xl space-y-8 rounded-xl border bg-card p-8"
+      className="relative mx-auto max-w-3xl space-y-10 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:p-10"
       data-template={templateId}
       style={
         {
@@ -32,6 +34,7 @@ export function TemplateRenderer({
         } as React.CSSProperties
       }
     >
+      <div className="lx-spark-line absolute inset-x-0 top-0" aria-hidden="true" />
       <ProfileHero
         basics={profileData.basics}
         profilePhoto={profilePhoto}

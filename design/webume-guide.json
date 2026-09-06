@@ -1,0 +1,394 @@
+{
+  "archetypeId": "webume-career-ink",
+  "pairingId": "fraunces-manrope",
+  "colors": [
+    {
+      "name": "Background",
+      "rationale": "The canvas. Sets the mood before a single word is read.",
+      "base": "#0b1020",
+      "scale": {
+        "50": "#f4f5f8",
+        "100": "#e2e6ef",
+        "200": "#c1cae2",
+        "300": "#92a3d3",
+        "400": "#617bc7",
+        "500": "#3f5bb6",
+        "600": "#344a98",
+        "700": "#2b3973",
+        "800": "#232b53",
+        "900": "#191d33",
+        "950": "#11121d"
+      }
+    },
+    {
+      "name": "Surface",
+      "rationale": "Raised material for cards and panels — subtle separation from the canvas.",
+      "base": "#141b2e",
+      "scale": {
+        "50": "#f5f6f8",
+        "100": "#e3e7ed",
+        "200": "#c4ccde",
+        "300": "#98a8cd",
+        "400": "#6b82bd",
+        "500": "#4a64ab",
+        "600": "#3e528e",
+        "700": "#323f6c",
+        "800": "#272f4e",
+        "900": "#1c1f31",
+        "950": "#12131c"
+      }
+    },
+    {
+      "name": "Primary",
+      "rationale": "The signature accent. Used sparingly on the moments that matter.",
+      "base": "#f0b35b",
+      "scale": {
+        "50": "#f9f6f3",
+        "100": "#f3e8dd",
+        "200": "#edd3b5",
+        "300": "#ebb97a",
+        "400": "#eaa13d",
+        "500": "#e08d15",
+        "600": "#bb7811",
+        "700": "#8d5f11",
+        "800": "#644812",
+        "900": "#3d2f10",
+        "950": "#221c0c"
+      }
+    },
+    {
+      "name": "Accent",
+      "rationale": "A lighter partner to Primary for highlights and hover states.",
+      "base": "#ffd08a",
+      "scale": {
+        "50": "#faf6f2",
+        "100": "#f5e8db",
+        "200": "#f3d4af",
+        "300": "#f6bb6f",
+        "400": "#fca62c",
+        "500": "#f59200",
+        "600": "#cc7d00",
+        "700": "#996405",
+        "800": "#6c4b09",
+        "900": "#41310b",
+        "950": "#241d0a"
+      }
+    },
+    {
+      "name": "Text",
+      "rationale": "Primary reading color, tuned for comfort over long passages.",
+      "base": "#f3f4f8",
+      "scale": {
+        "50": "#f5f6f7",
+        "100": "#e5e7ec",
+        "200": "#c8cdda",
+        "300": "#a1a9c4",
+        "400": "#7984af",
+        "500": "#5a679b",
+        "600": "#4b5581",
+        "700": "#3b4263",
+        "800": "#2e3148",
+        "900": "#1f212d",
+        "950": "#14141a"
+      }
+    },
+    {
+      "name": "Muted",
+      "rationale": "Secondary text and meta — present but never competing.",
+      "base": "#9aa3b8",
+      "scale": {
+        "50": "#f5f6f7",
+        "100": "#e6e8ea",
+        "200": "#cbcfd7",
+        "300": "#a7afbe",
+        "400": "#828da6",
+        "500": "#657290",
+        "600": "#545e78",
+        "700": "#42495c",
+        "800": "#323643",
+        "900": "#22232b",
+        "950": "#151519"
+      }
+    }
+  ],
+  "onPrimary": "#12100e",
+  "typography": [
+    {
+      "name": "Display",
+      "family": "Fraunces, Georgia, serif",
+      "role": "Hero statements",
+      "sizePx": 61,
+      "lineHeight": 1.02,
+      "weight": 600,
+      "letterSpacing": "-0.02em"
+    },
+    {
+      "name": "H1",
+      "family": "Fraunces, Georgia, serif",
+      "role": "Page titles",
+      "sizePx": 49,
+      "lineHeight": 1.08,
+      "weight": 600,
+      "letterSpacing": "-0.015em"
+    },
+    {
+      "name": "H2",
+      "family": "Fraunces, Georgia, serif",
+      "role": "Section titles",
+      "sizePx": 39,
+      "lineHeight": 1.15,
+      "weight": 600,
+      "letterSpacing": "-0.01em"
+    },
+    {
+      "name": "H3",
+      "family": "Fraunces, Georgia, serif",
+      "role": "Subsections",
+      "sizePx": 31,
+      "lineHeight": 1.25,
+      "weight": 600,
+      "letterSpacing": "0"
+    },
+    {
+      "name": "Body Large",
+      "family": "Manrope, 'Segoe UI', system-ui, sans-serif",
+      "role": "Lead paragraphs",
+      "sizePx": 20,
+      "lineHeight": 1.6,
+      "weight": 400,
+      "letterSpacing": "0"
+    },
+    {
+      "name": "Body",
+      "family": "Manrope, 'Segoe UI', system-ui, sans-serif",
+      "role": "Default text",
+      "sizePx": 16,
+      "lineHeight": 1.65,
+      "weight": 400,
+      "letterSpacing": "0"
+    },
+    {
+      "name": "Caption",
+      "family": "Manrope, 'Segoe UI', system-ui, sans-serif",
+      "role": "Labels, meta",
+      "sizePx": 13,
+      "lineHeight": 1.5,
+      "weight": 500,
+      "letterSpacing": "0.02em"
+    }
+  ],
+  "spacing": {
+    "base": 4,
+    "ratio": 1.5,
+    "steps": [
+      {
+        "name": "3xs",
+        "px": 4
+      },
+      {
+        "name": "2xs",
+        "px": 6
+      },
+      {
+        "name": "xs",
+        "px": 9
+      },
+      {
+        "name": "sm",
+        "px": 14
+      },
+      {
+        "name": "md",
+        "px": 20
+      },
+      {
+        "name": "lg",
+        "px": 30
+      },
+      {
+        "name": "xl",
+        "px": 46
+      },
+      {
+        "name": "2xl",
+        "px": 68
+      },
+      {
+        "name": "3xl",
+        "px": 103
+      }
+    ]
+  },
+  "elevation": [
+    {
+      "name": "flat",
+      "level": 0,
+      "shadow": "none"
+    },
+    {
+      "name": "raised",
+      "level": 1,
+      "shadow": "0 6px 16px -2px rgba(0,0,0,0.15), 0 3px 8px -1px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.14)"
+    },
+    {
+      "name": "floating",
+      "level": 2,
+      "shadow": "0 12px 32px -4px rgba(0,0,0,0.19), 0 6px 16px -2px rgba(0,0,0,0.34), 0 1px 2px rgba(0,0,0,0.14)"
+    },
+    {
+      "name": "overlay",
+      "level": 3,
+      "shadow": "0 18px 48px -6px rgba(0,0,0,0.22), 0 9px 24px -3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.14)"
+    },
+    {
+      "name": "modal",
+      "level": 4,
+      "shadow": "0 24px 64px -8px rgba(0,0,0,0.25), 0 12px 32px -4px rgba(0,0,0,0.46), 0 1px 2px rgba(0,0,0,0.14)"
+    }
+  ],
+  "motion": [
+    {
+      "name": "instant",
+      "durationMs": 80,
+      "easing": "cubic-bezier(0.25, 1, 0.5, 1)",
+      "role": "State flips, toggles"
+    },
+    {
+      "name": "quick",
+      "durationMs": 144,
+      "easing": "cubic-bezier(0.25, 1, 0.5, 1)",
+      "role": "Hover, focus, small reveals"
+    },
+    {
+      "name": "base",
+      "durationMs": 208,
+      "easing": "cubic-bezier(0.25, 1, 0.5, 1)",
+      "role": "Default transitions"
+    },
+    {
+      "name": "slow",
+      "durationMs": 336,
+      "easing": "cubic-bezier(0.25, 1, 0.5, 1)",
+      "role": "Panels, drawers, modals"
+    },
+    {
+      "name": "entrance",
+      "durationMs": 496,
+      "easing": "cubic-bezier(0.25, 1, 0.5, 1)",
+      "role": "First-paint hero reveals"
+    }
+  ],
+  "depth": {
+    "name": "depth",
+    "perspectivePx": 1200,
+    "tiltDeg": 4,
+    "liftPx": 8,
+    "layers": [
+      0,
+      8,
+      20,
+      40
+    ]
+  },
+  "atmosphere": {
+    "style": "spotlight",
+    "intensity": "restrained",
+    "grainOpacity": 0.04,
+    "driftSeconds": 30,
+    "html": "<div class=\"lx-atmo\" aria-hidden=\"true\"></div>",
+    "css": ".lx-atmo{position:absolute;inset:0;overflow:hidden;pointer-events:none;background:#0b1020;background-image:radial-gradient(60% 55% at 50% 0%, rgba(240,179,91,0.1), transparent 70%);}\n.lx-atmo::after{content:\"\";position:absolute;inset:0;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\");opacity:0.04;mix-blend-mode:overlay}\n@media (prefers-reduced-motion: reduce){.lx-atmo,.lx-atmo *{animation:none !important}}",
+    "spec": "soft radial spotlight of #f0b35b at 0.1 alpha falling from top center onto #0b1020, grain 0.04"
+  },
+  "entrances": [
+    {
+      "id": "mask-reveal",
+      "name": "Mask Reveal",
+      "staggerMs": 60,
+      "spec": "headline lines rise from behind an overflow mask — 496ms quart-out, one line per 60ms",
+      "css": ".lx-mask{display:block;overflow:hidden}\n.lx-mask > *{display:block;transform:translateY(110%);animation:lx-rise 496ms cubic-bezier(0.25, 1, 0.5, 1) forwards}\n.lx-mask:nth-child(2) > *{animation-delay:60ms}\n.lx-mask:nth-child(3) > *{animation-delay:120ms}\n@keyframes lx-rise{to{transform:translateY(0)}}\n@media (prefers-reduced-motion: reduce){.lx-mask > *{animation:none;transform:none}}"
+    },
+    {
+      "id": "stagger-cascade",
+      "name": "Stagger Cascade",
+      "staggerMs": 60,
+      "spec": "siblings fade up 12px in sequence — 347ms quart-out, 60ms apart, total under 1s",
+      "css": ".lx-cascade > *{opacity:0;transform:translateY(12px);animation:lx-fade-up 347ms cubic-bezier(0.25, 1, 0.5, 1) forwards}\n.lx-cascade > *:nth-child(2){animation-delay:60ms}\n.lx-cascade > *:nth-child(3){animation-delay:120ms}\n.lx-cascade > *:nth-child(4){animation-delay:180ms}\n.lx-cascade > *:nth-child(5){animation-delay:240ms}\n@keyframes lx-fade-up{to{opacity:1;transform:translateY(0)}}\n@media (prefers-reduced-motion: reduce){.lx-cascade > *{animation-duration:1ms;transform:none}}"
+    }
+  ],
+  "counterpart": {
+    "mode": "light",
+    "palette": {
+      "background": "#faf7f1",
+      "surface": "#f0ede7",
+      "primary": "#9a610e",
+      "accent": "#945900",
+      "text": "#262017",
+      "muted": "#706c66",
+      "onPrimary": "#faf9f6"
+    },
+    "contrastReport": [
+      {
+        "pair": "Primary on Background (light)",
+        "ratio": 4.8,
+        "passesAA": true,
+        "adjusted": true
+      },
+      {
+        "pair": "Text on Background (light)",
+        "ratio": 15.09,
+        "passesAA": true,
+        "adjusted": false
+      },
+      {
+        "pair": "Ink on Primary fill (light)",
+        "ratio": 4.88,
+        "passesAA": true,
+        "adjusted": true
+      },
+      {
+        "pair": "Accent on Background (light)",
+        "ratio": 5.32,
+        "passesAA": true,
+        "adjusted": true
+      },
+      {
+        "pair": "Muted on Background (light)",
+        "ratio": 4.88,
+        "passesAA": true,
+        "adjusted": true
+      }
+    ]
+  },
+  "contrastReport": [
+    {
+      "pair": "Accent on Background",
+      "ratio": 13.2,
+      "passesAA": true,
+      "adjusted": false
+    },
+    {
+      "pair": "Text on Background",
+      "ratio": 17.23,
+      "passesAA": true,
+      "adjusted": false
+    },
+    {
+      "pair": "Muted on Background",
+      "ratio": 7.49,
+      "passesAA": true,
+      "adjusted": false
+    },
+    {
+      "pair": "Text on Surface",
+      "ratio": 15.58,
+      "passesAA": true,
+      "adjusted": false
+    },
+    {
+      "pair": "Ink on Primary fill (buttons)",
+      "ratio": 10.22,
+      "passesAA": true,
+      "adjusted": true
+    }
+  ]
+}

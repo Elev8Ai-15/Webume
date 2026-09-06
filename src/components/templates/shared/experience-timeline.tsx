@@ -9,61 +9,67 @@ export function ExperienceTimeline({ experiences, accentColor }: Props) {
   if (experiences.length === 0) return null;
 
   return (
-    <div className="space-y-6">
-      <h2
-        className="text-lg font-semibold uppercase tracking-wider"
-        style={{ color: accentColor }}
-      >
+    <section className="space-y-6">
+      <h2 className="text-xs font-semibold tracking-[0.2em] uppercase" style={{ color: accentColor }}>
         Experience
       </h2>
-      <div className="space-y-8">
+      <div className="space-y-4">
         {experiences.map((exp, i) => (
-          <div key={i} className="relative border-l-2 pl-6" style={{ borderColor: accentColor }}>
-            <div
-              className="absolute -left-[7px] top-1 h-3 w-3 rounded-full"
-              style={{ backgroundColor: accentColor }}
-            />
-            <div className="space-y-2">
+          <article
+            key={i}
+            className="relative overflow-hidden rounded-2xl border border-border bg-background/40 p-6"
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
               <div>
-                <h3 className="font-semibold">{exp.role}</h3>
-                <p className="text-sm" style={{ color: accentColor }}>
+                <h3 className="text-2xl leading-snug">{exp.role}</h3>
+                <p className="text-base font-medium" style={{ color: accentColor }}>
                   {exp.company}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {exp.startDate} — {exp.endDate}
-                </p>
               </div>
-              {exp.description && (
-                <p className="text-sm text-muted-foreground">
-                  {exp.description}
-                </p>
-              )}
-              {exp.responsibilities.length > 0 && (
-                <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                  {exp.responsibilities.map((r, j) => (
-                    <li key={j}>{r}</li>
-                  ))}
-                </ul>
-              )}
-              {exp.metrics.length > 0 && (
-                <div className="flex flex-wrap gap-3">
-                  {exp.metrics.map((m, j) => (
-                    <div
-                      key={j}
-                      className="rounded-md border px-3 py-1 text-center"
-                    >
-                      <p className="text-sm font-semibold" style={{ color: accentColor }}>
-                        {m.value}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{m.label}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <p className="text-sm text-muted-foreground">
+                {exp.startDate} &ndash; {exp.endDate}
+              </p>
             </div>
-          </div>
+
+            {exp.description && (
+              <p className="mt-4 text-[15px] leading-relaxed text-foreground/85">
+                {exp.description}
+              </p>
+            )}
+
+            {exp.metrics.length > 0 && (
+              <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {exp.metrics.map((m, j) => (
+                  <div
+                    key={j}
+                    className="rounded-lg border border-border bg-card px-3 py-3 text-center"
+                  >
+                    <p className="font-heading text-2xl" style={{ color: accentColor }}>
+                      {m.value}
+                    </p>
+                    <p className="mt-1 text-[11px] text-muted-foreground">{m.label}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {exp.responsibilities.length > 0 && (
+              <ul className="mt-5 space-y-2 text-[15px] leading-relaxed text-foreground/85">
+                {exp.responsibilities.map((r, j) => (
+                  <li key={j} className="flex gap-3">
+                    <span
+                      className="mt-[11px] h-1.5 w-1.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: accentColor }}
+                      aria-hidden="true"
+                    />
+                    <span>{r}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </article>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

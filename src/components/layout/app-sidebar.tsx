@@ -21,9 +21,9 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 border-r border-border bg-card md:block">
-      <div className="flex h-14 items-center border-b border-border px-4">
-        <Link href="/dashboard" className="text-lg font-semibold">
+    <aside className="hidden w-64 border-r border-border bg-sidebar md:block">
+      <div className="flex h-16 items-center border-b border-border px-5">
+        <Link href="/dashboard" className="font-heading text-2xl">
           Webume
         </Link>
       </div>

@@ -9,7 +9,7 @@ export function SkillsSection({ skills, accentColor }: Props) {
   return (
     <div className="space-y-3">
       <h2
-        className="text-lg font-semibold uppercase tracking-wider"
+        className="text-xs font-semibold tracking-[0.2em] uppercase"
         style={{ color: accentColor }}
       >
         Skills
@@ -18,8 +18,7 @@ export function SkillsSection({ skills, accentColor }: Props) {
         {skills.map((skill, i) => (
           <span
             key={i}
-            className="rounded-full border px-3 py-1 text-xs"
-            style={{ borderColor: accentColor, color: accentColor }}
+            className="rounded-full border border-border bg-background/50 px-3 py-1.5 text-sm text-foreground/90"
           >
             {skill}
           </span>

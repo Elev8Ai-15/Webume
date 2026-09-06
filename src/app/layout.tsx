@@ -1,24 +1,28 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Manrope } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// LuxeCraft pairing "fraunces-manrope" (design/webume-guide.json).
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
+  weight: ["400", "600"],
+  axes: ["opsz"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "Webume — Your Living Career Story",
+  title: "Webume — The last resume you'll ever make",
   description:
-    "Not just a resume. A verified, organic timeline of your professional journey.",
+    "Never rebuild your resume again. Build your career profile once, update it forever, and share it as a link.",
 };
 
 export default function RootLayout({
@@ -34,7 +38,7 @@ export default function RootLayout({
     >
       <html
         lang="en"
-        className={`${geistSans.variable} ${geistMono.variable} dark`}
+        className={`${fraunces.variable} ${manrope.variable} dark`}
       >
         <body className="min-h-screen bg-background text-foreground antialiased">
           <TooltipProvider>{children}</TooltipProvider>

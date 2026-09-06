@@ -73,18 +73,18 @@ export default async function PublicProfilePage({ params }: Props) {
   ]);
 
   const template = getTemplate(user.selectedTemplate as TemplateId);
-  const accent = template.color;
+  const accent = "var(--primary)";
 
   return (
-    <div className="min-h-screen bg-background py-12">
-      <div className="mx-auto max-w-3xl space-y-8 px-4">
+    <div className="relative min-h-screen bg-background py-10 sm:py-14"><div className="lx-atmo" aria-hidden="true" />
+      <div className="relative mx-auto max-w-3xl space-y-8 px-4">
         <TemplateRenderer
           profileData={profileData}
           templateId={user.selectedTemplate as TemplateId}
           profilePhoto={user.profilePhoto}
         />
 
-        <div className="space-y-8 rounded-xl border bg-card p-8">
+        <div className="space-y-8 rounded-2xl border border-border bg-card p-6 sm:p-10">
           <SocialActionsPanel
             recipientSlug={slug}
             isOwner={isOwner}

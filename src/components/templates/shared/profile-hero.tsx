@@ -7,12 +7,20 @@ interface Props {
 }
 
 export function ProfileHero({ basics, profilePhoto, accentColor }: Props) {
+  const contacts = [
+    basics.location,
+    basics.email,
+    basics.phone,
+    basics.linkedin,
+    basics.website,
+  ].filter(Boolean) as string[];
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-start gap-6">
-        {profilePhoto && (
+    <div className="space-y-6">
+      <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+        {profilePhoto ? (
           <div
-            className="h-24 w-24 shrink-0 overflow-hidden rounded-full border-2"
+            className="h-28 w-28 shrink-0 overflow-hidden rounded-2xl border-2 shadow-lg"
             style={{ borderColor: accentColor }}
           >
             <img
@@ -21,29 +29,41 @@ export function ProfileHero({ basics, profilePhoto, accentColor }: Props) {
               className="h-full w-full object-cover"
             />
           </div>
+        ) : (
+          <div
+            className="flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl border bg-secondary font-heading text-4xl"
+            style={{ color: accentColor }}
+            aria-hidden="true"
+          >
+            {basics.name?.trim().charAt(0) || "W"}
+          </div>
         )}
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold">{basics.name}</h1>
-          <p className="text-xl" style={{ color: accentColor }}>
+        <div className="min-w-0 space-y-2">
+          <h1 className="text-4xl leading-tight sm:text-5xl">{basics.name}</h1>
+          <p className="text-xl font-medium" style={{ color: accentColor }}>
             {basics.title}
           </p>
           {basics.tagline && (
-            <p className="text-sm text-muted-foreground">{basics.tagline}</p>
+            <p className="text-base text-muted-foreground">{basics.tagline}</p>
           )}
         </div>
       </div>
 
-      {/* Contact chips */}
-      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-        {basics.email && <span>{basics.email}</span>}
-        {basics.phone && <span>{basics.phone}</span>}
-        {basics.location && <span>{basics.location}</span>}
-        {basics.linkedin && <span>{basics.linkedin}</span>}
-        {basics.website && <span>{basics.website}</span>}
-      </div>
+      {contacts.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {contacts.map((c) => (
+            <span
+              key={c}
+              className="rounded-full border border-border bg-background/50 px-3 py-1 text-xs text-muted-foreground"
+            >
+              {c}
+            </span>
+          ))}
+        </div>
+      )}
 
       {basics.summary && (
-        <p className="text-sm leading-relaxed text-muted-foreground">
+        <p className="max-w-prose text-[15px] leading-relaxed text-foreground/85">
           {basics.summary}
         </p>
       )}

@@ -1,0 +1,12 @@
+<style>
+.lx-float{position:relative;height:180px;overflow:hidden}
+.lx-float i{position:absolute;display:block;animation:lx-drift 9s ease-in-out infinite alternate}
+.lx-float .lx-f1{width:52px;height:52px;left:18%;top:30%;border:1px solid rgba(240,179,91,0.5);border-radius:50%}
+.lx-float .lx-f2{width:10px;height:10px;left:55%;top:22%;background:#ffd08a;border-radius:50%;animation-delay:-3s;animation-duration:11s}
+.lx-float .lx-f3{width:88px;height:88px;left:72%;top:40%;border:1px solid rgba(255,208,138,0.3);border-radius:50%;animation-delay:-6s;animation-duration:13s}
+@keyframes lx-drift{from{transform:translateY(-9px) rotate(-2deg)}to{transform:translateY(9px) rotate(2deg)}}
+@media (prefers-reduced-motion: reduce){.lx-float i{animation:none}}
+</style>
+<div class="lx-float" aria-hidden="true">
+  <i class="lx-f1"></i><i class="lx-f2"></i><i class="lx-f3"></i>
+</div>
