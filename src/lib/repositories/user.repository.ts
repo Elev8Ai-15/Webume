@@ -26,9 +26,15 @@ export async function createUserFromClerk(input: {
   try {
     return await db.user.create({ data });
   } catch (error: unknown) {
-    // Race on slug uniqueness: retry once with a timestamp suffix.
+    // A webhook and the app layout can create the same Clerk user concurrently.
     if (error instanceof Error && error.message.includes("Unique constraint")) {
-      return db.user.create({ data: { ...data, slug: `${baseSlug}-${Date.now()}` } });
+      const existing = await db.user.findUnique({
+        where: { clerkId: input.clerkId },
+      });
+      if (existing) return existing;
+      return db.user.create({
+        data: { ...data, slug: `${baseSlug}-${Date.now()}` },
+      });
     }
     throw error;
   }
@@ -43,7 +49,8 @@ export async function ensureUser() {
   if (!cu) return null;
   const existing = await db.user.findUnique({ where: { clerkId: cu.id } });
   if (existing) return existing;
-  const email = cu.primaryEmailAddress?.emailAddress ?? cu.emailAddresses[0]?.emailAddress;
+  const email =
+    cu.primaryEmailAddress?.emailAddress ?? cu.emailAddresses[0]?.emailAddress;
   if (!email) return null;
   const name = [cu.firstName, cu.lastName].filter(Boolean).join(" ") || "User";
   return createUserFromClerk({ clerkId: cu.id, email, name });

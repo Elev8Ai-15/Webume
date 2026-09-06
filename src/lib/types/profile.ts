@@ -30,6 +30,7 @@ export interface Metric {
 }
 
 export interface Experience {
+  id?: string;
   company: string;
   companyInfo: CompanyInfo;
   role: string;

@@ -2,6 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { profileDataSchema } from "@/lib/schemas/profile.schema";
 import { db } from "@/lib/db";
 import { VALID_TEMPLATES } from "@/lib/types/profile";
 import type { ActionState } from "@/lib/types/actions";
@@ -18,7 +19,12 @@ export async function updateProfileData(
 
   // Experiences live as relational rows now — this action patches header
   // fields only (basics, skills, achievements, education, certifications).
-  const { experience: _experience, ...headerPatch } = data;
+  const parsed = profileDataSchema
+    .omit({ experience: true })
+    .partial()
+    .safeParse(data);
+  if (!parsed.success) return { success: false, error: "Invalid profile data" };
+  const headerPatch = parsed.data;
   const existing = (user.profileData as unknown as ProfileData | null) ?? {};
   const merged = { ...existing, ...headerPatch };
 
@@ -55,19 +61,31 @@ export async function updateTemplate(
   return { success: true, data: undefined };
 }
 
-export async function togglePublic(
-  isPublic: boolean,
-): Promise<ActionState> {
+export async function togglePublic(isPublic: boolean): Promise<ActionState> {
   const { userId } = await auth();
   if (!userId) return { success: false, error: "Not authenticated" };
 
-  await db.user.update({
-    where: { clerkId: userId },
-    data: { isPublic },
-  });
-
+  if (typeof isPublic !== "boolean")
+    return { success: false, error: "Invalid visibility" };
+  const user = await db.user.findUnique({ where: { clerkId: userId } });
+  if (!user) return { success: false, error: "User not found" };
+  const header = profileDataSchema
+    .omit({ experience: true })
+    .safeParse(user.profileData);
+  if (
+    isPublic &&
+    (!user.slug || !header.success || !header.data.basics.name.trim())
+  ) {
+    return {
+      success: false,
+      error: "Save your profile name and public URL before publishing.",
+    };
+  }
+  await db.user.update({ where: { id: user.id }, data: { isPublic } });
   revalidatePath("/dashboard");
   revalidatePath("/settings");
+  revalidatePath("/profile");
+  if (user.slug) revalidatePath(`/p/${user.slug}`);
 
   return { success: true, data: undefined };
 }

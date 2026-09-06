@@ -1,7 +1,6 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { put } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { parseResumeWithAI } from "@/lib/ai/parse-resume";
@@ -9,7 +8,7 @@ import { saveParsedProfile } from "@/lib/profile/profile.service";
 import type { ActionState } from "@/lib/types/actions";
 import type { ProfileData } from "@/lib/types/profile";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
 // ponytail: DOCX cut for v1 — regex tag-stripping on zipped XML produced
 // garbage; add mammoth-based parsing at Gate B if users ask for it.
 const ALLOWED_TYPES = ["application/pdf", "text/plain"];
@@ -27,13 +26,13 @@ export async function uploadAndParseResume(
     return { success: false, error: "User not found" };
   }
 
-  const file = formData.get("resume") as File | null;
-  if (!file || file.size === 0) {
+  const file = formData.get("resume");
+  if (!(file instanceof File) || file.size === 0) {
     return { success: false, error: "No file provided" };
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    return { success: false, error: "File too large (max 5MB)" };
+    return { success: false, error: "File too large (max 4MB)" };
   }
 
   if (!ALLOWED_TYPES.includes(file.type)) {
@@ -43,17 +42,21 @@ export async function uploadAndParseResume(
     };
   }
 
-  try {
-    // 1. Upload to Vercel Blob
-    const blob = await put(`resumes/${userId}/${file.name}`, file, {
-      access: "public",
-      addRandomSuffix: true, // re-uploading the same filename must not fail
-    });
+  if (user.profileData && formData.get("replaceConfirmed") !== "yes") {
+    return {
+      success: false,
+      error: "Confirm replacement of your current profile before importing.",
+    };
+  }
 
-    // 2. AI parse. PDFs go to Claude as-is (it reads PDF natively); TXT as text.
+  try {
+    // Process the source in memory. Private resumes must never become public blobs.
     const rawText = file.type === "text/plain" ? await file.text() : "";
     if (file.type === "text/plain" && rawText.trim().length < 50) {
-      return { success: false, error: "That text file is nearly empty. Try a different file." };
+      return {
+        success: false,
+        error: "That text file is nearly empty. Try a different file.",
+      };
     }
     const profileData = await parseResumeWithAI(
       file.type === "application/pdf"
@@ -64,13 +67,14 @@ export async function uploadAndParseResume(
     // 4. Save header JSON + relational Experience rows
     await saveParsedProfile(user.id, profileData, {
       rawText,
-      resumeUrl: blob.url,
     });
 
     // 5. Revalidate
     revalidatePath("/dashboard");
     revalidatePath("/resume");
     revalidatePath("/profile");
+    revalidatePath("/profile/edit");
+    if (user.slug) revalidatePath(`/p/${user.slug}`);
 
     return { success: true, data: { profileData } };
   } catch (error) {
@@ -78,9 +82,7 @@ export async function uploadAndParseResume(
     return {
       success: false,
       error:
-        error instanceof Error
-          ? error.message
-          : "Failed to process resume. Please try again.",
+        "Could not process this resume. Your saved profile was not changed. Please try another PDF or TXT file.",
     };
   }
 }

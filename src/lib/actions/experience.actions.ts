@@ -13,7 +13,10 @@ const experienceInputSchema = z.object({
   startDate: z.string().trim().max(50).default(""),
   endDate: z.string().trim().max(50).default(""),
   description: z.string().trim().max(2000).default(""),
-  responsibilities: z.array(z.string().trim().min(1).max(500)).max(50).default([]),
+  responsibilities: z
+    .array(z.string().trim().min(1).max(500))
+    .max(50)
+    .default([]),
   metrics: z
     .array(
       z.object({
@@ -129,6 +132,7 @@ export async function reorderExperiences(
   });
   const ownedIds = new Set(owned.map((e) => e.id));
   if (
+    new Set(orderedIds).size !== orderedIds.length ||
     orderedIds.length !== ownedIds.size ||
     !orderedIds.every((id) => ownedIds.has(id))
   ) {

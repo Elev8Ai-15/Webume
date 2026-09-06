@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
@@ -9,12 +10,11 @@ import {
 } from "@/lib/repositories/user.repository";
 import { getProfileBySlug } from "@/lib/profile/profile.service";
 import {
-  getEndorsementsForUser,
+  getApprovedTestimonialsForUser,
   getMediaForUser,
 } from "@/lib/repositories/social.repository";
 import { TemplateRenderer } from "@/components/templates/template-renderer";
-import { getTemplate } from "@/lib/templates/template-registry";
-import { EndorsementsDisplay } from "@/components/social/endorsements-display";
+import { TestimonialsDisplay } from "@/components/social/testimonials-display";
 import { GalleryDisplay } from "@/components/social/gallery-display";
 import type { TemplateId } from "@/lib/types/profile";
 
@@ -64,20 +64,21 @@ export default async function PublicProfilePage({ params }: Props) {
 
   // PDR §5.2: two channels only. Testimonials and photos show when they exist;
   // no visitor comment box or endorsement form on the public page.
-  const [endorsements, media] = await Promise.all([
-    getEndorsementsForUser(user.id),
+  const [testimonials, media] = await Promise.all([
+    getApprovedTestimonialsForUser(user.id),
     getMediaForUser(user.id),
   ]);
 
-  const template = getTemplate(user.selectedTemplate as TemplateId);
   const accent = "var(--primary)";
 
   return (
     <div className="relative min-h-screen bg-background">
       <div className="lx-orbs" aria-hidden="true" />
-      <div className="relative mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+      <div className="relative mx-auto max-w-6xl px-5 py-6 sm:px-10 sm:py-10">
         <div className="mb-6 flex items-center justify-between">
-          <span className="font-heading text-lg text-muted-foreground">Webume</span>
+          <Link href="/" className="font-heading text-2xl">
+            Webume<span className="text-primary">.</span>
+          </Link>
           {profileData.basics.email && (
             <a
               href={`mailto:${profileData.basics.email}`}
@@ -92,14 +93,17 @@ export default async function PublicProfilePage({ params }: Props) {
           profileData={profileData}
           templateId={user.selectedTemplate as TemplateId}
           profilePhoto={user.profilePhoto}
+          profileHref={`/p/${user.slug}`}
         />
 
-        {(endorsements.length > 0 || media.length > 0) && (
+        {(testimonials.length > 0 || media.length > 0) && (
           <div className="mt-8 space-y-8 rounded-2xl border border-white/10 bg-card p-6 sm:p-8">
-            {endorsements.length > 0 && (
-              <EndorsementsDisplay endorsements={endorsements} accentColor={accent} />
+            {testimonials.length > 0 && (
+              <TestimonialsDisplay testimonials={testimonials} />
             )}
-            {media.length > 0 && <GalleryDisplay media={media} accentColor={accent} />}
+            {media.length > 0 && (
+              <GalleryDisplay media={media} accentColor={accent} />
+            )}
           </div>
         )}
 

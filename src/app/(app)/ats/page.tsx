@@ -32,19 +32,19 @@ export default async function ATSPage() {
 
   const result = calculateATSScore(profileData);
 
-  const gradeColor =
-    result.grade.startsWith("A")
-      ? "text-green-500 border-green-500"
-      : result.grade === "B"
-        ? "text-yellow-500 border-yellow-500"
-        : "text-red-500 border-red-500";
+  const gradeColor = result.grade.startsWith("A")
+    ? "text-green-500 border-green-500"
+    : result.grade === "B"
+      ? "text-yellow-500 border-yellow-500"
+      : "text-red-500 border-red-500";
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">ATS Score</h1>
         <p className="text-muted-foreground">
-          See how your profile performs against Applicant Tracking Systems.
+          A basic keyword and completeness check. This is not a test against an
+          employer’s ATS or a prediction of interview success.
         </p>
       </div>
       <Separator />
@@ -95,7 +95,9 @@ export default async function ATSPage() {
       {result.tips.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">Tips to Improve</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Tips to Improve
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">

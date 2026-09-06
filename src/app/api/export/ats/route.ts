@@ -8,16 +8,21 @@ import { renderAtsResume } from "@/lib/export/ats-resume";
 // Single column, standard headings, real text (no tables, no columns, no icons).
 export async function GET() {
   const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  if (!userId)
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   const result = await getProfileByClerkId(userId);
-  if (!result?.profileData) return NextResponse.json({ error: "No profile yet" }, { status: 404 });
-  if (!isPremiumUser(result.user.subscription?.planId ?? "free")) {
+  if (!result?.profileData)
+    return NextResponse.json({ error: "No profile yet" }, { status: 404 });
+  if (!isPremiumUser(result.user.subscription)) {
     return NextResponse.json({ error: "Pro feature" }, { status: 402 });
   }
 
   const pdf = await renderAtsResume(result.profileData);
-  const safeName = (result.profileData.basics.name || "resume").replace(/[^a-z0-9]+/gi, "-");
+  const safeName = (result.profileData.basics.name || "resume").replace(
+    /[^a-z0-9]+/gi,
+    "-",
+  );
   return new NextResponse(new Uint8Array(pdf), {
     headers: {
       "Content-Type": "application/pdf",

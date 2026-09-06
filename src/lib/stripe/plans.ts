@@ -17,7 +17,7 @@ export const PLANS: Record<string, Plan> = {
       "Your living profile, forever",
       "Public link to share anywhere",
       "Resume import (PDF) or build by hand",
-      "You own your data: export or delete anytime",
+      "Manual editing of your career details",
     ],
     limits: { tailoredResumes: 0, profiles: 1 },
   },
@@ -25,7 +25,7 @@ export const PLANS: Record<string, Plan> = {
     id: "pro",
     name: "Pro",
     price: 999,
-    priceId: process.env.STRIPE_PRO_PRICE_ID ?? "price_pro_monthly",
+    priceId: process.env.STRIPE_PRO_PRICE_ID ?? null,
     features: [
       "Everything in Free",
       "AI Resume Tailor: rewrite your profile for any job posting",
@@ -34,24 +34,29 @@ export const PLANS: Record<string, Plan> = {
     ],
     limits: { tailoredResumes: -1, profiles: -1 },
   },
-  enterprise: {
-    id: "enterprise",
-    name: "Enterprise",
-    price: 2999,
-    priceId:
-      process.env.STRIPE_ENTERPRISE_PRICE_ID ?? "price_enterprise_monthly",
-    features: [
-      "Everything in Pro",
-      "Team Management",
-      "API Access",
-      "White Label",
-      "Dedicated Support",
-    ],
-    limits: { tailoredResumes: -1, profiles: -1 },
-  },
 };
 
-export function isPremiumUser(planId: string): boolean {
-  const plan = planId?.toLowerCase();
-  return plan === "pro" || plan === "enterprise";
+export function isPremiumUser(
+  subscription: { planId: string; status: string } | null | undefined,
+): boolean {
+  return (
+    !!subscription &&
+    ["pro", "enterprise"].includes(subscription.planId.toLowerCase()) &&
+    ["active", "trialing"].includes(subscription.status)
+  );
+}
+
+export function planForStripePrice(priceId: string): string {
+  if (
+    process.env.STRIPE_PRO_PRICE_ID &&
+    priceId === process.env.STRIPE_PRO_PRICE_ID
+  )
+    return "pro";
+  // Preserve existing enterprise subscribers, without selling unimplemented features.
+  if (
+    process.env.STRIPE_ENTERPRISE_PRICE_ID &&
+    priceId === process.env.STRIPE_ENTERPRISE_PRICE_ID
+  )
+    return "enterprise";
+  return "free";
 }

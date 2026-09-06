@@ -12,7 +12,7 @@ export default async function TailorPage() {
   const user = await getUserByClerkId(userId);
   if (!user) redirect("/sign-in");
 
-  const premium = isPremiumUser(user.subscription?.planId ?? "free");
+  const premium = isPremiumUser(user.subscription);
   const hasProfile = !!user.profileData;
 
   return (

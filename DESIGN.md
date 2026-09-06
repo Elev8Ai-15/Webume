@@ -10,7 +10,7 @@ Never rebuild your resume again. Webume turns a resume into a living career prof
 
 **Inspiration:** A career you're proud of, presented like it matters.
 
-**Style direction:** Midnight Atelier — Deep charcoal canvas, warm gold, and restrained motion. A private studio after hours — confident and quiet.
+**Style direction:** Midnight Atelier — Deep ink canvas, maroon accents, and restrained motion. A private studio after hours — confident and quiet.
 
 ## 2. Color Tokens
 ### Background — `#0b1020`
@@ -281,7 +281,7 @@ The opening statement: spotlight atmosphere in the system's own palette, numbere
 ```
 
 ### Primary Button
-The one call to action per view. Gold fill, dark ink, restrained hover lift and a visible focus ring.
+The one call to action per view. Maroon fill, dark ink, restrained hover lift and a visible focus ring.
 
 ```html
 <button
@@ -293,7 +293,7 @@ The one call to action per view. Gold fill, dark ink, restrained hover lift and 
 ```
 
 ### Feature Card
-Raised surface with a hairline border, gold eyebrow label, serif heading, and muted body. The workhorse container.
+Raised surface with a hairline border, maroon eyebrow label, serif heading, and muted body. The workhorse container.
 
 ```html
 <div class="max-w-sm rounded-[16px] border border-white/10 bg-[#141b2e] p-8 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.19),0_6px_16px_-2px_rgba(0,0,0,0.34),0_1px_2px_rgba(0,0,0,0.14)]">
@@ -371,7 +371,7 @@ Metallic foil text: a brand-hue gradient clipped to the glyphs with a slow sheen
 @keyframes lx-sheen{0%,100%{background-position:0% 0}50%{background-position:100% 0}}
 @media (prefers-reduced-motion: reduce){.lx-foil{animation:none}}
 </style>
-<h2 class="lx-foil text-[44px] leading-tight" style="font-family:Fraunces, Georgia, serif;font-weight:600">The Gilded Standard</h2>
+<h2 class="lx-foil text-[44px] leading-tight" style="font-family:Fraunces, Georgia, serif;font-weight:600">The Career Standard</h2>
 ```
 
 ### Shine-Sweep Button

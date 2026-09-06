@@ -46,16 +46,20 @@ export default async function ProfilePage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
           <p className="text-muted-foreground">
-            This is exactly what people see when you share your link.
+            Preview your career portfolio. Your public page also includes any
+            published gallery items and approved testimonials.
           </p>
         </div>
-        <div className="flex gap-2">
-          {isPremiumUser(user.subscription?.planId ?? "free") ? (
+        <div className="flex flex-wrap gap-2">
+          {isPremiumUser(user.subscription) ? (
             <a href="/api/export/ats" className={buttonVariants()}>
               Download ATS resume
             </a>
           ) : (
-            <Link href="/pricing" className={buttonVariants({ variant: "outline" })}>
+            <Link
+              href="/pricing"
+              className={buttonVariants({ variant: "outline" })}
+            >
               ATS resume &middot; Pro
             </Link>
           )}
@@ -73,6 +77,7 @@ export default async function ProfilePage() {
         profileData={profileData}
         templateId={user.selectedTemplate as TemplateId}
         profilePhoto={user.profilePhoto}
+        profileHref="/profile"
       />
     </div>
   );

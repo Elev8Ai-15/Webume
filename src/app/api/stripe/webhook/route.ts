@@ -1,24 +1,16 @@
-import { headers } from "next/headers";
-import { db } from "@/lib/db";
+import type Stripe from "stripe";
+import { getStripe } from "@/lib/stripe/client";
+import { stripeId, syncStripeSubscription } from "@/lib/stripe/sync";
 
 export async function POST(req: Request) {
-  const body = await req.text();
-  const headerPayload = await headers();
-  const signature = headerPayload.get("stripe-signature");
-
-  if (!signature || !process.env.STRIPE_WEBHOOK_SECRET) {
-    return new Response("Missing signature or secret", { status: 400 });
-  }
-
-  let event;
+  const signature = req.headers.get("stripe-signature");
+  if (!signature) return new Response("Missing signature", { status: 400 });
+  if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET)
+    return new Response("Billing is not configured", { status: 503 });
+  let event: Stripe.Event;
   try {
-    // Dynamic import to avoid bundling
-    const Stripe =
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      require("stripe") as typeof import("stripe").default;
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-    event = stripe.webhooks.constructEvent(
-      body,
+    event = getStripe().webhooks.constructEvent(
+      await req.text(),
       signature,
       process.env.STRIPE_WEBHOOK_SECRET,
     );
@@ -26,63 +18,40 @@ export async function POST(req: Request) {
     return new Response("Invalid signature", { status: 400 });
   }
 
-  switch (event.type) {
-    case "checkout.session.completed": {
-      const session = event.data.object;
-      const userId = session.metadata?.userId;
-      const planId = session.metadata?.planId;
-
-      if (userId && planId) {
-        await db.subscription.upsert({
-          where: { userId },
-          update: {
-            planId,
-            status: "active",
-            stripeCustomerId: session.customer as string,
-            stripeSubscriptionId: session.subscription as string,
-            startedAt: new Date(),
-            cancelledAt: null,
-          },
-          create: {
-            userId,
-            planId,
-            status: "active",
-            stripeCustomerId: session.customer as string,
-            stripeSubscriptionId: session.subscription as string,
-          },
-        });
+  try {
+    let subscriptionId: string | undefined;
+    let ownerHint: string | undefined;
+    switch (event.type) {
+      case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded": {
+        const session = event.data.object;
+        if (session.mode !== "subscription") break;
+        subscriptionId = stripeId(session.subscription);
+        ownerHint = session.client_reference_id ?? session.metadata?.userId;
+        break;
       }
-      break;
+      case "customer.subscription.created":
+      case "customer.subscription.updated":
+      case "customer.subscription.deleted":
+      case "customer.subscription.paused":
+      case "customer.subscription.resumed":
+        subscriptionId = event.data.object.id;
+        break;
+      case "invoice.paid":
+      case "invoice.payment_failed":
+        subscriptionId = stripeId(
+          event.data.object.parent?.subscription_details?.subscription,
+        );
+        break;
     }
-
-    case "customer.subscription.deleted": {
-      const subscription = event.data.object;
-      const sub = await db.subscription.findFirst({
-        where: { stripeSubscriptionId: subscription.id },
-      });
-      if (sub) {
-        await db.subscription.update({
-          where: { id: sub.id },
-          data: { planId: "free", status: "cancelled", cancelledAt: new Date() },
-        });
-      }
-      break;
-    }
-
-    case "invoice.payment_failed": {
-      const invoice = event.data.object;
-      const sub = await db.subscription.findFirst({
-        where: { stripeCustomerId: invoice.customer as string },
-      });
-      if (sub) {
-        await db.subscription.update({
-          where: { id: sub.id },
-          data: { status: "past_due" },
-        });
-      }
-      break;
-    }
+    if (subscriptionId) await syncStripeSubscription(subscriptionId, ownerHint);
+    return new Response("OK", { status: 200 });
+  } catch {
+    // Stripe retries non-2xx deliveries. Never acknowledge a failed database sync.
+    console.error("Stripe subscription sync failed", {
+      eventId: event.id,
+      type: event.type,
+    });
+    return new Response("Subscription sync failed", { status: 500 });
   }
-
-  return new Response("OK", { status: 200 });
 }
