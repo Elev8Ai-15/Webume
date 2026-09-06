@@ -7,6 +7,7 @@ import { getProfileByClerkId } from "@/lib/profile/profile.service";
 import { TemplateRenderer } from "@/components/templates/template-renderer";
 import { TemplatePicker } from "./template-picker";
 import type { TemplateId } from "@/lib/types/profile";
+import { isPremiumUser } from "@/lib/stripe/plans";
 
 export default async function ProfilePage() {
   const { userId } = await auth();
@@ -49,12 +50,23 @@ export default async function ProfilePage() {
             Preview your profile and choose a template.
           </p>
         </div>
-        <Link
-          href="/profile/edit"
-          className={buttonVariants({ variant: "outline" })}
-        >
-          Edit profile
-        </Link>
+        <div className="flex gap-2">
+          {isPremiumUser(user.subscription?.planId ?? "free") ? (
+            <a href="/api/export/ats" className={buttonVariants()}>
+              Download ATS resume
+            </a>
+          ) : (
+            <Link href="/pricing" className={buttonVariants({ variant: "outline" })}>
+              ATS resume &middot; Pro
+            </Link>
+          )}
+          <Link
+            href="/profile/edit"
+            className={buttonVariants({ variant: "outline" })}
+          >
+            Edit profile
+          </Link>
+        </div>
       </div>
       <Separator />
 

@@ -12,6 +12,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { getUserByClerkId } from "@/lib/repositories/user.repository";
+import { isPremiumUser } from "@/lib/stripe/plans";
 
 export default async function DashboardPage() {
   const { userId } = await auth();
@@ -60,6 +61,27 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <CopyLinkButton slug={user.slug} />
+          </CardContent>
+        </Card>
+      )}
+      {hasProfile && (
+        <Card className="border-primary/40">
+          <CardHeader>
+            <CardDescription>ATS-ready resume</CardDescription>
+            <CardTitle className="text-base font-medium">
+              A clean, traditional PDF built from your Webume, for employers that still want a file.
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isPremiumUser(planId) ? (
+              <a href="/api/export/ats" className={buttonVariants()}>
+                Download ATS resume (PDF)
+              </a>
+            ) : (
+              <Link href="/pricing" className={buttonVariants({ variant: "outline" })}>
+                Pro feature &middot; Upgrade to download
+              </Link>
+            )}
           </CardContent>
         </Card>
       )}

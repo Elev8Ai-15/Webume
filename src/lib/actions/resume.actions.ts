@@ -14,34 +14,6 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 // garbage; add mammoth-based parsing at Gate B if users ask for it.
 const ALLOWED_TYPES = ["application/pdf", "text/plain"];
 
-async function extractTextFromFile(file: File): Promise<string> {
-  const type = file.type;
-
-  if (type === "text/plain") {
-    return file.text();
-  }
-
-  if (type === "application/pdf") {
-    const pdfjs = await import("pdfjs-dist");
-    const buffer = await file.arrayBuffer();
-    const pdf = await pdfjs.getDocument({ data: new Uint8Array(buffer) })
-      .promise;
-
-    const pages: string[] = [];
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      const text = content.items
-        .map((item) => ("str" in item ? item.str : ""))
-        .join(" ");
-      pages.push(text);
-    }
-    return pages.join("\n\n");
-  }
-
-  throw new Error("Unsupported file type");
-}
-
 export async function uploadAndParseResume(
   formData: FormData,
 ): Promise<ActionState<{ profileData: ProfileData }>> {
@@ -77,17 +49,16 @@ export async function uploadAndParseResume(
       access: "public",
     });
 
-    // 2. Extract text from file
-    const rawText = await extractTextFromFile(file);
-    if (!rawText || rawText.trim().length < 50) {
-      return {
-        success: false,
-        error: "Could not extract enough text from file. Try a different format.",
-      };
+    // 2. AI parse. PDFs go to Claude as-is (it reads PDF natively); TXT as text.
+    const rawText = file.type === "text/plain" ? await file.text() : "";
+    if (file.type === "text/plain" && rawText.trim().length < 50) {
+      return { success: false, error: "That text file is nearly empty. Try a different file." };
     }
-
-    // 3. AI parse
-    const profileData = await parseResumeWithAI(rawText);
+    const profileData = await parseResumeWithAI(
+      file.type === "application/pdf"
+        ? { pdf: new Uint8Array(await file.arrayBuffer()) }
+        : { text: rawText },
+    );
 
     // 4. Save header JSON + relational Experience rows
     await saveParsedProfile(user.id, profileData, {

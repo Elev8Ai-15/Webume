@@ -31,7 +31,7 @@ export const PLANS: Record<string, Plan> = {
       "Unlimited Profiles",
       "All 10 Templates",
       "Priority Support",
-      "PDF Export",
+      "ATS-ready resume download (PDF)",
       "Analytics Dashboard",
     ],
     limits: { tailoredResumes: -1, profiles: -1 },
