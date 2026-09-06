@@ -5,7 +5,6 @@ import { buttonVariants } from "@/components/ui/button-variants";
 import { Separator } from "@/components/ui/separator";
 import { getProfileByClerkId } from "@/lib/profile/profile.service";
 import { TemplateRenderer } from "@/components/templates/template-renderer";
-import { TemplatePicker } from "./template-picker";
 import type { TemplateId } from "@/lib/types/profile";
 import { isPremiumUser } from "@/lib/stripe/plans";
 
@@ -47,7 +46,7 @@ export default async function ProfilePage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
           <p className="text-muted-foreground">
-            Preview your profile and choose a template.
+            This is exactly what people see when you share your link.
           </p>
         </div>
         <div className="flex gap-2">
@@ -69,10 +68,6 @@ export default async function ProfilePage() {
         </div>
       </div>
       <Separator />
-
-      <TemplatePicker
-        currentTemplate={user.selectedTemplate as TemplateId}
-      />
 
       <TemplateRenderer
         profileData={profileData}

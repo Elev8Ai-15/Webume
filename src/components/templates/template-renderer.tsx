@@ -14,8 +14,10 @@ interface Props {
  *  template color skins are ignored, the signature color comes from the tokens. */
 export function TemplateRenderer({ profileData, templateId, profilePhoto }: Props) {
   const accent = "var(--primary)";
-  // "By the numbers": the first three metrics across all jobs.
-  const headline = profileData.experience.flatMap((e) => e.metrics).slice(0, 3);
+  // "By the numbers": one headline metric per job (up to 3), only when there is
+  // more than one job so the band doesn't just repeat the first chapter's tiles.
+  const perJob = profileData.experience.map((e) => e.metrics[0]).filter(Boolean);
+  const headline = perJob.length >= 2 ? perJob.slice(0, 3) : [];
   const years = profileData.experience.length;
 
   return (

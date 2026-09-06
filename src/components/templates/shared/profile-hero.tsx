@@ -43,7 +43,9 @@ export function ProfileHero({ basics, profilePhoto, accentColor }: Props) {
         </p>
         <h1 className="mt-3 text-[clamp(36px,6vw,64px)] leading-[1.02] text-balance">{basics.name}</h1>
         {basics.title && <p className="mt-3 text-xl font-medium text-foreground/90 sm:text-2xl">{basics.title}</p>}
-        {basics.tagline && <p className="mt-2 text-base text-muted-foreground">{basics.tagline}</p>}
+        {basics.tagline && basics.tagline.trim() !== basics.summary?.trim() && (
+          <p className="mt-2 text-base text-muted-foreground">{basics.tagline}</p>
+        )}
 
         {basics.summary && (
           <p className="mt-6 max-w-prose text-[15px] leading-relaxed text-foreground/85">{basics.summary}</p>
