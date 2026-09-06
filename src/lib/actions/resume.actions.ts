@@ -47,6 +47,7 @@ export async function uploadAndParseResume(
     // 1. Upload to Vercel Blob
     const blob = await put(`resumes/${userId}/${file.name}`, file, {
       access: "public",
+      addRandomSuffix: true, // re-uploading the same filename must not fail
     });
 
     // 2. AI parse. PDFs go to Claude as-is (it reads PDF natively); TXT as text.
