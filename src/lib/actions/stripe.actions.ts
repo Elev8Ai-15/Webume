@@ -37,6 +37,10 @@ export async function createCheckoutSession(
     return { success: false, error: "App URL not configured" };
   }
 
+  if (!process.env.STRIPE_SECRET_KEY || !plan.priceId.startsWith("price_1")) {
+    // Stripe keys / live price IDs not set yet. Fail soft, never crash the page.
+    return { success: false, error: "Pro checkout isn't open yet. Your free profile and link stay free forever." };
+  }
   const stripe = getStripe();
 
   const session = await stripe.checkout.sessions.create({
