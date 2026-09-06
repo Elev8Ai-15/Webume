@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* Design system: LuxeCraft "Career Ink" (design/webume-guide.json, DESIGN.md).
-   Ink-navy ground, amber signature, Fraunces headings, Manrope body. */
+   Ink-navy ground, maroon-red signature, Fraunces headings, Manrope body. */
 
 @theme inline {
   --color-background: var(--background);
@@ -53,24 +53,24 @@
 
 /* Light counterpart (auto-derived by LuxeCraft, AA-tuned). Unused for now: html carries .dark. */
 :root {
-  --background: oklch(0.9768 0.0086 84.57);
-  --foreground: oklch(0.2474 0.0186 77.76);
-  --card: oklch(0.9468 0.0086 84.57);
-  --card-foreground: oklch(0.2474 0.0186 77.76);
-  --popover: oklch(0.9468 0.0086 84.57);
-  --popover-foreground: oklch(0.2474 0.0186 77.76);
-  --primary: oklch(0.5429 0.1141 68.49);
+  --background: oklch(0.9705 0.006 43.34);
+  --foreground: oklch(0.2268 0.0179 24.52);
+  --card: oklch(0.9404 0.0061 43.33);
+  --card-foreground: oklch(0.2268 0.0179 24.52);
+  --popover: oklch(0.9404 0.0061 43.33);
+  --popover-foreground: oklch(0.2268 0.0179 24.52);
+  --primary: oklch(0.5506 0.1889 19.1);
   --primary-foreground: oklch(0.982 0.0041 91.45);
-  --secondary: oklch(0.9317 0.0087 84.57);
-  --secondary-foreground: oklch(0.2474 0.0186 77.76);
-  --muted: oklch(0.9317 0.0087 84.57);
-  --muted-foreground: oklch(0.533 0.0105 78.24);
-  --accent: oklch(0.9249 0.0223 80.68);
-  --accent-foreground: oklch(0.2474 0.0186 77.76);
+  --secondary: oklch(0.9252 0.0061 43.33);
+  --secondary-foreground: oklch(0.2268 0.0179 24.52);
+  --muted: oklch(0.9252 0.0061 43.33);
+  --muted-foreground: oklch(0.5231 0.0094 36.53);
+  --accent: oklch(0.9135 0.0255 14.62);
+  --accent-foreground: oklch(0.2268 0.0179 24.52);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.8857 0.01 87.48);
-  --input: oklch(0.8857 0.01 87.48);
-  --ring: oklch(0.5191 0.1151 66.58);
+  --border: oklch(0.8772 0.0072 39.46);
+  --input: oklch(0.8772 0.0072 39.46);
+  --ring: oklch(0.5545 0.2109 21.94);
   --chart-1: var(--primary);
   --chart-2: var(--muted-foreground);
   --chart-3: var(--border);
@@ -95,18 +95,18 @@
   --card-foreground: oklch(0.9675 0.0054 274.97);
   --popover: oklch(0.2255 0.0386 267.86);
   --popover-foreground: oklch(0.9675 0.0054 274.97);
-  --primary: oklch(0.8065 0.1265 74.28);
+  --primary: oklch(0.6337 0.1596 14.75);
   --primary-foreground: oklch(0.1747 0.0052 67.47);
   --secondary: oklch(0.2459 0.0297 269.92);
   --secondary-foreground: oklch(0.9675 0.0054 274.97);
   --muted: oklch(0.2459 0.0297 269.92);
   --muted-foreground: oklch(0.7152 0.0322 267.1);
-  --accent: oklch(0.2637 0.0062 314.71);
+  --accent: oklch(0.2345 0.0339 314.97);
   --accent-foreground: oklch(0.9675 0.0054 274.97);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(0.3104 0.0262 269.49);
   --input: oklch(0.3104 0.0262 269.49);
-  --ring: oklch(0.8832 0.1023 76.77);
+  --ring: oklch(0.7497 0.1221 11.45);
   --chart-1: var(--primary);
   --chart-2: var(--muted-foreground);
   --chart-3: var(--border);
@@ -139,13 +139,13 @@
   }
 }
 
-/* LuxeCraft atmosphere: soft amber spotlight from top center + film grain. */
+/* LuxeCraft atmosphere: soft maroon spotlight from top center + film grain. */
 .lx-atmo {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  background-image: radial-gradient(60% 55% at 50% 0%, rgba(240, 179, 91, 0.12), transparent 70%);
+  background-image: radial-gradient(60% 55% at 50% 0%, rgba(217, 90, 107, 0.12), transparent 70%);
 }
 .lx-atmo::after {
   content: "";
@@ -172,7 +172,7 @@
 }
 
 /* ---- LuxeCraft atelier components (design/components/*.tailwind.html), palette-keyed ---- */
-:root { --glow-1: #f0b35b; --glow-2: #ef6f5a; --glow-3: #ffd08a; }
+:root { --glow-1: #d95a6b; --glow-2: #8f2536; --glow-3: #f08c9a; }
 
 /* Foil headline: amber sheen text. */
 .lx-foil {
@@ -208,8 +208,8 @@
   border: 1px solid transparent;
   background:
     linear-gradient(var(--card), var(--card)) padding-box,
-    linear-gradient(135deg, var(--glow-1), rgba(255,208,138,0.55) 60%, transparent) border-box;
-  box-shadow: 0 30px 80px -30px rgba(240,179,91,0.35), 0 12px 32px -4px rgba(0,0,0,0.35);
+    linear-gradient(135deg, var(--glow-1), rgba(240,140,154,0.55) 60%, transparent) border-box;
+  box-shadow: 0 30px 80px -30px rgba(217,90,107,0.35), 0 12px 32px -4px rgba(0,0,0,0.35);
 }
 
 /* Border beam: one point of light circling the frame. ONE per view. */
@@ -226,9 +226,9 @@
 
 /* Floating accents (rings + a spark). */
 .lx-float i { position: absolute; display: block; animation: lx-drift 9s ease-in-out infinite alternate; }
-.lx-float .lx-f1 { width: 64px; height: 64px; border: 1px solid rgba(240,179,91,0.5); border-radius: 50%; }
+.lx-float .lx-f1 { width: 64px; height: 64px; border: 1px solid rgba(217,90,107,0.5); border-radius: 50%; }
 .lx-float .lx-f2 { width: 10px; height: 10px; background: var(--glow-3); border-radius: 50%; animation-delay: -3s; animation-duration: 11s; box-shadow: 0 0 18px var(--glow-3); }
-.lx-float .lx-f3 { width: 120px; height: 120px; border: 1px solid rgba(255,208,138,0.3); border-radius: 50%; animation-delay: -6s; animation-duration: 13s; }
+.lx-float .lx-f3 { width: 120px; height: 120px; border: 1px solid rgba(240,140,154,0.3); border-radius: 50%; animation-delay: -6s; animation-duration: 13s; }
 @keyframes lx-drift { from { transform: translateY(-9px) rotate(-2deg); } to { transform: translateY(9px) rotate(2deg); } }
 
 /* Orbs: two blurred color fields behind the hero (the "futuristic" glow). */
@@ -237,8 +237,8 @@
   content: ""; position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.55;
   animation: lx-orb 14s ease-in-out infinite alternate;
 }
-.lx-orbs::before { width: 46vw; height: 46vw; right: -10vw; top: -14vw; background: radial-gradient(circle, rgba(240,179,91,0.55), transparent 65%); }
-.lx-orbs::after { width: 38vw; height: 38vw; left: -12vw; bottom: -16vw; background: radial-gradient(circle, rgba(239,111,90,0.45), transparent 65%); animation-delay: -7s; }
+.lx-orbs::before { width: 46vw; height: 46vw; right: -10vw; top: -14vw; background: radial-gradient(circle, rgba(217,90,107,0.55), transparent 65%); }
+.lx-orbs::after { width: 38vw; height: 38vw; left: -12vw; bottom: -16vw; background: radial-gradient(circle, rgba(143,37,54,0.45), transparent 65%); animation-delay: -7s; }
 @keyframes lx-orb { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(-3vw, 2vw, 0) scale(1.08); } }
 
 /* 3D card stack (hero). Perspective on the parent; each layer tilts and lifts on hover. */
@@ -254,12 +254,12 @@
 }
 
 /* Gradient stat band. */
-.lx-band { background: linear-gradient(90deg, var(--glow-1), var(--glow-2)); color: #12100e; }
+.lx-band { background: linear-gradient(90deg, #b8404f, var(--glow-2)); color: #fff; }
 
 @media (prefers-reduced-motion: reduce) {
   .lx-foil, .lx-beam, .lx-float i, .lx-orbs::before, .lx-orbs::after { animation: none; }
   .lx-shine::after { display: none; }
-  .lx-beam { border-color: rgba(255,208,138,0.35); }
+  .lx-beam { border-color: rgba(240,140,154,0.35); }
   .lx-stack > * { transition: none; }
 }
 

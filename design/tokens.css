@@ -5,23 +5,23 @@
    https://fonts.googleapis.com/css2?display=swap&family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Manrope:wght@400;500 */
 
 :root {
-  --background: oklch(0.9768 0.0086 84.57);
-  --foreground: oklch(0.2474 0.0186 77.76);
-  --card: oklch(0.9468 0.0086 84.57);
-  --card-foreground: oklch(0.2474 0.0186 77.76);
-  --popover: oklch(0.9468 0.0086 84.57);
-  --popover-foreground: oklch(0.2474 0.0186 77.76);
-  --primary: oklch(0.5429 0.1141 68.49);
+  --background: oklch(0.9705 0.006 43.34);
+  --foreground: oklch(0.2268 0.0179 24.52);
+  --card: oklch(0.9404 0.0061 43.33);
+  --card-foreground: oklch(0.2268 0.0179 24.52);
+  --popover: oklch(0.9404 0.0061 43.33);
+  --popover-foreground: oklch(0.2268 0.0179 24.52);
+  --primary: oklch(0.5506 0.1889 19.1);
   --primary-foreground: oklch(0.982 0.0041 91.45);
-  --secondary: oklch(0.9317 0.0087 84.57);
-  --secondary-foreground: oklch(0.2474 0.0186 77.76);
-  --muted: oklch(0.9317 0.0087 84.57);
-  --muted-foreground: oklch(0.533 0.0105 78.24);
-  --accent: oklch(0.9249 0.0223 80.68);
-  --accent-foreground: oklch(0.2474 0.0186 77.76);
-  --border: oklch(0.8857 0.01 87.48);
-  --input: oklch(0.8857 0.01 87.48);
-  --ring: oklch(0.5191 0.1151 66.58);
+  --secondary: oklch(0.9252 0.0061 43.33);
+  --secondary-foreground: oklch(0.2268 0.0179 24.52);
+  --muted: oklch(0.9252 0.0061 43.33);
+  --muted-foreground: oklch(0.5231 0.0094 36.53);
+  --accent: oklch(0.9135 0.0255 14.62);
+  --accent-foreground: oklch(0.2268 0.0179 24.52);
+  --border: oklch(0.8772 0.0072 39.46);
+  --input: oklch(0.8772 0.0072 39.46);
+  --ring: oklch(0.5545 0.2109 21.94);
   --radius: 10px;
   --font-heading: Fraunces, Georgia, serif;
   --font-body: Manrope, 'Segoe UI', system-ui, sans-serif;
@@ -34,15 +34,15 @@
   --card-foreground: oklch(0.9675 0.0054 274.97);
   --popover: oklch(0.2255 0.0386 267.86);
   --popover-foreground: oklch(0.9675 0.0054 274.97);
-  --primary: oklch(0.8065 0.1265 74.28);
+  --primary: oklch(0.6337 0.1596 14.75);
   --primary-foreground: oklch(0.1747 0.0052 67.47);
   --secondary: oklch(0.2459 0.0297 269.92);
   --secondary-foreground: oklch(0.9675 0.0054 274.97);
   --muted: oklch(0.2459 0.0297 269.92);
   --muted-foreground: oklch(0.7152 0.0322 267.1);
-  --accent: oklch(0.2637 0.0062 314.71);
+  --accent: oklch(0.2345 0.0339 314.97);
   --accent-foreground: oklch(0.9675 0.0054 274.97);
   --border: oklch(0.3104 0.0262 269.49);
   --input: oklch(0.3104 0.0262 269.49);
-  --ring: oklch(0.8832 0.1023 76.77);
+  --ring: oklch(0.7497 0.1221 11.45);
 }

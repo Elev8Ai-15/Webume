@@ -47,38 +47,38 @@ surface-900: #1c1f31
 surface-950: #12131c
 ```
 
-### Primary — `#f0b35b`
+### Primary — `#d95a6b`
 _The signature accent. Used sparingly on the moments that matter._
 
 ```
-primary-50: #f9f6f3
-primary-100: #f3e8dd
-primary-200: #edd3b5
-primary-300: #ebb97a
-primary-400: #eaa13d
-primary-500: #e08d15
-primary-600: #bb7811
-primary-700: #8d5f11
-primary-800: #644812
-primary-900: #3d2f10
-primary-950: #221c0c
+primary-50: #f8f4f5
+primary-100: #f0e0e3
+primary-200: #e6bcc4
+primary-300: #dd8896
+primary-400: #d55366
+primary-500: #c72e42
+primary-600: #a62635
+primary-700: #7e2129
+primary-800: #591c20
+primary-900: #371517
+primary-950: #1f0f0f
 ```
 
-### Accent — `#ffd08a`
+### Accent — `#f08c9a`
 _A lighter partner to Primary for highlights and hover states._
 
 ```
-accent-50: #faf6f2
-accent-100: #f5e8db
-accent-200: #f3d4af
-accent-300: #f6bb6f
-accent-400: #fca62c
-accent-500: #f59200
-accent-600: #cc7d00
-accent-700: #996405
-accent-800: #6c4b09
-accent-900: #41310b
-accent-950: #241d0a
+accent-50: #f9f3f5
+accent-100: #f2dee2
+accent-200: #ebb7c1
+accent-300: #e67f91
+accent-400: #e4445c
+accent-500: #d91c37
+accent-600: #b4182b
+accent-700: #881621
+accent-800: #61151a
+accent-900: #3b1213
+accent-950: #210d0d
 ```
 
 ### Text — `#f3f4f8`
@@ -117,28 +117,28 @@ muted-950: #151519
 
 ### Accessibility (WCAG AA) audit
 ```
-PASS  Accent on Background: 13.2:1
+PASS  Accent on Background: 8.04:1
 PASS  Text on Background: 17.23:1
 PASS  Muted on Background: 7.49:1
 PASS  Text on Surface: 15.58:1
-PASS  Ink on Primary fill (buttons): 10.22:1 (auto-adjusted for AA)
+PASS  Ink on Primary fill (buttons): 5.09:1 (auto-adjusted for AA)
 ```
 
 ### Light-mode counterpart
 Auto-derived twin palette (brand hues kept, neutrals flipped and AA-tuned). Use it as the light theme; the Tokens export carries both as `:root`/`.dark` CSS variables.
 ```
-background  #faf7f1
-surface     #f0ede7
-primary     #9a610e
-accent      #945900
-text        #262017
-muted       #706c66
+background  #f9f4f2
+surface     #efeae8
+primary     #c82e43
+accent      #d21b35
+text        #241918
+muted       #6f6866
 onPrimary   #faf9f6
-PASS  Primary on Background (light): 4.8:1 (auto-adjusted)
-PASS  Text on Background (light): 15.09:1
-PASS  Ink on Primary fill (light): 4.88:1 (auto-adjusted)
-PASS  Accent on Background (light): 5.32:1 (auto-adjusted)
-PASS  Muted on Background (light): 4.88:1 (auto-adjusted)
+PASS  Primary on Background (light): 4.9:1 (auto-adjusted)
+PASS  Text on Background (light): 15.69:1
+PASS  Ink on Primary fill (light): 5.08:1 (auto-adjusted)
+PASS  Accent on Background (light): 4.88:1 (auto-adjusted)
+PASS  Muted on Background (light): 5:1 (auto-adjusted)
 ```
 
 ## 3. Typography
@@ -195,14 +195,14 @@ parallax layers (z): 0, 8, 20, 40
 ## 5. Atmosphere (Background System)
 **Style: spotlight** · intensity **restrained** · grain 0.04
 
-Spec for AI builders: _soft radial spotlight of #f0b35b at 0.1 alpha falling from top center onto #0b1020, grain 0.04_
+Spec for AI builders: _soft radial spotlight of #d95a6b at 0.1 alpha falling from top center onto #0b1020, grain 0.04_
 
 Drop this inside any `position: relative` section (the hero ships with it wired in):
 ```html
 <div class="lx-atmo" aria-hidden="true"></div>
 ```
 ```css
-.lx-atmo{position:absolute;inset:0;overflow:hidden;pointer-events:none;background:#0b1020;background-image:radial-gradient(60% 55% at 50% 0%, rgba(240,179,91,0.1), transparent 70%);}
+.lx-atmo{position:absolute;inset:0;overflow:hidden;pointer-events:none;background:#0b1020;background-image:radial-gradient(60% 55% at 50% 0%, rgba(217,90,107,0.1), transparent 70%);}
 .lx-atmo::after{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.04;mix-blend-mode:overlay}
 @media (prefers-reduced-motion: reduce){.lx-atmo,.lx-atmo *{animation:none !important}}
 ```
@@ -250,11 +250,11 @@ Spec: _cross-fade between pages, 336ms cubic-bezier(0.25, 1, 0.5, 1) — pure CS
 _Snippets below are in **tailwind** flavor for Next.js._
 
 ### Hero Section
-The opening statement: spotlight atmosphere in the system's own palette, numbered eyebrow, mask-reveal headline, one CTA. Atmosphere spec: soft radial spotlight of #f0b35b at 0.1 alpha falling from top center onto #0b1020, grain 0.04.
+The opening statement: spotlight atmosphere in the system's own palette, numbered eyebrow, mask-reveal headline, one CTA. Atmosphere spec: soft radial spotlight of #d95a6b at 0.1 alpha falling from top center onto #0b1020, grain 0.04.
 
 ```html
 <style>
-.lx-atmo{position:absolute;inset:0;overflow:hidden;pointer-events:none;background:#0b1020;background-image:radial-gradient(60% 55% at 50% 0%, rgba(240,179,91,0.1), transparent 70%);}
+.lx-atmo{position:absolute;inset:0;overflow:hidden;pointer-events:none;background:#0b1020;background-image:radial-gradient(60% 55% at 50% 0%, rgba(217,90,107,0.1), transparent 70%);}
 .lx-atmo::after{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.04;mix-blend-mode:overlay}
 @media (prefers-reduced-motion: reduce){.lx-atmo,.lx-atmo *{animation:none !important}}
 .lx-mask{display:block;overflow:hidden}
@@ -269,13 +269,13 @@ The opening statement: spotlight atmosphere in the system's own palette, numbere
   <div class="lx-atmo" aria-hidden="true"></div>
   <div class="lx-hero-scrim"></div>
   <div class="relative mx-auto max-w-3xl px-6 py-32 text-center sm:py-44">
-    <p style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif" class="mb-6 text-[12px] font-medium uppercase tracking-[0.28em] text-[#f0b35b]">01 — Welcome</p>
+    <p style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif" class="mb-6 text-[12px] font-medium uppercase tracking-[0.28em] text-[#d95a6b]">01 — Welcome</p>
     <h1 style="font-family:Fraunces, Georgia, serif;font-weight:600" class="text-balance text-[clamp(40px,7vw,84px)] leading-[1.02] tracking-[-0.02em] text-[#f3f4f8]">
       <span class="lx-mask"><span>Quiet luxury,</span></span>
       <span class="lx-mask"><span>engineered.</span></span>
     </h1>
     <p style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif" class="mx-auto mt-6 max-w-md text-[17px] leading-relaxed text-[#9aa3b8]">A brand experience measured in restraint — every surface, shadow, and second considered.</p>
-    <a href="#" style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif" class="mt-10 inline-flex items-center gap-2 rounded-[10px] bg-[#f0b35b] px-7 py-3.5 text-[15px] font-medium tracking-wide text-[#12100e] transition-[filter] duration-200 hover:brightness-110">Reserve your place</a>
+    <a href="#" style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif" class="mt-10 inline-flex items-center gap-2 rounded-[10px] bg-[#d95a6b] px-7 py-3.5 text-[15px] font-medium tracking-wide text-[#12100e] transition-[filter] duration-200 hover:brightness-110">Reserve your place</a>
   </div>
 </section>
 ```
@@ -286,7 +286,7 @@ The one call to action per view. Gold fill, dark ink, restrained hover lift and 
 ```html
 <button
   style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif"
-  class="inline-flex items-center gap-2 rounded-[10px] bg-[#f0b35b] px-6 py-3 text-[15px] font-medium tracking-wide text-[#12100e] shadow-[0_6px_16px_-2px_rgba(0,0,0,0.15),0_3px_8px_-1px_rgba(0,0,0,0.28),0_1px_2px_rgba(0,0,0,0.14)] transition-[filter,transform] duration-200 ease-out hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#ffd08a] motion-reduce:transition-none"
+  class="inline-flex items-center gap-2 rounded-[10px] bg-[#d95a6b] px-6 py-3 text-[15px] font-medium tracking-wide text-[#12100e] shadow-[0_6px_16px_-2px_rgba(0,0,0,0.15),0_3px_8px_-1px_rgba(0,0,0,0.28),0_1px_2px_rgba(0,0,0,0.14)] transition-[filter,transform] duration-200 ease-out hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#f08c9a] motion-reduce:transition-none"
 >
   Reserve your place
 </button>
@@ -297,7 +297,7 @@ Raised surface with a hairline border, gold eyebrow label, serif heading, and mu
 
 ```html
 <div class="max-w-sm rounded-[16px] border border-white/10 bg-[#141b2e] p-8 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.19),0_6px_16px_-2px_rgba(0,0,0,0.34),0_1px_2px_rgba(0,0,0,0.14)]">
-  <p class="text-[12px] font-medium uppercase tracking-[0.18em] text-[#f0b35b]">Membership</p>
+  <p class="text-[12px] font-medium uppercase tracking-[0.18em] text-[#d95a6b]">Membership</p>
   <h3 style="font-family:Fraunces, Georgia, serif" class="mt-3 text-[26px] leading-tight text-[#f3f4f8]">The Founders' Circle</h3>
   <p style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif" class="mt-3 text-[15px] leading-relaxed text-[#9aa3b8]">A limited tier for the first hundred members. Lifetime rate, first access, a permanent seat.</p>
 </div>
@@ -309,7 +309,7 @@ Perspective plus a subtle tilt-and-lift on hover — depth as a premium micro-in
 ```html
 <div style="perspective:1200px">
   <div class="group max-w-sm rounded-[16px] border border-white/10 bg-[#141b2e] p-8 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.19),0_6px_16px_-2px_rgba(0,0,0,0.34),0_1px_2px_rgba(0,0,0,0.14)] transition-transform duration-300 ease-out [transform-style:preserve-3d] hover:[transform:rotateX(4deg)_translateZ(8px)] motion-reduce:transition-none motion-reduce:hover:[transform:none]">
-    <p class="text-[12px] font-medium uppercase tracking-[0.18em] text-[#f0b35b]">Depth</p>
+    <p class="text-[12px] font-medium uppercase tracking-[0.18em] text-[#d95a6b]">Depth</p>
     <h3 style="font-family:Fraunces, Georgia, serif" class="mt-3 text-[26px] leading-tight text-[#f3f4f8]">Layered by design</h3>
     <p style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif" class="mt-3 text-[15px] leading-relaxed text-[#9aa3b8]">Material that responds to presence — a considered tilt, never a gimmick.</p>
   </div>
@@ -320,8 +320,8 @@ Perspective plus a subtle tilt-and-lift on hover — depth as a premium micro-in
 A quiet marker for state or category — outlined, never loud.
 
 ```html
-<span style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif" class="inline-flex items-center gap-1.5 rounded-full border border-[#f0b35b]/40 px-3 py-1 text-[12px] font-medium uppercase tracking-[0.12em] text-[#f0b35b]">
-  <span class="h-1.5 w-1.5 rounded-full bg-[#f0b35b]"></span>Invitation Only
+<span style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif" class="inline-flex items-center gap-1.5 rounded-full border border-[#d95a6b]/40 px-3 py-1 text-[12px] font-medium uppercase tracking-[0.12em] text-[#d95a6b]">
+  <span class="h-1.5 w-1.5 rounded-full bg-[#d95a6b]"></span>Invitation Only
 </span>
 ```
 
@@ -330,7 +330,7 @@ Dark glassmorphism: frosted blur, hairline border, and a brighter 1px top edge s
 
 ```html
 <div class="max-w-sm rounded-[16px] p-8" style="background:rgba(255,255,255,0.08);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid rgba(255,255,255,0.14);box-shadow:inset 0 1px 0 rgba(255,255,255,0.18), 0 12px 32px -4px rgba(0,0,0,0.19), 0 6px 16px -2px rgba(0,0,0,0.34), 0 1px 2px rgba(0,0,0,0.14)">
-  <p class="text-[12px] font-medium uppercase tracking-[0.18em] text-[#ffd08a]" style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif">Concierge</p>
+  <p class="text-[12px] font-medium uppercase tracking-[0.18em] text-[#f08c9a]" style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif">Concierge</p>
   <h3 style="font-family:Fraunces, Georgia, serif" class="mt-3 text-[26px] leading-tight text-[#f3f4f8]">Glass, lit from above</h3>
   <p style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif" class="mt-3 text-[15px] leading-relaxed text-[#9aa3b8]">Frosted material over the atmosphere — the brighter top edge is the overhead light.</p>
 </div>
@@ -340,7 +340,7 @@ Dark glassmorphism: frosted blur, hairline border, and a brighter 1px top edge s
 The two-layer background trick: a brand-hue gradient border that dissolves to transparent. Quietly expensive; zero images.
 
 ```html
-<div class="max-w-sm rounded-[16px] p-8" style="border:1px solid transparent;background:linear-gradient(#141b2e,#141b2e) padding-box, linear-gradient(135deg, #f0b35b, rgba(255,208,138,0.55) 60%, transparent) border-box;box-shadow:0 12px 32px -4px rgba(0,0,0,0.19), 0 6px 16px -2px rgba(0,0,0,0.34), 0 1px 2px rgba(0,0,0,0.14)">
+<div class="max-w-sm rounded-[16px] p-8" style="border:1px solid transparent;background:linear-gradient(#141b2e,#141b2e) padding-box, linear-gradient(135deg, #d95a6b, rgba(240,140,154,0.55) 60%, transparent) border-box;box-shadow:0 12px 32px -4px rgba(0,0,0,0.19), 0 6px 16px -2px rgba(0,0,0,0.34), 0 1px 2px rgba(0,0,0,0.14)">
   <h3 style="font-family:Fraunces, Georgia, serif" class="text-[24px] leading-tight text-[#f3f4f8]">A seam of light</h3>
   <p style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif" class="mt-3 text-[15px] leading-relaxed text-[#9aa3b8]">The border is a gradient fading to nothing — jewelry, not a box.</p>
 </div>
@@ -352,9 +352,9 @@ An animated point of accent light orbiting the card's border (@property conic tr
 ```html
 <style>
 @property --lx-angle{syntax:"<angle>";initial-value:0deg;inherits:false}
-.lx-beam{position:relative;border:1px solid transparent;border-radius:16px;background:linear-gradient(#141b2e,#141b2e) padding-box, conic-gradient(from var(--lx-angle), transparent 0 82%, #ffd08a 92%, transparent) border-box;animation:lx-spin 5s linear infinite}
+.lx-beam{position:relative;border:1px solid transparent;border-radius:16px;background:linear-gradient(#141b2e,#141b2e) padding-box, conic-gradient(from var(--lx-angle), transparent 0 82%, #f08c9a 92%, transparent) border-box;animation:lx-spin 5s linear infinite}
 @keyframes lx-spin{to{--lx-angle:360deg}}
-@media (prefers-reduced-motion: reduce){.lx-beam{animation:none;border-color:rgba(255,208,138,0.35)}}
+@media (prefers-reduced-motion: reduce){.lx-beam{animation:none;border-color:rgba(240,140,154,0.35)}}
 </style>
 <div class="lx-beam max-w-sm p-8" style="box-shadow:0 12px 32px -4px rgba(0,0,0,0.19), 0 6px 16px -2px rgba(0,0,0,0.34), 0 1px 2px rgba(0,0,0,0.14)">
   <h3 style="font-family:Fraunces, Georgia, serif" class="text-[24px] leading-tight text-[#f3f4f8]">Border beam</h3>
@@ -367,7 +367,7 @@ Metallic foil text: a brand-hue gradient clipped to the glyphs with a slow sheen
 
 ```html
 <style>
-.lx-foil{background:linear-gradient(105deg, #f0b35b 20%, #ffd08a 48%, #f0b35b 76%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:lx-sheen 6s ease-in-out infinite}
+.lx-foil{background:linear-gradient(105deg, #d95a6b 20%, #f08c9a 48%, #d95a6b 76%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:lx-sheen 6s ease-in-out infinite}
 @keyframes lx-sheen{0%,100%{background-position:0% 0}50%{background-position:100% 0}}
 @media (prefers-reduced-motion: reduce){.lx-foil{animation:none}}
 </style>
@@ -384,7 +384,7 @@ The primary button with a light sweep crossing on hover — one pass, 600ms, the
 .lx-shine:hover::after{left:120%}
 @media (prefers-reduced-motion: reduce){.lx-shine::after{display:none}}
 </style>
-<button class="lx-shine inline-flex items-center gap-2 rounded-[10px] bg-[#f0b35b] px-7 py-3.5 text-[15px] font-medium tracking-wide text-[#12100e]" style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif;box-shadow:0 6px 16px -2px rgba(0,0,0,0.15), 0 3px 8px -1px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.14)">Request an invitation</button>
+<button class="lx-shine inline-flex items-center gap-2 rounded-[10px] bg-[#d95a6b] px-7 py-3.5 text-[15px] font-medium tracking-wide text-[#12100e]" style="font-family:Manrope, 'Segoe UI', system-ui, sans-serif;box-shadow:0 6px 16px -2px rgba(0,0,0,0.15), 0 3px 8px -1px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.14)">Request an invitation</button>
 ```
 
 ### Marquee Strip
@@ -399,7 +399,7 @@ An infinite band of brand words (or client logos) with soft edge fades. Content 
 @media (prefers-reduced-motion: reduce){.lx-marquee-track{animation:none}}
 </style>
 <div class="lx-marquee">
-  <div class="lx-marquee-track"><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Bespoke</span><span aria-hidden="true" style="color:rgba(240,179,91,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Considered</span><span aria-hidden="true" style="color:rgba(240,179,91,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Enduring</span><span aria-hidden="true" style="color:rgba(240,179,91,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Rare</span><span aria-hidden="true" style="color:rgba(240,179,91,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Quiet</span><span aria-hidden="true" style="color:rgba(240,179,91,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Exact</span><span aria-hidden="true" style="color:rgba(240,179,91,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Bespoke</span><span aria-hidden="true" style="color:rgba(240,179,91,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Considered</span><span aria-hidden="true" style="color:rgba(240,179,91,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Enduring</span><span aria-hidden="true" style="color:rgba(240,179,91,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Rare</span><span aria-hidden="true" style="color:rgba(240,179,91,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Quiet</span><span aria-hidden="true" style="color:rgba(240,179,91,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Exact</span><span aria-hidden="true" style="color:rgba(240,179,91,0.6)">·</span></div>
+  <div class="lx-marquee-track"><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Bespoke</span><span aria-hidden="true" style="color:rgba(217,90,107,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Considered</span><span aria-hidden="true" style="color:rgba(217,90,107,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Enduring</span><span aria-hidden="true" style="color:rgba(217,90,107,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Rare</span><span aria-hidden="true" style="color:rgba(217,90,107,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Quiet</span><span aria-hidden="true" style="color:rgba(217,90,107,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Exact</span><span aria-hidden="true" style="color:rgba(217,90,107,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Bespoke</span><span aria-hidden="true" style="color:rgba(217,90,107,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Considered</span><span aria-hidden="true" style="color:rgba(217,90,107,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Enduring</span><span aria-hidden="true" style="color:rgba(217,90,107,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Rare</span><span aria-hidden="true" style="color:rgba(217,90,107,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Quiet</span><span aria-hidden="true" style="color:rgba(217,90,107,0.6)">·</span><span style="font:500 13px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.22em;color:#9aa3b8;padding:0 28px;white-space:nowrap">Exact</span><span aria-hidden="true" style="color:rgba(217,90,107,0.6)">·</span></div>
 </div>
 ```
 
@@ -410,9 +410,9 @@ Decorative geometry — hairline circles and a filled dot drifting on desynced 9
 <style>
 .lx-float{position:relative;height:180px;overflow:hidden}
 .lx-float i{position:absolute;display:block;animation:lx-drift 9s ease-in-out infinite alternate}
-.lx-float .lx-f1{width:52px;height:52px;left:18%;top:30%;border:1px solid rgba(240,179,91,0.5);border-radius:50%}
-.lx-float .lx-f2{width:10px;height:10px;left:55%;top:22%;background:#ffd08a;border-radius:50%;animation-delay:-3s;animation-duration:11s}
-.lx-float .lx-f3{width:88px;height:88px;left:72%;top:40%;border:1px solid rgba(255,208,138,0.3);border-radius:50%;animation-delay:-6s;animation-duration:13s}
+.lx-float .lx-f1{width:52px;height:52px;left:18%;top:30%;border:1px solid rgba(217,90,107,0.5);border-radius:50%}
+.lx-float .lx-f2{width:10px;height:10px;left:55%;top:22%;background:#f08c9a;border-radius:50%;animation-delay:-3s;animation-duration:11s}
+.lx-float .lx-f3{width:88px;height:88px;left:72%;top:40%;border:1px solid rgba(240,140,154,0.3);border-radius:50%;animation-delay:-6s;animation-duration:13s}
 @keyframes lx-drift{from{transform:translateY(-9px) rotate(-2deg)}to{transform:translateY(9px) rotate(2deg)}}
 @media (prefers-reduced-motion: reduce){.lx-float i{animation:none}}
 </style>
@@ -425,7 +425,7 @@ Decorative geometry — hairline circles and a filled dot drifting on desynced 9
 The CTA leans toward the cursor inside a 90px radius and springs home when it leaves. Desktop pointers only; inert under reduced motion. Use on ONE button per view.
 
 ```html
-<span class="lx-magnet-zone" style="display:inline-block"><button class="lx-magnet" style="display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;background:#f0b35b;padding:14px 28px;font:500 15px/1 Manrope, 'Segoe UI', system-ui, sans-serif;letter-spacing:.02em;color:#12100e;box-shadow:0 6px 16px -2px rgba(0,0,0,0.15), 0 3px 8px -1px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.14);cursor:pointer;transition:transform .18s ease-out">Drawn to you</button></span>
+<span class="lx-magnet-zone" style="display:inline-block"><button class="lx-magnet" style="display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;background:#d95a6b;padding:14px 28px;font:500 15px/1 Manrope, 'Segoe UI', system-ui, sans-serif;letter-spacing:.02em;color:#12100e;box-shadow:0 6px 16px -2px rgba(0,0,0,0.15), 0 3px 8px -1px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.14);cursor:pointer;transition:transform .18s ease-out">Drawn to you</button></span>
 <script>
 (function(){
   if(!matchMedia('(pointer:fine)').matches||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
@@ -487,7 +487,7 @@ The Depth Card, upgraded: tilt tracks the cursor position (max 6.4°) and a spec
 </style>
 <div style="perspective:1200px">
   <div class="lx-tilt" style="max-width:24rem;border-radius:16px;border:1px solid rgba(255,255,255,0.1);background:#141b2e;padding:32px;box-shadow:0 12px 32px -4px rgba(0,0,0,0.19), 0 6px 16px -2px rgba(0,0,0,0.34), 0 1px 2px rgba(0,0,0,0.14)">
-    <p style="margin:0;font:500 12px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.18em;color:#f0b35b">Dimension</p>
+    <p style="margin:0;font:500 12px/1 Manrope, 'Segoe UI', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.18em;color:#d95a6b">Dimension</p>
     <h3 style="margin:12px 0 0;font:400 26px/1.15 Fraunces, Georgia, serif;color:#f3f4f8">It follows the light</h3>
     <p style="margin:12px 0 0;font:400 15px/1.6 Manrope, 'Segoe UI', system-ui, sans-serif;color:#9aa3b8">Tilt tracks the cursor; the sheen is a specular highlight riding the same position.</p>
   </div>

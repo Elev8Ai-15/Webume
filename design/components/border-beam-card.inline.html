@@ -1,8 +1,8 @@
 <style>
 @property --lx-angle{syntax:"<angle>";initial-value:0deg;inherits:false}
-.lx-beam{position:relative;border:1px solid transparent;border-radius:16px;background:linear-gradient(#141b2e,#141b2e) padding-box, conic-gradient(from var(--lx-angle), transparent 0 82%, #ffd08a 92%, transparent) border-box;animation:lx-spin 5s linear infinite}
+.lx-beam{position:relative;border:1px solid transparent;border-radius:16px;background:linear-gradient(#141b2e,#141b2e) padding-box, conic-gradient(from var(--lx-angle), transparent 0 82%, #f08c9a 92%, transparent) border-box;animation:lx-spin 5s linear infinite}
 @keyframes lx-spin{to{--lx-angle:360deg}}
-@media (prefers-reduced-motion: reduce){.lx-beam{animation:none;border-color:rgba(255,208,138,0.35)}}
+@media (prefers-reduced-motion: reduce){.lx-beam{animation:none;border-color:rgba(240,140,154,0.35)}}
 </style>
 <div class="lx-beam" style="max-width:24rem;padding:32px;box-shadow:0 12px 32px -4px rgba(0,0,0,0.19), 0 6px 16px -2px rgba(0,0,0,0.34), 0 1px 2px rgba(0,0,0,0.14)">
   <h3 style="margin:0;font:400 24px/1.15 Fraunces, Georgia, serif;color:#f3f4f8">Border beam</h3>

@@ -41,37 +41,37 @@
     {
       "name": "Primary",
       "rationale": "The signature accent. Used sparingly on the moments that matter.",
-      "base": "#f0b35b",
+      "base": "#d95a6b",
       "scale": {
-        "50": "#f9f6f3",
-        "100": "#f3e8dd",
-        "200": "#edd3b5",
-        "300": "#ebb97a",
-        "400": "#eaa13d",
-        "500": "#e08d15",
-        "600": "#bb7811",
-        "700": "#8d5f11",
-        "800": "#644812",
-        "900": "#3d2f10",
-        "950": "#221c0c"
+        "50": "#f8f4f5",
+        "100": "#f0e0e3",
+        "200": "#e6bcc4",
+        "300": "#dd8896",
+        "400": "#d55366",
+        "500": "#c72e42",
+        "600": "#a62635",
+        "700": "#7e2129",
+        "800": "#591c20",
+        "900": "#371517",
+        "950": "#1f0f0f"
       }
     },
     {
       "name": "Accent",
       "rationale": "A lighter partner to Primary for highlights and hover states.",
-      "base": "#ffd08a",
+      "base": "#f08c9a",
       "scale": {
-        "50": "#faf6f2",
-        "100": "#f5e8db",
-        "200": "#f3d4af",
-        "300": "#f6bb6f",
-        "400": "#fca62c",
-        "500": "#f59200",
-        "600": "#cc7d00",
-        "700": "#996405",
-        "800": "#6c4b09",
-        "900": "#41310b",
-        "950": "#241d0a"
+        "50": "#f9f3f5",
+        "100": "#f2dee2",
+        "200": "#ebb7c1",
+        "300": "#e67f91",
+        "400": "#e4445c",
+        "500": "#d91c37",
+        "600": "#b4182b",
+        "700": "#881621",
+        "800": "#61151a",
+        "900": "#3b1213",
+        "950": "#210d0d"
       }
     },
     {
@@ -296,8 +296,8 @@
     "grainOpacity": 0.04,
     "driftSeconds": 30,
     "html": "<div class=\"lx-atmo\" aria-hidden=\"true\"></div>",
-    "css": ".lx-atmo{position:absolute;inset:0;overflow:hidden;pointer-events:none;background:#0b1020;background-image:radial-gradient(60% 55% at 50% 0%, rgba(240,179,91,0.1), transparent 70%);}\n.lx-atmo::after{content:\"\";position:absolute;inset:0;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\");opacity:0.04;mix-blend-mode:overlay}\n@media (prefers-reduced-motion: reduce){.lx-atmo,.lx-atmo *{animation:none !important}}",
-    "spec": "soft radial spotlight of #f0b35b at 0.1 alpha falling from top center onto #0b1020, grain 0.04"
+    "css": ".lx-atmo{position:absolute;inset:0;overflow:hidden;pointer-events:none;background:#0b1020;background-image:radial-gradient(60% 55% at 50% 0%, rgba(217,90,107,0.1), transparent 70%);}\n.lx-atmo::after{content:\"\";position:absolute;inset:0;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\");opacity:0.04;mix-blend-mode:overlay}\n@media (prefers-reduced-motion: reduce){.lx-atmo,.lx-atmo *{animation:none !important}}",
+    "spec": "soft radial spotlight of #d95a6b at 0.1 alpha falling from top center onto #0b1020, grain 0.04"
   },
   "entrances": [
     {
@@ -318,42 +318,42 @@
   "counterpart": {
     "mode": "light",
     "palette": {
-      "background": "#faf7f1",
-      "surface": "#f0ede7",
-      "primary": "#9a610e",
-      "accent": "#945900",
-      "text": "#262017",
-      "muted": "#706c66",
+      "background": "#f9f4f2",
+      "surface": "#efeae8",
+      "primary": "#c82e43",
+      "accent": "#d21b35",
+      "text": "#241918",
+      "muted": "#6f6866",
       "onPrimary": "#faf9f6"
     },
     "contrastReport": [
       {
         "pair": "Primary on Background (light)",
-        "ratio": 4.8,
+        "ratio": 4.9,
         "passesAA": true,
         "adjusted": true
       },
       {
         "pair": "Text on Background (light)",
-        "ratio": 15.09,
+        "ratio": 15.69,
         "passesAA": true,
         "adjusted": false
       },
       {
         "pair": "Ink on Primary fill (light)",
-        "ratio": 4.88,
+        "ratio": 5.08,
         "passesAA": true,
         "adjusted": true
       },
       {
         "pair": "Accent on Background (light)",
-        "ratio": 5.32,
+        "ratio": 4.88,
         "passesAA": true,
         "adjusted": true
       },
       {
         "pair": "Muted on Background (light)",
-        "ratio": 4.88,
+        "ratio": 5,
         "passesAA": true,
         "adjusted": true
       }
@@ -362,7 +362,7 @@
   "contrastReport": [
     {
       "pair": "Accent on Background",
-      "ratio": 13.2,
+      "ratio": 8.04,
       "passesAA": true,
       "adjusted": false
     },
@@ -386,7 +386,7 @@
     },
     {
       "pair": "Ink on Primary fill (buttons)",
-      "ratio": 10.22,
+      "ratio": 5.09,
       "passesAA": true,
       "adjusted": true
     }
