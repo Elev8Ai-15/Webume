@@ -38,7 +38,10 @@ export function PublishCard({ isPublic, slug }: PublishCardProps) {
         <CardTitle className="flex items-center gap-2">
           Publish
           {isPublic ? (
-            <Badge variant="outline" className="border-green-500 text-green-500">
+            <Badge
+              variant="outline"
+              className="border-green-500 text-green-500"
+            >
               Live
             </Badge>
           ) : (
@@ -54,14 +57,10 @@ export function PublishCard({ isPublic, slug }: PublishCardProps) {
       <CardContent className="flex flex-wrap items-center gap-2">
         <Button
           onClick={handleToggle}
-          disabled={isPending || !slug}
+          disabled={isPending || (!isPublic && !slug)}
           variant={isPublic ? "outline" : "default"}
         >
-          {isPending
-            ? "Saving..."
-            : isPublic
-              ? "Make private"
-              : "Publish"}
+          {isPending ? "Saving..." : isPublic ? "Make private" : "Publish"}
         </Button>
         {isPublic && slug && <CopyLinkButton slug={slug} />}
         {!slug && (
@@ -98,9 +97,6 @@ export function SlugCard({ slug }: SlugCardProps) {
     });
   }
 
-  const origin =
-    typeof window !== "undefined" ? window.location.origin : "";
-
   return (
     <Card>
       <CardHeader>
@@ -129,7 +125,7 @@ export function SlugCard({ slug }: SlugCardProps) {
           </Button>
         </div>
         <p className="text-sm text-muted-foreground break-all">
-          {origin}/p/{value.trim().toLowerCase() || "your-name"}
+          /p/{value.trim().toLowerCase() || "your-name"}
         </p>
         {error && <p className="text-sm text-destructive">{error}</p>}
         {saved && <p className="text-sm text-green-500">Saved.</p>}

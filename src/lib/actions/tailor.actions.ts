@@ -1,5 +1,6 @@
 "use server";
 
+import { z } from "zod";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
@@ -22,13 +23,30 @@ export async function tailorResume(
   if (!result0) return { success: false, error: "User not found" };
   const { user, profileData } = result0;
 
-  if (!isPremiumUser(user.subscription?.planId ?? "free")) {
+  if (!isPremiumUser(user.subscription)) {
     return { success: false, error: "Premium subscription required" };
   }
 
   if (!profileData) {
     return { success: false, error: "Upload a resume first" };
   }
+
+  const input = z
+    .object({
+      jobTitle: z.string().trim().min(1).max(200),
+      company: z.string().trim().min(1).max(200),
+      jobDescription: z.string().trim().min(20).max(20000),
+      jobUrl: z
+        .union([z.url({ protocol: /^https?$/ }), z.literal("")])
+        .optional(),
+    })
+    .safeParse({ jobTitle, company, jobDescription, jobUrl });
+  if (!input.success)
+    return {
+      success: false,
+      error:
+        "Add a job title, company, and job description (20–20,000 characters), with a valid job URL if provided.",
+    };
 
   try {
     const result = await tailorResumeWithAI(

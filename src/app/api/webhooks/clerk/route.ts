@@ -20,8 +20,8 @@ export async function POST(req: Request) {
     return new Response("Missing svix headers", { status: 400 });
   }
 
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
+  // Signature verification must use the original bytes, not reserialized JSON.
+  const body = await req.text();
 
   const wh = new Webhook(WEBHOOK_SECRET);
   let evt: WebhookEvent;
@@ -41,8 +41,7 @@ export async function POST(req: Request) {
     const email = email_addresses[0]?.email_address;
     if (!email) return new Response("No email", { status: 400 });
 
-    const name =
-      [first_name, last_name].filter(Boolean).join(" ") || "User";
+    const name = [first_name, last_name].filter(Boolean).join(" ") || "User";
     // ensureUser (app layout) may have created the row already.
     const exists = await db.user.findUnique({ where: { clerkId: id } });
     if (!exists) await createUserFromClerk({ clerkId: id, email, name });
@@ -51,8 +50,7 @@ export async function POST(req: Request) {
   if (evt.type === "user.updated") {
     const { id, email_addresses, first_name, last_name } = evt.data;
     const email = email_addresses[0]?.email_address;
-    const name =
-      [first_name, last_name].filter(Boolean).join(" ") || undefined;
+    const name = [first_name, last_name].filter(Boolean).join(" ") || undefined;
 
     await db.user
       .update({

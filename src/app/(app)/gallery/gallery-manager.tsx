@@ -24,6 +24,7 @@ interface MediaAsset {
 
 interface Props {
   media: MediaAsset[];
+  experiences: { id: string; company: string; role: string }[];
 }
 
 const KIND_OPTIONS = [
@@ -36,7 +37,7 @@ const KIND_OPTIONS = [
 
 type UploadState = ActionState<{ id: string; url: string }> | null;
 
-export function GalleryManager({ media }: Props) {
+export function GalleryManager({ media, experiences }: Props) {
   const [state, action, isPending] = useActionState<UploadState, FormData>(
     async (_prev, formData) => uploadMediaAsset(formData),
     null,
@@ -55,15 +56,43 @@ export function GalleryManager({ media }: Props) {
       <Card>
         <CardContent className="p-6">
           <form action={action} className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Upload images you intend to share publicly. Anyone with the image
+              URL can view it, even while your portfolio is private.
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="gallery-chapter">Career chapter</Label>
+              <select
+                id="gallery-chapter"
+                name="experienceId"
+                className="min-h-11 w-full rounded-lg border bg-background px-3 text-sm"
+              >
+                <option value="">Entire portfolio</option>
+                {experiences.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.company} · {e.role}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="file">Photo (max 10MB)</Label>
+                <Label htmlFor="file">Photo (max 4MB)</Label>
                 <Input
                   id="file"
                   name="file"
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/gif"
                   required
+                  onChange={(event) => {
+                    const file = event.currentTarget.files?.[0];
+                    event.currentTarget.setCustomValidity(
+                      file && file.size > 4 * 1024 * 1024
+                        ? "Choose an image smaller than 4 MB."
+                        : "",
+                    );
+                    event.currentTarget.reportValidity();
+                  }}
                 />
               </div>
               <div className="space-y-2">
@@ -117,7 +146,10 @@ export function GalleryManager({ media }: Props) {
       ) : (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
           {media.map((asset) => (
-            <div key={asset.id} className="group relative overflow-hidden rounded-lg border">
+            <div
+              key={asset.id}
+              className="group relative overflow-hidden rounded-lg border"
+            >
               <div className="relative aspect-square">
                 <Image
                   src={asset.url}

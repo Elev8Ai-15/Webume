@@ -31,7 +31,19 @@ const COMMON_KEYWORDS = [
 ];
 
 export function calculateATSScore(profile: ProfileData): ATSResult {
-  const profileText = JSON.stringify(profile).toLowerCase();
+  const profileText = [
+    profile.basics.summary,
+    profile.basics.title,
+    ...profile.skills,
+    ...profile.experience.flatMap((e) => [
+      e.role,
+      e.description,
+      ...e.responsibilities,
+    ]),
+    ...profile.achievements.flatMap((a) => [a.title, a.description]),
+  ]
+    .join(" ")
+    .toLowerCase();
   const skills = profile.skills ?? [];
 
   let score = 0;
@@ -77,9 +89,7 @@ export function calculateATSScore(profile: ProfileData): ATSResult {
     score < 70 ? "Add more quantifiable achievements with numbers" : null,
     skills.length < 10 ? "Add more relevant skills to improve matching" : null,
     !profile.basics?.summary ? "Add a professional summary" : null,
-    profile.experience?.length < 2
-      ? "Add more work experience details"
-      : null,
+    profile.experience?.length < 2 ? "Add more work experience details" : null,
   ].filter((t): t is string => t !== null);
 
   return {
@@ -88,7 +98,9 @@ export function calculateATSScore(profile: ProfileData): ATSResult {
     matches: matches.slice(0, 10),
     suggestions: missing
       .slice(0, 5)
-      .map((k) => `Consider adding "${k}" to your profile`),
+      .map(
+        (k) => `If supported by your experience, describe your work in "${k}"`,
+      ),
     tips,
   };
 }

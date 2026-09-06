@@ -1,3 +1,4 @@
+import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
@@ -13,6 +14,11 @@ export default async function GalleryPage() {
   if (!user) redirect("/sign-in");
 
   const media = await getMediaForUser(user.id);
+  const experiences = await db.experience.findMany({
+    where: { userId: user.id },
+    select: { id: true, company: true, role: true },
+    orderBy: { displayOrder: "asc" },
+  });
 
   return (
     <div className="space-y-6">
@@ -23,7 +29,7 @@ export default async function GalleryPage() {
         </p>
       </div>
       <Separator />
-      <GalleryManager media={media} />
+      <GalleryManager media={media} experiences={experiences} />
     </div>
   );
 }

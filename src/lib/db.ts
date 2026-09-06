@@ -9,7 +9,9 @@ function createPrismaClient(): PrismaClient {
     throw new Error("DATABASE_URL environment variable is not set");
   }
   // pg logs a loud SECURITY WARNING for sslmode=require (Neon default); verify-full is the same behavior, named.
-  const adapter = new PrismaPg(connectionString.replace(/sslmode=require/, "sslmode=verify-full"));
+  const adapter = new PrismaPg(
+    connectionString.replace(/sslmode=require\b/, "sslmode=verify-full"),
+  );
   return new PrismaClient({ adapter });
 }
 

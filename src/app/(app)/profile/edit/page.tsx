@@ -1,8 +1,11 @@
+import { db } from "@/lib/db";
+import { EvidenceForm } from "./evidence-form";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { getProfileByClerkId } from "@/lib/profile/profile.service";
+import { QualificationsForm } from "./qualifications-form";
 import { HeaderForm } from "./header-form";
 import { ExperienceEditor, type ExperienceRow } from "./experience-editor";
 
@@ -13,6 +16,11 @@ export default async function ProfileEditPage() {
   const result = await getProfileByClerkId(userId);
   if (!result) redirect("/sign-in");
   const { user, profileData } = result;
+  const documents = await db.document.findMany({
+    where: { userId: user.id },
+    select: { id: true, title: true, experienceId: true },
+    orderBy: { createdAt: "desc" },
+  });
 
   const basics = profileData?.basics ?? {
     name: user.name,
@@ -57,6 +65,14 @@ export default async function ProfileEditPage() {
       />
 
       <ExperienceEditor experiences={experiences} />
+      <EvidenceForm experiences={experiences} documents={documents} />
+      <QualificationsForm
+        initial={{
+          education: profileData?.education ?? [],
+          certifications: profileData?.certifications ?? [],
+          achievements: profileData?.achievements ?? [],
+        }}
+      />
     </div>
   );
 }

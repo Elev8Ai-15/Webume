@@ -42,6 +42,7 @@ export function assembleProfileData(
   if (!header?.basics) return null;
 
   const experience: ExperienceData[] = user.experiences.map((exp) => ({
+    id: exp.id,
     company: exp.company,
     companyInfo:
       (exp.companyInfo as unknown as CompanyInfo | null) ?? EMPTY_COMPANY_INFO,

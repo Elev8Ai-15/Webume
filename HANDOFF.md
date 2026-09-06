@@ -35,3 +35,18 @@ LIVE at https://webume-bradgpowell1123-2659s-projects.vercel.app (public, Vercel
 - Brad's account currently holds the SAMPLE profile (Sam Test / Bayline Market). He must upload his real resume (replaces it) or edit by hand, then Publish in Settings.
 - Decide: flip Brad's subscription to `pro` in the DB for testing the ATS download, or wait for Stripe. Stripe Pro price ID + keys when he wants checkout live.
 - Founding profile run (above). Career Tree section pick (4 vs 8). OK the §5 deletion list in the vision plan. 10 names.
+
+## 8. 2026-09-06 local review branch (NOT deployed)
+- Branch: `codex/webume-executive-refinement`, based on `5c65208`.
+- Executive portfolio and app shell refined; mobile navigation, expandable chapters, dashboard, and import flow updated.
+- Publishing, import privacy/consent, lockfile, ordering, raw webhook verification, and other fixes are detailed in `docs/WEBUME-REVIEW-2026-09-06.md`.
+- 17 tests passed; clean install and TypeScript passed; lint has one pre-existing Stripe warning. Next compilation succeeded but full build stopped at missing DATABASE_URL. No browser or production journey proof.
+- GitHub write rejected with 403; patch delivery only. No remote branch, PR, or deployment.
+- Payment issues are documented for discussion, not changed. Previously public resume blobs require a separate authorized cleanup.
+
+## 9. Follow-up: GitHub connectivity restored, review delivery
+- Supersedes the payment deferral and patch-only delivery notes in section 8. Brad explicitly requested remaining fixes and repository push.
+- Adds career chapter routes, owned evidence links/gallery association, qualifications editing, one-use testimonial invitations and owner moderation, tailored-resume review and factual checks, and Stripe status/webhook/portal fixes.
+- No schema migrations or production service operations were performed. Free/Pro remain the offered plans; no gold/amber palette introduced.
+- Delivery branch: `codex/webume-executive-refinement`, targeting a draft PR into main. Do not interpret repository delivery as deployed or live-journey verified.
+- Review `docs/WEBUME-REVIEW-2026-09-06.md` for runtime verification requirements, previously public source files, AI quotas, and import/evidence relationship behavior.

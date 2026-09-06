@@ -27,6 +27,8 @@ export async function updateSlug(newSlug: string): Promise<ActionState> {
   const { userId } = await auth();
   if (!userId) return { success: false, error: "Not authenticated" };
 
+  if (typeof newSlug !== "string")
+    return { success: false, error: "Invalid public URL" };
   const slug = newSlug.trim().toLowerCase();
 
   if (!SLUG_PATTERN.test(slug)) {
@@ -52,10 +54,22 @@ export async function updateSlug(newSlug: string): Promise<ActionState> {
   }
 
   const oldSlug = user.slug;
-  await db.user.update({
-    where: { clerkId: userId },
-    data: { slug },
-  });
+  try {
+    await db.user.update({ where: { clerkId: userId }, data: { slug } });
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return {
+        success: false,
+        error: "That slug was just taken. Please choose another.",
+      };
+    }
+    throw error;
+  }
 
   revalidatePath("/dashboard");
   revalidatePath("/settings");
