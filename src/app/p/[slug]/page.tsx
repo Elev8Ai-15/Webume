@@ -10,15 +10,12 @@ import {
 import { getProfileBySlug } from "@/lib/profile/profile.service";
 import {
   getEndorsementsForUser,
-  getCommentsForUser,
   getMediaForUser,
 } from "@/lib/repositories/social.repository";
 import { TemplateRenderer } from "@/components/templates/template-renderer";
 import { getTemplate } from "@/lib/templates/template-registry";
 import { EndorsementsDisplay } from "@/components/social/endorsements-display";
-import { CommentsDisplay } from "@/components/social/comments-display";
 import { GalleryDisplay } from "@/components/social/gallery-display";
-import { SocialActionsPanel } from "@/components/social/social-actions-panel";
 import type { TemplateId } from "@/lib/types/profile";
 
 interface Props {
@@ -65,10 +62,10 @@ export default async function PublicProfilePage({ params }: Props) {
     after(() => incrementProfileViews(slug));
   }
 
-  // Load social data in parallel
-  const [endorsements, comments, media] = await Promise.all([
+  // PDR §5.2: two channels only. Testimonials and photos show when they exist;
+  // no visitor comment box or endorsement form on the public page.
+  const [endorsements, media] = await Promise.all([
     getEndorsementsForUser(user.id),
-    getCommentsForUser(user.id),
     getMediaForUser(user.id),
   ]);
 
@@ -76,37 +73,39 @@ export default async function PublicProfilePage({ params }: Props) {
   const accent = "var(--primary)";
 
   return (
-    <div className="relative min-h-screen bg-background py-10 sm:py-14"><div className="lx-atmo" aria-hidden="true" />
-      <div className="relative mx-auto max-w-3xl space-y-8 px-4">
+    <div className="relative min-h-screen bg-background">
+      <div className="lx-orbs" aria-hidden="true" />
+      <div className="relative mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+        <div className="mb-6 flex items-center justify-between">
+          <span className="font-heading text-lg text-muted-foreground">Webume</span>
+          {profileData.basics.email && (
+            <a
+              href={`mailto:${profileData.basics.email}`}
+              className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground transition hover:brightness-110"
+            >
+              Contact {profileData.basics.name.split(" ")[0]}
+            </a>
+          )}
+        </div>
+
         <TemplateRenderer
           profileData={profileData}
           templateId={user.selectedTemplate as TemplateId}
           profilePhoto={user.profilePhoto}
         />
 
-        <div className="space-y-8 rounded-2xl border border-border bg-card p-6 sm:p-10">
-          <SocialActionsPanel
-            recipientSlug={slug}
-            isOwner={isOwner}
-            suggestedSkills={profileData.skills}
-          />
+        {(endorsements.length > 0 || media.length > 0) && (
+          <div className="mt-8 space-y-8 rounded-2xl border border-white/10 bg-card p-6 sm:p-8">
+            {endorsements.length > 0 && (
+              <EndorsementsDisplay endorsements={endorsements} accentColor={accent} />
+            )}
+            {media.length > 0 && <GalleryDisplay media={media} accentColor={accent} />}
+          </div>
+        )}
 
-          <EndorsementsDisplay
-            endorsements={endorsements}
-            accentColor={accent}
-          />
-
-          <GalleryDisplay media={media} accentColor={accent} />
-
-          <CommentsDisplay comments={comments} accentColor={accent} />
-        </div>
-
-        <footer className="pt-4 pb-8 text-center text-sm text-muted-foreground">
-          <Link
-            href="/"
-            className="font-medium text-primary hover:underline"
-          >
-            Create your own Webume — free
+        <footer className="mt-14 border-t border-white/10 pt-8 text-center text-sm text-muted-foreground">
+          <Link href="/" className="font-medium text-primary hover:underline">
+            Create your own Webume &mdash; free
           </Link>
           <p className="mt-1">The last resume you&apos;ll ever make.</p>
         </footer>

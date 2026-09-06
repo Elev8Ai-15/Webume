@@ -18,14 +18,14 @@ export function EducationSection({
       {education.length > 0 && (
         <div className="space-y-3">
           <h2
-            className="text-lg font-semibold uppercase tracking-wider"
+            className="text-xs font-semibold tracking-[0.2em] uppercase"
             style={{ color: accentColor }}
           >
             Education
           </h2>
           {education.map((edu, i) => (
             <div key={i}>
-              <p className="font-semibold">{edu.degree}</p>
+              <p className="font-heading text-lg">{edu.degree}</p>
               <p className="text-sm text-muted-foreground">
                 {edu.school} {edu.year && `— ${edu.year}`}
               </p>
@@ -40,12 +40,12 @@ export function EducationSection({
       {certifications.length > 0 && (
         <div className="space-y-2">
           <h2
-            className="text-lg font-semibold uppercase tracking-wider"
+            className="text-xs font-semibold tracking-[0.2em] uppercase"
             style={{ color: accentColor }}
           >
             Certifications
           </h2>
-          <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
+          <ul className="space-y-1.5 text-sm text-foreground/85">
             {certifications.map((cert, i) => (
               <li key={i}>{cert}</li>
             ))}

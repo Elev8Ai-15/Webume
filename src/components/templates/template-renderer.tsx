@@ -1,7 +1,4 @@
-"use client";
-
 import type { ProfileData, TemplateId } from "@/lib/types/profile";
-import { getTemplate } from "@/lib/templates/template-registry";
 import { ProfileHero } from "./shared/profile-hero";
 import { ExperienceTimeline } from "./shared/experience-timeline";
 import { SkillsSection } from "./shared/skills-section";
@@ -13,67 +10,76 @@ interface Props {
   profilePhoto?: string | null;
 }
 
-export function TemplateRenderer({
-  profileData,
-  templateId,
-  profilePhoto,
-}: Props) {
-  const template = getTemplate(templateId);
-  // One system for every profile (Vision Plan v2: one template, done well).
-  // Template color skins are ignored; the signature color comes from the tokens.
+/** Executive portfolio layout. One system for every profile (Vision Plan v2);
+ *  template color skins are ignored, the signature color comes from the tokens. */
+export function TemplateRenderer({ profileData, templateId, profilePhoto }: Props) {
   const accent = "var(--primary)";
+  // "By the numbers": the first three metrics across all jobs.
+  const headline = profileData.experience.flatMap((e) => e.metrics).slice(0, 3);
+  const years = profileData.experience.length;
 
   return (
-    <div
-      className="relative mx-auto max-w-3xl space-y-10 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:p-10"
-      data-template={templateId}
-      style={
-        {
-          "--template-primary": template.color,
-          "--template-accent": template.accent2,
-        } as React.CSSProperties
-      }
-    >
-      <div className="lx-spark-line absolute inset-x-0 top-0" aria-hidden="true" />
-      <ProfileHero
-        basics={profileData.basics}
-        profilePhoto={profilePhoto}
-        accentColor={accent}
-      />
+    <article className="mx-auto w-full max-w-4xl" data-template={templateId}>
+      {/* Hero */}
+      <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-card px-6 py-10 sm:px-12 sm:py-14">
+        <div className="lx-atmo" aria-hidden="true" />
+        <div className="lx-spark-line absolute inset-x-0 top-0" aria-hidden="true" />
+        <div className="relative">
+          <ProfileHero basics={profileData.basics} profilePhoto={profilePhoto} accentColor={accent} />
+        </div>
+      </header>
 
-      <ExperienceTimeline
-        experiences={profileData.experience}
-        accentColor={accent}
-      />
+      {/* By the numbers */}
+      {headline.length > 0 && (
+        <section className="mt-5 grid gap-3 sm:grid-cols-3" aria-label="By the numbers">
+          {headline.map((m, i) => (
+            <div key={i} className="lx-gradient-border rounded-2xl px-5 py-5 text-center">
+              <p className="font-heading text-4xl leading-none text-primary">{m.value}</p>
+              <p className="mt-2 text-xs tracking-wide text-muted-foreground uppercase">{m.label}</p>
+            </div>
+          ))}
+        </section>
+      )}
 
-      <SkillsSection skills={profileData.skills} accentColor={accent} />
+      {/* Experience chapters */}
+      <div className="mt-12">
+        <ExperienceTimeline experiences={profileData.experience} accentColor={accent} />
+      </div>
 
-      <EducationSection
-        education={profileData.education}
-        certifications={profileData.certifications}
-        accentColor={accent}
-      />
+      {/* Skills + Education */}
+      <div className="mt-12 grid gap-8 md:grid-cols-[1.2fr_1fr]">
+        <div className="rounded-2xl border border-white/10 bg-card p-6 sm:p-8">
+          <SkillsSection skills={profileData.skills} accentColor={accent} />
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-card p-6 sm:p-8">
+          <EducationSection
+            education={profileData.education}
+            certifications={profileData.certifications}
+            accentColor={accent}
+          />
+        </div>
+      </div>
 
+      {/* Achievements */}
       {profileData.achievements.length > 0 && (
-        <div className="space-y-3">
-          <h2
-            className="text-lg font-semibold uppercase tracking-wider"
-            style={{ color: accent }}
-          >
+        <section className="mt-8 rounded-2xl border border-white/10 bg-card p-6 sm:p-8">
+          <h2 className="text-xs font-semibold tracking-[0.2em] uppercase" style={{ color: accent }}>
             Achievements
           </h2>
-          <div className="space-y-2">
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
             {profileData.achievements.map((a, i) => (
-              <div key={i}>
-                <p className="font-semibold">{a.title}</p>
-                <p className="text-sm text-muted-foreground">
-                  {a.description}
-                </p>
+              <div key={i} className="rounded-xl border border-white/10 bg-background/40 p-4">
+                <p className="font-heading text-lg">{a.title}</p>
+                {a.description && (
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{a.description}</p>
+                )}
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
-    </div>
+
+      <p className="sr-only">{years} positions listed.</p>
+    </article>
   );
 }
