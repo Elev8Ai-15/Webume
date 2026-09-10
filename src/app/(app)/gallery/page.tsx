@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { getUserByClerkId } from "@/lib/repositories/user.repository";
-import { getMediaForUser } from "@/lib/repositories/social.repository";
+import { getMediaForUser } from "@/lib/repositories/career.repository";
 import { GalleryManager } from "./gallery-manager";
 
 export default async function GalleryPage() {

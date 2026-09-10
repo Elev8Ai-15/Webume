@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState, useTransition } from "react";
-import { addActivity, deleteActivity } from "@/lib/actions/social.actions";
+import { addMilestone, deleteMilestone } from "@/lib/actions/milestone.actions";
+import { MILESTONE_KINDS } from "@/lib/milestone-kinds";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,46 +11,41 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { ActionState } from "@/lib/types/actions";
 
-interface Activity {
+interface Milestone {
   id: string;
   kind: string;
   title: string;
   description: string | null;
   date: string;
-  experienceCompany: string | null;
+  company: string | null;
 }
 
 interface Props {
-  activities: Activity[];
+  milestones: Milestone[];
+  jobs: { id: string; company: string; role: string }[];
 }
 
-const KIND_OPTIONS = [
-  { value: "promotion", label: "Promotion" },
-  { value: "review", label: "Performance Review" },
-  { value: "award", label: "Award" },
-  { value: "project", label: "Project Launch" },
-  { value: "certification", label: "Certification" },
-  { value: "custom", label: "Other" },
-];
+const selectClass =
+  "flex h-9 w-full rounded-md border border-border bg-background px-3 text-sm";
 
-export function ActivityManager({ activities }: Props) {
+export function MilestoneManager({ milestones, jobs }: Props) {
   const [state, action, isPending] = useActionState<ActionState | null, FormData>(
     async (_prev, formData) => {
       const kind = formData.get("kind") as string;
       const title = formData.get("title") as string;
       const description = formData.get("description") as string;
       const date = formData.get("date") as string;
-      const company = formData.get("experienceCompany") as string;
-      return addActivity(kind, title, description || null, date, company || null);
+      const experienceId = formData.get("experienceId") as string;
+      return addMilestone(kind, title, description || null, date, experienceId || null);
     },
     null,
   );
   const [isDeleting, startDelete] = useTransition();
 
   function handleDelete(id: string) {
-    if (!confirm("Delete this activity?")) return;
+    if (!confirm("Delete this milestone?")) return;
     startDelete(() => {
-      deleteActivity(id);
+      deleteMilestone(id);
     });
   }
 
@@ -61,15 +57,10 @@ export function ActivityManager({ activities }: Props) {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="kind">Type</Label>
-                <select
-                  id="kind"
-                  name="kind"
-                  className="flex h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
-                  defaultValue="promotion"
-                >
-                  {KIND_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
+                <select id="kind" name="kind" className={selectClass} defaultValue="promotion">
+                  {Object.entries(MILESTONE_KINDS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
                     </option>
                   ))}
                 </select>
@@ -87,20 +78,23 @@ export function ActivityManager({ activities }: Props) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                name="title"
-                placeholder="Promoted to Senior Engineer"
-                required
-              />
+              <Input id="title" name="title" placeholder="Promoted to Store Manager" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="experienceCompany">Company (optional)</Label>
-              <Input
-                id="experienceCompany"
-                name="experienceCompany"
-                placeholder="Acme Corp"
-              />
+              <Label htmlFor="experienceId">Job</Label>
+              <select
+                id="experienceId"
+                name="experienceId"
+                className={selectClass}
+                defaultValue={jobs[0]?.id ?? ""}
+              >
+                <option value="">Career-wide (no single job)</option>
+                {jobs.map((j) => (
+                  <option key={j.id} value={j.id}>
+                    {j.company} · {j.role}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description (optional)</Label>
@@ -108,11 +102,11 @@ export function ActivityManager({ activities }: Props) {
                 id="description"
                 name="description"
                 rows={3}
-                placeholder="Recognized for leading the platform migration project..."
+                placeholder="Led the grand opening of the Brandon location: 40 hires, opened on time."
               />
             </div>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Adding..." : "Add Activity"}
+              {isPending ? "Adding..." : "Add milestone"}
             </Button>
             {state && !state.success && (
               <p className="text-sm text-destructive">{state.error}</p>
@@ -121,36 +115,32 @@ export function ActivityManager({ activities }: Props) {
         </CardContent>
       </Card>
 
-      {activities.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No activity yet.</p>
+      {milestones.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No milestones yet.</p>
       ) : (
         <div className="space-y-3">
-          {activities.map((a) => (
-            <Card key={a.id}>
+          {milestones.map((m) => (
+            <Card key={m.id}>
               <CardContent className="flex items-start justify-between gap-3 p-4">
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs capitalize">
-                      {a.kind}
+                    <Badge variant="outline" className="text-xs">
+                      {MILESTONE_KINDS[m.kind as keyof typeof MILESTONE_KINDS] ?? m.kind}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
-                      {new Date(a.date).toLocaleDateString()}
+                      {new Date(m.date).toLocaleDateString()}
                     </span>
-                    {a.experienceCompany && (
-                      <span className="text-xs text-muted-foreground">
-                        · {a.experienceCompany}
-                      </span>
+                    {m.company && (
+                      <span className="text-xs text-muted-foreground">· {m.company}</span>
                     )}
                   </div>
-                  <p className="font-medium">{a.title}</p>
-                  {a.description && (
-                    <p className="text-sm text-muted-foreground">
-                      {a.description}
-                    </p>
+                  <p className="font-medium">{m.title}</p>
+                  {m.description && (
+                    <p className="text-sm text-muted-foreground">{m.description}</p>
                   )}
                 </div>
                 <button
-                  onClick={() => handleDelete(a.id)}
+                  onClick={() => handleDelete(m.id)}
                   disabled={isDeleting}
                   className="text-xs text-destructive hover:underline"
                 >

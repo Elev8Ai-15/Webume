@@ -12,10 +12,12 @@ import { getProfileBySlug } from "@/lib/profile/profile.service";
 import {
   getApprovedTestimonialsForUser,
   getMediaForUser,
-} from "@/lib/repositories/social.repository";
+  getMilestonesForUser,
+} from "@/lib/repositories/career.repository";
 import { TemplateRenderer } from "@/components/templates/template-renderer";
-import { TestimonialsDisplay } from "@/components/social/testimonials-display";
-import { GalleryDisplay } from "@/components/social/gallery-display";
+import { TestimonialsDisplay } from "@/components/portfolio/testimonials-display";
+import { GalleryDisplay } from "@/components/portfolio/gallery-display";
+import { MilestonesTimeline } from "@/components/portfolio/milestones-timeline";
 import type { TemplateId } from "@/lib/types/profile";
 
 interface Props {
@@ -62,11 +64,12 @@ export default async function PublicProfilePage({ params }: Props) {
     after(() => incrementProfileViews(slug));
   }
 
-  // PDR §5.2: two channels only. Testimonials and photos show when they exist;
-  // no visitor comment box or endorsement form on the public page.
-  const [testimonials, media] = await Promise.all([
+  // PDR §5.2: two channels only. Testimonials, photos and owner-authored
+  // milestones show when they exist; nothing on this page takes visitor input.
+  const [testimonials, media, milestones] = await Promise.all([
     getApprovedTestimonialsForUser(user.id),
     getMediaForUser(user.id),
+    getMilestonesForUser(user.id),
   ]);
 
   const accent = "var(--primary)";
@@ -95,6 +98,17 @@ export default async function PublicProfilePage({ params }: Props) {
           profilePhoto={user.profilePhoto}
           profileHref={`/p/${user.slug}`}
         />
+
+        {milestones.length > 0 && (
+          <div className="mt-8 rounded-2xl border border-white/10 bg-card p-6 sm:p-8">
+            <MilestonesTimeline
+              milestones={milestones.map((m) => ({
+                ...m,
+                company: m.experience?.company ?? null,
+              }))}
+            />
+          </div>
+        )}
 
         {(testimonials.length > 0 || media.length > 0) && (
           <div className="mt-8 space-y-8 rounded-2xl border border-white/10 bg-card p-6 sm:p-8">

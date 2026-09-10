@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 /** Every evidence lookup is scoped to both the job and its owner. */
 export async function getCareerEvidence(userId: string, experienceId: string) {
-  const [documents, testimonials, media] = await Promise.all([
+  const [documents, testimonials, media, milestones] = await Promise.all([
     db.document.findMany({
       where: { userId, experienceId },
       select: { id: true, title: true, url: true, kind: true, year: true },
@@ -22,6 +22,10 @@ export async function getCareerEvidence(userId: string, experienceId: string) {
       where: { userId, experienceId },
       orderBy: { createdAt: "desc" },
     }),
+    db.careerActivity.findMany({
+      where: { userId, experienceId },
+      orderBy: { date: "desc" },
+    }),
   ]);
-  return { documents, testimonials, media };
+  return { documents, testimonials, media, milestones };
 }

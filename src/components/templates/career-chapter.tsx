@@ -2,8 +2,9 @@ import Link from "next/link";
 import { ArrowUpRight, ArrowLeft } from "lucide-react";
 import type { Experience } from "@/lib/types/profile";
 import { ExperienceTimeline } from "./shared/experience-timeline";
-import { TestimonialsDisplay } from "@/components/social/testimonials-display";
-import { GalleryDisplay } from "@/components/social/gallery-display";
+import { TestimonialsDisplay } from "@/components/portfolio/testimonials-display";
+import { GalleryDisplay } from "@/components/portfolio/gallery-display";
+import { MilestonesTimeline } from "@/components/portfolio/milestones-timeline";
 import type { getCareerEvidence } from "@/lib/profile/career.service";
 export function CareerChapter({
   name,
@@ -33,6 +34,10 @@ export function CareerChapter({
       <ExperienceTimeline
         experiences={[experience]}
         accentColor="var(--primary)"
+      />
+      <MilestonesTimeline
+        milestones={evidence.milestones}
+        heading="Milestones in this chapter"
       />
       {evidence.documents.length > 0 && (
         <section>

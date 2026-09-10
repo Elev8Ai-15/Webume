@@ -29,10 +29,6 @@ model User {
   subscription       Subscription?
   tailoredResumes    TailoredResume[]
   settings           UserSettings?
-  endorsementsMade   Endorsement[]    @relation("EndorsementAuthor")
-  endorsementsRcvd   Endorsement[]    @relation("EndorsementRecipient")
-  commentsMade       Comment[]        @relation("CommentAuthor")
-  commentsRcvd       Comment[]        @relation("CommentRecipient")
   mediaAssets        MediaAsset[]
   activities         CareerActivity[]
   experiences        Experience[]
@@ -69,6 +65,7 @@ model Experience {
   media        MediaAsset[]
   documents    Document[]
   testimonials Testimonial[]
+  milestones   CareerActivity[]
 
   @@index([userId, displayOrder])
 }
@@ -126,39 +123,6 @@ model Testimonial {
   @@index([recipientId, status])
 }
 
-model Endorsement {
-  id          String   @id @default(cuid())
-  authorId    String
-  recipientId String
-  skill       String
-  message     String?
-  experienceCompany String?
-  createdAt   DateTime @default(now())
-
-  author    User @relation("EndorsementAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  recipient User @relation("EndorsementRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
-
-  @@index([recipientId])
-  @@index([authorId])
-  @@unique([authorId, recipientId, skill])
-}
-
-model Comment {
-  id          String   @id @default(cuid())
-  authorId    String
-  recipientId String
-  experienceCompany String?
-  body        String
-  approved    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-
-  author    User @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  recipient User @relation("CommentRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
-
-  @@index([recipientId])
-  @@index([createdAt])
-}
-
 model MediaAsset {
   id           String   @id @default(cuid())
   userId       String
@@ -178,18 +142,20 @@ model MediaAsset {
 }
 
 model CareerActivity {
-  id          String   @id @default(cuid())
-  userId      String
-  kind        String   // "promotion", "review", "award", "project", "certification", "custom"
-  title       String
-  description String?
-  date        DateTime
-  experienceCompany String?
-  createdAt   DateTime @default(now())
+  id           String   @id @default(cuid())
+  userId       String
+  experienceId String?
+  kind         String   // "promotion", "win", "launch", "event", "award", "certification", "review", "custom"
+  title        String
+  description  String?
+  date         DateTime
+  createdAt    DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experience Experience? @relation(fields: [experienceId], references: [id], onDelete: SetNull)
 
   @@index([userId])
+  @@index([experienceId])
   @@index([date])
 }
 

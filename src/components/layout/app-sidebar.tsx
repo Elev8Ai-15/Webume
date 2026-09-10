@@ -25,7 +25,7 @@ const groups = [
       { label: "Resume import", href: "/resume", icon: FileUp },
       { label: "Gallery", href: "/gallery", icon: Images },
       { label: "Testimonials", href: "/testimonials", icon: BookOpen },
-      { label: "Career milestones", href: "/activity", icon: Milestone },
+      { label: "Career milestones", href: "/milestones", icon: Milestone },
     ],
   },
   {

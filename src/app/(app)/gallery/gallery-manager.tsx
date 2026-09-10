@@ -5,7 +5,7 @@ import { useActionState, useTransition } from "react";
 import {
   uploadMediaAsset,
   deleteMediaAsset,
-} from "@/lib/actions/social.actions";
+} from "@/lib/actions/media.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
