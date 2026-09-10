@@ -12,6 +12,8 @@ const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
 // ponytail: DOCX cut for v1 — regex tag-stripping on zipped XML produced
 // garbage; add mammoth-based parsing at Gate B if users ask for it.
 const ALLOWED_TYPES = ["application/pdf", "text/plain"];
+const PARSES_PER_DAY = 5;
+const PARSE_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 export async function uploadAndParseResume(
   formData: FormData,
@@ -48,6 +50,22 @@ export async function uploadAndParseResume(
       error: "Confirm replacement of your current profile before importing.",
     };
   }
+
+  // ponytail: fixed daily cap per user; per-plan limits when Pro exists.
+  const windowFresh =
+    Date.now() - user.parseWindowStart.getTime() < PARSE_WINDOW_MS;
+  if (windowFresh && user.parseCount >= PARSES_PER_DAY) {
+    return {
+      success: false,
+      error: `Daily import limit reached (${PARSES_PER_DAY}). Try again tomorrow or edit your profile by hand.`,
+    };
+  }
+  await db.user.update({
+    where: { id: user.id },
+    data: windowFresh
+      ? { parseCount: { increment: 1 } }
+      : { parseCount: 1, parseWindowStart: new Date() },
+  });
 
   try {
     // Process the source in memory. Private resumes must never become public blobs.

@@ -17,6 +17,8 @@ model User {
   resumeUrl        String?
   selectedTemplate String    @default("minimal")
   rawText          String?
+  parseCount       Int       @default(0)
+  parseWindowStart DateTime  @default(now())
   profileData      Json?
   isPublic         Boolean   @default(false)
   profileViews     Int       @default(0)

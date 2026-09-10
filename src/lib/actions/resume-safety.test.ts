@@ -2,6 +2,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   auth: vi.fn(),
   findUser: vi.fn(),
+  updateUser: vi.fn(),
   parse: vi.fn(),
   save: vi.fn(),
   put: vi.fn(),
@@ -9,14 +10,22 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock("@clerk/nextjs/server", () => ({ auth: mocks.auth }));
 vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidate }));
-vi.mock("@/lib/db", () => ({ db: { user: { findUnique: mocks.findUser } } }));
+vi.mock("@/lib/db", () => ({
+  db: { user: { findUnique: mocks.findUser, update: mocks.updateUser } },
+}));
 vi.mock("@/lib/ai/parse-resume", () => ({ parseResumeWithAI: mocks.parse }));
 vi.mock("@/lib/profile/profile.service", () => ({
   saveParsedProfile: mocks.save,
 }));
 vi.mock("@vercel/blob", () => ({ put: mocks.put }));
 import { uploadAndParseResume } from "./resume.actions";
-const user = { id: "u1", slug: "example", profileData: null };
+const user = {
+  id: "u1",
+  slug: "example",
+  profileData: null,
+  parseCount: 0,
+  parseWindowStart: new Date(),
+};
 beforeEach(() => {
   vi.resetAllMocks();
   mocks.auth.mockResolvedValue({ userId: "c1" });
@@ -68,4 +77,18 @@ it("rejects oversized files before AI or database writes", async () => {
   expect((await uploadAndParseResume(data)).success).toBe(false);
   expect(mocks.parse).not.toHaveBeenCalled();
   expect(mocks.save).not.toHaveBeenCalled();
+});
+it("caps AI parses per user per day and resets after the window", async () => {
+  mocks.findUser.mockResolvedValue({ ...user, parseCount: 5 });
+  expect((await uploadAndParseResume(input())).success).toBe(false);
+  expect(mocks.parse).not.toHaveBeenCalled();
+  mocks.findUser.mockResolvedValue({
+    ...user,
+    parseCount: 5,
+    parseWindowStart: new Date(Date.now() - 25 * 60 * 60 * 1000),
+  });
+  expect((await uploadAndParseResume(input())).success).toBe(true);
+  expect(mocks.updateUser).toHaveBeenCalledWith(
+    expect.objectContaining({ data: expect.objectContaining({ parseCount: 1 }) }),
+  );
 });
