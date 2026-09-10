@@ -39,7 +39,7 @@ export default async function DashboardPage() {
       done: !!profile?.experience.length,
     },
     {
-      title: "Share your Webume",
+      title: "Share your Careerory",
       detail: "Publish a link you can use in your next application.",
       href: "/settings",
       done: live,

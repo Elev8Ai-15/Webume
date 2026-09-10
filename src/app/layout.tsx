@@ -20,7 +20,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Webume — The last resume you'll ever make",
+  title: "Careerory — The last resume you'll ever make",
   description:
     "Never rebuild your resume again. Build your career profile once, update it forever, and share it as a link.",
 };

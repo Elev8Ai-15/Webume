@@ -1,6 +1,6 @@
-# Webume
+# Careerory
 
-**Never rebuild your resume again.** Webume turns a resume into a living career profile: build it once, update it forever, share it as a link in any job application.
+**Never rebuild your resume again.** Careerory turns a resume into a living career profile: build it once, update it forever, share it as a link in any job application.
 
 Canonical product decisions live in the PDR (`dev/my-assistant/notes/webume-build/00-PDR-canonical.md` on Brad's machine). Read §5 locked rules before changing product behavior. Headlines: NOT social media (no feed/posts/likes), public profiles have no signup wall, users own and can delete their data, employer-side AI is decision-support only.
 

@@ -50,8 +50,8 @@ export function PublishCard({ isPublic, slug }: PublishCardProps) {
         </CardTitle>
         <CardDescription>
           {isPublic && slug
-            ? `Your Webume is live at /p/${slug}`
-            : "Your Webume is private. Only you can see it."}
+            ? `Your Careerory is live at /p/${slug}`
+            : "Your Careerory is private. Only you can see it."}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-wrap items-center gap-2">
@@ -102,7 +102,7 @@ export function SlugCard({ slug }: SlugCardProps) {
       <CardHeader>
         <CardTitle>Public URL</CardTitle>
         <CardDescription>
-          Choose the address where your Webume lives.
+          Choose the address where your Careerory lives.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">

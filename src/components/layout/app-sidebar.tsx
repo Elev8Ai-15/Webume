@@ -92,7 +92,7 @@ export function AppSidebar() {
         href="/dashboard"
         className="flex h-24 shrink-0 items-center gap-3 px-7 font-heading text-3xl"
       >
-        <span className="text-primary">w.</span>Webume
+        <span className="text-primary">c.</span>Careerory
       </Link>
       <div className="flex-1 overflow-y-auto">
         <AppNavigation />

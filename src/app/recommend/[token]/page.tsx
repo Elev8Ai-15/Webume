@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { RecommendationForm } from "./recommendation-form";
 export const metadata = {
-  title: "Private recommendation request | Webume",
+  title: "Private recommendation request | Careerory",
   robots: { index: false, follow: false },
   referrer: "no-referrer" as const,
 };
@@ -27,7 +27,7 @@ export default async function RecommendationPage({
     );
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
-      <p className="portfolio-eyebrow">Webume / Recommendation</p>
+      <p className="portfolio-eyebrow">Careerory / Recommendation</p>
       <h1 className="mt-4 text-4xl">
         Your experience working with {request.recipient.name}.
       </h1>

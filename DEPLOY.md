@@ -1,4 +1,4 @@
-# Webume — DEPLOY
+# Careerory — DEPLOY
 
 Vercel project `webume` (team `bradgpowell1123-2659s-projects`), GitHub-linked to `Elev8Ai-15/Webume` `main`. Push to `main` = production deploy. Manual: `vercel --prod --cwd C:/Users/bradg/dev/Webume`.
 
@@ -8,7 +8,7 @@ Vercel project `webume` (team `bradgpowell1123-2659s-projects`), GitHub-linked t
 |---|---|---|
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob store `webume` (store_X1RD8tnhvUaKNEth), auto-injected | set 2026-09-05 |
 | `DATABASE_URL` | Neon via Vercel Marketplace, resource `webume`, auto-injected | set 2026-09-05 |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | Clerk app "Webume", dashboard.clerk.com → API Keys | set 2026-09-05 |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | Clerk app "Careerory", dashboard.clerk.com → API Keys | set 2026-09-05 |
 | `CLERK_WEBHOOK_SECRET` | Clerk → Webhooks → endpoint `https://<prod-url>/api/webhooks/clerk`, event `user.created`/`user.updated`/`user.deleted` | after first deploy |
 | `ANTHROPIC_API_KEY` | shared Anthropic org | set 2026-09-05 |
 | `NEXT_PUBLIC_APP_URL` | https://webume-bradgpowell1123-2659s-projects.vercel.app | set 2026-09-05 |

@@ -12,7 +12,7 @@ export default async function SettingsPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
         <p className="text-muted-foreground">
-          Manage your public Webume.
+          Manage your public Careerory.
         </p>
       </div>
       <Separator />

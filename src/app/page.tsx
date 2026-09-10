@@ -41,7 +41,7 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       {/* Nav */}
       <header className="relative z-20 mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
-        <span className="font-heading text-2xl">Webume</span>
+        <span className="font-heading text-2xl">Careerory</span>
         <nav className="flex items-center gap-3 text-sm">
           <Link href="/sign-in" className="px-3 py-2 text-muted-foreground transition-colors hover:text-foreground">
             Sign in
@@ -66,7 +66,7 @@ export default function HomePage() {
             <h1 className="mt-6 text-[clamp(42px,6.2vw,76px)] leading-[1.0] tracking-[-0.02em] text-balance">
               Never rebuild your resume again.
               <br />
-              Meet <span className="lx-foil">Webume</span>.
+              Meet <span className="lx-foil">Careerory</span>.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
               Build your career profile once. Every job gets its own page with
@@ -75,7 +75,7 @@ export default function HomePage() {
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link href="/sign-up" className={pillPrimary}>
-                Build my Webume &mdash; free
+                Build my Careerory &mdash; free
               </Link>
               <Link href="/sign-up" className={pillOutline}>
                 Upload a resume instead
@@ -102,11 +102,11 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Middle layer: the Webume job page */}
+            {/* Middle layer: the Careerory job page */}
             <div className="lx-layer-mid lx-gradient-border relative rounded-2xl p-6 sm:p-7">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-[11px] font-medium tracking-[0.18em] text-primary uppercase">Your Webume</p>
+                  <p className="text-[11px] font-medium tracking-[0.18em] text-primary uppercase">Your Careerory</p>
                   <h3 className="mt-2 text-3xl leading-none">Store Manager</h3>
                   <p className="mt-1 text-sm text-muted-foreground">Bayline Market &middot; 2015 &ndash; Present</p>
                 </div>
@@ -192,7 +192,7 @@ export default function HomePage() {
         <div className="lx-atmo" aria-hidden="true" />
         <div className="relative mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2">
           <div>
-            <p className="text-[12px] font-medium tracking-[0.28em] text-primary uppercase">Why Webume</p>
+            <p className="text-[12px] font-medium tracking-[0.28em] text-primary uppercase">Why Careerory</p>
             <h2 className="mt-4 text-4xl text-balance sm:text-5xl">
               Be honest &mdash; where is your resume right now?
             </h2>
@@ -230,7 +230,7 @@ export default function HomePage() {
           </p>
           <div className="mt-10 flex justify-center">
             <Link href="/sign-up" className={pillPrimary}>
-              Build my Webume &mdash; free
+              Build my Careerory &mdash; free
             </Link>
           </div>
         </div>

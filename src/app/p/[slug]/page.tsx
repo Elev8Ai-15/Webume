@@ -80,7 +80,7 @@ export default async function PublicProfilePage({ params }: Props) {
       <div className="relative mx-auto max-w-6xl px-5 py-6 sm:px-10 sm:py-10">
         <div className="mb-6 flex items-center justify-between">
           <Link href="/" className="font-heading text-2xl">
-            Webume<span className="text-primary">.</span>
+            Careerory<span className="text-primary">.</span>
           </Link>
           {profileData.basics.email && (
             <a
@@ -123,7 +123,7 @@ export default async function PublicProfilePage({ params }: Props) {
 
         <footer className="mt-14 border-t border-white/10 pt-8 text-center text-sm text-muted-foreground">
           <Link href="/" className="font-medium text-primary hover:underline">
-            Create your own Webume &mdash; free
+            Create your own Careerory &mdash; free
           </Link>
           <p className="mt-1">The last resume you&apos;ll ever make.</p>
         </footer>

@@ -37,7 +37,7 @@ export function AppHeader() {
             </SheetTrigger>
             <SheetContent side="left" className="overflow-y-auto">
               <SheetHeader className="px-7 pt-8">
-                <SheetTitle className="text-3xl">Webume</SheetTitle>
+                <SheetTitle className="text-3xl">Careerory</SheetTitle>
                 <SheetDescription>Your career workspace</SheetDescription>
               </SheetHeader>
               <AppNavigation onNavigate={() => setOpen(false)} />

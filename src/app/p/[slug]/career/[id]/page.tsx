@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getProfileBySlug } from "@/lib/profile/profile.service";
 import { getCareerEvidence } from "@/lib/profile/career.service";
 import { CareerChapter } from "@/components/templates/career-chapter";
-export const metadata = { title: "Career chapter | Webume" };
+export const metadata = { title: "Career chapter | Careerory" };
 export default async function PublicCareerPage({
   params,
 }: {

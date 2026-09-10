@@ -58,7 +58,7 @@ export async function createCheckoutSession(
         expires_at: (checkoutHour + 2) * 3600,
       },
       {
-        idempotencyKey: `webume-checkout-${user.id}-${planId}-${checkoutHour}`,
+        idempotencyKey: `careerory-checkout-${user.id}-${planId}-${checkoutHour}`,
       },
     );
     if (!session.url) throw new Error("No checkout URL");
